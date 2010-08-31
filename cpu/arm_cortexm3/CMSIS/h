@@ -1,0 +1,2 @@
+a2fxxxm3.h:#define ENVM_REGS_BASE          0x60100000U
+a2fxxxm3.h:#define ENVM_REGS            ((NVM_TypeDef *) ENVM_REGS_BASE)

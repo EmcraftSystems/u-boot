@@ -1,0 +1,258 @@
+for dir in tools examples/standalone examples/api cpu/arm_cortexm3 /home/vlad/uboot/u-boot/cpu/arm_cortexm3/ ; do \
+			make -C $dir _depend ; done
+make[1]: Entering directory `/home/vlad/uboot/u-boot/tools'
+make[1]: Nothing to be done for `_depend'.
+make[1]: Leaving directory `/home/vlad/uboot/u-boot/tools'
+make[1]: Entering directory `/home/vlad/uboot/u-boot/examples/standalone'
+make[1]: Nothing to be done for `_depend'.
+make[1]: Leaving directory `/home/vlad/uboot/u-boot/examples/standalone'
+make[1]: Entering directory `/home/vlad/uboot/u-boot/examples/api'
+make[1]: Nothing to be done for `_depend'.
+make[1]: Leaving directory `/home/vlad/uboot/u-boot/examples/api'
+make[1]: Entering directory `/home/vlad/uboot/u-boot/cpu/arm_cortexm3'
+make[1]: Leaving directory `/home/vlad/uboot/u-boot/cpu/arm_cortexm3'
+make[1]: Entering directory `/home/vlad/uboot/u-boot/cpu/arm_cortexm3'
+make[1]: Nothing to be done for `_depend'.
+make[1]: Leaving directory `/home/vlad/uboot/u-boot/cpu/arm_cortexm3'
+make[1]: Entering directory `/home/vlad/uboot/u-boot/cpu/arm_cortexm3'
+make[1]: Nothing to be done for `_depend'.
+make[1]: Leaving directory `/home/vlad/uboot/u-boot/cpu/arm_cortexm3'
+make -C tools all
+make[1]: Entering directory `/home/vlad/uboot/u-boot/tools'
+make[1]: Leaving directory `/home/vlad/uboot/u-boot/tools'
+make -C examples/standalone all
+make[1]: Entering directory `/home/vlad/uboot/u-boot/examples/standalone'
+make[1]: Nothing to be done for `all'.
+make[1]: Leaving directory `/home/vlad/uboot/u-boot/examples/standalone'
+make -C examples/api all
+make[1]: Entering directory `/home/vlad/uboot/u-boot/examples/api'
+make[1]: Nothing to be done for `all'.
+make[1]: Leaving directory `/home/vlad/uboot/u-boot/examples/api'
+make -C cpu/arm_cortexm3 start.o
+make[1]: Entering directory `/home/vlad/uboot/u-boot/cpu/arm_cortexm3'
+make[1]: `start.o' is up to date.
+make[1]: Leaving directory `/home/vlad/uboot/u-boot/cpu/arm_cortexm3'
+make -C lib_generic/
+make[1]: Entering directory `/home/vlad/uboot/u-boot/lib_generic'
+make[1]: `libgeneric.a' is up to date.
+make[1]: Leaving directory `/home/vlad/uboot/u-boot/lib_generic'
+make -C lib_generic/lzma/
+make[1]: Entering directory `/home/vlad/uboot/u-boot/lib_generic/lzma'
+arm-none-eabi-ar crv liblzma.a 
+make[1]: Leaving directory `/home/vlad/uboot/u-boot/lib_generic/lzma'
+make -C lib_generic/lzo/
+make[1]: Entering directory `/home/vlad/uboot/u-boot/lib_generic/lzo'
+arm-none-eabi-ar crv liblzo.a 
+make[1]: Leaving directory `/home/vlad/uboot/u-boot/lib_generic/lzo'
+make -C cpu/arm_cortexm3/
+make[1]: Entering directory `/home/vlad/uboot/u-boot/cpu/arm_cortexm3'
+arm-none-eabi-gcc  -g  -Os   -g2 -mthumb -mcpu=cortex-m3 -fsigned-char -O2 -fno-builtin-puts -I/usr/local/arm-toolchain/arm-none-eabi/include  -D__KERNEL__ -I/home/vlad/uboot/u-boot/include -fno-builtin -ffreestanding -isystem /usr/local/arm-toolchain/bin/../lib/gcc/arm-none-eabi/4.2.3/include -pipe  -DCONFIG_ARM -D__ARM__ -Wall -Wstrict-prototypes -fno-stack-protector   -o my_uart.o my_uart.c -c
+arm-none-eabi-ar crv libarm_cortexm3.a cpu.o cmd_cptf.o nvm.o my_uart.o my_lib.o my_printf.o my_dump.o CMSIS/core_cm3.o CMSIS/system_a2fxxxm3.o
+r - cpu.o
+r - cmd_cptf.o
+r - nvm.o
+r - my_uart.o
+r - my_lib.o
+r - my_printf.o
+r - my_dump.o
+r - CMSIS/core_cm3.o
+r - CMSIS/system_a2fxxxm3.o
+make[1]: Leaving directory `/home/vlad/uboot/u-boot/cpu/arm_cortexm3'
+make -C lib_arm/
+make[1]: Entering directory `/home/vlad/uboot/u-boot/lib_arm'
+arm-none-eabi-gcc  -g  -Os   -g2 -mthumb -mcpu=cortex-m3 -fsigned-char -O2 -fno-builtin-puts -I/usr/local/arm-toolchain/arm-none-eabi/include  -D__KERNEL__ -I/home/vlad/uboot/u-boot/include -fno-builtin -ffreestanding -isystem /usr/local/arm-toolchain/bin/../lib/gcc/arm-none-eabi/4.2.3/include -pipe  -DCONFIG_ARM -D__ARM__ -Wall -Wstrict-prototypes -fno-stack-protector   -o board.o board.c -c
+arm-none-eabi-ar crv libarm.a board.o bootm.o cache.o cache-cp15.o interrupts.o reset.o
+r - board.o
+r - bootm.o
+r - cache.o
+r - cache-cp15.o
+r - interrupts.o
+r - reset.o
+make[1]: Leaving directory `/home/vlad/uboot/u-boot/lib_arm'
+make -C fs/cramfs/
+make[1]: Entering directory `/home/vlad/uboot/u-boot/fs/cramfs'
+arm-none-eabi-ar crv libcramfs.a 
+make[1]: Leaving directory `/home/vlad/uboot/u-boot/fs/cramfs'
+make -C fs/fat/
+make[1]: Entering directory `/home/vlad/uboot/u-boot/fs/fat'
+arm-none-eabi-ar crv libfat.a 
+make[1]: Leaving directory `/home/vlad/uboot/u-boot/fs/fat'
+make -C fs/fdos/
+make[1]: Entering directory `/home/vlad/uboot/u-boot/fs/fdos'
+arm-none-eabi-ar crv libfdos.a 
+make[1]: Leaving directory `/home/vlad/uboot/u-boot/fs/fdos'
+make -C fs/jffs2/
+make[1]: Entering directory `/home/vlad/uboot/u-boot/fs/jffs2'
+arm-none-eabi-ar crv libjffs2.a 
+make[1]: Leaving directory `/home/vlad/uboot/u-boot/fs/jffs2'
+make -C fs/reiserfs/
+make[1]: Entering directory `/home/vlad/uboot/u-boot/fs/reiserfs'
+arm-none-eabi-ar crv libreiserfs.a 
+make[1]: Leaving directory `/home/vlad/uboot/u-boot/fs/reiserfs'
+make -C fs/ext2/
+make[1]: Entering directory `/home/vlad/uboot/u-boot/fs/ext2'
+arm-none-eabi-ar crv libext2fs.a 
+make[1]: Leaving directory `/home/vlad/uboot/u-boot/fs/ext2'
+make -C fs/yaffs2/
+make[1]: Entering directory `/home/vlad/uboot/u-boot/fs/yaffs2'
+arm-none-eabi-ar crv libyaffs2.a 
+make[1]: Leaving directory `/home/vlad/uboot/u-boot/fs/yaffs2'
+make -C fs/ubifs/
+make[1]: Entering directory `/home/vlad/uboot/u-boot/fs/ubifs'
+arm-none-eabi-ar crv libubifs.a 
+make[1]: Leaving directory `/home/vlad/uboot/u-boot/fs/ubifs'
+make -C net/
+make[1]: Entering directory `/home/vlad/uboot/u-boot/net'
+arm-none-eabi-ar crv libnet.a 
+make[1]: Leaving directory `/home/vlad/uboot/u-boot/net'
+make -C disk/
+make[1]: Entering directory `/home/vlad/uboot/u-boot/disk'
+make[1]: Nothing to be done for `all'.
+make[1]: Leaving directory `/home/vlad/uboot/u-boot/disk'
+make -C drivers/bios_emulator/
+make[1]: Entering directory `/home/vlad/uboot/u-boot/drivers/bios_emulator'
+arm-none-eabi-ar crv libatibiosemu.a 
+make[1]: Leaving directory `/home/vlad/uboot/u-boot/drivers/bios_emulator'
+make -C drivers/block/
+make[1]: Entering directory `/home/vlad/uboot/u-boot/drivers/block'
+arm-none-eabi-ar crv libblock.a 
+make[1]: Leaving directory `/home/vlad/uboot/u-boot/drivers/block'
+make -C drivers/dma/
+make[1]: Entering directory `/home/vlad/uboot/u-boot/drivers/dma'
+arm-none-eabi-ar crv libdma.a 
+make[1]: Leaving directory `/home/vlad/uboot/u-boot/drivers/dma'
+make -C drivers/fpga/
+make[1]: Entering directory `/home/vlad/uboot/u-boot/drivers/fpga'
+arm-none-eabi-ar crv libfpga.a 
+make[1]: Leaving directory `/home/vlad/uboot/u-boot/drivers/fpga'
+make -C drivers/gpio/
+make[1]: Entering directory `/home/vlad/uboot/u-boot/drivers/gpio'
+arm-none-eabi-ar crv libgpio.a 
+make[1]: Leaving directory `/home/vlad/uboot/u-boot/drivers/gpio'
+make -C drivers/hwmon/
+make[1]: Entering directory `/home/vlad/uboot/u-boot/drivers/hwmon'
+arm-none-eabi-ar crv libhwmon.a 
+make[1]: Leaving directory `/home/vlad/uboot/u-boot/drivers/hwmon'
+make -C drivers/i2c/
+make[1]: Entering directory `/home/vlad/uboot/u-boot/drivers/i2c'
+arm-none-eabi-ar crv libi2c.a 
+make[1]: Leaving directory `/home/vlad/uboot/u-boot/drivers/i2c'
+make -C drivers/input/
+make[1]: Entering directory `/home/vlad/uboot/u-boot/drivers/input'
+arm-none-eabi-ar crv libinput.a 
+make[1]: Leaving directory `/home/vlad/uboot/u-boot/drivers/input'
+make -C drivers/misc/
+make[1]: Entering directory `/home/vlad/uboot/u-boot/drivers/misc'
+arm-none-eabi-ar crv libmisc.a 
+make[1]: Leaving directory `/home/vlad/uboot/u-boot/drivers/misc'
+make -C drivers/mmc/
+make[1]: Entering directory `/home/vlad/uboot/u-boot/drivers/mmc'
+arm-none-eabi-ar crv libmmc.a 
+make[1]: Leaving directory `/home/vlad/uboot/u-boot/drivers/mmc'
+make -C drivers/mtd/
+make[1]: Entering directory `/home/vlad/uboot/u-boot/drivers/mtd'
+arm-none-eabi-ar crv libmtd.a 
+make[1]: Leaving directory `/home/vlad/uboot/u-boot/drivers/mtd'
+make -C drivers/mtd/nand/
+make[1]: Entering directory `/home/vlad/uboot/u-boot/drivers/mtd/nand'
+arm-none-eabi-ar crv libnand.a 
+make[1]: Leaving directory `/home/vlad/uboot/u-boot/drivers/mtd/nand'
+make -C drivers/mtd/onenand/
+make[1]: Entering directory `/home/vlad/uboot/u-boot/drivers/mtd/onenand'
+arm-none-eabi-ar crv libonenand.a 
+make[1]: Leaving directory `/home/vlad/uboot/u-boot/drivers/mtd/onenand'
+make -C drivers/mtd/ubi/
+make[1]: Entering directory `/home/vlad/uboot/u-boot/drivers/mtd/ubi'
+arm-none-eabi-ar crv libubi.a 
+make[1]: Leaving directory `/home/vlad/uboot/u-boot/drivers/mtd/ubi'
+make -C drivers/mtd/spi/
+make[1]: Entering directory `/home/vlad/uboot/u-boot/drivers/mtd/spi'
+arm-none-eabi-ar crv libspi_flash.a 
+make[1]: Leaving directory `/home/vlad/uboot/u-boot/drivers/mtd/spi'
+make -C drivers/net/
+make[1]: Entering directory `/home/vlad/uboot/u-boot/drivers/net'
+arm-none-eabi-ar crv libnet.a 
+make[1]: Leaving directory `/home/vlad/uboot/u-boot/drivers/net'
+make -C drivers/net/phy/
+make[1]: Entering directory `/home/vlad/uboot/u-boot/drivers/net/phy'
+arm-none-eabi-ar crv libphy.a 
+make[1]: Leaving directory `/home/vlad/uboot/u-boot/drivers/net/phy'
+make -C drivers/pci/
+make[1]: Entering directory `/home/vlad/uboot/u-boot/drivers/pci'
+arm-none-eabi-ar crv libpci.a 
+make[1]: Leaving directory `/home/vlad/uboot/u-boot/drivers/pci'
+make -C drivers/pcmcia/
+make[1]: Entering directory `/home/vlad/uboot/u-boot/drivers/pcmcia'
+make[1]: Nothing to be done for `all'.
+make[1]: Leaving directory `/home/vlad/uboot/u-boot/drivers/pcmcia'
+make -C drivers/power/
+make[1]: Entering directory `/home/vlad/uboot/u-boot/drivers/power'
+arm-none-eabi-ar crv libpower.a 
+make[1]: Leaving directory `/home/vlad/uboot/u-boot/drivers/power'
+make -C drivers/spi/
+make[1]: Entering directory `/home/vlad/uboot/u-boot/drivers/spi'
+arm-none-eabi-ar crv libspi.a 
+make[1]: Leaving directory `/home/vlad/uboot/u-boot/drivers/spi'
+make -C drivers/rtc/
+make[1]: Entering directory `/home/vlad/uboot/u-boot/drivers/rtc'
+make[1]: Nothing to be done for `all'.
+make[1]: Leaving directory `/home/vlad/uboot/u-boot/drivers/rtc'
+make -C drivers/serial/
+make[1]: Entering directory `/home/vlad/uboot/u-boot/drivers/serial'
+make[1]: Nothing to be done for `all'.
+make[1]: Leaving directory `/home/vlad/uboot/u-boot/drivers/serial'
+make -C drivers/twserial/
+make[1]: Entering directory `/home/vlad/uboot/u-boot/drivers/twserial'
+arm-none-eabi-ar crv libtws.a 
+make[1]: Leaving directory `/home/vlad/uboot/u-boot/drivers/twserial'
+make -C drivers/usb/gadget/
+make[1]: Entering directory `/home/vlad/uboot/u-boot/drivers/usb/gadget'
+arm-none-eabi-ar crv libusb_gadget.a 
+make[1]: Leaving directory `/home/vlad/uboot/u-boot/drivers/usb/gadget'
+make -C drivers/usb/host/
+make[1]: Entering directory `/home/vlad/uboot/u-boot/drivers/usb/host'
+arm-none-eabi-ar crv libusb_host.a 
+make[1]: Leaving directory `/home/vlad/uboot/u-boot/drivers/usb/host'
+make -C drivers/usb/musb/
+make[1]: Entering directory `/home/vlad/uboot/u-boot/drivers/usb/musb'
+arm-none-eabi-ar crv libusb_musb.a 
+make[1]: Leaving directory `/home/vlad/uboot/u-boot/drivers/usb/musb'
+make -C drivers/usb/phy/
+make[1]: Entering directory `/home/vlad/uboot/u-boot/drivers/usb/phy'
+make[1]: Nothing to be done for `all'.
+make[1]: Leaving directory `/home/vlad/uboot/u-boot/drivers/usb/phy'
+make -C drivers/video/
+make[1]: Entering directory `/home/vlad/uboot/u-boot/drivers/video'
+make[1]: Nothing to be done for `all'.
+make[1]: Leaving directory `/home/vlad/uboot/u-boot/drivers/video'
+make -C drivers/watchdog/
+make[1]: Entering directory `/home/vlad/uboot/u-boot/drivers/watchdog'
+arm-none-eabi-ar crv libwatchdog.a 
+make[1]: Leaving directory `/home/vlad/uboot/u-boot/drivers/watchdog'
+make -C common/
+make[1]: Entering directory `/home/vlad/uboot/u-boot/common'
+make[1]: Nothing to be done for `all'.
+make[1]: Leaving directory `/home/vlad/uboot/u-boot/common'
+make -C libfdt/
+make[1]: Entering directory `/home/vlad/uboot/u-boot/libfdt'
+arm-none-eabi-ar crv libfdt.a 
+make[1]: Leaving directory `/home/vlad/uboot/u-boot/libfdt'
+make -C api/
+make[1]: Entering directory `/home/vlad/uboot/u-boot/api'
+arm-none-eabi-ar crv libapi.a 
+make[1]: Leaving directory `/home/vlad/uboot/u-boot/api'
+make -C post/
+make[1]: Entering directory `/home/vlad/uboot/u-boot/post'
+make[1]: Nothing to be done for `all'.
+make[1]: Leaving directory `/home/vlad/uboot/u-boot/post'
+make -C board/actel/actel_f2/
+make[1]: Entering directory `/home/vlad/uboot/u-boot/board/actel/actel_f2'
+make[1]: `libactel_f2.a' is up to date.
+make[1]: Leaving directory `/home/vlad/uboot/u-boot/board/actel/actel_f2'
+make -C /home/vlad/uboot/u-boot/cpu/arm_cortexm3/ u-boot.lds
+make[1]: Entering directory `/home/vlad/uboot/u-boot/cpu/arm_cortexm3'
+make[1]: Nothing to be done for `u-boot.lds'.
+make[1]: Leaving directory `/home/vlad/uboot/u-boot/cpu/arm_cortexm3'
+UNDEF_SYM=`arm-none-eabi-objdump -x board/actel/actel_f2/libactel_f2.a lib_generic/libgeneric.a lib_generic/lzma/liblzma.a lib_generic/lzo/liblzo.a cpu/arm_cortexm3/libarm_cortexm3.a lib_arm/libarm.a fs/cramfs/libcramfs.a fs/fat/libfat.a fs/fdos/libfdos.a fs/jffs2/libjffs2.a fs/reiserfs/libreiserfs.a fs/ext2/libext2fs.a fs/yaffs2/libyaffs2.a fs/ubifs/libubifs.a net/libnet.a disk/libdisk.a drivers/bios_emulator/libatibiosemu.a drivers/block/libblock.a drivers/dma/libdma.a drivers/fpga/libfpga.a drivers/gpio/libgpio.a drivers/hwmon/libhwmon.a drivers/i2c/libi2c.a drivers/input/libinput.a drivers/misc/libmisc.a drivers/mmc/libmmc.a drivers/mtd/libmtd.a drivers/mtd/nand/libnand.a drivers/mtd/onenand/libonenand.a drivers/mtd/ubi/libubi.a drivers/mtd/spi/libspi_flash.a drivers/net/libnet.a drivers/net/phy/libphy.a drivers/pci/libpci.a drivers/pcmcia/libpcmcia.a drivers/power/libpower.a drivers/spi/libspi.a drivers/rtc/librtc.a drivers/serial/libserial.a drivers/twserial/libtws.a drivers/usb/gadget/libusb_gadget.a drivers/usb/host/libusb_host.a drivers/usb/musb/libusb_musb.a drivers/usb/phy/libusb_phy.a drivers/video/libvideo.a drivers/watchdog/libwatchdog.a common/libcommon.a libfdt/libfdt.a api/libapi.a post/libpost.a | sed  -n -e 's/.*\(__u_boot_cmd_.*\)/-u\1/p'|sort|uniq`; cd /home/vlad/uboot/u-boot && arm-none-eabi-ld -Bstatic -T u-boot.lds  $UNDEF_SYM cpu/arm_cortexm3/start.o --start-group lib_generic/libgeneric.a lib_generic/lzma/liblzma.a lib_generic/lzo/liblzo.a cpu/arm_cortexm3/libarm_cortexm3.a lib_arm/libarm.a fs/cramfs/libcramfs.a fs/fat/libfat.a fs/fdos/libfdos.a fs/jffs2/libjffs2.a fs/reiserfs/libreiserfs.a fs/ext2/libext2fs.a fs/yaffs2/libyaffs2.a fs/ubifs/libubifs.a net/libnet.a disk/libdisk.a drivers/bios_emulator/libatibiosemu.a drivers/block/libblock.a drivers/dma/libdma.a drivers/fpga/libfpga.a drivers/gpio/libgpio.a drivers/hwmon/libhwmon.a drivers/i2c/libi2c.a drivers/input/libinput.a drivers/misc/libmisc.a drivers/mmc/libmmc.a drivers/mtd/libmtd.a drivers/mtd/nand/libnand.a drivers/mtd/onenand/libonenand.a drivers/mtd/ubi/libubi.a drivers/mtd/spi/libspi_flash.a drivers/net/libnet.a drivers/net/phy/libphy.a drivers/pci/libpci.a drivers/pcmcia/libpcmcia.a drivers/power/libpower.a drivers/spi/libspi.a drivers/rtc/librtc.a drivers/serial/libserial.a drivers/twserial/libtws.a drivers/usb/gadget/libusb_gadget.a drivers/usb/host/libusb_host.a drivers/usb/musb/libusb_musb.a drivers/usb/phy/libusb_phy.a drivers/video/libvideo.a drivers/watchdog/libwatchdog.a common/libcommon.a libfdt/libfdt.a api/libapi.a post/libpost.a board/actel/actel_f2/libactel_f2.a --end-group -L /usr/local/arm-toolchain/bin/../lib/gcc/arm-none-eabi/4.2.3/thumb2 -lgcc -Map u-boot.map -o u-boot
+arm-none-eabi-objcopy -O srec u-boot u-boot.srec
+arm-none-eabi-objcopy --gap-fill=0xff -O binary u-boot u-boot.bin

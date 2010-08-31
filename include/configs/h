@@ -1,0 +1,950 @@
+A3000.h:#define CONFIG_ENV_SIZE		0x00020000 /* Size of the Environment		*/
+a320evb.h:#define CONFIG_SYS_MALLOC_LEN		(CONFIG_ENV_SIZE + 128 * 1024)
+a320evb.h:#define CONFIG_ENV_SIZE			0x20000
+acadia.h:#define	CONFIG_ENV_SIZE		0x4000	/* Total Size of Environment Sector	*/
+acadia.h:#define CONFIG_ENV_SIZE_REDUND	(CONFIG_ENV_SIZE)
+acadia.h:#define CONFIG_ENV_SIZE		CONFIG_SYS_NAND_BLOCK_SIZE
+acadia.h:#define CONFIG_ENV_OFFSET		(CONFIG_SYS_NAND_U_BOOT_OFFS + CONFIG_ENV_SIZE)
+acadia.h:#define CONFIG_ENV_OFFSET_REDUND	(CONFIG_ENV_OFFSET + CONFIG_ENV_SIZE)
+actel_f2.h:#define CONFIG_ENV_SIZE 10
+actux1.h:#define CONFIG_SYS_MALLOC_LEN			(CONFIG_ENV_SIZE + 128*1024)
+actux1.h:#define CONFIG_ENV_SIZE			0x2000
+actux2.h:#define CONFIG_SYS_MALLOC_LEN			(CONFIG_ENV_SIZE + 128*1024)
+actux2.h:#define CONFIG_ENV_SIZE			0x2000
+actux3.h:#define CONFIG_SYS_MALLOC_LEN			(CONFIG_ENV_SIZE + 128*1024)
+actux3.h:#define CONFIG_ENV_SIZE			0x2000
+actux4.h:#define CONFIG_SYS_MALLOC_LEN			(CONFIG_ENV_SIZE + 128*1024)
+actux4.h:#define CONFIG_ENV_SIZE			0x1000
+ADCIOP.h:#define CONFIG_ENV_SIZE		0x0400		/* Size of Environment vars	*/
+ADCIOP.h:	(CONFIG_SYS_NVRAM_BASE_ADDR+CONFIG_SYS_NVRAM_SIZE-CONFIG_ENV_SIZE)	/* Env	*/
+ADCIOP.h:#define CONFIG_ENV_SIZE		0x1000	/* Total Size of Environment Sector	*/
+ADNPESC1.h:#define CONFIG_SYS_MALLOC_LEN		(CONFIG_ENV_SIZE + 128*1024)
+ADNPESC1.h:#define CONFIG_ENV_SIZE		(64 * 1024)	/* 64 KByte (1 sector)	*/
+ADNPESC1.h:#if	((CONFIG_ENV_ADDR + CONFIG_ENV_SIZE) == 0x1050000)
+aev.h:#define CONFIG_ENV_SIZE		0x10000
+aev.h:#define	CONFIG_ENV_SIZE_REDUND	(CONFIG_ENV_SIZE)
+afeb9260.h:#define CONFIG_ENV_SIZE		0x4200
+afeb9260.h:#define CONFIG_SYS_MALLOC_LEN		ROUND(3 * CONFIG_ENV_SIZE + 128*1024, 0x1000)
+Alaska8220.h:#define CONFIG_ENV_SIZE		256
+Alaska8220.h:#define CONFIG_ENV_SIZE		PHYS_AMD_SECT_SIZE
+Alaska8220.h:#define CONFIG_ENV_SIZE		PHYS_INTEL_SECT_SIZE
+alpr.h:#define	CONFIG_ENV_SIZE		0x2000	/* Total Size of Environment Sector	*/
+alpr.h:#define CONFIG_ENV_SIZE_REDUND	(CONFIG_ENV_SIZE)
+AmigaOneG3SE.h:#define CONFIG_ENV_SIZE		0x8000	   /* Size of the Environment. See comment above */
+AMX860.h:#define	CONFIG_ENV_SIZE		0x4000	/* Total Size of Environment Sector	*/
+AP1000.h:#define CONFIG_ENV_SIZE		0x1000	/* Total Size of Environment Sector */
+AP1000.h:#define CONFIG_ENV_SIZE		0x1000		/* Size of Environment vars */
+AP1000.h:    (CONFIG_SYS_NVRAM_BASE_ADDR+CONFIG_SYS_NVRAM_SIZE-CONFIG_ENV_SIZE)	/* Env	*/
+ap325rxa.h:#define CONFIG_ENV_SIZE		(CONFIG_ENV_SECT_SIZE)
+ap325rxa.h:#define CONFIG_ENV_SIZE_REDUND	(CONFIG_ENV_SECT_SIZE)
+APC405.h:#define CONFIG_ENV_SIZE		0x800	/* 2048 bytes may be used for env vars*/
+apollon.h:#define	CONFIG_ENV_SIZE SZ_128K	/* Total Size of Environment Sector */
+apollon.h:#define CONFIG_ENV_SIZE_FLEX SZ_256K
+apollon.h:#define	CONFIG_SYS_MALLOC_LEN	(CONFIG_ENV_SIZE + SZ_1M)
+AR405.h:#define CONFIG_ENV_SIZE		0x04000	        /* Size of Environment	        */
+AR405.h:#define CONFIG_ENV_SIZE_REDUND	CONFIG_ENV_SIZE
+aria.h:#define CONFIG_ENV_SIZE			0x2000
+aria.h:#define CONFIG_ENV_SIZE_REDUND		(CONFIG_ENV_SIZE)
+armadillo.h:#define CONFIG_SYS_MALLOC_LEN		(CONFIG_ENV_SIZE + 128*1024)
+armadillo.h:#define CONFIG_ENV_SIZE		0x20000	/* Total Size of Environment Sector	*/
+ASH405.h:#define CONFIG_ENV_SIZE		0x700	/* 2048 bytes may be used for env vars*/
+assabet.h:#define CONFIG_SYS_MALLOC_LEN          (CONFIG_ENV_SIZE + 128*1024)
+assabet.h:#define CONFIG_ENV_SIZE		PHYS_FLASH_SECT_SIZE
+at91cap9adk.h:#define CONFIG_ENV_SIZE		0x4200
+at91cap9adk.h:#define CONFIG_ENV_SIZE		0x4000
+at91cap9adk.h:#define CONFIG_SYS_MALLOC_LEN		ROUND(CONFIG_ENV_SIZE + 128*1024, 0x1000)
+at91rm9200dk.h:#define CONFIG_SYS_MALLOC_LEN	(CONFIG_ENV_SIZE + 128*1024)
+at91rm9200dk.h:#define CONFIG_ENV_SIZE			0x2000  /* 0x8000 */
+at91rm9200dk.h:#define CONFIG_ENV_SIZE			0x2000  /* 0x8000 */
+at91rm9200dk.h:#define CONFIG_ENV_SIZE			0x10000 /* sectors are 64K here */
+at91rm9200ek.h:#define CONFIG_ENV_SIZE			0x2000
+at91rm9200ek.h:#define CONFIG_ENV_SIZE			0x10000 /* sectors are 64K here */
+at91rm9200ek.h:#define CONFIG_ENV_SIZE			0x10000 /* sectors are 64K here */
+at91rm9200ek.h:#define CONFIG_SYS_MALLOC_LEN		ROUND(3 * CONFIG_ENV_SIZE + 128 * 1024 \
+at91sam9260ek.h:#define CONFIG_ENV_SIZE		0x4200
+at91sam9260ek.h:#define CONFIG_ENV_SIZE		0x4200
+at91sam9260ek.h:#define CONFIG_ENV_SIZE		0x20000		/* 1 sector = 128 kB */
+at91sam9260ek.h:#define CONFIG_SYS_MALLOC_LEN		ROUND(3 * CONFIG_ENV_SIZE + 128*1024, 0x1000)
+at91sam9261ek.h:#define CONFIG_ENV_SIZE		0x4200
+at91sam9261ek.h:#define CONFIG_ENV_SIZE		0x4200
+at91sam9261ek.h:#define CONFIG_ENV_SIZE		0x20000		/* 1 sector = 128 kB */
+at91sam9261ek.h:#define CONFIG_SYS_MALLOC_LEN		ROUND(3 * CONFIG_ENV_SIZE + 128*1024, 0x1000)
+at91sam9263ek.h:#define CONFIG_ENV_ADDR_REDUND	(CONFIG_ENV_ADDR - CONFIG_ENV_SIZE)
+at91sam9263ek.h:#define CONFIG_ENV_SIZE		0x2000
+at91sam9263ek.h:#define CONFIG_ENV_SIZE		0x4200
+at91sam9263ek.h:#define CONFIG_ENV_SIZE		0x20000		/* 1 sector = 128 kB */
+at91sam9263ek.h:#define CONFIG_SYS_MALLOC_LEN		ROUND(3 * CONFIG_ENV_SIZE + 128*1024, 0x1000)
+at91sam9m10g45ek.h:#define CONFIG_ENV_SIZE		0x4200
+at91sam9m10g45ek.h:#define CONFIG_ENV_SIZE		0x20000		/* 1 sector = 128 kB */
+at91sam9m10g45ek.h:#define CONFIG_SYS_MALLOC_LEN		ROUND(3 * CONFIG_ENV_SIZE + 128*1024, 0x1000)
+at91sam9rlek.h:#define CONFIG_ENV_SIZE		0x4200
+at91sam9rlek.h:#define CONFIG_ENV_SIZE		0x20000		/* 1 sector = 128 kB */
+at91sam9rlek.h:#define CONFIG_SYS_MALLOC_LEN		ROUND(3 * CONFIG_ENV_SIZE + 128*1024, 0x1000)
+atc.h:# define CONFIG_ENV_SIZE		0x10000
+atc.h:#define CONFIG_ENV_SIZE		2048
+atngw100.h:#define CONFIG_ENV_SIZE			65536
+atngw100.h:#define CONFIG_ENV_ADDR			(CONFIG_SYS_FLASH_BASE + CONFIG_SYS_FLASH_SIZE - CONFIG_ENV_SIZE)
+atstk1002.h:#define CONFIG_ENV_SIZE			65536
+atstk1002.h:#define CONFIG_ENV_ADDR			(CONFIG_SYS_FLASH_BASE + CONFIG_SYS_FLASH_SIZE - CONFIG_ENV_SIZE)
+atstk1003.h:#define CONFIG_ENV_SIZE			65536
+atstk1003.h:#define CONFIG_ENV_ADDR			(CONFIG_SYS_FLASH_BASE + CONFIG_SYS_FLASH_SIZE - CONFIG_ENV_SIZE)
+atstk1004.h:#define CONFIG_ENV_SIZE			65536
+atstk1004.h:#define CONFIG_ENV_ADDR			(CONFIG_SYS_FLASH_BASE + CONFIG_SYS_FLASH_SIZE - CONFIG_ENV_SIZE)
+atstk1006.h:#define CONFIG_ENV_SIZE			65536
+atstk1006.h:#define CONFIG_ENV_ADDR			(CONFIG_SYS_FLASH_BASE + CONFIG_SYS_FLASH_SIZE - CONFIG_ENV_SIZE)
+ATUM8548.h:#define CONFIG_ENV_SIZE		0x2000
+B2.h:#define CONFIG_ENV_SIZE		1024		/* 1024 bytes may be used for env vars*/
+B2.h:#define CONFIG_SYS_MALLOC_LEN		(CONFIG_ENV_SIZE + 128*1024 )
+BAB7xx.h:#define CONFIG_ENV_SIZE            0x400       /* Size of Environment vars (1kB) */
+bamboo.h:#define	CONFIG_ENV_SIZE		0x2000	/* Total Size of Environment Sector	*/
+bamboo.h:#define CONFIG_ENV_SIZE_REDUND	(CONFIG_ENV_SIZE)
+bamboo.h:#define CONFIG_ENV_SIZE		CONFIG_SYS_NAND_BLOCK_SIZE
+bamboo.h:#define CONFIG_ENV_OFFSET		(CONFIG_SYS_NAND_U_BOOT_OFFS + CONFIG_ENV_SIZE)
+bamboo.h:#define CONFIG_ENV_OFFSET_REDUND	(CONFIG_ENV_OFFSET + CONFIG_ENV_SIZE)
+bamboo.h:#define CONFIG_ENV_SIZE		0x200	    /* Size of Environment vars */
+barco.h:#define CONFIG_ENV_SIZE		0x00002000	/* Total Size of Environment Sector */
+BC3450.h:#define CONFIG_ENV_SIZE		0x10000
+BC3450.h:#define CONFIG_ENV_SIZE_REDUND	(CONFIG_ENV_SIZE)
+bf518f-ezbrd.h:#define CONFIG_ENV_SIZE		0x2000
+bf518f-ezbrd.h:#define CONFIG_ENV_SIZE		0x2000
+bf526-ezbrd.h:#define CONFIG_ENV_SIZE		0x2000
+bf526-ezbrd.h:#define CONFIG_ENV_SIZE		0x2000
+bf527-ezkit.h:#define CONFIG_ENV_SIZE		0x2000
+bf527-ezkit.h:#define CONFIG_ENV_SIZE		0x20000
+bf527-ezkit.h:#define CONFIG_ENV_SIZE		0x2000
+bf533-stamp.h:#define CONFIG_ENV_SIZE		0x2000
+bf533-stamp.h:#define CONFIG_ENV_SIZE		0x2000
+bf537-minotaur.h:#define CONFIG_ENV_SIZE		0x10000
+bf537-pnav.h:#define CONFIG_ENV_SIZE		0x1000
+bf537-srv1.h:#define CONFIG_ENV_SIZE		0x10000
+bf537-stamp.h:#define CONFIG_ENV_SIZE		0x2000
+bf537-stamp.h:#define CONFIG_ENV_SIZE		0x2000
+bf538f-ezkit.h:#define CONFIG_ENV_SIZE		0x2000
+bf538f-ezkit.h:#define CONFIG_ENV_SIZE		0x2000
+bf548-ezkit.h:#define CONFIG_ENV_SIZE		0x2000
+bf548-ezkit.h:#define CONFIG_ENV_SIZE		0x20000
+bf548-ezkit.h:#define CONFIG_ENV_SIZE		0x2000
+bf561-acvilon.h:#define CONFIG_ENV_SIZE				(8 * 1056)
+bf561-acvilon.h:#define CONFIG_ENV_OFFSET_REDUND	(CONFIG_ENV_OFFSET + CONFIG_ENV_SIZE)
+bf561-ezkit.h:#define CONFIG_ENV_SIZE		0x2000
+blackstamp.h:#define CONFIG_ENV_SIZE		0x2000
+BMW.h:#define CONFIG_ENV_SIZE		0x1ff0	/* Size of the Environment - 8K	   */
+bubinga.h:#define	CONFIG_ENV_SIZE		0x4000	/* Total Size of Environment Sector	*/
+bubinga.h:#define CONFIG_ENV_SIZE_REDUND	(CONFIG_ENV_SIZE)
+bubinga.h:#define CONFIG_ENV_SIZE		0x0ff8		/* Size of Environment vars	*/
+bubinga.h:	(CONFIG_SYS_NVRAM_BASE_ADDR+CONFIG_SYS_NVRAM_SIZE-CONFIG_ENV_SIZE)	/* Env	*/
+c2mon.h:#define	CONFIG_ENV_SIZE		0x4000	/* Total Size of Environment Sector	*/
+CANBT.h:#define CONFIG_ENV_SIZE		0x1000	/* Total Size of Environment Sector	*/
+CANBT.h:#define CONFIG_ENV_SIZE		0x400	/* 1024 bytes may be used for env vars */
+canmb.h:#define CONFIG_ENV_SIZE		0x2000
+canyonlands.h:#define CONFIG_ENV_SIZE		CONFIG_SYS_NAND_BLOCK_SIZE
+canyonlands.h:#define CONFIG_ENV_OFFSET		(CONFIG_SYS_NAND_U_BOOT_OFFS + CONFIG_ENV_SIZE)
+canyonlands.h:#define CONFIG_ENV_OFFSET_REDUND	(CONFIG_ENV_OFFSET + CONFIG_ENV_SIZE)
+canyonlands.h:#define	CONFIG_ENV_SIZE		0x4000	/* Total Size of Environment Sector	*/
+canyonlands.h:#define CONFIG_ENV_SIZE_REDUND	(CONFIG_ENV_SIZE)
+CATcenter.h:#define CONFIG_ENV_SIZE_REDUND	0x2000
+CCM.h:#define	CONFIG_ENV_SIZE		0x4000	/* Total Size of Environment Sector	*/
+CCM.h:#define CONFIG_ENV_OFFSET_REDUND	(CONFIG_ENV_OFFSET+CONFIG_ENV_SIZE)
+CCM.h:#define CONFIG_ENV_SIZE_REDUND	(CONFIG_ENV_SIZE)
+CCM.h:#define CONFIG_ENV_SIZE		2048
+cerf250.h:#define CONFIG_SYS_MALLOC_LEN	    (CONFIG_ENV_SIZE + 128*1024)
+cerf250.h:#define CONFIG_ENV_SIZE		0x40000	/* Total Size of Environment Sector	*/
+cm4008.h:#define CONFIG_SYS_MALLOC_LEN		(CONFIG_ENV_SIZE + 128*1024)
+cm4008.h:#define CONFIG_ENV_SIZE		0x20000     /* Total Size of Environment */
+cm41xx.h:#define CONFIG_SYS_MALLOC_LEN		(CONFIG_ENV_SIZE + 128*1024)
+cm41xx.h:#define CONFIG_ENV_SIZE		0x20000     /* Total Size of Environment */
+cm5200.h:#define CONFIG_ENV_SIZE		0x10000
+cm5200.h:#define CONFIG_ENV_SIZE_REDUND	(CONFIG_ENV_SIZE)
+cm-bf527.h:#define CONFIG_ENV_SIZE		0x8000
+cm-bf533.h:#define CONFIG_ENV_SIZE		0x10000
+cm-bf537e.h:#define CONFIG_ENV_SIZE		0x2000
+cm-bf537u.h:#define CONFIG_ENV_SIZE		0x2000
+cm-bf548.h:#define CONFIG_ENV_SIZE		0x8000
+cm-bf561.h:#define CONFIG_ENV_SIZE		0x10000
+cmc_pu2.h:#define CONFIG_SYS_MALLOC_LEN	(CONFIG_ENV_SIZE + 128*1024)
+cmc_pu2.h:#define CONFIG_ENV_SIZE			(16 << 10)	/* Use only 16 kB */
+cmi_mpc5xx.h:#define	CONFIG_ENV_SIZE		0x00010000	/* Set whole sector as env		*/
+CMS700.h:#define CONFIG_ENV_SIZE		0x700	/* 2048 bytes may be used for env vars*/
+cogent_mpc8260.h:#define	CONFIG_ENV_SIZE		0x1000	/* Total Size of Environment Sector */
+cogent_mpc8260.h:#define	CONFIG_ENV_SIZE		0x4000	/* Total Size of Environment Sector */
+cogent_mpc8xx.h:#define	CONFIG_ENV_SIZE		0x1000	/* Total Size of Environment Sector	*/
+cogent_mpc8xx.h:#define	CONFIG_ENV_SIZE		0x4000	/* Total Size of Environment Sector	*/
+CPC45.h:#define CONFIG_ENV_SIZE		0x4000	/* Size of the Environment		*/
+CPCI2DP.h:#define CONFIG_ENV_SIZE		0x400	/* 1024 bytes may be used for env vars */
+CPCI4052.h:#define CONFIG_ENV_SIZE		0x0ff8		/* Size of Environment vars	*/
+CPCI4052.h:	(CONFIG_SYS_NVRAM_BASE_ADDR+CONFIG_SYS_NVRAM_SIZE-(CONFIG_ENV_SIZE+8))	/* Env	*/
+CPCI4052.h:#define CONFIG_ENV_SIZE		0x800	/* 2048 bytes may be used for env vars*/
+CPCI405AB.h:#define CONFIG_ENV_SIZE		0x800	/* 2048 bytes may be used for env vars*/
+CPCI405DT.h:#define CONFIG_ENV_SIZE		0x0ff8		/* Size of Environment vars	*/
+CPCI405DT.h:	(CONFIG_SYS_NVRAM_BASE_ADDR+CONFIG_SYS_NVRAM_SIZE-(CONFIG_ENV_SIZE+8))	/* Env	*/
+CPCI405DT.h:#define CONFIG_ENV_SIZE		0x800	/* 2048 bytes may be used for env vars*/
+CPCI405.h:#define CONFIG_ENV_SIZE		0x1000		/* Size of Environment vars	*/
+CPCI405.h:	(CONFIG_SYS_NVRAM_BASE_ADDR+CONFIG_SYS_NVRAM_SIZE-CONFIG_ENV_SIZE)	/* Env	*/
+CPCI405.h:#define CONFIG_ENV_SIZE            0x400   /* 1024 bytes may be used for env vars */
+cpci5200.h:#define CONFIG_ENV_SIZE		0x20000
+cpci5200.h:#define CONFIG_ENV_SIZE		0x0400	/* 8192 bytes may be used for env vars */
+CPCI750.h:#define CONFIG_ENV_SIZE		0x1000	/* Total Size of Environment Sector */
+CPCI750.h:#define CONFIG_ENV_SIZE		0x600	/* 2048 bytes may be used for env vars*/
+CPCIISER4.h:#define CONFIG_ENV_SIZE		0x300	/* 768 bytes may be used for env vars */
+CPU86.h:# define CONFIG_ENV_SIZE		0x10000
+CPU86.h:#define CONFIG_ENV_SIZE		(2048 - 512)
+CPU87.h:# define CONFIG_ENV_SIZE		0x10000
+CPU87.h:#define CONFIG_ENV_SIZE		(2048 - 512)
+cpu9260.h:#define	CONFIG_ENV_SIZE			0x20000
+cpu9260.h:		ROUND(3 * CONFIG_ENV_SIZE + 128 * 1024, 0x1000)
+cpuat91.h:#define CONFIG_ENV_SIZE			0x20000
+cpuat91.h:#define CONFIG_SYS_MALLOC_LEN		(CONFIG_ENV_SIZE + 128 * 1024)
+cradle.h:#define CONFIG_SYS_MALLOC_LEN		(CONFIG_ENV_SIZE + 128*1024)
+cradle.h:#define CONFIG_ENV_SIZE				0x20000	   /* 8K ouch, this may later be */
+CRAYL1.h:#define	CONFIG_ENV_SIZE		0x1000	 /* Total Size of Environment area	*/
+csb226.h:#define CONFIG_ENV_SIZE            0x4000  /* Total Size of Environment Sector */
+csb272.h:#define	CONFIG_ENV_SIZE		0x00001000 /* Size of Environment */
+csb472.h:#define	CONFIG_ENV_SIZE		0x00001000 /* Size of Environment */
+csb637.h:#define CONFIG_SYS_MALLOC_LEN	(CONFIG_ENV_SIZE + 128*1024)
+csb637.h:#define CONFIG_ENV_SIZE			0x2000  /* 0x8000 */
+csb637.h:#define CONFIG_ENV_SIZE			0x20000 /* sectors are 128K here */
+CU824.h:#define CONFIG_ENV_SIZE		0x8000	/* Size of the Environment Sector	*/
+CU824.h:#define CONFIG_ENV_SIZE		0x4000	/* Size of the Environment		*/
+da830evm.h:#define CONFIG_ENV_SIZE			(512 << 10)
+da830evm.h:#define CONFIG_ENV_SIZE			(16 << 10)
+da830evm.h:#define CONFIG_ENV_SIZE		(16 << 10)
+DASA_SIM.h:#define CONFIG_ENV_SIZE		0x1000	/* Total Size of Environment Sector	*/
+davinci_dm355evm.h:#define CONFIG_ENV_SIZE		(256 << 10)	/* 256 KiB */
+davinci_dm355leopard.h:#define CONFIG_ENV_SIZE		(256 << 10)	/* 256 KiB */
+davinci_dm365evm.h:#define CONFIG_ENV_SIZE		(256 << 10)	/* 256 KiB */
+davinci_dm6467evm.h:#define CONFIG_ENV_SIZE			(16 << 10)	/* 16 KiB */
+davinci_dm6467evm.h:#define CONFIG_ENV_SIZE			(4 << 10)	/* 4 KiB */
+davinci_dvevm.h:#define CONFIG_ENV_SIZE		(16 << 10)	/* 16 KiB */
+davinci_dvevm.h:#define CONFIG_ENV_SIZE		(128 << 10)	/* 128 KiB */
+davinci_schmoogie.h:#define CONFIG_ENV_SIZE		(128 << 10)	/* 128 KiB */
+davinci_sffsdr.h:#define CONFIG_ENV_SIZE		(128 << 10)	/* 128 KiB */
+davinci_sonata.h:#define CONFIG_ENV_SIZE		(16 << 10)	/* 16 KiB */
+DB64360.h:#define CONFIG_ENV_SIZE		0x1000	/* Total Size of Environment Sector */
+DB64460.h:#define CONFIG_ENV_SIZE		0x1000	/* Total Size of Environment Sector */
+dbau1x00.h:#define CONFIG_ENV_SIZE		0x10000
+debris.h:#define CONFIG_ENV_SIZE		0x400	/* Size of the Environment - 8K	   */
+delta.h:#define CONFIG_SYS_MALLOC_LEN	    (CONFIG_ENV_SIZE + 256*1024)
+delta.h:#define CONFIG_ENV_SIZE		0x4000
+devkit8000.h:#define CONFIG_ENV_SIZE			(128 << 10)	/* 128 KiB */
+devkit8000.h:#define CONFIG_SYS_MALLOC_LEN		(CONFIG_ENV_SIZE + (128 << 10))
+digsy_mtc.h:#define CONFIG_ENV_SIZE		0x10000
+DK1C20.h:#define CONFIG_SYS_MALLOC_LEN		(CONFIG_ENV_SIZE + 128*1024)
+DK1C20.h:#define CONFIG_ENV_SIZE		(64 * 1024)	/* 64 KByte (1 sector)	*/
+DK1S10.h:#define CONFIG_SYS_MALLOC_LEN		(CONFIG_ENV_SIZE + 128*1024)
+DK1S10.h:#define CONFIG_ENV_SIZE		(64 * 1024)	/* 64 KByte (1 sector)	*/
+dlvision.h:#define	CONFIG_ENV_SIZE		0x2000	/* Total Size of Environment Sector */
+dlvision.h:#define CONFIG_ENV_SIZE_REDUND	(CONFIG_ENV_SIZE)
+dnp1110.h:#define CONFIG_SYS_MALLOC_LEN		(CONFIG_ENV_SIZE + 128*1024)
+dnp1110.h:#define CONFIG_ENV_SIZE			0x20000						/* Total Size of Environment Sector	*/
+DP405.h:#define CONFIG_ENV_SIZE		0x700	/* 2048 bytes may be used for env vars*/
+DU405.h:#define CONFIG_ENV_SIZE		0x400	/* 1024 bytes may be used for env vars */
+DU440.h:#define	CONFIG_ENV_SIZE		0x2000	/* Total Size of Environment Sector   */
+DU440.h:#define CONFIG_ENV_SIZE_REDUND	(CONFIG_ENV_SIZE)
+DU440.h:#define CONFIG_ENV_SIZE		0x1000 /* 4096 bytes may be used for env vars */
+eb_cpux9k2.h:#define CONFIG_SYS_MALLOC_LEN		(CONFIG_ENV_SIZE + 520*1024)
+eb_cpux9k2.h:#define CONFIG_ENV_SIZE			0x20000 /* sectors are 128K here */
+ebony.h:#define CONFIG_ENV_SIZE		0x1000	    /* Size of Environment vars */
+ebony.h:	(CONFIG_SYS_NVRAM_BASE_ADDR+CONFIG_SYS_NVRAM_SIZE-CONFIG_ENV_SIZE)
+ebony.h:#define	CONFIG_ENV_SIZE		0x4000	/* Total Size of Environment Sector	*/
+ebony.h:#define CONFIG_ENV_SIZE_REDUND	(CONFIG_ENV_SIZE)
+edb93xx.h:#define CONFIG_ENV_SIZE			CONFIG_ENV_SECT_SIZE
+edb93xx.h:#define CONFIG_ENV_SIZE_REDUND		CONFIG_ENV_SIZE
+ELPPC.h:#define CONFIG_ENV_SIZE            0x400       /* Size of Environment vars (1kB) */
+ELPPC.h:#define CONFIG_SYS_NV_SROM_COPY_ADDR   (CONFIG_ENV_ADDR + CONFIG_ENV_SIZE)
+ELPT860.h:#  define CONFIG_ENV_SIZE		0x10000 /* Total Size of Environment Sector  */
+ELPT860.h:#  define CONFIG_ENV_SIZE		0x4000	/* Total Size of Environment Sector  */
+eNET.h:#define CONFIG_SYS_MALLOC_LEN	(CONFIG_ENV_SIZE + 128*1024)
+eNET.h:#define CONFIG_ENV_SIZE			CONFIG_ENV_SECT_SIZE
+eNET.h:#define CONFIG_ENV_SIZE_REDUND		CONFIG_ENV_SECT_SIZE
+EP1C20.h:#define CONFIG_SYS_MALLOC_LEN		(CONFIG_ENV_SIZE + 128*1024)
+EP1C20.h:#define CONFIG_ENV_SIZE		(64 * 1024)	/* 64 KByte (1 sector)	*/
+EP1S10.h:#define CONFIG_SYS_MALLOC_LEN		(CONFIG_ENV_SIZE + 256*1024) /* 256k heap */
+EP1S10.h:#define CONFIG_ENV_SIZE		(64 * 1024)	/* 64 KByte (1 sector)	*/
+EP1S40.h:#define CONFIG_SYS_MALLOC_LEN		(CONFIG_ENV_SIZE + 256*1024) /* 256k heap */
+EP1S40.h:#define CONFIG_ENV_SIZE		(64 * 1024)	/* 64 KByte (1 sector)	*/
+ep7312.h:#define CONFIG_SYS_MALLOC_LEN		(CONFIG_ENV_SIZE + 128*1024)
+ep7312.h:#define CONFIG_ENV_SIZE		0x20000	/* Total Size of Environment Sector	*/
+ep8260.h:#    define CONFIG_ENV_SIZE       0x1000  /* Total Size of Environment Sector */
+ep8260.h:#  define CONFIG_ENV_SIZE         0x200
+ep82xxm.h:#define CONFIG_ENV_SIZE		0x200	    /* Size of Environment vars */
+ERIC.h:#define CONFIG_ENV_SIZE		0x800	/* 2048 bytes may be used for env vars */
+ERIC.h:#define	CONFIG_ENV_SIZE		(2 * 1024) /* Total Size of Environment Sector 2k */
+ERIC.h:#define CONFIG_ENV_ADDR            (CONFIG_SYS_MONITOR_BASE + CONFIG_SYS_MONITOR_LEN - CONFIG_ENV_SIZE - 0x10) /* let space for reset vector */
+ERIC.h:#define CONFIG_ENV_SIZE		0x7F8		/* Size of Environment vars	*/
+ERIC.h:	(CONFIG_SYS_NVRAM_BASE_ADDR+CONFIG_SYS_NVRAM_SIZE-CONFIG_ENV_SIZE)	/* Env	*/
+espt.h:#define CONFIG_ENV_SIZE		(CONFIG_ENV_SECT_SIZE)
+espt.h:#define CONFIG_ENV_SIZE_REDUND	(CONFIG_ENV_SECT_SIZE)
+ESTEEM192E.h:#define	CONFIG_ENV_SIZE		0x2000	/* Total Size of Environment Sector	*/
+ETX094.h:#define	CONFIG_ENV_SIZE		0x8000	/* Total Size of Environment Sector	*/
+ETX094.h:#define	CONFIG_ENV_SIZE		0x4000	/* Total Size of Environment Sector	*/
+evb4510.h:#define CONFIG_SYS_MALLOC_LEN		(CONFIG_ENV_SIZE + 128*1024)
+evb4510.h:#define CONFIG_ENV_SIZE		0x1000	   /* max size for environment */
+EVB64260.h:#define	CONFIG_ENV_SIZE		0x1000	/* Total Size of Environment Sector */
+eXalion.h:#define CONFIG_ENV_SIZE		CONFIG_ENV_SECT_SIZE	/* Use one Flash sector for enviroment	*/
+EXBITGEN.h:#define	CONFIG_ENV_SIZE		350	/* that is 350 bytes only!	*/
+EXBITGEN.h:#define	CONFIG_ENV_SIZE		0x00010000 /* Total Size of Environment Sector	*/
+FADS823.h:#define	CONFIG_ENV_SIZE		0x40000	/* Total Size of Environment Sector	*/
+FADS850SAR.h:#define	CONFIG_ENV_SIZE		0x40000	/* Total Size of Environment Sector	*/
+favr-32-ezkit.h:#define CONFIG_ENV_SIZE			65536
+favr-32-ezkit.h:#define CONFIG_ENV_ADDR			(CONFIG_SYS_FLASH_BASE + CONFIG_SYS_FLASH_SIZE - CONFIG_ENV_SIZE)
+FLAGADM.h:#define CONFIG_ENV_SIZE		0x20000 /* Total Size of Environment Sector	*/
+FPS850L.h:#define	CONFIG_ENV_SIZE		0x4000	/* Total Size of Environment Sector	*/
+FPS850L.h:#define CONFIG_ENV_OFFSET_REDUND	(CONFIG_ENV_OFFSET+CONFIG_ENV_SIZE)
+FPS850L.h:#define CONFIG_ENV_SIZE_REDUND	(CONFIG_ENV_SIZE)
+FPS860L.h:#define	CONFIG_ENV_SIZE		0x4000	/* Total Size of Environment Sector	*/
+FPS860L.h:#define CONFIG_ENV_OFFSET_REDUND	(CONFIG_ENV_OFFSET+CONFIG_ENV_SIZE)
+FPS860L.h:#define CONFIG_ENV_SIZE_REDUND	(CONFIG_ENV_SIZE)
+fx12mm.h:#define CONFIG_ENV_SIZE         0x10000
+G2000.h:#define CONFIG_ENV_SIZE		0x700	/* 2048 bytes may be used for env vars*/
+galaxy5200.h:#define CONFIG_ENV_SIZE		CONFIG_SYS_EEPROM_SIZE
+gcplus.h:#define CONFIG_SYS_MALLOC_LEN          (CONFIG_ENV_SIZE + 128*1024)
+gcplus.h:#define CONFIG_ENV_SIZE		PHYS_FLASH_SECT_SIZE
+gdppc440etx.h:#define CONFIG_ENV_SIZE			0x2000 /* Total Size of Env. Sector */
+gdppc440etx.h:#define CONFIG_ENV_SIZE_REDUND		(CONFIG_ENV_SIZE)
+GEN860T.h:#define CONFIG_ENV_SIZE			(2 * 1024)
+GEN860T.h:#define CONFIG_ENV_SIZE			0x1000
+GENIETV.h:#define	CONFIG_ENV_SIZE		0x10000	/* Total Size of Environment Sector (64k)*/
+gr_cpci_ax2000.h:#define CONFIG_ENV_SIZE		0x8000
+gr_ep2s60.h:#define CONFIG_ENV_SIZE		0x8000
+grsim.h:#define CONFIG_ENV_SIZE		0x8000
+grsim.h:#define CONFIG_ENV_ADDR		(CONFIG_SYS_FLASH_BASE+CONFIG_SYS_FLASH_SIZE-CONFIG_ENV_SIZE)
+grsim.h:/*#define CONFIG_ENV_SIZE		0x8000*/
+grsim_leon2.h:#define CONFIG_ENV_SIZE		0x8000
+grsim_leon2.h:#define CONFIG_ENV_ADDR		(CONFIG_SYS_FLASH_BASE+CONFIG_SYS_FLASH_SIZE-CONFIG_ENV_SIZE)
+grsim_leon2.h:/*#define CONFIG_ENV_SIZE		0x8000*/
+gr_xc3s_1500.h:#define CONFIG_ENV_SIZE		0x8000
+gth2.h:#define CONFIG_ENV_SIZE		0x10000
+GTH.h:#define	CONFIG_ENV_SIZE		0x4000	/* Total Size of Environment Sector	*/
+gw8260.h:#  define CONFIG_ENV_SIZE        (16 * 1024)/* Size of Environment Sector  */
+gw8260.h:#  define CONFIG_ENV_ADD  ((CONFIG_SYS_MONITOR_BASE + CONFIG_SYS_MONITOR_LEN) - CONFIG_ENV_SIZE)
+hammerhead.h:#define CONFIG_ENV_SIZE			65536
+hammerhead.h:#define CONFIG_ENV_ADDR			(CONFIG_SYS_FLASH_BASE + CONFIG_SYS_FLASH_SIZE - CONFIG_ENV_SIZE)
+hcu4.h:#define CONFIG_ENV_SIZE	(PROM_SIZE-CONFIG_ENV_OFFSET)
+hcu4.h:#define	CONFIG_ENV_SIZE		8*1024	/* 8 KB Environment Sector	*/
+hcu4.h:#define CONFIG_ENV_SIZE_REDUND	(CONFIG_ENV_SIZE)
+hcu5.h:#define CONFIG_ENV_SIZE	(PROM_SIZE-CONFIG_ENV_OFFSET)
+hcu5.h:#define CONFIG_ENV_SIZE		8*1024	/* 8 KB Environment Sector	*/
+hcu5.h:#define CONFIG_ENV_SIZE_REDUND	(CONFIG_ENV_SIZE)
+hermes.h:#define	CONFIG_ENV_SIZE		0x2000	/* Total Size of Environment Sector	*/
+HH405.h:#define CONFIG_ENV_SIZE            0x700   /* 2048 bytes may be used for env vars*/
+HIDDEN_DRAGON.h:#define CONFIG_ENV_SIZE		0x00002000	/* Total Size of Environment Sector */
+hmi1001.h:#define CONFIG_ENV_SIZE		0x4000
+hmi1001.h:#define CONFIG_ENV_SIZE_REDUND     (CONFIG_ENV_SIZE)
+HMI10.h:#define CONFIG_ENV_SIZE		0x4000	/* Total Size of Environment Sector	*/
+HMI10.h:#define CONFIG_ENV_OFFSET_REDUND	(CONFIG_ENV_OFFSET+CONFIG_ENV_SIZE)
+HMI10.h:#define CONFIG_ENV_SIZE_REDUND	(CONFIG_ENV_SIZE)
+HUB405.h:#define CONFIG_ENV_SIZE		0x700	/* 2048 bytes may be used for env vars*/
+hymod.h:#define	CONFIG_ENV_SIZE		0x40000	/* Total Size of Environment Sector */
+IAD210.h:#define	CONFIG_ENV_SIZE		0x4000	/* Total Size of Environment Sector	*/
+ibf-dsp561.h:#define CONFIG_ENV_SIZE		0x2000
+IceCube.h:#define CONFIG_ENV_SIZE		0x10000
+ICU862.h:#define	CONFIG_ENV_SIZE		0x4000	/* Used Size of Environment Sector	*/
+idmr.h:#define CONFIG_ENV_SIZE		0x2000
+IDS8247.h:#define CONFIG_ENV_SIZE		0x20000
+impa7.h:#define CONFIG_SYS_MALLOC_LEN		(CONFIG_ENV_SIZE + 128*1024)
+impa7.h:#define CONFIG_ENV_SIZE		0x4000	/* Total Size of Environment Sector	*/
+imx27lite.h:#define CONFIG_ENV_SIZE		CONFIG_ENV_SECT_SIZE
+imx27lite.h:#define CONFIG_ENV_OFFSET_REDUND	(CONFIG_ENV_OFFSET + CONFIG_ENV_SIZE)
+imx27lite.h:#define CONFIG_ENV_SIZE_REDUND	CONFIG_ENV_SIZE
+imx31_litekit.h:#define CONFIG_SYS_MALLOC_LEN		(CONFIG_ENV_SIZE + 128 * 1024)
+imx31_litekit.h:#define CONFIG_ENV_SIZE		(64 * 1024)
+imx31_phycore.h:#define CONFIG_SYS_MALLOC_LEN		(CONFIG_ENV_SIZE + 128 * 1024)
+imx31_phycore.h:#define CONFIG_ENV_SIZE			4096
+incaip.h:#define CONFIG_ENV_SIZE		0x10000
+inka4x0.h:#define CONFIG_ENV_SIZE		0x2000
+innokom.h:#define CONFIG_ENV_SIZE			1024	/* 1 KiB                    */
+integratorap.h:#define CONFIG_SYS_MALLOC_LEN	(CONFIG_ENV_SIZE + 128*1024)
+integratorap.h:#define CONFIG_ENV_SIZE			32768
+integratorcp.h:#define CONFIG_SYS_MALLOC_LEN		(CONFIG_ENV_SIZE + 128*1024)
+integratorcp.h:#define CONFIG_ENV_SIZE		8192		/* 8KB */
+intip.h:#define	CONFIG_ENV_SIZE		0x4000	/* Total Size of Environment Sector */
+intip.h:#define CONFIG_ENV_SIZE_REDUND	(CONFIG_ENV_SIZE)
+IP860.h:#define CONFIG_ENV_SIZE		(16<<10)	/* use 16 kB	*/
+IP860.h:#define CONFIG_ENV_SIZE		1536	/* Use remaining space			*/
+ipek01.h:#define CONFIG_ENV_SIZE			0x10000
+ipek01.h:#define CONFIG_ENV_SIZE_REDUND		CONFIG_ENV_SIZE
+ISPAN.h:#define CONFIG_ENV_SIZE		(CONFIG_ENV_SECT_SIZE)
+ISPAN.h:#define CONFIG_ENV_SIZE_REDUND	(CONFIG_ENV_SIZE)
+IVML24.h:#define	CONFIG_ENV_SIZE		0x2000	/* Total Size of Environment Sector	*/
+IVMS8.h:#define	CONFIG_ENV_SIZE		0x2000	/* Total Size of Environment Sector	*/
+ixdp425.h:#define CONFIG_SYS_MALLOC_LEN      (CONFIG_ENV_SIZE + 128*1024)
+ixdp425.h:#define	CONFIG_ENV_SIZE		0x2000	/* Total Size of Environment Sector	*/
+ixdpg425.h:#define	CONFIG_ENV_SIZE		0x2000	/* Total Size of Environment Sector	*/
+ixdpg425.h:#define CONFIG_ENV_SIZE_REDUND	(CONFIG_ENV_SIZE)
+JSE.h:#define CONFIG_ENV_SIZE	512
+jupiter.h:#define CONFIG_ENV_SIZE		0x20000
+jupiter.h:#define CONFIG_ENV_SIZE_REDUND	(CONFIG_ENV_SIZE)
+KAREF.h:#define CONFIG_ENV_SIZE	      0x1000	     /* Size of Env vars	*/
+katmai.h:#define	CONFIG_ENV_SIZE		0x4000	/* Total Size of Environment Sector	*/
+katmai.h:#define CONFIG_ENV_SIZE_REDUND	(CONFIG_ENV_SIZE)
+kb9202.h:#define CONFIG_SYS_MALLOC_LEN	(roundup(CONFIG_ENV_SIZE,4096) + 128*1024)
+kb9202.h:#define CONFIG_ENV_SIZE			0x0200
+kb9202.h:#define CONFIG_ENV_SIZE			0x1000
+keymile-common.h:#define CONFIG_ENV_SIZE		0x04000 /* Size of Environment */
+kilauea.h:#define	CONFIG_ENV_SIZE		0x4000	/* Total Size of Environment Sector	*/
+kilauea.h:#define CONFIG_ENV_SIZE_REDUND	(CONFIG_ENV_SIZE)
+kilauea.h:#define CONFIG_ENV_SIZE		CONFIG_SYS_NAND_BLOCK_SIZE
+kilauea.h:#define CONFIG_ENV_OFFSET		(CONFIG_SYS_NAND_U_BOOT_OFFS + CONFIG_ENV_SIZE)
+kilauea.h:#define CONFIG_ENV_OFFSET_REDUND	(CONFIG_ENV_OFFSET + CONFIG_ENV_SIZE)
+km8xx.h:#define CONFIG_ENV_SIZE_REDUND	(CONFIG_ENV_SIZE)
+kmeter1.h:#define CONFIG_ENV_SIZE_REDUND	(CONFIG_ENV_SIZE)
+kmeter1.h:#define CONFIG_ENV_SIZE		0x2000
+korat.h:#define CONFIG_ENV_SIZE		0x2000	/* Total Size of Environment Sector   */
+korat.h:#define CONFIG_ENV_SIZE_REDUND	CONFIG_ENV_SIZE
+KUP4K.h:#define CONFIG_ENV_SIZE		0x1000	/* Total Size of Environment Sector	*/
+KUP4K.h:#define CONFIG_ENV_OFFSET_REDUND	(CONFIG_ENV_OFFSET+CONFIG_ENV_SIZE)
+KUP4K.h:#define CONFIG_ENV_SIZE_REDUND	(CONFIG_ENV_SIZE)
+KUP4X.h:#define CONFIG_ENV_SIZE		0x1000	/* Total Size of Environment Sector	*/
+KUP4X.h:#define CONFIG_ENV_OFFSET_REDUND	(CONFIG_ENV_OFFSET+CONFIG_ENV_SIZE)
+KUP4X.h:#define CONFIG_ENV_SIZE_REDUND	(CONFIG_ENV_SIZE)
+kvme080.h:#define CONFIG_ENV_SIZE		0x400
+LANTEC.h:#define	CONFIG_ENV_SIZE		0x4000	/* Total Size of Environment Sector	*/
+lart.h:#define CONFIG_SYS_MALLOC_LEN		(CONFIG_ENV_SIZE + 128*1024)
+lart.h:#define CONFIG_ENV_SIZE		0x4000	/* Total Size of Environment Sector	*/
+linkstation.h:#define CONFIG_ENV_SIZE		0x00010000
+logodl.h:#define CONFIG_ENV_SIZE            0x4000  /* Total Size of Environment Sector     */
+lpc2292sodimm.h:#define CONFIG_SYS_MALLOC_LEN		(CONFIG_ENV_SIZE + 128*1024)
+lpc2292sodimm.h:#define CONFIG_ENV_SIZE		0x2000 /* Total Size of Environment Sector	*/
+lpd7a400.h:#define CONFIG_SYS_MALLOC_LEN		(CONFIG_ENV_SIZE + 128*1024)
+lpd7a400.h:#define CONFIG_ENV_SIZE		0x40000
+lpd7a404.h:#define CONFIG_SYS_MALLOC_LEN		(CONFIG_ENV_SIZE + 128*1024)
+lpd7a404.h:#define CONFIG_ENV_SIZE		0x40000
+luan.h:#define CONFIG_ENV_SIZE		0x2000	/* Total Size of Environment Sector	*/
+luan.h:#define CONFIG_ENV_SIZE_REDUND	(CONFIG_ENV_SIZE)
+lubbock.h:#define CONFIG_SYS_MALLOC_LEN	    (CONFIG_ENV_SIZE + 128*1024)
+lubbock.h:#define CONFIG_ENV_SIZE		(PHYS_FLASH_SECT_SIZE / 16)
+lwmon5.h:#define	CONFIG_ENV_SIZE		0x2000	/* Total Size of Environment Sector	*/
+lwmon5.h:#define CONFIG_ENV_SIZE_REDUND	(CONFIG_ENV_SIZE)
+lwmon.h:#define CONFIG_ENV_SIZE		0x2000	/* Total Size of Environment		*/
+m501sk.h:#define CONFIG_SYS_MALLOC_LEN		(CONFIG_ENV_SIZE + 128*1024)
+m501sk.h:#define CONFIG_ENV_SIZE		0x2000
+m501sk.h:#define CONFIG_ENV_SIZE		2048
+m501sk.h:#define CONFIG_ENV_SIZE		1024
+M5208EVBE.h:#define CONFIG_ENV_SIZE			0x1000
+M52277EVB.h:#	define CONFIG_ENV_SIZE		0x1000
+M52277EVB.h:#	define CONFIG_ENV_SIZE		0x1000
+M5235EVB.h:#	define CONFIG_ENV_SIZE		0x4000
+M5235EVB.h:#	define CONFIG_ENV_SIZE		0x2000
+M5249EVB.h:#define CONFIG_ENV_SIZE		0x2000	/* Total Size of Environment Sector	*/
+M5282EVB.h:#define CONFIG_ENV_SIZE		0x2000
+M53017EVB.h:#define CONFIG_ENV_SIZE			0x1000
+M54451EVB.h:#	define CONFIG_ENV_SIZE		0x2000
+M54451EVB.h:#	define CONFIG_ENV_SIZE		0x2000
+M54455EVB.h:#	define CONFIG_ENV_SIZE		0x2000
+M54455EVB.h:#	define CONFIG_ENV_SIZE		0x2000
+makalu.h:#define	CONFIG_ENV_SIZE		0x4000	/* Total Size of Environment Sector	*/
+makalu.h:#define CONFIG_ENV_SIZE_REDUND	(CONFIG_ENV_SIZE)
+MBX860T.h:#define CONFIG_ENV_SIZE		0x1000
+MBX.h:#define CONFIG_ENV_SIZE		0x1000
+mcc200.h:#define	CONFIG_ENV_SIZE		0x2000	/* Total Size of Environment Sector	*/
+mcc200.h:#define CONFIG_ENV_SIZE_REDUND	(CONFIG_ENV_SIZE)
+mcu25.h:#define CONFIG_ENV_SIZE	(PROM_SIZE-CONFIG_ENV_OFFSET)
+mcu25.h:#define	CONFIG_ENV_SIZE		8*1024	/* 8 KB Environment Sector */
+mcu25.h:#define CONFIG_ENV_SIZE_REDUND	(CONFIG_ENV_SIZE)
+mecp5123.h:#define CONFIG_ENV_SIZE		0x1000
+mecp5200.h:#define CONFIG_ENV_SIZE		0x10000
+mecp5200.h:#define CONFIG_ENV_SIZE		0x0400	/* 8192 bytes may be used for env vars*/
+meesc.h:#define CONFIG_ENV_SIZE			0x4200
+meesc.h:#define CONFIG_SYS_MALLOC_LEN		ROUND(3 * CONFIG_ENV_SIZE + \
+METROBOX.h:#define CONFIG_ENV_SIZE	      0x1000	     /* Size of Env vars	*/
+mgcoge.h:#define CONFIG_ENV_SIZE_REDUND		(CONFIG_ENV_SIZE)
+MHPC.h:#define CONFIG_ENV_SIZE		0x20000 /* Total Size of Environment	*/
+microblaze-generic.h:		#define	CONFIG_ENV_SIZE		0x1000
+microblaze-generic.h:		#define	CONFIG_ENV_ADDR		(CONFIG_SYS_MONITOR_BASE - CONFIG_ENV_SIZE)
+microblaze-generic.h:		#define	CONFIG_ENV_SIZE		0x20000
+microblaze-generic.h:	#define	CONFIG_ENV_SIZE		0x1000
+microblaze-generic.h:	#define	CONFIG_ENV_ADDR		(CONFIG_SYS_MONITOR_BASE - CONFIG_ENV_SIZE)
+MigoR.h:#define CONFIG_ENV_SIZE		(CONFIG_ENV_SECT_SIZE)
+MigoR.h:#define CONFIG_ENV_SIZE_REDUND	(CONFIG_ENV_SECT_SIZE)
+mimc200.h:#define CONFIG_ENV_SIZE			65536
+mimc200.h:#define CONFIG_ENV_ADDR			(CONFIG_SYS_FLASH_BASE + CONFIG_SYS_FLASH_SIZE - CONFIG_ENV_SIZE)
+MIP405.h:#define CONFIG_ENV_SIZE		0x00800	/* 2k bytes may be used for env vars */
+ML2.h:#define	CONFIG_ENV_SIZE		0x10000	/* Total Size of Environment Sector	*/
+ML2.h:#define CONFIG_ENV_SIZE		0x1000		/* Size of Environment vars	*/
+ML2.h:	(CONFIG_SYS_NVRAM_BASE_ADDR+CONFIG_SYS_NVRAM_SIZE-CONFIG_ENV_SIZE)	/* Env	*/
+ml507.h:#define	CONFIG_ENV_SIZE		0x20000
+modnet50.h:#define CONFIG_SYS_MALLOC_LEN		(CONFIG_ENV_SIZE + 128*1024)
+modnet50.h:#define CONFIG_ENV_SIZE		0x4000	/* max size for environment */
+motionpro.h:#define CONFIG_ENV_SIZE		0x1000
+motionpro.h:#define CONFIG_ENV_SIZE_REDUND	(CONFIG_ENV_SIZE)
+MOUSSE.h:#define CONFIG_ENV_SIZE            0x4000  /* Size of the Environment Sector    */
+MOUSSE.h:#define CONFIG_ENV_SIZE            NV_U_BOOT_ENV_SIZE /* 2K */
+mp2usb.h:#define CONFIG_SYS_MALLOC_LEN	(CONFIG_ENV_SIZE + 128*1024)
+mp2usb.h:#define CONFIG_ENV_SIZE			0x20000
+mpc5121ads.h:#define CONFIG_ENV_SIZE		0x2000
+mpc5121ads.h:#define CONFIG_ENV_SIZE_REDUND	(CONFIG_ENV_SIZE)
+mpc7448hpc2.h:#define CONFIG_ENV_SIZE	0x00000400	/* Total Size of Environment Space */
+MPC8260ADS.h:#  define CONFIG_ENV_SIZE		0x200
+MPC8266ADS.h:#  define CONFIG_ENV_SIZE		0x200
+MPC8313ERDB.h:	#define CONFIG_ENV_SIZE		CONFIG_ENV_SECT_SIZE
+MPC8313ERDB.h:	#define CONFIG_ENV_SIZE_REDUND	CONFIG_ENV_SIZE
+MPC8313ERDB.h:	#define CONFIG_ENV_SIZE		0x2000
+MPC8313ERDB.h:	#define CONFIG_ENV_SIZE		0x2000
+MPC8315ERDB.h:	#define CONFIG_ENV_SIZE		CONFIG_ENV_SECT_SIZE
+MPC8315ERDB.h:	#define CONFIG_ENV_SIZE_REDUND	CONFIG_ENV_SIZE
+MPC8315ERDB.h:	#define CONFIG_ENV_SIZE		0x2000
+MPC8315ERDB.h:	#define CONFIG_ENV_SIZE		0x2000
+MPC8323ERDB.h:	#define CONFIG_ENV_SIZE		0x2000
+MPC8323ERDB.h:	#define CONFIG_ENV_SIZE		0x2000
+MPC832XEMDS.h:	#define CONFIG_ENV_SIZE		0x2000
+MPC832XEMDS.h:	#define CONFIG_ENV_SIZE		0x2000
+MPC8349EMDS.h:	#define CONFIG_ENV_SIZE		0x2000
+MPC8349EMDS.h:#define CONFIG_ENV_SIZE_REDUND	(CONFIG_ENV_SIZE)
+MPC8349EMDS.h:	#define CONFIG_ENV_SIZE		0x2000
+MPC8349ITX.h:  #define CONFIG_ENV_SIZE		0x2000
+MPC8349ITX.h:  #define CONFIG_ENV_SIZE		0x2000
+MPC8360EMDS.h:	#define CONFIG_ENV_SIZE		0x2000
+MPC8360EMDS.h:	#define CONFIG_ENV_SIZE		0x2000
+MPC8360ERDK.h:#define CONFIG_ENV_SIZE		0x20000
+MPC8360ERDK.h:#define CONFIG_ENV_SIZE		0x2000
+MPC837XEMDS.h:	#define CONFIG_ENV_SIZE		0x2000
+MPC837XEMDS.h:	#define CONFIG_ENV_SIZE		0x2000
+MPC837XERDB.h:	#define CONFIG_ENV_SIZE		0x4000
+MPC837XERDB.h:	#define CONFIG_ENV_SIZE		0x2000
+MPC8536DS.h:	#define CONFIG_ENV_SIZE		CONFIG_SYS_NAND_BLOCK_SIZE
+MPC8536DS.h:	#define CONFIG_ENV_SIZE		0x2000
+MPC8536DS.h:	#define CONFIG_ENV_SIZE		0x2000
+MPC8540ADS.h:  #define CONFIG_ENV_SIZE		0x2000
+MPC8540ADS.h:  #define CONFIG_ENV_SIZE		0x2000
+MPC8540EVAL.h:#define CONFIG_ENV_SIZE		0x2000
+MPC8540EVAL.h:#define CONFIG_ENV_SIZE		0x2000
+MPC8540EVAL.h:#define CONFIG_ENV_SIZE		0x2000
+MPC8541CDS.h:#define CONFIG_ENV_SIZE		0x2000
+MPC8544DS.h:#define CONFIG_ENV_SIZE		0x2000
+MPC8548CDS.h:#define CONFIG_ENV_SIZE		0x2000
+MPC8555CDS.h:#define CONFIG_ENV_SIZE		0x2000
+MPC8560ADS.h:  #define CONFIG_ENV_SIZE		0x2000
+MPC8560ADS.h:  #define CONFIG_ENV_SIZE		0x2000
+MPC8568MDS.h:#define CONFIG_ENV_SIZE		0x2000
+MPC8569MDS.h:#define CONFIG_ENV_SIZE		CONFIG_SYS_NAND_BLOCK_SIZE
+MPC8569MDS.h:#define CONFIG_ENV_SIZE		CONFIG_ENV_SECT_SIZE
+MPC8572DS.h:#define CONFIG_ENV_SIZE		0x2000
+MPC8610HPCD.h:#define CONFIG_ENV_SIZE		0x2000
+MPC8610HPCD.h:#define CONFIG_ENV_SIZE		0x2000
+MPC8641HPCN.h:#define CONFIG_ENV_SIZE		0x2000
+mpr2.h:#define CONFIG_ENV_SIZE		CONFIG_ENV_SECT_SIZE
+ms7720se.h:#define CONFIG_ENV_SIZE		CONFIG_ENV_SECT_SIZE
+ms7722se.h:#define CONFIG_ENV_SIZE		(CONFIG_ENV_SECT_SIZE)
+ms7722se.h:#define CONFIG_ENV_SIZE_REDUND	(CONFIG_ENV_SECT_SIZE)
+ms7750se.h:#define CONFIG_ENV_SIZE		(CONFIG_ENV_SECT_SIZE)
+munices.h:#define CONFIG_ENV_SIZE		0x4000
+munices.h:#define CONFIG_ENV_SIZE_REDUND     (CONFIG_ENV_SIZE)
+MUSENKI.h:#define CONFIG_ENV_SIZE		0x00010000 /* Size of the Environment		*/
+mv88f6281gtw_ge.h:#define CONFIG_ENV_SIZE			0x1000	/* 4k */
+MVBC_P.h:#define CONFIG_ENV_SIZE		0x10000
+MVBC_P.h:#define CONFIG_ENV_ADDR_REDUND	(CONFIG_ENV_ADDR+CONFIG_ENV_SIZE)
+MVBC_P.h:#define CONFIG_ENV_SIZE_REDUND	CONFIG_ENV_SIZE
+MVBLM7.h:#define CONFIG_ENV_SIZE		0x2000
+MVBLM7.h:#define CONFIG_ENV_ADDR_REDUND	(CONFIG_ENV_ADDR+CONFIG_ENV_SIZE)
+MVBLM7.h:#define CONFIG_ENV_SIZE_REDUND 	CONFIG_ENV_SIZE
+MVBLUE.h:#define CONFIG_ENV_SIZE		0x00010000
+MVS1.h:#define	CONFIG_ENV_SIZE		0x2000	/* Used Size of Environment Sector 8k	*/
+mx1ads.h:#define CONFIG_SYS_MALLOC_LEN		(CONFIG_ENV_SIZE + 128*1024)
+mx1ads.h:#define CONFIG_ENV_SIZE		0x04000 /* Total Size of Environment Sector */
+mx1fs2.h:#define CONFIG_SYS_MALLOC_LEN	  (CONFIG_ENV_SIZE + (128<<10) )
+mx1fs2.h:#define CONFIG_ENV_SIZE		0x20000
+mx31ads.h:#define CONFIG_SYS_MALLOC_LEN		(CONFIG_ENV_SIZE + 128 * 1024)
+mx31ads.h:#define CONFIG_ENV_SIZE		CONFIG_ENV_SECT_SIZE
+mx31ads.h:#define CONFIG_ENV_OFFSET_REDUND	(CONFIG_ENV_OFFSET + CONFIG_ENV_SIZE)
+mx31ads.h:#define CONFIG_ENV_SIZE_REDUND	CONFIG_ENV_SIZE
+mx31pdk.h:#define CONFIG_SYS_MALLOC_LEN		(2*CONFIG_ENV_SIZE + 2 * 128 * 1024)
+mx31pdk.h:#define CONFIG_ENV_SIZE			(128 * 1024)
+mx51evk.h:#define CONFIG_SYS_MALLOC_LEN		(CONFIG_ENV_SIZE + 2 * 1024 * 1024)
+mx51evk.h:#define CONFIG_ENV_SIZE		CONFIG_ENV_SECT_SIZE
+NC650.h:#define	CONFIG_ENV_SIZE		0x4000	/* Used Size of Environment Sector	*/
+neo.h:#define	CONFIG_ENV_SIZE		0x2000	/* Total Size of Environment Sector	*/
+neo.h:#define CONFIG_ENV_SIZE_REDUND	(CONFIG_ENV_SIZE)
+NETPHONE.h:#define	CONFIG_ENV_SIZE		0x4000
+NETPHONE.h:#define CONFIG_ENV_SIZE_REDUND	CONFIG_ENV_SIZE
+netstar.h:#define CONFIG_ENV_SIZE			(8 * 1024)
+netstar.h:#define CONFIG_ENV_SIZE_REDUND		CONFIG_ENV_SIZE
+NETTA2.h:#define	CONFIG_ENV_SIZE		0x4000
+NETTA2.h:#define CONFIG_ENV_SIZE_REDUND	CONFIG_ENV_SIZE
+NETTA.h:#define	CONFIG_ENV_SIZE		0x4000
+NETTA.h:#define CONFIG_ENV_SIZE_REDUND	CONFIG_ENV_SIZE
+NETVIA.h:#define	CONFIG_ENV_SIZE		0x4000
+NETVIA.h:#define CONFIG_ENV_SIZE_REDUND	CONFIG_ENV_SIZE
+nhk8815.h:#define CONFIG_SYS_MALLOC_LEN		(CONFIG_ENV_SIZE + 256 * 1024)
+nhk8815.h:#   define CONFIG_ENV_SIZE		0x20000 /* 128 Kb - one sector */
+nhk8815.h:#   define CONFIG_ENV_ADDR		(0x00280000 - CONFIG_ENV_SIZE)
+nhk8815.h:#   define CONFIG_ENV_SIZE		0x20000 /* 128 Kb - one sector */
+nhk8815.h:#   define CONFIG_ENV_OFFSET		(0x00280000 - CONFIG_ENV_SIZE)
+ns9750dev.h:#define CONFIG_SYS_MALLOC_LEN		(CONFIG_ENV_SIZE + 128*1024)
+ns9750dev.h:#define CONFIG_ENV_SIZE		0x10000	/* Total Size of Environment Sector */
+NSCU.h:#define	CONFIG_ENV_SIZE		0x4000	/* Total Size of Environment Sector	*/
+NSCU.h:#define CONFIG_ENV_OFFSET_REDUND	(CONFIG_ENV_OFFSET+CONFIG_ENV_SIZE)
+NSCU.h:#define CONFIG_ENV_SIZE_REDUND	(CONFIG_ENV_SIZE)
+NX823.h:#define CONFIG_ENV_SIZE		0x200	/* FIXME How big when embedded?? */
+NX823.h:#define CONFIG_ENV_SIZE		0x20000 /* 8K ouch, this may later be */
+o2dnt.h:#define CONFIG_ENV_SIZE		0x20000
+ocotea.h:#define CONFIG_ENV_SIZE		0x1000	    /* Size of Environment vars */
+ocotea.h:	(CONFIG_SYS_NVRAM_BASE_ADDR+CONFIG_SYS_NVRAM_SIZE-CONFIG_ENV_SIZE)
+ocotea.h:#define	CONFIG_ENV_SIZE		0x4000	/* Total Size of Environment Sector	*/
+ocotea.h:#define CONFIG_ENV_SIZE_REDUND	(CONFIG_ENV_SIZE)
+OCRTC.h:#define CONFIG_ENV_SIZE		0x1000		/* Size of Environment vars	*/
+OCRTC.h:	(CONFIG_SYS_NVRAM_BASE_ADDR+CONFIG_SYS_NVRAM_SIZE-CONFIG_ENV_SIZE)	/* Env	*/
+OCRTC.h:#define CONFIG_ENV_SIZE		0x300	/* 768 bytes may be used for env vars */
+omap1510inn.h:#define CONFIG_SYS_MALLOC_LEN		(CONFIG_ENV_SIZE + 128*1024)
+omap1510inn.h:#define CONFIG_ENV_SIZE		CONFIG_ENV_SECT_SIZE
+omap1610h2.h:#define CONFIG_SYS_MALLOC_LEN	(CONFIG_ENV_SIZE + 128*1024)
+omap1610h2.h:#define CONFIG_ENV_SIZE	0x20000	/* Total Size of Environment Sector */
+omap1610inn.h:#define CONFIG_SYS_MALLOC_LEN	(CONFIG_ENV_SIZE + 128*1024)
+omap1610inn.h:#define CONFIG_ENV_SIZE	0x20000	/* Total Size of Environment Sector */
+omap2420h4.h:#define CONFIG_ENV_SIZE             SZ_128K     /* Total Size of Environment Sector */
+omap2420h4.h:#define CONFIG_SYS_MALLOC_LEN           (CONFIG_ENV_SIZE + SZ_128K)
+omap3_beagle.h:#define CONFIG_ENV_SIZE			(128 << 10)	/* 128 KiB */
+omap3_beagle.h:#define CONFIG_SYS_MALLOC_LEN		(CONFIG_ENV_SIZE + (128 << 10))
+omap3_evm.h:#define CONFIG_ENV_SIZE			(128 << 10)	/* 128 KiB */
+omap3_evm.h:#define CONFIG_SYS_MALLOC_LEN		(CONFIG_ENV_SIZE + (128 << 10))
+omap3_overo.h:#define CONFIG_ENV_SIZE			(128 << 10)	/* 128 KiB */
+omap3_overo.h:#define CONFIG_SYS_MALLOC_LEN		(CONFIG_ENV_SIZE + (128 << 10))
+omap3_pandora.h:#define CONFIG_ENV_SIZE			(128 << 10)	/* 128 KiB */
+omap3_pandora.h:#define CONFIG_SYS_MALLOC_LEN		(CONFIG_ENV_SIZE + (128 << 10))
+omap3_sdp3430.h:#define CONFIG_ENV_SIZE			(256 << 10)
+omap3_sdp3430.h:#define CONFIG_SYS_MALLOC_LEN		(CONFIG_ENV_SIZE + (256 << 10))
+omap3_zoom1.h:#define CONFIG_ENV_SIZE			(128 << 10)	/* 128 KiB */
+omap3_zoom1.h:#define CONFIG_SYS_MALLOC_LEN		(CONFIG_ENV_SIZE + (128 << 10))
+omap3_zoom2.h:#define CONFIG_ENV_SIZE			(128 << 10)	/* 128 KiB */
+omap3_zoom2.h:#define CONFIG_SYS_MALLOC_LEN		(CONFIG_ENV_SIZE + (128 << 10))
+omap5912osk.h:#define CONFIG_SYS_MALLOC_LEN	(CONFIG_ENV_SIZE + 128*1024)
+omap5912osk.h:#define CONFIG_ENV_SIZE	0x20000	/* Total Size of Environment Sector */
+omap730p2.h:#define CONFIG_SYS_MALLOC_LEN		   (CONFIG_ENV_SIZE + 128*1024)
+omap730p2.h:#define CONFIG_ENV_SIZE		   0x20000	  /* Total Size of Environment Sector */
+openrd_base.h:#define CONFIG_ENV_SIZE			0x20000	/* 128k */
+ORSG.h:#define CONFIG_ENV_SIZE		0x1000		/* Size of Environment vars	*/
+ORSG.h:	(CONFIG_SYS_NVRAM_BASE_ADDR+CONFIG_SYS_NVRAM_SIZE-CONFIG_ENV_SIZE)	/* Env	*/
+ORSG.h:#define CONFIG_ENV_SIZE		0x300	/* 768 bytes may be used for env vars */
+otc570.h:#define CONFIG_ENV_SIZE			0x4200
+otc570.h:#define CONFIG_SYS_MALLOC_LEN		ROUND(3 * CONFIG_ENV_SIZE + \
+OXC.h:#define CONFIG_ENV_SIZE		0x00010000	/* Total Size of Environment Sector */
+P1_P2_RDB.h:	#define CONFIG_ENV_SIZE		CONFIG_SYS_NAND_BLOCK_SIZE
+P1_P2_RDB.h:	#define CONFIG_ENV_SIZE		0x2000
+P1_P2_RDB.h:	#define CONFIG_ENV_SIZE		0x2000
+P2020DS.h:#define CONFIG_ENV_SIZE		0x2000
+P3G4.h:#define	CONFIG_ENV_SIZE		0x1000	/* Total Size of Environment Sector */
+p3mx.h:#define	CONFIG_ENV_SIZE		0x2000	/* Total Size of Environment Sector	*/
+p3p440.h:#define	CONFIG_ENV_SIZE		0x2000	/* Total Size of Environment Sector	*/
+p3p440.h:#define CONFIG_ENV_SIZE_REDUND	(CONFIG_ENV_SIZE)
+PATI.h:#define CONFIG_ENV_SIZE		2048
+PATI.h:#define	CONFIG_ENV_SIZE		0x00002000		/* Set whole sector as env		*/
+PATI.h:#define CONFIG_ENV_OFFSET		((0 - CONFIG_SYS_FLASH_BASE) - CONFIG_ENV_SIZE)		/* Environment starts at this adress	*/
+pb1x00.h:#define CONFIG_ENV_SIZE		0x10000
+PCI405.h:#define CONFIG_ENV_SIZE		0x400	/* 1024 bytes may be used for env vars*/
+PCI5441.h:#define CONFIG_SYS_MALLOC_LEN		(CONFIG_ENV_SIZE + 128*1024)
+PCI5441.h:#define CONFIG_ENV_SIZE		(64 * 1024)	/* 64 KByte (1 sector)	*/
+PCIPPC2.h:#define CONFIG_ENV_SIZE		0x1000	/* Size of the Environment		*/
+PCIPPC6.h:#define CONFIG_ENV_SIZE		0x1000	/* Size of the Environment		*/
+pcm030.h:#define CONFIG_ENV_SIZE		CONFIG_SYS_EEPROM_SIZE
+pcs440ep.h:#define CONFIG_ENV_SIZE		0x2000	/* Total Size of Environment Sector	*/
+pcs440ep.h:#define CONFIG_ENV_SIZE_REDUND	(CONFIG_ENV_SIZE)
+pcu_e.h:#define CONFIG_ENV_SIZE		0x2000	/* Total Size of Environment		*/
+pcu_e.h:#define CONFIG_ENV_SIZE		1024
+pdnb3.h:#define	CONFIG_ENV_SIZE		0x4000	/* Total Size of Environment Sector	*/
+pdnb3.h:#define	CONFIG_ENV_SIZE		0x1000	/* Total Size of Environment Sector	*/
+pdnb3.h:#define CONFIG_ENV_SIZE_REDUND	(CONFIG_ENV_SIZE)
+pf5200.h:#define CONFIG_ENV_SIZE		0x10000
+pf5200.h:#define CONFIG_ENV_SIZE		0x0400	/* 8192 bytes may be used for env vars */
+PIP405.h:#define CONFIG_ENV_SIZE            0x800   /* 2 kBytes may be used for env vars */
+PK1C20.h:#define CONFIG_SYS_MALLOC_LEN		(CONFIG_ENV_SIZE + 128*1024)
+PK1C20.h:#define CONFIG_ENV_SIZE		(64 * 1024)	/* 64 KByte (1 sector)	*/
+pleb2.h:#define CONFIG_SYS_MALLOC_LEN	    (CONFIG_ENV_SIZE + 128*1024)
+pleb2.h:#define CONFIG_ENV_SIZE		0x4000	/* Total Size of Environment */
+PLU405.h:#define CONFIG_ENV_SIZE		0x700
+PM520.h:#define CONFIG_ENV_SIZE		0x10000
+PM826.h:#define CONFIG_ENV_SIZE		0x40000
+PM826.h:#define CONFIG_ENV_SIZE		(2048 - 512)
+PM828.h:#define CONFIG_ENV_SIZE		0x40000
+PM828.h:#define CONFIG_ENV_SIZE		(2048 - 512)
+PM854.h:  #define CONFIG_ENV_SIZE		0x2000
+PM854.h:  #define CONFIG_ENV_SIZE		0x2000
+PM856.h:  #define CONFIG_ENV_SIZE		0x2000
+PM856.h:  #define CONFIG_ENV_SIZE		0x2000
+pm9261.h:#define CONFIG_ENV_SIZE		0x4200
+pm9261.h:#define CONFIG_ENV_SIZE			0x20000		/* 1 sector = 128 kB */
+pm9261.h:#define	CONFIG_ENV_SIZE		0x10000
+pm9261.h:		ROUND(3 * CONFIG_ENV_SIZE + 128 * 1024, 0x1000)
+pm9263.h:#define CONFIG_ENV_SIZE		0x4200
+pm9263.h:#define CONFIG_ENV_SIZE		0x20000		/* 1 sector = 128 kB */
+pm9263.h:#define	CONFIG_ENV_SIZE		0x10000
+pm9263.h:#define CONFIG_SYS_MALLOC_LEN	ROUND(3 * CONFIG_ENV_SIZE + 128 * 1024, 0x1000)
+PMC405DE.h:#define CONFIG_ENV_SIZE			0x700
+PMC405.h:#define CONFIG_ENV_SIZE		0x800 /* 2048 bytes may be used for env vars */
+PMC440.h:#define CONFIG_ENV_SIZE		0x2000	/* Total Size of Environment Sector     */
+PMC440.h:#define CONFIG_ENV_SIZE_REDUND	(CONFIG_ENV_SIZE)
+PMC440.h:#define CONFIG_ENV_SIZE		0x1000	/* 4096 bytes may be used for env vars */
+PMC440.h:#define CONFIG_ENV_SIZE		CONFIG_SYS_NAND_BLOCK_SIZE
+PMC440.h:#define CONFIG_ENV_OFFSET		(CONFIG_SYS_NAND_U_BOOT_OFFS + CONFIG_ENV_SIZE)
+PMC440.h:#define CONFIG_ENV_OFFSET_REDUND	(CONFIG_ENV_OFFSET + CONFIG_ENV_SIZE)
+PN62.h:#define CONFIG_ENV_SIZE		0x00002000	/* Total Size of Environment Sector */
+PPChameleonEVB.h:#define CONFIG_ENV_SIZE		0x700	/* 2048-256 bytes may be used for env vars (total size of a CAT24WC16 is 2048 bytes)*/
+PPChameleonEVB.h:#define CONFIG_ENV_SIZE_REDUND	0x2000
+ppmc7xx.h: * CONFIG_ENV_SIZE			- Ammount of RAM for env vars (used to save RAM, 4KB)
+ppmc7xx.h:#define CONFIG_ENV_SIZE		0x1000
+ppmc7xx.h:#define CONFIG_ENV_SIZE_REDUND	0x1000
+ppmc8260.h:#    define CONFIG_ENV_SIZE	0x1000	/* Total Size of Environment Sector	*/
+ppmc8260.h:#define CONFIG_ENV_SIZE		0x1000
+purple.h:#define CONFIG_ENV_SIZE		0x4000
+pxa255_idp.h:#define CONFIG_SYS_MALLOC_LEN	    (CONFIG_ENV_SIZE + 128*1024)
+pxa255_idp.h:#define CONFIG_ENV_SIZE		PHYS_FLASH_SECT_SIZE	/* Total Size of Environment Sector	*/
+qemu-mips.h:#define CONFIG_ENV_SIZE		0x8000
+qong.h:#define CONFIG_SYS_MALLOC_LEN		(CONFIG_ENV_SIZE + 128 * 1024)
+qong.h:#define CONFIG_ENV_SIZE		CONFIG_ENV_SECT_SIZE
+qong.h:#define CONFIG_ENV_OFFSET_REDUND	(CONFIG_ENV_OFFSET + CONFIG_ENV_SIZE)
+qong.h:#define CONFIG_ENV_SIZE_REDUND	CONFIG_ENV_SIZE
+QS823.h:#define CONFIG_ENV_SIZE		0x2000		/* 8kb */
+QS850.h:#define CONFIG_ENV_SIZE		0x2000		/* 8kb */
+QS860T.h:#define CONFIG_ENV_SIZE		0x00001000	/* We use only the last 4K for PPCBoot */
+quad100hd.h:#define CONFIG_ENV_SIZE_REDUND	(CONFIG_ENV_SECT_SIZE)
+quad100hd.h:#define CONFIG_ENV_SIZE		0x400		/* Size of Environment vars */
+quantum.h:#define CONFIG_ENV_SIZE		CONFIG_ENV_SECT_SIZE
+quantum.h:#define CONFIG_ENV_OFFSET_REDUND	(CONFIG_ENV_OFFSET+CONFIG_ENV_SIZE)
+quantum.h:#define CONFIG_ENV_SIZE_REDUND	(CONFIG_ENV_SIZE)
+r2dplus.h:#define CONFIG_ENV_SIZE        (CONFIG_ENV_SECT_SIZE)
+R360MPI.h:#define	CONFIG_ENV_SIZE		0x4000	/* Used Size of Environment sector	*/
+r7780mp.h:#define CONFIG_ENV_SIZE		(CONFIG_ENV_SECT_SIZE)
+RBC823.h:#define	CONFIG_ENV_SIZE		0x10000	/* Total Size of Environment Sector	*/
+rd6281a.h:#define CONFIG_ENV_SIZE			0x20000	/* 128k */
+redwood.h:#define CONFIG_ENV_SIZE		0x10000	/* Size of Environment vars	*/
+rmu.h:#define	CONFIG_ENV_SIZE		CONFIG_ENV_SECT_SIZE	/* Used size for environment	*/
+rmu.h:#define CONFIG_ENV_ADDR_REDUND	(CONFIG_ENV_ADDR+CONFIG_ENV_SIZE)
+rmu.h:#define CONFIG_ENV_SIZE_REDUND	(CONFIG_ENV_SIZE)
+RPXClassic.h:#define	CONFIG_ENV_SIZE		0x8000	/* Total Size of Environment Sector  */
+RPXClassic.h:#define CONFIG_ENV_SIZE            0x1000
+RPXlite_DW.h:#define CONFIG_ENV_SIZE		0x1000
+RPXlite_DW.h:#define CONFIG_ENV_SIZE		0x8000	/* Total Size of Environment Sector	*/
+RPXsuper.h:#    define CONFIG_ENV_SIZE       0x1000  /* Total Size of Environment Sector */
+RPXsuper.h:#  define CONFIG_ENV_SIZE         0x200
+RRvision.h:#define	CONFIG_ENV_SIZE		0x4000	/* Total Size of Environment Sector	*/
+RRvision.h:#define CONFIG_ENV_OFFSET_REDUND	(CONFIG_ENV_OFFSET+CONFIG_ENV_SIZE)
+RRvision.h:#define CONFIG_ENV_SIZE_REDUND	(CONFIG_ENV_SIZE)
+rsk7203.h:#define CONFIG_ENV_SIZE		CONFIG_ENV_SECT_SIZE
+sacsng.h:#    define CONFIG_ENV_SIZE	0x1000	/* Total Size of Environment Sector	*/
+sacsng.h:#  define CONFIG_ENV_SIZE		0x200
+Sandpoint8240.h:#define CONFIG_ENV_SIZE		0x00002000	/* Total Size of Environment Sector */
+Sandpoint8245.h:#define CONFIG_ENV_SIZE		0x00002000	/* Total Size of Environment Sector */
+sbc2410x.h:#define CONFIG_SYS_MALLOC_LEN		(CONFIG_ENV_SIZE + 128*1024)
+sbc2410x.h:#define CONFIG_ENV_SIZE		0x10000	/* Total Size of Environment Sector */
+sbc35_a9g20.h:#define CONFIG_ENV_SIZE		0x1000
+sbc35_a9g20.h:#define CONFIG_ENV_SIZE			0x20000
+sbc35_a9g20.h:#define CONFIG_SYS_MALLOC_LEN	ROUND(3 * CONFIG_ENV_SIZE + 128 * 1024, 0x1000)
+sbc405.h:#define CONFIG_ENV_SIZE		0x40000	/* Total Size of Environment Sector	*/
+sbc8240.h:#define CONFIG_ENV_SIZE		0x4000	/* Size of the Environment		*/
+sbc8260.h:#    define CONFIG_ENV_SIZE	0x1000	/* Total Size of Environment Sector	*/
+sbc8260.h:#  define CONFIG_ENV_SIZE		0x200
+sbc8349.h:	#define CONFIG_ENV_SIZE		0x2000
+sbc8349.h:#define CONFIG_ENV_SIZE_REDUND	(CONFIG_ENV_SIZE)
+sbc8349.h:	#define CONFIG_ENV_SIZE		0x2000
+SBC8540.h:    #define CONFIG_ENV_SIZE	0x2000
+SBC8540.h:    #define CONFIG_ENV_SIZE	0x2000 /* CONFIG_ENV_SECT_SIZE */
+SBC8540.h:  #define CONFIG_ENV_SIZE		0x2000
+sbc8548.h:#define CONFIG_ENV_SIZE		0x2000
+sbc8560.h:    #define CONFIG_ENV_SIZE	0x2000
+sbc8560.h:    #define CONFIG_ENV_SIZE	0x2000 /* CONFIG_ENV_SECT_SIZE */
+sbc8560.h:  #define CONFIG_ENV_SIZE		0x2000
+sbc8641d.h:#define CONFIG_ENV_SIZE		0x2000
+sc3.h:#define CONFIG_ENV_SIZE		0x4000	    /* Total Size of Environment Sector	*/
+sc3.h:#define CONFIG_ENV_OFFSET_REDUND	(CONFIG_ENV_OFFSET+CONFIG_ENV_SIZE)
+sc3.h:#define CONFIG_ENV_SIZE_REDUND	(CONFIG_ENV_SIZE)
+sc520_cdp.h:#define CONFIG_SYS_MALLOC_LEN	(CONFIG_ENV_SIZE + 128*1024)
+sc520_cdp.h:#define CONFIG_ENV_SIZE	       0x4000	/* Total Size of Environment EEPROM 16k is SPI is used or 128 bytes if MW is used*/
+sc520_spunk.h:#define CONFIG_SYS_MALLOC_LEN	(CONFIG_ENV_SIZE + 128*1024)
+sc520_spunk.h:# define CONFIG_ENV_SIZE		0x20000	/* Total Size of Environment Sector (or 0x10000) */
+sc520_spunk.h:# define CONFIG_ENV_SIZE		0x2000	/* Total Size of Environment EEPROM	*/
+scb9328.h:#define CONFIG_SYS_MALLOC_LEN		(CONFIG_ENV_SIZE + (128<<10) )
+scb9328.h:#define CONFIG_ENV_SIZE		0x20000
+SCM.h:#define CONFIG_ENV_SIZE		0x40000
+SCM.h:#define CONFIG_ENV_SIZE		2048
+sequoia.h:#define CONFIG_ENV_SIZE		(8 << 10)
+sequoia.h:#define	CONFIG_ENV_SIZE		0x2000	/* Total Size of Environment Sector   */
+sequoia.h:#define CONFIG_ENV_SIZE_REDUND	(CONFIG_ENV_SIZE)
+sequoia.h:#define CONFIG_ENV_SIZE		CONFIG_SYS_NAND_BLOCK_SIZE
+sequoia.h:#define CONFIG_ENV_OFFSET		(CONFIG_SYS_NAND_U_BOOT_OFFS + CONFIG_ENV_SIZE)
+sequoia.h:#define CONFIG_ENV_OFFSET_REDUND	(CONFIG_ENV_OFFSET + CONFIG_ENV_SIZE)
+sh7763rdp.h:#define CONFIG_ENV_SIZE		(CONFIG_ENV_SECT_SIZE)
+sh7763rdp.h:#define CONFIG_ENV_SIZE_REDUND	(CONFIG_ENV_SECT_SIZE)
+sh7785lcr.h:#define CONFIG_ENV_SIZE		(CONFIG_ENV_SECT_SIZE)
+sh7785lcr.h:#define CONFIG_ENV_SIZE_REDUND	(CONFIG_ENV_SECT_SIZE)
+shannon.h:#define CONFIG_SYS_MALLOC_LEN		(CONFIG_ENV_SIZE + 128*1024)
+shannon.h:#define CONFIG_ENV_SIZE		0x4000	/* Total Size of Environment Sector	*/
+shannon.h:#define CONFIG_ENV_SIZE		0x4000	/* Total Size of Environment Sector	*/
+sheevaplug.h:#define CONFIG_ENV_SIZE			0x20000	/* 128k */
+SIMPC8313.h:	#define CONFIG_ENV_SIZE			CONFIG_ENV_SECT_SIZE
+SIMPC8313.h:	#define CONFIG_ENV_SIZE_REDUND		CONFIG_ENV_SIZE
+SIMPC8313.h:	#define CONFIG_ENV_SIZE			0x2000
+SIMPC8313.h:	#define CONFIG_ENV_SIZE			0x2000
+SM850.h:#define	CONFIG_ENV_SIZE		0x4000	/* Total Size of Environment Sector	*/
+smdk2400.h:#define CONFIG_SYS_MALLOC_LEN		(CONFIG_ENV_SIZE + 128*1024)
+smdk2400.h:#define CONFIG_ENV_SIZE		0x40000
+smdk2400.h:#define CONFIG_ENV_ADDR_REDUND	(CONFIG_ENV_ADDR + CONFIG_ENV_SIZE)
+smdk2400.h:#define CONFIG_ENV_SIZE_REDUND	(CONFIG_ENV_SIZE)
+smdk2410.h:#define CONFIG_SYS_MALLOC_LEN		(CONFIG_ENV_SIZE + 128*1024)
+smdk2410.h:#define CONFIG_ENV_SIZE		0x10000	/* Total Size of Environment Sector */
+smdk6400.h:#define CONFIG_SYS_MALLOC_LEN		(CONFIG_ENV_SIZE + 1024 * 1024)
+smdk6400.h:#define CONFIG_ENV_SIZE		0x4000	/* Total Size of Environment Sector */
+smdkc100.h:#define CONFIG_SYS_MALLOC_LEN		(CONFIG_ENV_SIZE + (1 << 20))
+smdkc100.h:#define CONFIG_ENV_SIZE			(128 << 10)	/* 128KiB, 0x20000 */
+smmaco4.h:#define CONFIG_ENV_SIZE		0x10000
+smmaco4.h:#define	CONFIG_ENV_SIZE_REDUND	(CONFIG_ENV_SIZE)
+SMN42.h:#define CONFIG_SYS_MALLOC_LEN		(CONFIG_ENV_SIZE + 128*1024)
+SMN42.h:#define CONFIG_ENV_SIZE		0x2000 /* Total Size of Environment Sector	*/
+socrates.h:#define CONFIG_ENV_SIZE		0x4000
+socrates.h:#define CONFIG_ENV_SIZE_REDUND	(CONFIG_ENV_SIZE)
+sorcery.h:#define CONFIG_ENV_SIZE		0x4000                       /* 16K */
+sorcery.h:#define CONFIG_ENV_SIZE_REDUND	CONFIG_ENV_SIZE
+SPD823TS.h:#define CONFIG_ENV_SIZE		0x0800	/* Total Size of Environment Sector	*/
+spear-common.h:#define CONFIG_ENV_SIZE				0x02000
+spieval.h:#define CONFIG_ENV_SIZE		0x10000
+spieval.h:#define	CONFIG_ENV_SIZE_REDUND	(CONFIG_ENV_SIZE)
+stxgp3.h:  #define CONFIG_ENV_SIZE		0x2000
+stxgp3.h:  #define CONFIG_ENV_SIZE		0x2000
+stxssa.h:# define CONFIG_ENV_SIZE		2048
+stxssa.h:# define CONFIG_ENV_SIZE		0x4000
+stxssa.h:# define CONFIG_ENV_SIZE_REDUND	(CONFIG_ENV_SIZE)
+stxxtc.h:#define	CONFIG_ENV_SIZE		0x4000
+stxxtc.h:#define CONFIG_ENV_SIZE_REDUND	CONFIG_ENV_SIZE
+suen3.h:#undef	CONFIG_ENV_SIZE
+suen3.h:#define CONFIG_ENV_SIZE			(0x2000 - CONFIG_ENV_OFFSET)
+suen3.h:/* offset redund: (CONFIG_ENV_OFFSET + CONFIG_ENV_SIZE) */
+suen3.h:#define CONFIG_ENV_SIZE_REDUND		(CONFIG_ENV_SIZE)
+svm_sc8xx.h:#define	CONFIG_ENV_SIZE		0x10000	/* Total Size of Environment Sector	*/
+svm_sc8xx.h:#define	CONFIG_ENV_SIZE		0x10000	/* Total Size of Environment Sector	*/
+svm_sc8xx.h:#define	CONFIG_ENV_SIZE		0x4000	/* Total Size of Environment Sector	*/
+svm_sc8xx.h:#define CONFIG_ENV_OFFSET_REDUND   (CONFIG_ENV_OFFSET+CONFIG_ENV_SIZE)
+svm_sc8xx.h:#define CONFIG_ENV_SIZE_REDUND     (CONFIG_ENV_SIZE)
+SX1.h:#define CONFIG_SYS_MALLOC_LEN		(CONFIG_ENV_SIZE + 128*1024)
+SX1.h:#define CONFIG_ENV_SIZE		CONFIG_ENV_SECT_SIZE /* Total Size of Environment Sector */
+SX1.h:#define CONFIG_ENV_SIZE_REDUND	0x20000
+SXNI855T.h:  #define CONFIG_ENV_SIZE		0x00002000
+SXNI855T.h:  #define CONFIG_ENV_SIZE		     1024	/* Use only a part of it*/
+taihu.h:#define CONFIG_ENV_SIZE		0x4000	/* Total Size of Environment Sector	*/
+taihu.h:#define CONFIG_ENV_SIZE_REDUND	(CONFIG_ENV_SIZE)
+taihu.h:#define CONFIG_ENV_SIZE		0x0ff8		/* Size of Environment vars */
+taihu.h:	(CONFIG_SYS_NVRAM_BASE_ADDR+CONFIG_SYS_NVRAM_SIZE-CONFIG_ENV_SIZE)	/* Env*/
+taishan.h:#define	CONFIG_ENV_SIZE		0x4000	/* Total Size of Environment Sector	*/
+taishan.h:#define CONFIG_ENV_SIZE_REDUND	(CONFIG_ENV_SIZE)
+TASREG.h:#define CONFIG_ENV_SIZE		0x10000	/* Total Size of Environment Sector	*/
+tb0229.h:#define CONFIG_ENV_SIZE		0x20000
+TB5200.h:#define CONFIG_ENV_SIZE		0x10000
+TB5200.h:#define CONFIG_ENV_SIZE_REDUND	(CONFIG_ENV_SIZE)
+tcm-bf518.h:#define CONFIG_ENV_SIZE		0x2000
+tcm-bf537.h:#define CONFIG_ENV_SIZE		0x2000
+TK885D.h:#define CONFIG_ENV_SIZE		0x08000 /* Total Size of Environment		*/
+TK885D.h:#define CONFIG_ENV_SIZE_REDUND	(CONFIG_ENV_SIZE)
+tny_a9260.h:#define CONFIG_ENV_SIZE		0x1000
+tny_a9260.h:#define CONFIG_ENV_SIZE 0x20000
+tny_a9260.h:#define CONFIG_SYS_MALLOC_LEN	ROUND(3 * CONFIG_ENV_SIZE + 128 * 1024, 0x1000)
+TOP5200.h:#define CONFIG_ENV_SIZE		0x0700
+TOP860.h:#define CONFIG_ENV_SIZE		0x0700
+Total5200.h:#define CONFIG_ENV_SIZE		0x40000
+TQM5200.h:#define CONFIG_ENV_SIZE		0x4000	/* 16 k - keep small for fast booting */
+TQM5200.h:#define CONFIG_ENV_SIZE_REDUND	(CONFIG_ENV_SIZE)
+TQM823L.h:#define	CONFIG_ENV_SIZE		0x4000	/* Total Size of Environment Sector	*/
+TQM823L.h:#define CONFIG_ENV_OFFSET_REDUND	(CONFIG_ENV_OFFSET+CONFIG_ENV_SIZE)
+TQM823L.h:#define CONFIG_ENV_SIZE_REDUND	(CONFIG_ENV_SIZE)
+TQM823M.h:#define	CONFIG_ENV_SIZE		0x08000	/* Total Size of Environment		*/
+TQM823M.h:#define CONFIG_ENV_SIZE_REDUND	(CONFIG_ENV_SIZE)
+TQM8260.h:#define CONFIG_ENV_SIZE		0x08000
+TQM8260.h:#define CONFIG_ENV_SIZE_REDUND	CONFIG_ENV_SIZE
+TQM8272.h:#define CONFIG_ENV_SIZE		0x20000
+TQM8272.h:#define CONFIG_ENV_ADDR_REDUND	(CONFIG_ENV_ADDR + CONFIG_ENV_SIZE)
+TQM8272.h:#define CONFIG_ENV_SIZE_REDUND	0x20000
+TQM834x.h:#define CONFIG_ENV_SIZE			0x8000	/*  32K max size */
+TQM834x.h:#define CONFIG_ENV_SIZE_REDUND	(CONFIG_ENV_SIZE)
+TQM850L.h:#define	CONFIG_ENV_SIZE		0x4000	/* Total Size of Environment Sector	*/
+TQM850L.h:#define CONFIG_ENV_OFFSET_REDUND	(CONFIG_ENV_OFFSET+CONFIG_ENV_SIZE)
+TQM850L.h:#define CONFIG_ENV_SIZE_REDUND	(CONFIG_ENV_SIZE)
+TQM850M.h:#define	CONFIG_ENV_SIZE		0x08000	/* Total Size of Environment		*/
+TQM850M.h:#define CONFIG_ENV_SIZE_REDUND	(CONFIG_ENV_SIZE)
+TQM855L.h:#define	CONFIG_ENV_SIZE		0x4000	/* Total Size of Environment Sector	*/
+TQM855L.h:#define CONFIG_ENV_OFFSET_REDUND	(CONFIG_ENV_OFFSET+CONFIG_ENV_SIZE)
+TQM855L.h:#define CONFIG_ENV_SIZE_REDUND	(CONFIG_ENV_SIZE)
+TQM855M.h:#define	CONFIG_ENV_SIZE		0x08000	/* Total Size of Environment		*/
+TQM855M.h:#define CONFIG_ENV_SIZE_REDUND	(CONFIG_ENV_SIZE)
+TQM85xx.h:#define CONFIG_ENV_SIZE		0x2000
+TQM85xx.h:#define CONFIG_ENV_SIZE_REDUND	(CONFIG_ENV_SIZE)
+TQM860L.h:#define	CONFIG_ENV_SIZE		0x4000	/* Total Size of Environment Sector	*/
+TQM860L.h:#define CONFIG_ENV_OFFSET_REDUND	(CONFIG_ENV_OFFSET+CONFIG_ENV_SIZE)
+TQM860L.h:#define CONFIG_ENV_SIZE_REDUND	(CONFIG_ENV_SIZE)
+TQM860M.h:#define	CONFIG_ENV_SIZE		0x08000	/* Total Size of Environment Sector	*/
+TQM860M.h:#define CONFIG_ENV_SIZE_REDUND	(CONFIG_ENV_SIZE)
+TQM862L.h:#define	CONFIG_ENV_SIZE		0x4000	/* Total Size of Environment Sector	*/
+TQM862L.h:#define CONFIG_ENV_OFFSET_REDUND	(CONFIG_ENV_OFFSET+CONFIG_ENV_SIZE)
+TQM862L.h:#define CONFIG_ENV_SIZE_REDUND	(CONFIG_ENV_SIZE)
+TQM862M.h:#define	CONFIG_ENV_SIZE		0x08000	/* Total Size of Environment		*/
+TQM862M.h:#define CONFIG_ENV_SIZE_REDUND	(CONFIG_ENV_SIZE)
+TQM866M.h:#define CONFIG_ENV_SIZE		0x08000 /* Total Size of Environment Sector	*/
+TQM866M.h:#define CONFIG_ENV_SIZE_REDUND	(CONFIG_ENV_SIZE)
+TQM885D.h:#define CONFIG_ENV_SIZE		0x08000 /* Total Size of Environment		*/
+TQM885D.h:#define CONFIG_ENV_SIZE_REDUND	(CONFIG_ENV_SIZE)
+trab.h:#define CONFIG_SYS_MALLOC_LEN		(CONFIG_ENV_SIZE + 128*1024)
+trab.h:#define CONFIG_ENV_SIZE		0x4000
+trab.h:#define CONFIG_ENV_SIZE		0x4000
+trab.h:#define CONFIG_ENV_SIZE_REDUND	(CONFIG_ENV_SIZE)
+trizepsiv.h:#define CONFIG_SYS_MALLOC_LEN	    (CONFIG_ENV_SIZE + 128*1024)
+trizepsiv.h:#define CONFIG_ENV_SIZE		0x40000	/* Total Size of Environment		*/
+trizepsiv.h:#define CONFIG_ENV_SIZE_REDUND	(CONFIG_ENV_SIZE)
+tx25.h:#define CONFIG_ENV_SIZE		(128 * 1024)	/* 128 kB NAND block size */
+tx25.h:#define CONFIG_ENV_OFFSET_REDUND	(CONFIG_ENV_OFFSET + CONFIG_ENV_SIZE)
+uc100.h:#define	CONFIG_ENV_SIZE		0x4000	/* Total Size of Environment Sector	*/
+uc100.h:#define CONFIG_ENV_SIZE_REDUND	(CONFIG_ENV_SIZE)
+utx8245.h:#define CONFIG_ENV_SIZE		CONFIG_ENV_SECT_SIZE		/* Size of the Environment */
+v37.h:#define	CONFIG_ENV_SIZE		0x4000	/* Total Size of Environment Sector	*/
+v38b.h:#define CONFIG_ENV_SIZE		0x10000
+v5fx30teval.h:#define	CONFIG_ENV_SIZE		0x20000
+VCMA9.h:#define CONFIG_ENV_SIZE		0x800	/* 2KB should be more than enough */
+VCMA9.h:/*#define CONFIG_MALLOC_SIZE	(CONFIG_ENV_SIZE + 128*1024)*/
+VCMA9.h:#define CONFIG_ENV_SIZE		0x10000	/* Total Size of Environment Sector */
+vct.h:#define	CONFIG_ENV_SIZE		0x4000	/* Total Size of Environment Sector	*/
+vct.h:#define CONFIG_ENV_SIZE_REDUND	(CONFIG_ENV_SIZE)
+vct.h:#define	CONFIG_ENV_SIZE			(128 << 10)	/* erase size */
+versatile.h:#define CONFIG_SYS_MALLOC_LEN		(CONFIG_ENV_SIZE + 128 * 1024)
+versatile.h:#define CONFIG_ENV_SIZE			8192
+virtlab2.h:#define	CONFIG_ENV_SIZE		0x4000	/* Total Size of Environment Sector	*/
+virtlab2.h:#define CONFIG_ENV_OFFSET_REDUND	(CONFIG_ENV_OFFSET+CONFIG_ENV_SIZE)
+virtlab2.h:#define CONFIG_ENV_SIZE_REDUND	(CONFIG_ENV_SIZE)
+vme8349.h:	#define CONFIG_ENV_SIZE		0x2000
+vme8349.h:#define CONFIG_ENV_SIZE_REDUND	(CONFIG_ENV_SIZE)
+vme8349.h:	#define CONFIG_ENV_SIZE		0x2000
+VOH405.h:#define CONFIG_ENV_SIZE		0x700	/* 2048 bytes may be used for env vars*/
+voiceblue.h:#define CONFIG_ENV_SIZE			(8 * 1024)
+voiceblue.h:#define CONFIG_ENV_SIZE_REDUND		CONFIG_ENV_SIZE
+VOM405.h:#define CONFIG_ENV_SIZE		0x700	/* 2048 bytes may be used for env vars*/
+VoVPN-GW.h:#define CONFIG_ENV_SIZE			0x00020000
+W7OLMC.h:#define CONFIG_ENV_SIZE		0x1000		/* Size of Environment vars	*/
+W7OLMC.h:	(CONFIG_SYS_NVRAM_BASE_ADDR+CONFIG_SYS_NVRAM_SIZE-CONFIG_ENV_SIZE) Env  */
+W7OLMC.h:#define CONFIG_ENV_SIZE		0x10000		/* Total Size of env. sector	*/
+W7OLMG.h:#define CONFIG_ENV_SIZE		0x1000		/* Size of Environment vars	*/
+W7OLMG.h:	(CONFIG_SYS_NVRAM_BASE_ADDR+CONFIG_SYS_NVRAM_SIZE-CONFIG_ENV_SIZE) Env  */
+W7OLMG.h:#define CONFIG_ENV_SIZE		0x10000		/* Total Size of env. sector	*/
+walnut.h:#define CONFIG_ENV_SIZE		0x4000	/* Total Size of Environment Sector	*/
+walnut.h:#define CONFIG_ENV_SIZE_REDUND	(CONFIG_ENV_SIZE)
+walnut.h:#define CONFIG_ENV_SIZE		0x1000		/* Size of Environment vars	*/
+walnut.h:	(CONFIG_SYS_NVRAM_BASE_ADDR+CONFIG_SYS_NVRAM_SIZE-CONFIG_ENV_SIZE)	/* Env	*/
+wepep250.h:#define CONFIG_SYS_MALLOC_LEN	  (CONFIG_ENV_SIZE + (128<<10) )
+wepep250.h:#define CONFIG_ENV_SIZE		0x2000
+WUH405.h:#define CONFIG_ENV_SIZE		0x700	/* 2048 bytes may be used for env vars*/
+xaeniax.h:#define CONFIG_SYS_MALLOC_LEN	    (CONFIG_ENV_SIZE + 128*1024)
+xaeniax.h:#define CONFIG_ENV_SIZE		0x40000			/* Total Size of Environment Sector	*/
+xilinx-ppc405-generic.h:#define CONFIG_ENV_SIZE			0x10000
+xilinx-ppc440-generic.h:#define	CONFIG_ENV_SIZE		0x20000
+xilinx-ppc.h:#define CONFIG_SYS_MALLOC_LEN		(CONFIG_ENV_SIZE + 128 * 1024)
+xm250.h:#define CONFIG_ENV_SIZE		0x4000
+XPEDITE1000.h:#define CONFIG_ENV_SIZE		0x8000
+XPEDITE5170.h:#define CONFIG_ENV_SIZE		0x8000
+XPEDITE5200.h:#define CONFIG_ENV_SIZE		0x8000
+XPEDITE5370.h:#define CONFIG_ENV_SIZE		0x8000
+xsengine.h:#define CONFIG_ENV_SIZE                    0x4000				/* 16kB Total Size of Environment Sector */
+xsengine.h:#define CONFIG_SYS_MALLOC_LEN			(CONFIG_ENV_SIZE + 256*1024)
+yosemite.h:#define	CONFIG_ENV_SIZE		0x2000	/* Total Size of Environment Sector	*/
+yosemite.h:#define CONFIG_ENV_SIZE_REDUND	(CONFIG_ENV_SIZE)
+yosemite.h:#define CONFIG_ENV_SIZE		0x200	    /* Size of Environment vars */
+yucca.h:#define CONFIG_ENV_SIZE		0x10000	/* Size of Environment vars	*/
+Yukon8220.h:#define CONFIG_ENV_SIZE		256
+Yukon8220.h:#define CONFIG_ENV_SIZE		PHYS_AMD_SECT_SIZE
+Yukon8220.h:#define CONFIG_ENV_SIZE		PHYS_INTEL_SECT_SIZE
+zeus.h:#define	CONFIG_ENV_SIZE		0x2000	/* Total Size of Environment Sector	*/
+zeus.h:#define CONFIG_ENV_SIZE_REDUND	(CONFIG_ENV_SIZE)
+ZPC1900.h:#  define CONFIG_ENV_SIZE		0x1000
+ZUMA.h:#define CONFIG_ENV_SIZE		0x1000	/* Total Size of Environment Sector */
+zylonite.h:#define CONFIG_SYS_MALLOC_LEN	    (CONFIG_ENV_SIZE + 128*1024)
+zylonite.h:#define CONFIG_ENV_SIZE		0x4000
