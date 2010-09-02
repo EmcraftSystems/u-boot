@@ -28,6 +28,10 @@ int arch_cpu_init(void)
  	 */
 	my_uart_init(115200);
 
+        SYSREG->EMC_CS_1_CR = 0x000000AF;
+
+	nvm_init();
+
         return 0;
 }
 
@@ -70,9 +74,10 @@ int checkboard(void)
         return 0;
 }
 
+#if 0
 unsigned long flash_init(void)
 {
-	nvm_init();
-        return 0;
+	/*nvm_init();*/
+	return 0;
 }
-
+#endif

@@ -55,7 +55,7 @@
 #undef CONFIG_CMD_FPGA
 #undef CONFIG_CMD_IMI
 #undef CONFIG_CMD_ITEST
-#undef CONFIG_CMD_FLASH
+//#undef CONFIG_CMD_FLASH
 #undef CONFIG_CMD_IMLS
 #undef CONFIG_CMD_LOADS
 #undef CONFIG_CMD_MISC
@@ -68,7 +68,7 @@
 /* 
  * TO-DO: review this list
  */
-#define CONFIG_SYS_MAX_FLASH_SECT 0
+//#define CONFIG_SYS_MAX_FLASH_SECT 0
 
 /*
  * Configuration of the external RAM.
@@ -76,6 +76,8 @@
 #define CONFIG_NR_DRAM_BANKS	1
 #define EXT_RAM_BASE		0x70000000
 #define EXT_RAM_SIZE		(2 * 1024 * 1024)
+#define CONFIG_SYS_FLASH_BANK1_BASE 0x74000000
+#define CONFIG_SYS_FLASH_BANK2_BASE 0x74800000
 
 /*
  * MALLOC_LEN can't be more than the specified size!
@@ -141,9 +143,9 @@
 #define CONFIG_ENV_SIZE 0x1000 
 
 #define CONFIG_SYS_LOAD_ADDR 0
-#define CONFIG_SYS_FLASH_BASE 0
+//#define CONFIG_SYS_FLASH_BASE 0
 #define CONFIG_ENV_ADDR 0
-#define CONFIG_SYS_MAX_FLASH_BANKS 0
+//#define CONFIG_SYS_MAX_FLASH_BANKS 0
 #define CONFIG_SYS_MEMTEST_START 0
 #define CONFIG_SYS_MEMTEST_END 0
 #define CONFIG_SYS_HZ 100
@@ -180,5 +182,18 @@
 	  "cpff 8000; cptf 28000; " \
 	  "cptf 0 20000 10000 1\0"
 #endif
+
+/*-----------------------------------------------------------------------
+ * FLASH organization
+ */
+/* use CFI flash driver */
+#define CONFIG_SYS_FLASH_CFI		1	/* Flash is CFI conformant */
+#define CONFIG_FLASH_CFI_DRIVER		1	/* Use the common driver */
+#define CONFIG_SYS_FLASH_BANKS_LIST	{ CONFIG_SYS_FLASH_BANK1_BASE, CONFIG_SYS_FLASH_BANK2_BASE }
+#define CONFIG_SYS_MAX_FLASH_BANKS	2	/* max number of memory banks */
+#define CONFIG_SYS_MAX_FLASH_SECT	64	/* max number of sectors on one chip */
+
+#define CONFIG_SYS_MONITOR_BASE  0x0 
+#define CONFIG_MONITOR_IS_IN_RAM 1
 
 #endif /* __CONFIG_H */
