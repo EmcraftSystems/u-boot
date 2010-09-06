@@ -55,7 +55,6 @@
 #undef CONFIG_CMD_FPGA
 #undef CONFIG_CMD_IMI
 #undef CONFIG_CMD_ITEST
-//#undef CONFIG_CMD_FLASH
 #undef CONFIG_CMD_IMLS
 #undef CONFIG_CMD_LOADS
 #undef CONFIG_CMD_MISC
@@ -68,7 +67,6 @@
 /* 
  * TO-DO: review this list
  */
-//#define CONFIG_SYS_MAX_FLASH_SECT 0
 
 /*
  * Configuration of the external RAM.
@@ -143,9 +141,7 @@
 #define CONFIG_ENV_SIZE 0x1000 
 
 #define CONFIG_SYS_LOAD_ADDR 0
-//#define CONFIG_SYS_FLASH_BASE 0
 #define CONFIG_ENV_ADDR 0
-//#define CONFIG_SYS_MAX_FLASH_BANKS 0
 #define CONFIG_SYS_MEMTEST_START 0
 #define CONFIG_SYS_MEMTEST_END 0
 #define CONFIG_SYS_HZ 100

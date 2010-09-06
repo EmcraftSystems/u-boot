@@ -73,11 +73,3 @@ int checkboard(void)
 {
         return 0;
 }
-
-#if 0
-unsigned long flash_init(void)
-{
-	/*nvm_init();*/
-	return 0;
-}
-#endif
