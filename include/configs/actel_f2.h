@@ -60,7 +60,6 @@
 #undef CONFIG_CMD_MISC
 #undef CONFIG_CMD_NET
 #undef CONFIG_CMD_NFS
-#undef CONFIG_CMD_SAVEENV 
 #undef CONFIG_CMD_SOURCE
 #undef CONFIG_CMD_XIMG 
 
@@ -71,9 +70,9 @@
 /*
  * Configuration of the external RAM.
  */
-#define CONFIG_NR_DRAM_BANKS	1
-#define EXT_RAM_BASE		0x70000000
-#define EXT_RAM_SIZE		(2 * 1024 * 1024)
+#define CONFIG_NR_DRAM_BANKS        1
+#define EXT_RAM_BASE                0x70000000
+#define EXT_RAM_SIZE                (2 * 1024 * 1024)
 #define CONFIG_SYS_FLASH_BANK1_BASE 0x74000000
 #define CONFIG_SYS_FLASH_BANK2_BASE 0x74800000
 
@@ -97,11 +96,6 @@
  * TO-DO: what is this? ... something to do with clocks...
  */
 #undef CONFIG_FSL_ESDHC 
-
-/*
- * No environment for now
- */
-#define CONFIG_ENV_IS_NOWHERE
 
 /*
  * To save memory
@@ -138,10 +132,8 @@
 /*
  *
  */
-#define CONFIG_ENV_SIZE 0x1000 
 
 #define CONFIG_SYS_LOAD_ADDR 0
-#define CONFIG_ENV_ADDR 0
 #define CONFIG_SYS_MEMTEST_START 0
 #define CONFIG_SYS_MEMTEST_END 0
 #define CONFIG_SYS_HZ 100
@@ -191,5 +183,11 @@
 
 #define CONFIG_SYS_MONITOR_BASE  0x0 
 #define CONFIG_MONITOR_IS_IN_RAM 1
+
+/* ENV settings */
+#define CONFIG_ENV_IS_IN_FLASH 1
+#define CONFIG_ENV_ADDR        CONFIG_SYS_FLASH_BANK1_BASE
+#define CONFIG_ENV_SIZE        0x1000
+#define CONFIG_INFERNO         1
 
 #endif /* __CONFIG_H */
