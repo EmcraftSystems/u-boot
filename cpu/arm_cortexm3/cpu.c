@@ -32,6 +32,11 @@ int arch_cpu_init(void)
 
 	nvm_init();
 
+	printf("\nSystem Core Clock: %d\nPCLK0: %d\n"
+		, SystemCoreClock/1000000, g_FrequencyPCLK0/1000000);
+
+	timer_init();
+
         return 0;
 }
 
@@ -56,12 +61,6 @@ int dram_init (void)
 #endif
 
         return 0;
-}
-
-
-int timer_init(void)
-{
-	return 0;
 }
 
 int print_cpuinfo(void)

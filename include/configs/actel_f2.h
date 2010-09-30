@@ -136,7 +136,8 @@
 #define CONFIG_SYS_LOAD_ADDR 0
 #define CONFIG_SYS_MEMTEST_START 0
 #define CONFIG_SYS_MEMTEST_END 0
-#define CONFIG_SYS_HZ 100
+#define CONFIG_SYS_HZ 1000
+#define CONFIG_SYSTICK_FREQ 3125000
 
 /*
  * Serial console configuration
@@ -189,5 +190,7 @@
 #define CONFIG_ENV_ADDR        CONFIG_SYS_FLASH_BANK1_BASE
 #define CONFIG_ENV_SIZE        0x1000
 #define CONFIG_INFERNO         1
+
+#define CONFIG_BOOTDELAY    10
 
 #endif /* __CONFIG_H */

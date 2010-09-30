@@ -27,7 +27,7 @@ LIB	= $(obj)lib$(CPU).a
 
 START	:= start.o
 COBJS	:= cpu.o cmd_cptf.o nvm.o  \
-           my_uart.o my_lib.o my_printf.o my_dump.o \
+           my_uart.o my_lib.o my_printf.o my_dump.o timer.o \
 	   CMSIS/core_cm3.o CMSIS/system_a2fxxxm3.o
 
 SRCS	:= $(START:.o=.c) $(COBJS:.o=.c)
