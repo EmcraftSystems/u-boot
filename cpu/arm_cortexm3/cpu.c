@@ -46,7 +46,7 @@ int dram_init (void)
 	/*
 	 * EMC timing parameters for chip select 0
 	 */
-        SYSREG->EMC_CS_0_CR = 0x00207FFD;
+        SYSREG->EMC_CS_0_CR = 0x0020088D;
 
 	/*
 	 * External memory controller MUX configuration
