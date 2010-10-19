@@ -1,7 +1,7 @@
 /*
- * (C) Copyright 2006-2008
+ * (C) Copyright 2006-2010 Emcraft Systems
  *
- * Configuration settings for the Actel F2 board.
+ * Configuration settings for the Emcraft A2F-LNX-EVB board.
  *
  * See file CREDITS for list of people who contributed to this
  * project.
@@ -32,7 +32,7 @@
 #define CONFIG_ACTEL_F2		1	/* working with the Actel F2 board */
 
 /* System frequency (FCLK) coming out of reset */
-#define CONFIG_SYS_RESET_SYSCLCK_FREQ	25000000uL
+#define CONFIG_SYS_RESET_SYSCLCK_FREQ	80000000uL
 
 /*
  * Enable/disable debug messages
@@ -75,15 +75,18 @@
  */
 #define CONFIG_NR_DRAM_BANKS        1
 #define EXT_RAM_BASE                0x70000000
-#define EXT_RAM_SIZE                (2 * 1024 * 1024)
+#define EXT_RAM_SIZE                (8 * 1024 * 1024)
 #define CONFIG_SYS_FLASH_BANK1_BASE 0x74000000
-#define CONFIG_SYS_FLASH_BANK2_BASE 0x74800000
+//#define CONFIG_SYS_FLASH_BANK2_BASE 0x74800000
 
 /* External Memory Controller settings
  *
  */
-#define CONFIG_SYS_EMC0CS0CR	0x0020088D
-#define CONFIG_SYS_EMC0CS1CR	0x000000AF
+
+/* #define CONFIG_SYS_EMC0CS0CR	0x00002aad */ /* Slow timing */
+#define CONFIG_SYS_EMC0CS0CR	0x00002225
+#define CONFIG_SYS_EMC0CS1CR	0x000000af
+
 #define CONFIG_SYS_EMCMUXCR		0x00000001
 
 /*
@@ -121,7 +124,7 @@
 /*
  * Monitor prompt
  */
-#define CONFIG_SYS_PROMPT		"A2F> "
+#define CONFIG_SYS_PROMPT		"A2F-LNX-EVB> "
 
 /*
  * Console I/O buffer size
@@ -147,6 +150,7 @@
 #define CONFIG_SYS_MEMTEST_START 0
 #define CONFIG_SYS_MEMTEST_END 0
 #define CONFIG_SYS_HZ 1000
+/* system core clock /32 */
 #define CONFIG_SYSTICK_FREQ 3125000
 
 /*
@@ -188,9 +192,11 @@
 /* use CFI flash driver */
 #define CONFIG_SYS_FLASH_CFI		1	/* Flash is CFI conformant */
 #define CONFIG_FLASH_CFI_DRIVER		1	/* Use the common driver */
-#define CONFIG_SYS_FLASH_BANKS_LIST	{ CONFIG_SYS_FLASH_BANK1_BASE, CONFIG_SYS_FLASH_BANK2_BASE }
-#define CONFIG_SYS_MAX_FLASH_BANKS	2	/* max number of memory banks */
-#define CONFIG_SYS_MAX_FLASH_SECT	64	/* max number of sectors on one chip */
+#define CONFIG_SYS_FLASH_CFI_WIDTH	FLASH_CFI_16BIT
+#define CONFIG_SYS_FLASH_BANKS_LIST	{ CONFIG_SYS_FLASH_BANK1_BASE }
+#define CONFIG_SYS_MAX_FLASH_BANKS	1	/* max number of memory banks */
+#define CONFIG_SYS_MAX_FLASH_SECT	128	/* max number of sectors on one chip */
+#define CONFIG_SYS_FLASH_CFI_AMD_RESET
 
 #define CONFIG_SYS_MONITOR_BASE  0x0 
 #define CONFIG_MONITOR_IS_IN_RAM 1
@@ -202,5 +208,6 @@
 #define CONFIG_INFERNO         1
 
 #define CONFIG_BOOTDELAY    10
+#define CONFIG_ZERO_BOOTDELAY_CHECK
 
 #endif /* __CONFIG_H */

@@ -3192,6 +3192,9 @@ smdkc100_config:	unconfig
 actel_f2_config :  unconfig
 	@$(MKCONFIG) $(@:_config=) arm arm_cortexm3 actel_f2 actel NULL
 
+a2f-lnx-evb_config :  unconfig
+	@$(MKCONFIG) $(@:_config=) arm arm_cortexm3 actel_f2 actel NULL
+
 #########################################################################
 ## XScale Systems
 #########################################################################

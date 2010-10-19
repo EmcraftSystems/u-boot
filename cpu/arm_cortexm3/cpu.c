@@ -1,3 +1,4 @@
+
 #include <common.h>
 #include "my_uart.h"
 #include "my_lib.h"
@@ -12,7 +13,9 @@ int arch_cpu_init(void)
 	 * CMSIS clock initialization
 	 * TO-DO: move this somewhere else
 	 */
+#if 0
 	SystemCoreClockUpdate();
+#endif
 
 	/*
 	 * Initialize timer
@@ -28,12 +31,14 @@ int arch_cpu_init(void)
  	 */
 	my_uart_init(115200);
 
-        SYSREG->EMC_CS_1_CR = 0x000000AF;
+        SYSREG->EMC_CS_1_CR = CONFIG_SYS_EMC0CS1CR;
 
 	nvm_init();
 
+#if 0
 	printf("\nSystem Core Clock: %d\nPCLK0: %d\n"
 		, SystemCoreClock/1000000, g_FrequencyPCLK0/1000000);
+#endif
 
 	timer_init();
 
@@ -46,7 +51,7 @@ int dram_init (void)
 	/*
 	 * EMC timing parameters for chip select 0
 	 */
-        SYSREG->EMC_CS_0_CR = 0x0020088D;
+        SYSREG->EMC_CS_0_CR = CONFIG_SYS_EMC0CS0CR;
 
 	/*
 	 * External memory controller MUX configuration
@@ -54,7 +59,7 @@ int dram_init (void)
 	 * to select either FPGA I/O or EMC I/O.
 	 * 1 -> The multiplexed I/Os are allocated to the EMC.
 	 */
-        SYSREG->EMC_MUX_CR = 0x00000001;
+        SYSREG->EMC_MUX_CR = CONFIG_SYS_EMCMUXCR;
 
         gd->bd->bi_dram[0].start = EXT_RAM_BASE;
         gd->bd->bi_dram[0].size = EXT_RAM_SIZE;

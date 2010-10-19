@@ -6,11 +6,12 @@
  * SVN $Revision: 2069 $
  * SVN $Date: 2010-01-28 00:23:48 +0000 (Thu, 28 Jan 2010) $
  */
+#include <common.h>
 #include "a2fxxxm3.h"
 #include "mss_assert.h"
 
 /* System frequency (FCLK) coming out of reset is 25MHz. */
-#define RESET_SYSCLCK_FREQ      25000000uL
+#define RESET_SYSCLCK_FREQ      CONFIG_SYS_RESET_SYSCLCK_FREQ
 
 /*
  * SmartFusion Microcontroller Subsystem FLCK frequency.
