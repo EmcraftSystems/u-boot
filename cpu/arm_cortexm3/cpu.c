@@ -35,12 +35,19 @@ int arch_cpu_init(void)
 
 	nvm_init();
 
-#if 0
-	printf("\nSystem Core Clock: %d\nPCLK0: %d\n"
-		, SystemCoreClock/1000000, g_FrequencyPCLK0/1000000);
-#endif
-
 	timer_init();
+
+	/*
+	 * Architecture number; used by the Linux kernel.
+	 */
+	gd->bd->bi_arch_number = MACH_TYPE_A2F;
+
+	/*
+	 * Address of the kernel boot parameters.
+	 * Use start of the external RAM for that;
+	 * kernel resides at offset 0x8000.
+	 */
+	gd->bd->bi_boot_params = EXT_RAM_BASE;
 
         return 0;
 }
@@ -76,4 +83,13 @@ int print_cpuinfo(void)
 int checkboard(void)
 {
         return 0;
+}
+
+/*
+ * This is called right before passing control to
+ * the Linux kernel point.
+ */
+int cleanup_before_linux(void)
+{
+	return 0;
 }

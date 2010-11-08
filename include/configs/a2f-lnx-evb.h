@@ -210,4 +210,11 @@
 #define CONFIG_BOOTDELAY    10
 #define CONFIG_ZERO_BOOTDELAY_CHECK
 
+/* Kernel parameters */
+#if 0
+#define CONFIG_SERIAL_TAG
+#endif
+#define CONFIG_SETUP_MEMORY_TAGS
+#define CONFIG_CMDLINE_TAG
+
 #endif /* __CONFIG_H */
