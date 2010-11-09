@@ -3189,11 +3189,8 @@ omap3_zoom2_config :	unconfig
 smdkc100_config:	unconfig
 	@$(MKCONFIG) $(@:_config=) arm arm_cortexa8 smdkc100 samsung s5pc1xx
 
-actel_f2_config :  unconfig
-	@$(MKCONFIG) $(@:_config=) arm arm_cortexm3 actel_f2 actel NULL
-
 a2f-lnx-evb_config :  unconfig
-	@$(MKCONFIG) $(@:_config=) arm arm_cortexm3 actel_f2 actel NULL
+	@$(MKCONFIG) $(@:_config=) arm arm_cortexm3 a2f-lnx-evb emcraft NULL
 
 #########################################################################
 ## XScale Systems

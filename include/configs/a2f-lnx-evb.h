@@ -26,10 +26,13 @@
 #define __CONFIG_H
 
 /*
- * High Level Configuration Options
+ * This is an ARM Cortex-M3 CPU core
  */
-#define CONFIG_ARMCORTEXM3	1	/* This is an ARM Cortex-M3 CPU core */
-#define CONFIG_ACTEL_F2		1	/* working with the Actel F2 board */
+#define CONFIG_ARMCORTEXM3
+/*
+ * This is the Actel SmartFusion (aka A2F) device
+ */
+#define CONFIG_A2F
 
 /* System frequency (FCLK) coming out of reset */
 #define CONFIG_SYS_RESET_SYSCLCK_FREQ	80000000uL
