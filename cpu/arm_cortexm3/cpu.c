@@ -1,5 +1,7 @@
 
 #include <common.h>
+#include <command.h>
+#include <asm-arm/arch-a2f/a2f.h>
 #include "my_uart.h"
 #include "my_lib.h"
 #include "nvm.h"
@@ -31,7 +33,14 @@ int arch_cpu_init(void)
  	 */
 	my_uart_init(115200);
 
-        SYSREG->EMC_CS_1_CR = CONFIG_SYS_EMC0CS1CR;
+	/*
+	 * External memory controller MUX configuration
+	 * The EMC _SEL bit in the EMC_MUX_CR register is used
+	 * to select either FPGA I/O or EMC I/O.
+	 * 1 -> The multiplexed I/Os are allocated to the EMC.
+	 */
+        A2F_SYSREG->emc_mux_cr = CONFIG_SYS_EMCMUXCR;
+        A2F_SYSREG->emc_cs_1_cr = CONFIG_SYS_EMC0CS1CR;
 
 	nvm_init();
 
@@ -48,29 +57,6 @@ int arch_cpu_init(void)
 	 * kernel resides at offset 0x8000.
 	 */
 	gd->bd->bi_boot_params = EXT_RAM_BASE;
-
-        return 0;
-}
-
-int dram_init (void)
-{
-#if ( CONFIG_NR_DRAM_BANKS > 0 )
-	/*
-	 * EMC timing parameters for chip select 0
-	 */
-        SYSREG->EMC_CS_0_CR = CONFIG_SYS_EMC0CS0CR;
-
-	/*
-	 * External memory controller MUX configuration
-	 * The EMC _SEL bit in the EMC_MUX_CR register is used
-	 * to select either FPGA I/O or EMC I/O.
-	 * 1 -> The multiplexed I/Os are allocated to the EMC.
-	 */
-        SYSREG->EMC_MUX_CR = CONFIG_SYS_EMCMUXCR;
-
-        gd->bd->bi_dram[0].start = EXT_RAM_BASE;
-        gd->bd->bi_dram[0].size = EXT_RAM_SIZE;
-#endif
 
         return 0;
 }

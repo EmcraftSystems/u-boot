@@ -1,16 +1,9 @@
 /*
- * (C) Copyright 2004-2008
- * Texas Instruments, <www.ti.com>
+ * board/emcraft/a2f-lnx-evb/board.c
  *
- * Author :
- *	Manikandan Pillai <mani.pillai@ti.com>
+ * Board specific code the the Emcraft A2F-LNX-EVB board.
  *
- * Derived from Beagle Board and 3430 SDP code by
- *	Richard Woodruff <r-woodruff2@ti.com>
- *	Syed Mohammed Khasim <khasim@ti.com>
- *
- * See file CREDITS for list of people who contributed to this
- * project.
+ * Copyright (C) 2010 Vladimir Khusainov, Emcraft Systems
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License as
@@ -27,47 +20,38 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston,
  * MA 02111-1307 USA
  */
+
 #include <common.h>
 #include <netdev.h>
+#include <asm-arm/arch-a2f/a2f.h>
 
 DECLARE_GLOBAL_DATA_PTR;
 
-/*
- * Routine: board_init
- * Description: Early hardware init.
- */
 int board_init(void)
 {
 	return 0;
 }
 
-/*
- * Routine: misc_init_r
- * Description: Init ethernet (done here so udelay works)
- */
+int dram_init (void)
+{
+#if ( CONFIG_NR_DRAM_BANKS > 0 )
+	/*
+	 * EMC timing parameters for chip select 0
+	 */
+        A2F_SYSREG->emc_cs_0_cr = CONFIG_SYS_EMC0CS0CR;
+
+
+        gd->bd->bi_dram[0].start = EXT_RAM_BASE;
+        gd->bd->bi_dram[0].size = EXT_RAM_SIZE;
+#endif
+
+        return 0;
+}
+
 int misc_init_r(void)
 {
 
 	return 0;
-}
-
-/*
- * Routine: set_muxconf_regs
- * Description: Setting up the configuration Mux registers specific to the
- *		hardware. Many pins need to be moved from protect to primary
- *		mode.
- */
-void set_muxconf_regs(void)
-{
-}
-
-/*
- * Routine: setup_net_chip
- * Description: Setting up the configuration GPMC registers specific to the
- *		Ethernet hardware.
- */
-static void setup_net_chip(void)
-{
 }
 
 int board_eth_init(bd_t *bis)
