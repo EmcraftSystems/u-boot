@@ -119,12 +119,6 @@
 #undef CONFIG_SYS_LONGHELP
 
 /*
- * Use hush command parser
- */
-#define CONFIG_SYS_HUSH_PARSER
-#define CONFIG_SYS_PROMPT_HUSH_PS2      "> "
-
-/*
  * Monitor prompt
  */
 #define CONFIG_SYS_PROMPT		"A2F-LNX-EVB> "
