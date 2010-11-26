@@ -64,7 +64,7 @@
 #undef CONFIG_CMD_IMLS
 #undef CONFIG_CMD_LOADS
 #undef CONFIG_CMD_MISC
-#undef CONFIG_CMD_NET
+#define CONFIG_CMD_NET
 #undef CONFIG_CMD_NFS
 #undef CONFIG_CMD_SOURCE
 #undef CONFIG_CMD_XIMG 
@@ -213,5 +213,47 @@
 #endif
 #define CONFIG_SETUP_MEMORY_TAGS
 #define CONFIG_CMDLINE_TAG
+
+#define CONFIG_CMD_NET
+#define CONFIG_NET_MULTI
+#define CONFIG_CORE10100	1
+/* allocated Rx and Tx buffers in internal RAM */
+#define CONFIG_CORE10100_INTRAM_ADDRESS	   0x20008000
+#define CONFIG_BITBANGMII	1
+#undef CONFIG_CMD_MII
+
+#if defined(CONFIG_BITBANGMII)
+#include <asm/io.h>
+/* Register offsets */
+#define RCSR9			0x48
+#define RCSR9_MDC		(1 << 16)
+#define RCSR9_MDO		(1 << 17)
+#define RCSR9_MDEN		(1 << 18)
+#define RCSR9_MDI		(1 << 19)
+
+/* CORE 10/100 base address */
+#define ETH_CORE_BASE		0x40003000
+#define READ_REG(reg)		readl(ETH_CORE_BASE + reg)
+#define WRITE_REG(reg, val)	writel(val, ETH_CORE_BASE + reg)
+
+/* Direction - output */
+#define MDIO_ACTIVE		(WRITE_REG(RCSR9, READ_REG(RCSR9) | RCSR9_MDEN))
+/* Direction - input */
+#define MDIO_TRISTATE	(WRITE_REG(RCSR9, READ_REG(RCSR9) & ~RCSR9_MDEN))
+#define MDIO_READ		((READ_REG(RCSR9) & RCSR9_MDI) != 0)
+#define MDIO(val)							\
+	if (val) {							\
+		WRITE_REG(RCSR9, READ_REG (RCSR9) | RCSR9_MDO);		\
+	} else {							\
+		WRITE_REG(RCSR9, READ_REG (RCSR9) & ~RCSR9_MDO);	\
+	}
+#define MDC(val)						 \
+	if (val) {						 \
+		WRITE_REG(RCSR9, READ_REG (RCSR9) | RCSR9_MDC);	 \
+	} else {						 \
+		WRITE_REG(RCSR9, READ_REG (RCSR9) & ~RCSR9_MDC); \
+	}
+#define MIIDELAY		udelay(1)
+#endif
 
 #endif /* __CONFIG_H */

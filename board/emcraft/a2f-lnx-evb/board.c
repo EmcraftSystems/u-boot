@@ -56,5 +56,6 @@ int misc_init_r(void)
 
 int board_eth_init(bd_t *bis)
 {
+	core_eth_init(bis);
 	return 0;
 }
