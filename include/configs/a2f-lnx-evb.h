@@ -64,8 +64,10 @@
 #undef CONFIG_CMD_IMLS
 #undef CONFIG_CMD_LOADS
 #undef CONFIG_CMD_MISC
-#define CONFIG_CMD_NET
 #undef CONFIG_CMD_NFS
+#undef CONFIG_CMD_MII
+#define CONFIG_CMD_NET
+#undef CONFIG_CMD_DHCP
 #undef CONFIG_CMD_SOURCE
 #undef CONFIG_CMD_XIMG 
 
@@ -203,6 +205,7 @@
 #define CONFIG_ENV_ADDR        CONFIG_SYS_FLASH_BANK1_BASE
 #define CONFIG_ENV_SIZE        0x1000
 #define CONFIG_INFERNO         1
+#define CONFIG_ENV_OVERWRITE
 
 #define CONFIG_BOOTDELAY    10
 #define CONFIG_ZERO_BOOTDELAY_CHECK
@@ -214,13 +217,11 @@
 #define CONFIG_SETUP_MEMORY_TAGS
 #define CONFIG_CMDLINE_TAG
 
-#define CONFIG_CMD_NET
 #define CONFIG_NET_MULTI
 #define CONFIG_CORE10100	1
 /* allocated Rx and Tx buffers in internal RAM */
 #define CONFIG_CORE10100_INTRAM_ADDRESS	   0x20008000
 #define CONFIG_BITBANGMII	1
-#undef CONFIG_CMD_MII
 
 #if defined(CONFIG_BITBANGMII)
 #include <asm/io.h>

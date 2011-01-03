@@ -61,17 +61,10 @@ void set_muxconf_regs(void)
 {
 }
 
-/*
- * Routine: setup_net_chip
- * Description: Setting up the configuration GPMC registers specific to the
- *		Ethernet hardware.
- */
-static void setup_net_chip(void)
-{
-}
-
+#ifdef CONFIG_CORE10100
 int board_eth_init(bd_t *bis)
 {
 	core_eth_init(bis);
 	return 0;
 }
+#endif

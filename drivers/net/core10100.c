@@ -18,15 +18,15 @@
  */
 
 #include <config.h>
+/* Define to enable debugging messages */
+#undef DEBUG
+
 #include <common.h>
 #include <net.h>
 #include <malloc.h>
 #include <miiphy.h>
 #include <asm/io.h>
 #include "core10100.h"
-
-/* Set to 1 to turn on debugging */
-static u32 dbg;
 
 static inline u32 find_next_desc(u32 cur, u32 size)
 {
@@ -126,11 +126,13 @@ static int phy_init(struct core10100_dev *bp)
 		return -1;
 	}
 
-	if(dbg)printf("%s: found PHY id = %#x at addr %#x\n", __func__,
+	debug("%s: found PHY id = %#x at addr %#x\n", __func__,
 				  bp->phy_id, bp->phy_addr);
 
+#if 0 /* Seems not necessary */
 	/* Software reset */
 	mii_write(bp, PHY_BMCR, PHY_BMCR_RESET);
+#endif
 
 	return 0;
 }
@@ -226,15 +228,13 @@ static int setup_link(struct core10100_dev *bp)
 	return 0;
 }
 
-static void dump_desc(struct rxtx_desc *tx_desc, char *s, int dbg)
+static void dump_desc(struct rxtx_desc *tx_desc, char *s)
 {
-	if (dbg) {
-		printf("  DUMP of %sDESC @%#x\n", s, (int)tx_desc);
-		printf("  OWNSTAT: %#x\n", tx_desc->own_stat);
-		printf("  CNTLSIZ: %#x\n", tx_desc->cntl_size);
-		printf("  BUF1   : %#x\n", (int)tx_desc->buf1);
-		printf("  BUF2   : %#x\n", (int)tx_desc->buf2);
-	}
+	debug("  DUMP of %sDESC @%#x\n", s, (int)tx_desc);
+	debug("  OWNSTAT: %#x\n", tx_desc->own_stat);
+	debug("  CNTLSIZ: %#x\n", tx_desc->cntl_size);
+	debug("  BUF1   : %#x\n", (int)tx_desc->buf1);
+	debug("  BUF2   : %#x\n", (int)tx_desc->buf2);
 }
 
 static void core_set_mac(struct eth_device *netdev)
@@ -242,10 +242,10 @@ static void core_set_mac(struct eth_device *netdev)
 	int i;
 	struct core10100_dev *bp = to_core(netdev);
 
-	if(dbg)printf("%s: mac is %#x:%#x:%#x:%#x:%#x:%#x\n", __func__,
-				  netdev->enetaddr[0], netdev->enetaddr[1],
-		   netdev->enetaddr[2], netdev->enetaddr[3],
-		   netdev->enetaddr[4], netdev->enetaddr[5]);
+	debug("%s: mac is %#x:%#x:%#x:%#x:%#x:%#x\n", __func__,
+		  netdev->enetaddr[0], netdev->enetaddr[1],
+		  netdev->enetaddr[2], netdev->enetaddr[3],
+		  netdev->enetaddr[4], netdev->enetaddr[5]);
 
 	for (i = 0; i < 192; i += 12) {
 		memcpy((void *)bp->mac_filter + i, netdev->enetaddr, 6);
@@ -255,7 +255,7 @@ static void core_set_mac(struct eth_device *netdev)
 	bp->tx_mac->cntl_size = DESC_TCH | DESC_SET | 192;
 	bp->tx_mac->buf1 = bp->mac_filter;
 	bp->tx_mac->buf2 = (struct rxtx_desc *) bp->tx_mac;
-	dump_desc((struct rxtx_desc *)bp->tx_mac, "MAC TX", dbg);
+	dump_desc((struct rxtx_desc *)bp->tx_mac, "MAC TX");
 	write_reg(CSR4, (u32) bp->tx_mac);
 
 	/* Start transmission */
@@ -367,7 +367,7 @@ static int core_init(struct eth_device *netdev, bd_t *bd)
 		bp->rx_descs[a].buf1 = bp->rx_buffs[a];
 		bp->rx_descs[a].buf2 =	(struct rxtx_desc *) &bp->rx_descs[find_next_desc(a, RX_RING_SIZE)];
 
-		dump_desc((struct rxtx_desc *)&bp->rx_descs[a], "RX", dbg);
+		dump_desc((struct rxtx_desc *)&bp->rx_descs[a], "RX");
 	}
 	bp->rx_cur = 0;
 	write_reg(CSR3, (u32) bp->rx_descs);
@@ -400,7 +400,7 @@ static int core_init(struct eth_device *netdev, bd_t *bd)
 		return -1;
 	}
 
-	/* Start transmission and receiving */
+	/* Start transmission and receiving, interrupts disabled */
 	write_reg(CSR6, read_reg(CSR6) | CSR6_ST | CSR6_SR);
 	bp->flags |= TX_RX_ENABLED;
 	return 0;
@@ -430,7 +430,7 @@ static int core_send(struct eth_device *netdev, volatile void *packet,
 		return -1;
 	}
 
-	if(dbg)printf("%s: len %d\n", __func__, length);
+	debug("%s: len %d\n", __func__, length);
 
 	if (!length) {
 		printf("%s: zero len?\n", __func__);
@@ -449,6 +449,16 @@ static int core_send(struct eth_device *netdev, volatile void *packet,
 		return -1;
 	}
 
+	/* check the frame status for errors. DESC_TNC is always set
+	 * - controller bug?
+	 */
+	if (bp->tx_descs[bp->tx_cur].own_stat &
+		(DESC_TLO | DESC_TLC | DESC_TEC | DESC_TUF)) {
+		printf("%s: TX desc %d: send error!\n", __func__, bp->tx_cur);
+		dump_desc((struct rxtx_desc *)&bp->tx_descs[bp->tx_cur], "TX");
+		/* fallthrough */
+	}
+
 	/*
 	  Prepare the descriptors as follows:
 	  - set the last descriptor flag
@@ -460,7 +470,7 @@ static int core_send(struct eth_device *netdev, volatile void *packet,
 
 	memcpy((void *)bp->tx_descs[bp->tx_cur].buf1, (void *)packet, length);
 
-	dump_desc((struct rxtx_desc *)&bp->tx_descs[bp->tx_cur], "TX", dbg);
+	dump_desc((struct rxtx_desc *)&bp->tx_descs[bp->tx_cur], "TX");
 
 	/* Give the current descriptor ownership to Core10/100.	*/
 	bp->tx_descs[bp->tx_cur].own_stat = DESC_OWN;
@@ -500,7 +510,7 @@ static int core10100_check_rxframe(struct rxtx_desc *rx_desc)
 		/* The DESC_RES bit is valid only when the DESC_RLS is set */
 #if 0
 		if((rx_desc->own_stat & DESC_RES)) {/* don't report collisions */
-			printf(KERN_INFO "receive_frame error: DESC_RES flag is set, len %d\n", (rx_desc->own_stat >> 16) & 0x3fff);
+			printf("receive_frame error: DESC_RES flag is set, len %d\n", (rx_desc->own_stat >> 16) & 0x3fff);
 			dump_desc(rx_desc, "RX", 1);
 			/* Chesk status: may be status cache is out of sync */
 			/* link_stat(pd); */
@@ -568,11 +578,12 @@ static int core_recv(struct eth_device *netdev)
 
 	for (j = 0; j < RX_RING_SIZE; j++, bp->rx_cur = find_next_desc(bp->rx_cur, RX_RING_SIZE)) {
 		if (bp->rx_descs[bp->rx_cur].own_stat & DESC_OWN) {
-			if(dbg)printf("%s: %d not ready, exiting, try %d\n", __func__, bp->rx_cur, j);
+			debug("%s: %d not ready, exiting, try %d\n", __func__, bp->rx_cur, j);
 			break;
 		}
-		if(dbg)printf("rx_cur = %d, i %d\n", bp->rx_cur, j);
+		debug("rx_cur = %d, i %d\n", bp->rx_cur, j);
 
+		/* check for errors, drop packet if any */
 		if (core10100_check_rxframe((struct rxtx_desc *)&bp->rx_descs[bp->rx_cur])) {
 			goto end_alloc;
 		}
@@ -585,7 +596,7 @@ static int core_recv(struct eth_device *netdev)
 			goto end_alloc;
 		}
 
-		if(dbg)printf("%s: NetReceive pktlen %#x\n", __func__, size);
+		debug("%s: NetReceive pktlen %#x\n", __func__, size);
 		NetReceive(bp->rx_descs[bp->rx_cur].buf1, size);
 
 end_alloc:
@@ -621,7 +632,7 @@ int core_eth_init(bd_t *bd)
 	netdev->iobase = (u32)MAC_BASE;
 	bp->base = (char *)MAC_BASE;
 
-	sprintf(netdev->name, "MAC0");
+	sprintf(netdev->name, "CORE10/100_0");
 	netdev->init = core_init;
 
 	netdev->halt = core_halt;

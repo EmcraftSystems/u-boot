@@ -194,6 +194,20 @@ static void setup_commandline_tag (bd_t *bd, char *commandline)
 
 	strcpy (params->u.cmdline.cmdline, p);
 
+#ifdef CONFIG_A2F
+	/* Add "ethaddr=..." to bootargs, if not set by the user */
+	{
+		char *e;
+		/* Pass "ethaddr=..." to kernel in command line */
+		if (!strstr(p, "ethaddr=") && (e = getenv("ethaddr"))) {
+			sprintf(params->u.cmdline.cmdline + strlen(p),
+					" ethaddr=%s", e);
+			params->hdr.size =
+				(sizeof (struct tag_header) +
+				 strlen (params->u.cmdline.cmdline) + 1 + 4) >> 2;
+		}
+	}
+#endif
 	params = tag_next (params);
 }
 
