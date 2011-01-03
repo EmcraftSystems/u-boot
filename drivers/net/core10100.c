@@ -621,7 +621,7 @@ int core_eth_init(bd_t *bd)
 	netdev->iobase = (u32)MAC_BASE;
 	bp->base = (char *)MAC_BASE;
 
-	sprintf(netdev->name, "MAC0");
+	sprintf(netdev->name, "Core10/100");
 	netdev->init = core_init;
 
 	netdev->halt = core_halt;

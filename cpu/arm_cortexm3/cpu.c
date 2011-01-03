@@ -33,15 +33,6 @@ int arch_cpu_init(void)
  	 */
 	my_uart_init(115200);
 
-	/*
-	 * External memory controller MUX configuration
-	 * The EMC _SEL bit in the EMC_MUX_CR register is used
-	 * to select either FPGA I/O or EMC I/O.
-	 * 1 -> The multiplexed I/Os are allocated to the EMC.
-	 */
-        A2F_SYSREG->emc_mux_cr = CONFIG_SYS_EMCMUXCR;
-        A2F_SYSREG->emc_cs_1_cr = CONFIG_SYS_EMC0CS1CR;
-
 	nvm_init();
 
 	timer_init();
@@ -54,20 +45,16 @@ int arch_cpu_init(void)
 	/*
 	 * Address of the kernel boot parameters.
 	 * Use start of the external RAM for that;
-	 * kernel resides at offset 0x8000.
+	 * kernel resides at offset 0x8000 in the external RAM.
 	 */
-	gd->bd->bi_boot_params = EXT_RAM_BASE;
+	gd->bd->bi_boot_params = CONFIG_SYS_RAM_BASE;
 
         return 0;
 }
 
 int print_cpuinfo(void)
 {
-        return 0;
-}
-
-int checkboard(void)
-{
+	printf("CPU: %s\n", "SmartFusion FPGA (Cortex-M3 Hard IP)");
         return 0;
 }
 

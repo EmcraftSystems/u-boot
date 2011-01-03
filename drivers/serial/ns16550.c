@@ -22,7 +22,7 @@ void NS16550_init (NS16550_t com_port, int baud_divisor)
  * TO-DO: figure out the initialization procedure. 
  */
 
-#ifndef CONFIG_ARMCORTEXM3
+#ifndef CONFIG_SYS_ARMCORTEXM3
 	com_port->ier = 0x00;
 #if defined(CONFIG_OMAP) && !defined(CONFIG_OMAP3_ZOOM2)
 	com_port->mdr1 = 0x7;	/* mode select reset TL16C750*/
@@ -45,7 +45,7 @@ void NS16550_init (NS16550_t com_port, int baud_divisor)
 #endif
 #endif /* CONFIG_OMAP */
 
-#endif /* CONFIG_ARMCORTEXM3 */
+#endif /* CONFIG_SYS_ARMCORTEXM3 */
 }
 
 #ifndef CONFIG_NS16550_MIN_FUNCTIONS

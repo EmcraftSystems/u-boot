@@ -32,17 +32,41 @@ int board_init(void)
 	return 0;
 }
 
+int checkboard(void)
+{
+	printf("Board: A2F-LNX-EVB Rev %s, www.emcraft.com\n",
+		CONFIG_SYS_BOARD_REV_STR);
+	return 0;
+}
+
 int dram_init (void)
 {
 #if ( CONFIG_NR_DRAM_BANKS > 0 )
 	/*
+	 * External memory controller MUX configuration
+	 * The EMC _SEL bit in the EMC_MUX_CR register is used
+	 * to select either FPGA I/O or EMC I/O.
+	 * 1 -> The multiplexed I/Os are allocated to the EMC.
+	 */
+        A2F_SYSREG->emc_mux_cr = CONFIG_SYS_EMCMUXCR;
+
+	/*
 	 * EMC timing parameters for chip select 0
+	 * where the external SRAM memory resides on A2F-LNX-EVB.
 	 */
         A2F_SYSREG->emc_cs_0_cr = CONFIG_SYS_EMC0CS0CR;
 
+	/*
+	 * Fill in global info with description of SRAM configuration.
+	 */
+        gd->bd->bi_dram[0].start = CONFIG_SYS_RAM_BASE;
+        gd->bd->bi_dram[0].size = CONFIG_SYS_RAM_SIZE;
 
-        gd->bd->bi_dram[0].start = EXT_RAM_BASE;
-        gd->bd->bi_dram[0].size = EXT_RAM_SIZE;
+	/*
+	 * EMC timing parameters for chip select 1
+	 * where the external Flash memory resides on A2F-LNX-EVB.
+	 */
+        A2F_SYSREG->emc_cs_1_cr = CONFIG_SYS_EMC0CS1CR;
 #endif
 
         return 0;
