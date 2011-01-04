@@ -182,12 +182,19 @@
  * Short-cut to a command sequence to perform self-upgrade 
  */
 
-#if 0
-#define CONFIG_EXTRA_ENV_SETTINGS \
-	"s=cpff 0; cptf 20000; " \
-	  "cpff 8000; cptf 28000; " \
-	  "cptf 0 20000 10000 1\0"
-#endif
+#define CONFIG_EXTRA_ENV_SETTINGS		\
+	"loadaddr=70000000\0"			\
+	"addip=setenv bootargs ${bootargs} ip=${ipaddr}:::${netmask}:${hostname}:eth0:off\0"					\
+	"flashaddr=74020000\0"			\
+	"flashboot=run addip;bootm ${flashaddr}\0"	\
+	"netboot=tftp ${image};run addip;bootm\0"	\
+	"image=a2f/uImage\0"
+
+#define CONFIG_BOOTDELAY    3
+#define CONFIG_ZERO_BOOTDELAY_CHECK
+#define CONFIG_HOSTNAME		a2f-lnx-evb
+#define CONFIG_BOOTARGS		"console=ttyS0,115200 panic=10"
+#define CONFIG_BOOTCOMMAND	"run flashboot"
 
 /*-----------------------------------------------------------------------
  * FLASH organization
@@ -210,9 +217,6 @@
 #define CONFIG_ENV_SIZE        0x1000
 #define CONFIG_INFERNO         1
 #define CONFIG_ENV_OVERWRITE
-
-#define CONFIG_BOOTDELAY    10
-#define CONFIG_ZERO_BOOTDELAY_CHECK
 
 /* Kernel parameters */
 #if 0
