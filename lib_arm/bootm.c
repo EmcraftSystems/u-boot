@@ -194,7 +194,7 @@ static void setup_commandline_tag (bd_t *bd, char *commandline)
 
 	strcpy (params->u.cmdline.cmdline, p);
 
-#ifdef CONFIG_A2F
+#ifdef CONFIG_SYS_A2F
 	/* Add "ethaddr=..." to bootargs, if not set by the user */
 	{
 		char *e;
