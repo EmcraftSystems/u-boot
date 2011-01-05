@@ -3,7 +3,6 @@
 #include <command.h>
 #include <asm-arm/arch-a2f/a2f.h>
 #include "my_uart.h"
-#include "my_lib.h"
 #include "nvm.h"
 #include "CMSIS/a2fxxxm3.h"
 
@@ -66,3 +65,5 @@ int cleanup_before_linux(void)
 {
 	return 0;
 }
+
+void reset_cpu(ulong addr) {}

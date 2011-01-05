@@ -1,1 +1,0 @@
-void reset_cpu() {}
