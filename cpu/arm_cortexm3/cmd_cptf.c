@@ -3,7 +3,7 @@
 #include <command.h>
 #include <string.h>
 #include "CMSIS/a2fxxxm3.h"
-#include "nvm.h"
+#include "envm.h"
 
 #define A2F_RAM_BUFFER_BASE	0x20004000
 #define A2F_RAM_BUFFER_SIZE	0x8000
@@ -15,14 +15,14 @@
  */
 static int __attribute__((section(".ramcode")))
            __attribute__ ((long_call)) 
-  nvm_write_and_reset(ulong dst, ulong src, ulong size, int do_reset)
+  envm_write_and_reset(ulong dst, ulong src, ulong size, int do_reset)
 {
 	int ret = 0;
 
 	/*
  	 * Copy the buffer to the destination.
  	 */
-	if (nvm_write((uint) dst, (void *) src, (uint) size) != size) {
+	if (envm_write((uint) dst, (void *) src, (uint) size) != size) {
 		ret = -1;
 		goto Done;
 	}
@@ -122,7 +122,7 @@ int do_cptf(cmd_tbl_t *cmdtp, int flag, int argc, char *argv[])
 	/*
  	 * Copy the buffer to the destination.
  	 */
-	if (nvm_write_and_reset(dst, src, size, do_reset)) {
+	if (envm_write_and_reset(dst, src, size, do_reset)) {
 		printf("%s: nvm_write_and_reset failed\n", (char *) argv[0]);
 		goto Done;
 	}

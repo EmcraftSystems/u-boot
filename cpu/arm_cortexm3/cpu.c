@@ -3,7 +3,7 @@
 #include <command.h>
 #include <asm-arm/arch-a2f/a2f.h>
 #include "my_uart.h"
-#include "nvm.h"
+#include "envm.h"
 #include "CMSIS/a2fxxxm3.h"
 
 DECLARE_GLOBAL_DATA_PTR;
@@ -32,7 +32,7 @@ int arch_cpu_init(void)
  	 */
 	my_uart_init(115200);
 
-	nvm_init();
+	envm_init();
 
 	timer_init();
 
