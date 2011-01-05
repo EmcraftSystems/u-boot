@@ -1,5 +1,4 @@
 #include <config.h>
-#include "my_uart.h"
 #include "CMSIS/a2fxxxm3.h"
 
 extern char _data_lma_start;
@@ -154,20 +153,20 @@ static void __attribute__((used)) dump_ctx(unsigned int *ctx)
     unsigned char vec = SCB->ICSR & 0xFF;
     int i;
 
-    my_printf("==================================\n");
-    my_printf("UNHANDLED EXCEPTION: ");
+    printf("==================================\n");
+    printf("UNHANDLED EXCEPTION: ");
     if (vec < 16) {
-	my_printf("%s\n", exc[vec]);
+	printf("%s\n", exc[vec]);
     } else {
-	my_printf("INTISR[%d]\n", vec - 16);
+	printf("INTISR[%d]\n", vec - 16);
     }
     for (i = 0; i < 8; i++) {
-	my_printf("  %s\t= %08x", regs[i], ctx[i]);
+	printf("  %s\t= %08x", regs[i], ctx[i]);
 	if (((i + 1) % 2) == 0) {
-	    my_printf("\n");
+	    printf("\n");
 	}
     }
-    my_printf("==================================\n");
+    printf("==================================\n");
 }
 
 void hw_watchdog_reset(void)

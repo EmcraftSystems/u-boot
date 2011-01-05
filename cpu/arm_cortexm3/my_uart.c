@@ -3,8 +3,6 @@
 */
 
 #include "16550_regs.h"
-#include "my_lib.h"
-
 #include "CMSIS/a2fxxxm3.h"
 
 void my_uart_init(int baud_rate)
@@ -32,22 +30,3 @@ void my_uart_init(int baud_rate)
     /* Disable DLAB */
     UART0->LCR &= ~LCR_DLAB;
 }
-
-void my_uart_putc(char c)
-{
-    int wait = 1000;
-    
-    /* Wait for TX FIFO RDY */
-    while (wait--) {
-        if (UART0->LSR & LSR_THRE) {
-            break;
-        }
-        my_udelay(5);
-    }
-
-    UART0->THR = c;
-
-    if (c == '\n') {
-	my_uart_putc('\r');
-    }
-} 
