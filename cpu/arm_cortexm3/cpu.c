@@ -4,6 +4,7 @@
 #include <asm-arm/arch-a2f/a2f.h>
 #include "my_uart.h"
 #include "envm.h"
+#include "wdt.h"
 #include "CMSIS/a2fxxxm3.h"
 
 DECLARE_GLOBAL_DATA_PTR;
@@ -67,3 +68,16 @@ int cleanup_before_linux(void)
 }
 
 void reset_cpu(ulong addr) {}
+
+/*
+ * H/w WDT strobe routine
+ */
+#if defined (CONFIG_HW_WATCHDOG)
+void hw_watchdog_reset(void)
+{
+	/*
+	 * Call the h/w-specific WDT strobe.
+	 */
+	wdt_strobe();
+}
+#endif

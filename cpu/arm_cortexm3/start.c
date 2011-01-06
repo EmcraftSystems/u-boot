@@ -1,4 +1,5 @@
 #include <config.h>
+#include "wdt.h"
 #include "CMSIS/a2fxxxm3.h"
 
 extern char _data_lma_start;
@@ -46,23 +47,13 @@ unsigned int vectors[] __attribute__((section(".vectors"))) = {
 
 void _start(void)
 {
+	/* 
+	 * Depending on the config parameter, enable or disable the WDT.
+	 */
 #if !defined(CONFIG_HW_WATCHDOG)
-    /* 
-     * Disable WDT - unless this is done, we would have to strobe
-     * the WDT every once in a while to avoid a reset.
-     * Note that after the WDT is disabled, it can't be enabled
-     * anymore, until a next re-boot.
-     * TO-DO: this is an A2F-specific action - move it somewhere
-     */
-    WATCHDOG->WDOGENABLE = 0x4C6E55FA;
+	wdt_disable();
 #else
-    /*
-     * Enable WDT -> period is about 40 seconds.
-     */
-    WATCHDOG->WDOGMVRP = 0xFFFFFFFF;
-    WATCHDOG->WDOGLOAD = 0xFFFFFF00;
-    WATCHDOG->WDOGCONTROL = 0;
-    hw_watchdog_reset();
+	wdt_enable();
 #endif
 
     /*
@@ -167,11 +158,5 @@ static void __attribute__((used)) dump_ctx(unsigned int *ctx)
 	}
     }
     printf("==================================\n");
-}
-
-void hw_watchdog_reset(void)
-{
-    /* Refresh watchdog */
-    WATCHDOG->WDOGREFRESH = 0xAC15DE42;
 }
 
