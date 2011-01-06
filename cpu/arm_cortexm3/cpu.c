@@ -67,7 +67,18 @@ int cleanup_before_linux(void)
 	return 0;
 }
 
-void reset_cpu(ulong addr) {}
+/*
+ * Perform the low-level reset.
+ */
+void reset_cpu(ulong addr)
+{
+	/*
+	 * Perform reset but keep priority group unchanged.
+	 */
+	A2F_SCB->aircr  = (0x5FA << 16) |
+                          (A2F_SCB->aircr & (7<<8)) |
+                          (1<<2); 
+}
 
 /*
  * H/w WDT strobe routine
