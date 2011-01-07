@@ -1,4 +1,3 @@
-
 #include <common.h>
 #include <command.h>
 #include <asm-arm/arch-a2f/a2f.h>
@@ -8,14 +7,23 @@
 
 DECLARE_GLOBAL_DATA_PTR;
 
+/* 
+ * Architecture specific CPU initialization
+ */
 int arch_cpu_init(void)
 {
 	/*
-	 * CMSIS clock initialization
-	 * TO-DO: move this somewhere else
+	 * Make sure interrupts are disabled.
 	 */
-#if 0
-	SystemCoreClockUpdate();
+	__disable_irq();
+
+	/* 
+	 * Depending on the config parameter, enable or disable the WDT.
+	 */
+#if !defined(CONFIG_HW_WATCHDOG)
+	wdt_disable();
+#else
+	wdt_enable();
 #endif
 
 	/*
@@ -45,6 +53,9 @@ int arch_cpu_init(void)
         return 0;
 }
 
+/*
+ * Print CPU information
+ */
 int print_cpuinfo(void)
 {
 	printf("CPU: %s\n", "SmartFusion FPGA (Cortex-M3 Hard IP)");

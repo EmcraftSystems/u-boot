@@ -1,15 +1,12 @@
 #include <config.h>
-#include "wdt.h"
-#include "CMSIS/a2fxxxm3.h"
+#include <common.h>
+#include <asm-arm/arch-a2f/a2f.h>
 
 extern char _data_lma_start;
 extern char _data_start;
 extern char _data_end;
-extern char _bss_start;
-extern char _bss_end;
-
 extern char armboot_start;
-unsigned int _armboot_start;
+unsigned long _armboot_start;
 
 void _start(void);
 void default_isr(void);
@@ -47,21 +44,6 @@ unsigned int vectors[] __attribute__((section(".vectors"))) = {
 
 void _start(void)
 {
-	/* 
-	 * Depending on the config parameter, enable or disable the WDT.
-	 */
-#if !defined(CONFIG_HW_WATCHDOG)
-	wdt_disable();
-#else
-	wdt_enable();
-#endif
-
-    /*
-     * Make sure interrupts are disabled.
-     * TO-DO: figure out the interrupt-handling policy in U-boot
-     * TO-DO: is it affected by CONFIG_USE_IRQ?
-     */
-    __disable_irq();
 
     /*
      * Copy data and initialize BSS
@@ -141,7 +123,7 @@ static void __attribute__((used)) dump_ctx(unsigned int *ctx)
 	"PENDSV",
 	"SYSTICK",
     };
-    unsigned char vec = SCB->ICSR & 0xFF;
+    unsigned char vec = A2F_SCB->icsr & 0xFF;
     int i;
 
     printf("==================================\n");
