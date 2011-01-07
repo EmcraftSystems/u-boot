@@ -2,7 +2,6 @@
 #include <common.h>
 #include <command.h>
 #include <asm-arm/arch-a2f/a2f.h>
-#include "my_uart.h"
 #include "envm.h"
 #include "wdt.h"
 #include "CMSIS/a2fxxxm3.h"
@@ -26,12 +25,6 @@ int arch_cpu_init(void)
 	SYSREG->SOFT_RST_CR &= ~(1 << 6);
 	TIMER->TIM64_MODE = 0;
 	TIMER->TIM1_CTRL = 0x03;
-
-	/*
- 	 * Initialize UART
-	 * TO-DO: move this somewhere else
- 	 */
-	my_uart_init(115200);
 
 	envm_init();
 

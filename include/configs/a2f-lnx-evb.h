@@ -73,9 +73,19 @@
 #define CONFIG_ARCH_CPU_INIT
 
 /*
- * System frequency (FCLK) coming out from reset
+ * System frequency (FCLK) and the other derivative clocks
+ * coming out from reset. These are defined by the Libero
+ * project programmed onto SmartFusion.
+ * It is possible to read these frequencies from SmartFusion
+ * at run-time, however for simplicity we define these
+ * clocks at build-time.
  */
 #define CONFIG_SYS_RESET_SYSCLCK_FREQ	80000000uL
+#define CONFIG_SYS_CLK_FREQ		80000000uL
+#define CONFIG_SYS_CLK_PCLK0		(CONFIG_SYS_CLK_FREQ / 4)
+#define CONFIG_SYS_CLK_PCLK1		(CONFIG_SYS_CLK_FREQ / 4)
+#define CONFIG_SYS_ACE_PCLK1		(CONFIG_SYS_CLK_FREQ / 2)
+#define CONFIG_SYS_FPGA_PCLK1		(CONFIG_SYS_CLK_FREQ / 2)
 
 /*
  * No interrupts
@@ -112,6 +122,19 @@
  * Settings for the EMC MUX register
  */
 #define CONFIG_SYS_EMCMUXCR		0x00000001
+
+/*
+ * Serial console configuration
+ */
+#define CONFIG_SYS_NS16550
+#undef CONFIG_NS16550_MIN_FUNCTIONS
+#define CONFIG_SYS_NS16550_SERIAL
+#define CONFIG_SYS_NS16550_REG_SIZE     (-4)
+#define CONFIG_SYS_NS16550_CLK          CONFIG_SYS_CLK_PCLK0
+#define CONFIG_CONS_INDEX               1
+#define CONFIG_SYS_NS16550_COM1         0x40000000
+#define CONFIG_BAUDRATE                 115200
+#define CONFIG_SYS_BAUDRATE_TABLE       { 9600, 19200, 38400, 57600, 115200 }
 
 /*
  * MALLOC_LEN can't be more than the specified size!
@@ -155,23 +178,6 @@
 #define CONFIG_SYS_HZ 1000
 /* system core clock /32 */
 #define CONFIG_SYSTICK_FREQ 3125000
-
-/*
- * Serial console configuration
- */
-
-#define CONFIG_BAUDRATE                 115200
-#define CONFIG_CONS_INDEX               1
-#define CONFIG_SYS_NS16550
-#undef	CONFIG_NS16550_MIN_FUNCTIONS
-#define CONFIG_SYS_NS16550_SERIAL
-#define CONFIG_SYS_NS16550_COM1         0x40000000
-#define CONFIG_SYS_NS16550_COM2		0x40010000
-#define CONFIG_SYS_NS16550_REG_SIZE     (-4)
-#define CONFIG_SYS_NS16550_CLK          (100)
-
-/* valid baudrates */
-#define CONFIG_SYS_BAUDRATE_TABLE       { 9600, 19200, 38400, 57600, 115200 }
 
  /*
   * Enable/disable h/w watchdog
