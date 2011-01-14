@@ -71,7 +71,7 @@ struct a2f_sysreg {
 
 struct a2f_scb {
 	unsigned int	cpuid;
-	unsigned int	icsr;
+	unsigned int	icst;
 	unsigned int	vtor;
 	unsigned int	aircr;
 };
