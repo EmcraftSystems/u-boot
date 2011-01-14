@@ -117,7 +117,7 @@
 /*
  * Timings for external Flash
  */
-#define CONFIG_SYS_EMC0CS1CR		0x000000af
+#define CONFIG_SYS_EMC0CS1CR		0x0000393F
 /*
  * Settings for the EMC MUX register
  */
