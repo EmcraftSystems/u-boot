@@ -110,6 +110,9 @@ typedef volatile unsigned char	vu_char;
 #ifdef CONFIG_SOC_DA8XX
 #include <asm/arch/hardware.h>
 #endif
+#ifdef CONFIG_SYS_A2F
+#include <asm/arch-a2f/a2f.h>
+#endif
 
 #include <part.h>
 #include <flash.h>

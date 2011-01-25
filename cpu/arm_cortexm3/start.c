@@ -1,15 +1,39 @@
-#include <config.h>
+/*
+ * (C) Copyright 2010,2011
+ * Vladimir Khusainov, Emcraft Systems, vlad@emcraft.com
+ *
+ * This program is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU General Public License as
+ * published by the Free Software Foundation; either version 2 of
+ * the License, or (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program; if not, write to the Free Software
+ * Foundation, Inc., 59 Temple Place, Suite 330, Boston,
+ * MA 02111-1307 USA
+ */
+#include <string.h>
+#include <asm/arch-a2f/a2f.h>
 #include "wdt.h"
-#include "CMSIS/a2fxxxm3.h"
+
+
+extern void	printf(const char *fmt, ...)
+		__attribute__ ((format (__printf__, 1, 2)));
 
 extern char _data_lma_start;
 extern char _data_start;
 extern char _data_end;
-extern char _bss_start;
-extern char _bss_end;
 
+unsigned long _armboot_start;
 extern char armboot_start;
-unsigned int _armboot_start;
+
+extern char _bss_start; /* code + data end == BSS start */
+extern char _bss_end;   /* BSS end */
 
 void _start(void);
 void default_isr(void);
@@ -92,14 +116,14 @@ void _start(void)
      * is defined in the CPU specific .lds file.
      * TO-DO: There is yet another complication here. The ARM generic code
      * makes the assumption that the malloc pool resides right below
-     * the U-boot code, as relocated to RAM and hence _armoot_start
+     * the U-boot code, as relocated to RAM and hence _armboot_start
      * is both the base of the U-boot code and the upper boundary
      * for the malloc pool ... This is not the case for A2F, hence
      * we will have to re-set _armoot_start to the U-boot code base
      * in the CPU specific initialization code. 
      * There is the same issue for another global: monitor_flash_len
      */  
-    _armboot_start = &armboot_start;
+    _armboot_start = (unsigned long)&armboot_start;
     start_armboot();
 }
 
@@ -141,7 +165,7 @@ static void __attribute__((used)) dump_ctx(unsigned int *ctx)
 	"PENDSV",
 	"SYSTICK",
     };
-    unsigned char vec = SCB->ICSR & 0xFF;
+    unsigned char vec = A2F_SCB->icsr & 0xFF;
     int i;
 
     printf("==================================\n");

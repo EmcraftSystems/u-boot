@@ -1,5 +1,5 @@
 /*
- * (C) Copyright 2006-2010 Emcraft Systems
+ * (C) Copyright 2010-2011 Emcraft Systems
  *
  * Configuration settings for the Emcraft A2F-LNX-EVB board.
  *
@@ -44,7 +44,7 @@
 /*
  * This is a specific revision of the board
  */
-#define CONFIG_SYS_BOARD_REV		0x1A
+#define CONFIG_SYS_BOARD_REV		0x2A
 
 #if (CONFIG_SYS_BOARD_REV!=0x1A && CONFIG_SYS_BOARD_REV!=0x2A)
 #error CONFIG_SYS_BOARD_REV must be 1A or 2A
@@ -143,11 +143,6 @@
 #define CONFIG_SYS_MALLOC_LEN		(1024*8)
 
 /*
- * TO-DO: what is this? ... something to do with clocks...
- */
-#undef CONFIG_FSL_ESDHC 
-
-/*
  * To save memory
  */
 #undef CONFIG_SYS_LONGHELP
@@ -225,9 +220,6 @@
 #define CONFIG_ENV_OVERWRITE
 
 /* Kernel parameters */
-#if 0
-#define CONFIG_SERIAL_TAG
-#endif
 #define CONFIG_SETUP_MEMORY_TAGS
 #define CONFIG_CMDLINE_TAG
 
@@ -236,40 +228,7 @@
 /* allocated Rx and Tx buffers in internal RAM */
 #define CONFIG_CORE10100_INTRAM_ADDRESS	   0x20008000
 #define CONFIG_BITBANGMII	1
-
-#if defined(CONFIG_BITBANGMII)
-#include <asm/io.h>
-/* Register offsets */
-#define RCSR9			0x48
-#define RCSR9_MDC		(1 << 16)
-#define RCSR9_MDO		(1 << 17)
-#define RCSR9_MDEN		(1 << 18)
-#define RCSR9_MDI		(1 << 19)
-
-/* CORE 10/100 base address */
-#define ETH_CORE_BASE		0x40003000
-#define READ_REG(reg)		readl(ETH_CORE_BASE + reg)
-#define WRITE_REG(reg, val)	writel(val, ETH_CORE_BASE + reg)
-
-/* Direction - output */
-#define MDIO_ACTIVE		(WRITE_REG(RCSR9, READ_REG(RCSR9) | RCSR9_MDEN))
-/* Direction - input */
-#define MDIO_TRISTATE	(WRITE_REG(RCSR9, READ_REG(RCSR9) & ~RCSR9_MDEN))
-#define MDIO_READ		((READ_REG(RCSR9) & RCSR9_MDI) != 0)
-#define MDIO(val)							\
-	if (val) {							\
-		WRITE_REG(RCSR9, READ_REG (RCSR9) | RCSR9_MDO);		\
-	} else {							\
-		WRITE_REG(RCSR9, READ_REG (RCSR9) & ~RCSR9_MDO);	\
-	}
-#define MDC(val)						 \
-	if (val) {						 \
-		WRITE_REG(RCSR9, READ_REG (RCSR9) | RCSR9_MDC);	 \
-	} else {						 \
-		WRITE_REG(RCSR9, READ_REG (RCSR9) & ~RCSR9_MDC); \
-	}
-#define MIIDELAY		udelay(1)
-#endif
+#define CONFIG_BITBANGMII_MULTI	1
 
 /* 
  * Enable all those monitor commands that are needed

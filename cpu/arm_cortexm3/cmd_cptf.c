@@ -1,8 +1,26 @@
+/*
+ * (C) Copyright 2010,2011
+ * Vladimir Khusainov, Emcraft Systems, vlad@emcraft.com
+ *
+ * This program is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU General Public License as
+ * published by the Free Software Foundation; either version 2 of
+ * the License, or (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program; if not, write to the Free Software
+ * Foundation, Inc., 59 Temple Place, Suite 330, Boston,
+ * MA 02111-1307 USA
+ */
 
 #include <common.h>
 #include <command.h>
 #include <string.h>
-#include "CMSIS/a2fxxxm3.h"
 #include "envm.h"
 
 #define A2F_RAM_BUFFER_BASE	0x20004000
@@ -33,11 +51,8 @@ static int __attribute__((section(".ramcode")))
 	if (do_reset) {
 		/*
 	 	 * Cortex-M3 core reset.
- 	 	 * This call is actually all inlined so there are
- 	 	 * no function calls in here and no care should be
- 	 	 * taken about "long-call" function-calling conventions
  	 	 */
-		NVIC_SystemReset();
+		reset_cpu(0);
 
 		/*
 	 	 * Should never be here.
@@ -48,38 +63,6 @@ static int __attribute__((section(".ramcode")))
 	return ret;
 
 }
-
-#if 0
-int do_cpff(cmd_tbl_t *cmdtp, int flag, int argc, char *argv[])
-{
-	ulong flash_buf;
-	ulong ram_buf = A2F_RAM_BUFFER_BASE;
-	int ret = 0;
-
-	if (argc == 1) {
-		printf("%s: Flash offset must be specified\n",
-                       (char *) argv[0]);
-		goto Done;
-	}
-
-	flash_buf = simple_strtoul(argv[1], NULL, 16);
-
-	printf("%s: f=%x r=%x\n",
-               (char *) argv[0], (uint) flash_buf, (uint) ram_buf);
-
-	(void) memcpy((void *) ram_buf, (void *) flash_buf,
-                       A2F_RAM_BUFFER_SIZE);
-
-	Done:
-	return ret;
-}
-
-U_BOOT_CMD(
-	cpff,	2,		0,	do_cpff,
-	"copy internal Flash of the A2F to a RAM buffer",
-	"flash_off [ram_buf]"
-);
-#endif 
 
  /*
   * cptf: copy content of a buffer (including one in Flash) to Flash.

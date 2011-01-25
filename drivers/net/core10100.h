@@ -160,8 +160,8 @@
 
 /*Register access functions*/
 
-#define read_reg(reg) (readl(bp->base + reg))
-#define write_reg(reg, val) (writel(val, bp->base + reg))
+#define read_reg(reg) (readl(MAC_BASE + reg))
+#define write_reg(reg, val) (writel(val, MAC_BASE + reg))
 
 #define RX_RING_SIZE 4
 #define TX_RING_SIZE 4
@@ -290,6 +290,8 @@ struct core10100_dev {
 
 
 #define to_core(_nd) container_of(_nd, struct core10100_dev, netdev)
+
+#define CORE10100_MII_NAME	"core10/100_mii"
 
 #endif /* CORE10100_H */
 

@@ -2,6 +2,9 @@
 # (C) Copyright 2000-2003
 # Wolfgang Denk, DENX Software Engineering, wd@denx.de.
 #
+# Port to A2F
+# Vladimir Khusainov, Emcraft Systems, vlad@emcraft.com.
+#
 # See file CREDITS for list of people who contributed to this
 # project.
 #
@@ -26,8 +29,7 @@ include $(TOPDIR)/config.mk
 LIB	= $(obj)lib$(CPU).a
 
 START	:= start.o
-COBJS	:= cpu.o timer.o cmd_cptf.o envm.o wdt.o  \
-	   CMSIS/system_a2fxxxm3.o CMSIS/core_cm3.o
+COBJS	:= cpu.o timer.o cmd_cptf.o envm.o wdt.o
 
 SRCS	:= $(START:.o=.c) $(COBJS:.o=.c)
 OBJS	:= $(addprefix $(obj),$(COBJS))

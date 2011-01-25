@@ -1,10 +1,27 @@
+/*
+ * (C) Copyright 2010,2011
+ * Vladimir Khusainov, Emcraft Systems, vlad@emcraft.com
+ *
+ * This program is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU General Public License as
+ * published by the Free Software Foundation; either version 2 of
+ * the License, or (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program; if not, write to the Free Software
+ * Foundation, Inc., 59 Temple Place, Suite 330, Boston,
+ * MA 02111-1307 USA
+ */
 
 #include <common.h>
 #include <command.h>
-#include <asm-arm/arch-a2f/a2f.h>
 #include "envm.h"
 #include "wdt.h"
-#include "CMSIS/a2fxxxm3.h"
 
 DECLARE_GLOBAL_DATA_PTR;
 
@@ -22,9 +39,9 @@ int arch_cpu_init(void)
 	 * Initialize timer
 	 * TO-DO: move this somewhere else
 	 */
-	SYSREG->SOFT_RST_CR &= ~(1 << 6);
-	TIMER->TIM64_MODE = 0;
-	TIMER->TIM1_CTRL = 0x03;
+	A2F_SYSREG->soft_rst_cr &= ~(1 << 6);
+	A2F_TIMER->timer64_mode = 0;
+	A2F_TIMER->timer1_ctrl = 0x03;
 
 	envm_init();
 

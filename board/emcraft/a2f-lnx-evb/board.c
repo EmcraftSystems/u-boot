@@ -23,7 +23,6 @@
 
 #include <common.h>
 #include <netdev.h>
-#include <asm-arm/arch-a2f/a2f.h>
 
 DECLARE_GLOBAL_DATA_PTR;
 

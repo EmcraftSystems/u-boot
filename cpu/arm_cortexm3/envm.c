@@ -1,4 +1,24 @@
-#include "CMSIS/a2fxxxm3.h"
+/*
+ * (C) Copyright 2010,2011
+ * Vladimir Khusainov, Emcraft Systems, vlad@emcraft.com
+ *
+ * This program is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU General Public License as
+ * published by the Free Software Foundation; either version 2 of
+ * the License, or (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program; if not, write to the Free Software
+ * Foundation, Inc., 59 Temple Place, Suite 330, Boston,
+ * MA 02111-1307 USA
+ */
+
+#include <common.h>
 
 /*
  * ENVM control & status registers
@@ -53,6 +73,10 @@ struct mss_envm {
 #define MSS_ENVM_STATUS_BUSY		((1<<0)|(1<<16))
 #define MSS_ENVM_STATUS_ERROR_MASK	(0x300|(0x300<<16))
 
+/* Clock frequency of APB bus 0. */
+#define RESET_PCLK0_DIV	  4
+#define FREQ_PCLK0		  (CONFIG_SYS_RESET_SYSCLCK_FREQ / RESET_PCLK0_DIV)
+
 /*
  * Initialize the eNVM interface
  */
@@ -103,9 +127,9 @@ static int __attribute__((section(".ramcode")))
 		/*
  		 * If not done yet, delay
  		 */
-		TIMER->TIM1_LOADVAL = 
-		MSS_ENVM_WAIT_INTERVAL * (g_FrequencyPCLK0 / 1000000);
-		while (TIMER->TIM1_VAL) ;
+		A2F_TIMER->timer1_loadval =
+		MSS_ENVM_WAIT_INTERVAL * (FREQ_PCLK0 / 1000000);
+		while (A2F_TIMER->timer1_val) ;
 	}
 
 	/*

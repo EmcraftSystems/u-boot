@@ -1155,7 +1155,7 @@ struct malloc_chunk
   INTERNAL_SIZE_T size;      /* Size in bytes, including overhead. */
   struct malloc_chunk* fd;   /* double links -- used only if free. */
   struct malloc_chunk* bk;
-};
+} __attribute__((__may_alias__)) ;
 
 typedef struct malloc_chunk* mchunkptr;
 

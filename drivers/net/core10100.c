@@ -61,7 +61,7 @@ static ushort mii_read(struct core10100_dev *bp, u16 reg)
 {
 	u16 data;	/* Read data */
 
-	bb_miiphy_read(NULL, bp->phy_addr, reg, &data);
+	bb_miiphy_read(CORE10100_MII_NAME, bp->phy_addr, reg, &data);
 
 	return data;
 }
@@ -69,7 +69,7 @@ static ushort mii_read(struct core10100_dev *bp, u16 reg)
 /* Write a register value via MII */
 static void mii_write(struct core10100_dev *bp, u16 reg, u16 data)
 {
-	if (bb_miiphy_write (NULL, bp->phy_addr, reg, data)) {
+	if (bb_miiphy_write (CORE10100_MII_NAME, bp->phy_addr, reg, data)) {
 		printf ("%s error!\n", __func__);
 	}
 }
@@ -525,12 +525,11 @@ static int core10100_check_rxframe(struct rxtx_desc *rx_desc)
 			printf("%s: Runt Frame (damaged)\n", __func__);
 			badframe = 1;
 		}
-#if 1 //psl
+
 		if (rx_desc->own_stat & DESC_RCS) {
 			printf("%s: Collision\n", __func__);
 			badframe = 1;
 		}
-#endif
 		if (rx_desc->own_stat & DESC_RRE) {
 			printf("%s: RMII error\n", __func__);
 			badframe = 1;
@@ -641,7 +640,72 @@ int core_eth_init(bd_t *bd)
 
 	eth_register(netdev);
 #ifdef CONFIG_CMD_MII
-	miiphy_register("core10100", bb_miiphy_read, bb_miiphy_write);
+	miiphy_register(CORE10100_MII_NAME, bb_miiphy_read, bb_miiphy_write);
 #endif
 	return 0;
 }
+
+#ifdef CONFIG_BITBANGMII_MULTI
+/* Bit-Bang MII functions, see drivers/net/phy/miiphybb.c */
+
+static int bb_mdio_active(struct bb_miiphy_bus *bus)
+{
+	write_reg(CSR9, read_reg(CSR9) | CSR9_MDEN);
+	return 0;
+}
+
+static int bb_mdio_tristate(struct bb_miiphy_bus *bus)
+{
+	write_reg(CSR9, read_reg(CSR9) & ~CSR9_MDEN);
+	return 0;
+}
+
+static int bb_set_mdio(struct bb_miiphy_bus *bus, int v)
+{
+	if (v) {
+		write_reg(CSR9, read_reg (CSR9) | CSR9_MDO);
+	} else {
+		write_reg(CSR9, read_reg (CSR9) & ~CSR9_MDO);
+	}
+	return 0;
+}
+
+static int bb_get_mdio(struct bb_miiphy_bus *bus, int *v)
+{
+	*v = ((read_reg(CSR9) & CSR9_MDI) != 0);
+	return 0;
+}
+
+static int bb_set_mdc(struct bb_miiphy_bus *bus, int v)
+{
+	if (v) {
+		write_reg(CSR9, read_reg (CSR9) | CSR9_MDC);
+	} else {
+		write_reg(CSR9, read_reg (CSR9) & ~CSR9_MDC);
+	}
+	return 0;
+}
+
+static int bb_delay(struct bb_miiphy_bus *bus)
+{
+	udelay(1);
+	return 0;
+}
+
+struct bb_miiphy_bus bb_miiphy_buses[] = {
+	{
+		.name = CORE10100_MII_NAME,
+		.init = NULL,
+		.mdio_active = bb_mdio_active,
+		.mdio_tristate = bb_mdio_tristate,
+		.set_mdio = bb_set_mdio,
+		.get_mdio = bb_get_mdio,
+		.set_mdc = bb_set_mdc,
+		.delay = bb_delay,
+	}
+};
+
+int bb_miiphy_buses_num = sizeof(bb_miiphy_buses) /
+			  sizeof(bb_miiphy_buses[0]);
+
+#endif
