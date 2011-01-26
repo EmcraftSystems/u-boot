@@ -77,10 +77,9 @@
  * coming out from reset. These are defined by the Libero
  * project programmed onto SmartFusion.
  * It is possible to read these frequencies from SmartFusion
- * at run-time, however for simplicity we define these
+ * at run-time, however for simplicity of configuration we define these
  * clocks at build-time.
  */
-#define CONFIG_SYS_RESET_SYSCLCK_FREQ	80000000uL
 #define CONFIG_SYS_CLK_FREQ		80000000uL
 #define CONFIG_SYS_CLK_PCLK0		(CONFIG_SYS_CLK_FREQ / 4)
 #define CONFIG_SYS_CLK_PCLK1		(CONFIG_SYS_CLK_FREQ / 4)

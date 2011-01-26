@@ -73,10 +73,6 @@ struct mss_envm {
 #define MSS_ENVM_STATUS_BUSY		((1<<0)|(1<<16))
 #define MSS_ENVM_STATUS_ERROR_MASK	(0x300|(0x300<<16))
 
-/* Clock frequency of APB bus 0. */
-#define RESET_PCLK0_DIV	  4
-#define FREQ_PCLK0		  (CONFIG_SYS_RESET_SYSCLCK_FREQ / RESET_PCLK0_DIV)
-
 /*
  * Initialize the eNVM interface
  */
@@ -128,7 +124,7 @@ static int __attribute__((section(".ramcode")))
  		 * If not done yet, delay
  		 */
 		A2F_TIMER->timer1_loadval =
-		MSS_ENVM_WAIT_INTERVAL * (FREQ_PCLK0 / 1000000);
+		  MSS_ENVM_WAIT_INTERVAL * (CONFIG_SYS_CLK_PCLK0/ 1000000);
 		while (A2F_TIMER->timer1_val) ;
 	}
 

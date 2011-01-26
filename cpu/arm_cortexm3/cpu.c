@@ -25,16 +25,11 @@
 
 DECLARE_GLOBAL_DATA_PTR;
 
+/*
+ * CPU specific initilization
+ */
 int arch_cpu_init(void)
 {
-	/*
-	 * CMSIS clock initialization
-	 * TO-DO: move this somewhere else
-	 */
-#if 0
-	SystemCoreClockUpdate();
-#endif
-
 	/*
 	 * Initialize timer
 	 * TO-DO: move this somewhere else
@@ -43,8 +38,14 @@ int arch_cpu_init(void)
 	A2F_TIMER->timer64_mode = 0;
 	A2F_TIMER->timer1_ctrl = 0x03;
 
+	/*
+	 * Initialize the eNVM driver
+	 */
 	envm_init();
 
+	/*
+	 * Initialize the timers. 
+	 */
 	timer_init();
 
 	/*
@@ -62,6 +63,9 @@ int arch_cpu_init(void)
         return 0;
 }
 
+/*
+ * Print the CPU specific information
+ */
 int print_cpuinfo(void)
 {
 	printf("CPU: %s\n", "SmartFusion FPGA (Cortex-M3 Hard IP)");
