@@ -63,7 +63,7 @@ void wdt_disable(void)
 	 * Disable WDT - unless this is done, we would have to strobe
 	 * the WDT every once in a while to avoid a reset.
 	 * Note that after the WDT is disabled, it can't be enabled
-	 * anymore, until a next re-boot.
+	 * anymore, until a next power cycle.
 	 */
 	MSS_WDT->enable = MSS_WDT_DISABLE;
 }
@@ -75,6 +75,8 @@ void wdt_enable(void)
 {
 	/*
 	 * Enable WDT -> period is about 40 seconds.
+	 * This (the period) can be made configurable of course
+	 * however we do not really need that at this time.
 	 */
 	MSS_WDT->mvrp = 0xFFFFFFFF;
 	MSS_WDT->load = 0xFFFFFF00;

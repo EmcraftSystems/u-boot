@@ -29,7 +29,7 @@ include $(TOPDIR)/config.mk
 LIB	= $(obj)lib$(CPU).a
 
 START	:= start.o
-COBJS	:= cpu.o timer.o cmd_cptf.o envm.o wdt.o
+COBJS	:= cpu.o timer.o envm.o wdt.o cmd_cptf.o 
 
 SRCS	:= $(START:.o=.c) $(COBJS:.o=.c)
 OBJS	:= $(addprefix $(obj),$(COBJS))

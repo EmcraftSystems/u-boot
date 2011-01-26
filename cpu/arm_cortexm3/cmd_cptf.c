@@ -27,9 +27,9 @@
 #define A2F_RAM_BUFFER_SIZE	0x8000
 
 /*
- * The in-RAM copy of the processor reset function.
- * We need it in RAM so as to be able to reset the CPU
- * after we have upgraded U-boot in the internal Flash.
+ * Write the eNVM and, optionally, reset the CPU.
+ * We need it in RAM so as to be able to update U-boot,
+ * which itself runs from the eNVM.
  */
 static int __attribute__((section(".ramcode")))
            __attribute__ ((long_call)) 
@@ -61,13 +61,11 @@ static int __attribute__((section(".ramcode")))
 
 	Done:
 	return ret;
-
 }
 
  /*
   * cptf: copy content of a buffer (including one in Flash) to Flash.
   */
-
 int do_cptf(cmd_tbl_t *cmdtp, int flag, int argc, char *argv[])
 {
 	ulong dst;
@@ -99,8 +97,7 @@ int do_cptf(cmd_tbl_t *cmdtp, int flag, int argc, char *argv[])
 		do_reset = simple_strtol(argv[4], NULL, 16);
 	}
 
-	printf("%s: dst=%x src=%x sz=%x, do=%d\n",
-              (char *) argv[0], (uint) dst, (uint) src, (uint) size, do_reset);
+	printf("%s: Updating eNVM. Please wait ...\n", (char *) argv[0]);
 
 	/*
  	 * Copy the buffer to the destination.
