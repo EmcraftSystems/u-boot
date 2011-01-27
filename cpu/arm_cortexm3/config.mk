@@ -1,6 +1,6 @@
 #
-# (C) Copyright 2002
-# Gary Jennejohn, DENX Software Engineering, <garyj@denx.de>
+# (C) Copyright 2010,2011
+# Vladimir Khusainov, Emcraft Systems, vlad@emcraft.com
 #
 # See file CREDITS for list of people who contributed to this
 # project.

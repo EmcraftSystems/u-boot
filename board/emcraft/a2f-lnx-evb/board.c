@@ -3,7 +3,8 @@
  *
  * Board specific code the the Emcraft A2F-LNX-EVB board.
  *
- * Copyright (C) 2010 Vladimir Khusainov, Emcraft Systems
+ * Copyright (C) 2010, 2011
+ * Vladimir Khusainov, Emcraft Systems, vlad@emcraft.com
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License as

@@ -85,6 +85,8 @@
 #define CONFIG_SYS_ACE_PCLK1		(CONFIG_SYS_CLK_FREQ / 2)
 #define CONFIG_SYS_FPGA_PCLK1		(CONFIG_SYS_CLK_FREQ / 2)
 
+#define CONFIG_SYS_HZ			1000
+
 /*
  * Enable/disable h/w watchdog
  */
@@ -195,15 +197,19 @@
 #define CONFIG_BITBANGMII		1
 #define CONFIG_BITBANGMII_MULTI		1
 
-#define CONFIG_SYS_LOAD_ADDR 0
-#define CONFIG_SYS_MEMTEST_START 0
-#define CONFIG_SYS_MEMTEST_END 0
-#define CONFIG_SYS_HZ 1000
-/* system core clock /32 */
-#define CONFIG_SYSTICK_FREQ 3125000
+#define CONFIG_SYS_MEMTEST_START	CONFIG_SYS_RAM_BASE
+#define CONFIG_SYS_MEMTEST_END		(CONFIG_SYS_RAM_BASE + \
+					CONFIG_SYS_RAM_SIZE - 0x100000)
 
-#define CONFIG_SYS_MONITOR_BASE  	0x0 
-#define CONFIG_MONITOR_IS_IN_RAM 	1
+/* Need ot be defined for "loadb" */
+#define CONFIG_SYS_LOAD_ADDR		CONFIG_SYS_RAM_BASE
+
+/*
+ * Monitor is in NVM. For U-Boot, it is not flash, 
+ * neither RAM, so we configure it as follows.
+ */
+#define CONFIG_SYS_MONITOR_BASE  	0x0
+#define CONFIG_MONITOR_IS_IN_RAM  	1
 
 /* 
  * Enable all those monitor commands that are needed
@@ -222,7 +228,7 @@
 #define CONFIG_CMD_NET
 #undef CONFIG_CMD_NFS
 #undef CONFIG_CMD_SOURCE
-#undef CONFIG_CMD_XIMG 
+#undef CONFIG_CMD_XIMG
 
 /*
  * To save memory disable long help

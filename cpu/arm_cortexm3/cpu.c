@@ -31,14 +31,6 @@ DECLARE_GLOBAL_DATA_PTR;
 int arch_cpu_init(void)
 {
 	/*
-	 * Initialize timer
-	 * TO-DO: move this somewhere else
-	 */
-	A2F_SYSREG->soft_rst_cr &= ~(1 << 6);
-	A2F_TIMER->timer64_mode = 0;
-	A2F_TIMER->timer1_ctrl = 0x03;
-
-	/*
 	 * Initialize the eNVM driver
 	 */
 	envm_init();
@@ -69,7 +61,7 @@ int arch_cpu_init(void)
 int print_cpuinfo(void)
 {
 	printf("CPU: %s\n", "SmartFusion FPGA (Cortex-M3 Hard IP)");
-        return 0;
+	return 0;
 }
 
 /*
@@ -89,6 +81,7 @@ void reset_cpu(ulong addr)
 	/*
 	 * Perform reset but keep priority group unchanged.
 	 */
+
 	A2F_SCB->aircr  = (0x5FA << 16) |
                           (A2F_SCB->aircr & (7<<8)) |
                           (1<<2); 
