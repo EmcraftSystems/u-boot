@@ -258,7 +258,7 @@
  */
 #define CONFIG_EXTRA_ENV_SETTINGS	\
 	"loadaddr=70000000\0"		\
-	"addip=setenv bootargs ${bootargs} ip=${ipaddr}:::${netmask}:${hostname}:eth0:off\0"				\
+	"addip=setenv bootargs ${bootargs} ip=${ipaddr}:${serverip}:${gatewayip}:${netmask}:${hostname}:eth0:off\0"				\
 	"flashaddr=74020000\0"		\
 	"flashboot=run addip;bootm ${flashaddr}\0"	\
 	"netboot=tftp ${image};run addip;bootm\0"	\
