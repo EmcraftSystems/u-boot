@@ -28,27 +28,24 @@ struct systick {
 };
 
 /* system core clock /32 */
-#define CONFIG_SYSTICK_FREQ		3125000
+#define CONFIG_SYSTICK_FREQ	3125000
 
 /* SysTick Base Address */
 #define A2F_SYSTICK_BASE	(A2F_SCS_BASE +  0x0010)
 
 #define A2F_SYSTICK		((volatile struct systick *)(A2F_SYSTICK_BASE))
 
-#define SYSTICK_LOAD_RELOAD_POS		0
-#define SYSTICK_CTRL_ENABLE_POS		0
-#define SYSTICK_LOAD_RELOAD_MSK		(0xFFFFFFul << SYSTICK_LOAD_RELOAD_POS)
-#define SYSTICK_CTRL_ENABLE_MSK		(1ul << SYSTICK_CTRL_ENABLE_POS)
+#define SYSTICK_LOAD_RELOAD_POS	0
+#define SYSTICK_CTRL_ENABLE_POS	0
+#define SYSTICK_LOAD_RELOAD_MSK	(0xFFFFFFul << SYSTICK_LOAD_RELOAD_POS)
+#define SYSTICK_CTRL_ENABLE_MSK	(1ul << SYSTICK_CTRL_ENABLE_POS)
 
 /* Internal tick units */
-static unsigned long long timestamp;	/* Monotonic incrementing timer */
-static unsigned long lastdec;	/* Last decremneter snapshot */
+static unsigned long long timestamp; /* Monotonic incrementing timer */
+static unsigned long lastdec;	/* Last decrementer snapshot */
 
 int timer_init()
 {
-	/*
-	 * Initialize timer
-	 */
 	A2F_SYSREG->soft_rst_cr &= ~(1 << 6); /* Release systimer from reset */
 	A2F_TIMER->timer64_mode = 0;   /* enable 32bit timer1 */
 	A2F_TIMER->timer1_ctrl = 0x03; /* timer1 is used by envm driver */

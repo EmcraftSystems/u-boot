@@ -1,5 +1,5 @@
 /*
- * (C) Copyright 2010-2011 Emcraft Systems
+ * (C) Copyright 2010,2011 Emcraft Systems
  *
  * Configuration settings for the Emcraft A2F-LNX-EVB board.
  *
@@ -85,7 +85,9 @@
 #define CONFIG_SYS_ACE_PCLK1		(CONFIG_SYS_CLK_FREQ / 2)
 #define CONFIG_SYS_FPGA_PCLK1		(CONFIG_SYS_CLK_FREQ / 2)
 
-/* How many clock ticks in 1 sec */
+/* 
+ * Number of clock ticks in 1 sec
+ */
 #define CONFIG_SYS_HZ			1000
 
 /*
@@ -199,19 +201,23 @@
 #define CONFIG_BITBANGMII_MULTI		1
 
 #define CONFIG_SYS_MEMTEST_START	CONFIG_SYS_RAM_BASE
-#define CONFIG_SYS_MEMTEST_END		(CONFIG_SYS_RAM_BASE + CONFIG_SYS_RAM_SIZE)
+#define CONFIG_SYS_MEMTEST_END		(CONFIG_SYS_RAM_BASE + \
+					CONFIG_SYS_RAM_SIZE)
 
-/* Need ot be defined for "loadb" */
+/* 
+ * Needed by "loadb"
+ */ 
 #define CONFIG_SYS_LOAD_ADDR		CONFIG_SYS_RAM_BASE
 
 /*
- * Monitor is in NVM. For U-Boot, it is not flash, 
- * neither RAM, but CONFIG_SYS_MONITOR_BASE must be defined.
+ * Monitor is actually in eNVM. In terms of U-Boot, it is neither "flash", 
+ * not RAM, but CONFIG_SYS_MONITOR_BASE must be defined.
  */
 #define CONFIG_SYS_MONITOR_BASE  	0x0
+
 /*
- * Monitor is not in flash. Define the following to avoid
- * U-Boot to run flash_protect() on monitor code.
+ * Monitor is not in flash. Needs to define this to prevent 
+ * U-Boot from running flash_protect() on the monitor code.
  */
 #define CONFIG_MONITOR_IS_IN_RAM  	1
 
