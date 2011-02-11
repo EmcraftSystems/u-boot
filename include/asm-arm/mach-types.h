@@ -2699,7 +2699,7 @@ extern unsigned int __machine_arch_type;
 #define MACH_TYPE_MX53_EVK             2716
 #define MACH_TYPE_IGEP0030             2717
 #define MACH_TYPE_AXELL_H40_H50_CTRL   2718
-#define MACH_TYPE_A2F                  10001
+#define MACH_TYPE_A2F                  3344
 
 #ifdef CONFIG_ARCH_EBSA110
 # ifdef machine_arch_type
