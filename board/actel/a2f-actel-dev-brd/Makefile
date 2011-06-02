@@ -1,5 +1,5 @@
 #
-# (C) Copyright 2010, 2011
+# (C) Copyright 2011
 # Vladimir Khusainov, Emcraft Systems, vlad@emcraft.com
 #
 # See file CREDITS for list of people who contributed to this
