@@ -46,7 +46,7 @@
  * sets of the memory devices (3.3V or 1.8 memories)
  * are accessible at a time
  */
-#define CONFIG_SYS_BOARD_REV		0x33
+#define CONFIG_SYS_BOARD_REV		0x18
 
 #if (CONFIG_SYS_BOARD_REV!=0x33 && CONFIG_SYS_BOARD_REV!=0x18)
 #error CONFIG_SYS_BOARD_REV must be 33 or 18
@@ -121,7 +121,7 @@
 #if (CONFIG_SYS_BOARD_REV==0x33)
 # define CONFIG_SYS_EMC0CS0CR		0x00002225
 #else
-# define CONFIG_SYS_EMC0CS0CR		0x00002225
+# define CONFIG_SYS_EMC0CS0CR		0x00003335
 #endif
 
 /*
@@ -140,19 +140,24 @@
 #if (CONFIG_SYS_BOARD_REV==0x33)
 # define CONFIG_SYS_EMC0CS1CR		0x0000393F
 #else
-# define CONFIG_SYS_EMC0CS1CR		0x0000393F
+# define CONFIG_SYS_EMC0CS1CR		0x0000013F
 #endif
 
 /* 
  * Settings for the CFI Flash driver
  */
+#if (CONFIG_SYS_BOARD_REV==0x33)
+#error Need to add parameters for the 3.3V Flash
+#else
 #define CONFIG_SYS_FLASH_CFI		1
 #define CONFIG_FLASH_CFI_DRIVER		1
 #define CONFIG_SYS_FLASH_CFI_WIDTH	FLASH_CFI_16BIT
 #define CONFIG_SYS_FLASH_BANKS_LIST	{ CONFIG_SYS_FLASH_BANK1_BASE }
 #define CONFIG_SYS_MAX_FLASH_BANKS	1
-#define CONFIG_SYS_MAX_FLASH_SECT	128
+#define CONFIG_SYS_MAX_FLASH_SECT	140
 #define CONFIG_SYS_FLASH_CFI_AMD_RESET	1
+#define CONFIG_SYS_FLASH_PROTECTION	1
+#endif
 
 /* 
  * U-boot environment configruation
@@ -268,13 +273,16 @@
 /* 
  * Short-cuts to some useful commands (macros)
  */
-#define CONFIG_EXTRA_ENV_SETTINGS	\
-	"loadaddr=70000000\0"		\
+#define CONFIG_EXTRA_ENV_SETTINGS				\
+	"loadaddr=70000000\0"					\
 	"addip=setenv bootargs ${bootargs} ip=${ipaddr}:${serverip}:${gatewayip}:${netmask}:${hostname}:eth0:off\0"				\
-	"flashaddr=74020000\0"		\
-	"flashboot=run addip;bootm ${flashaddr}\0"	\
-	"netboot=tftp ${image};run addip;bootm\0"	\
-	"image=a2f/uImage\0"
+	"flashaddr=74020000\0"					\
+	"flashboot=run addip;bootm ${flashaddr}\0"		\
+	"ethaddr=C0:B1:3C:88:88:88\0"				\
+	"ipaddr=172.17.4.206\0"					\
+	"serverip=172.17.0.1\0"					\
+	"image=a2f/uImage\0"					\
+	"netboot=tftp ${image};run addip;bootm\0"
 
 /*
  * Linux kernel boot parameters configuration
