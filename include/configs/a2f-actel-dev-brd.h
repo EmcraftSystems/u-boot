@@ -48,8 +48,8 @@
  */
 #define CONFIG_SYS_BOARD_REV		0x18
 
-#if (CONFIG_SYS_BOARD_REV!=0x33 && CONFIG_SYS_BOARD_REV!=0x18)
-#error CONFIG_SYS_BOARD_REV must be 33 or 18
+#if (CONFIG_SYS_BOARD_REV!=0x18)
+#error CONFIG_SYS_BOARD_REV must be 18
 #endif
 
 /*
@@ -109,7 +109,7 @@
 #define CONFIG_NR_DRAM_BANKS		1
 #define CONFIG_SYS_RAM_BASE		0x70000000
 #if (CONFIG_SYS_BOARD_REV==0x33)
-# define CONFIG_SYS_RAM_SIZE		(4 * 1024 * 1024)
+# error Define configuration for the 3.3V memory
 #else
 # define CONFIG_SYS_RAM_SIZE		(16 * 1024 * 1024)
 #endif
@@ -119,7 +119,7 @@
  * Optimized timings for external SRAM
  */
 #if (CONFIG_SYS_BOARD_REV==0x33)
-# define CONFIG_SYS_EMC0CS0CR		0x00002225
+# error Define configuration for the 3.3V memory
 #else
 # define CONFIG_SYS_EMC0CS0CR		0x00003335
 #endif
@@ -138,25 +138,25 @@
  * Timings for the external Flash
  */
 #if (CONFIG_SYS_BOARD_REV==0x33)
-# define CONFIG_SYS_EMC0CS1CR		0x0000393F
+# error Define configuration for the 3.3V memory
 #else
-# define CONFIG_SYS_EMC0CS1CR		0x0000013F
+# define CONFIG_SYS_EMC0CS1CR		0x00000137
 #endif
 
 /* 
  * Settings for the CFI Flash driver
  */
 #if (CONFIG_SYS_BOARD_REV==0x33)
-#error Need to add parameters for the 3.3V Flash
+# error Define configuration for the 3.3V memory
 #else
-#define CONFIG_SYS_FLASH_CFI		1
-#define CONFIG_FLASH_CFI_DRIVER		1
-#define CONFIG_SYS_FLASH_CFI_WIDTH	FLASH_CFI_16BIT
-#define CONFIG_SYS_FLASH_BANKS_LIST	{ CONFIG_SYS_FLASH_BANK1_BASE }
-#define CONFIG_SYS_MAX_FLASH_BANKS	1
-#define CONFIG_SYS_MAX_FLASH_SECT	140
-#define CONFIG_SYS_FLASH_CFI_AMD_RESET	1
-#define CONFIG_SYS_FLASH_PROTECTION	1
+# define CONFIG_SYS_FLASH_CFI		1
+# define CONFIG_FLASH_CFI_DRIVER	1
+# define CONFIG_SYS_FLASH_CFI_WIDTH	FLASH_CFI_16BIT
+# define CONFIG_SYS_FLASH_BANKS_LIST	{ CONFIG_SYS_FLASH_BANK1_BASE }
+# define CONFIG_SYS_MAX_FLASH_BANKS	1
+# define CONFIG_SYS_MAX_FLASH_SECT	140
+# define CONFIG_SYS_FLASH_CFI_AMD_RESET	1
+# define CONFIG_SYS_FLASH_PROTECTION	1
 #endif
 
 /* 
