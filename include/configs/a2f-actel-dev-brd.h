@@ -267,7 +267,8 @@
 #define CONFIG_BOOTDELAY		3
 #define CONFIG_ZERO_BOOTDELAY_CHECK
 #define CONFIG_HOSTNAME			a2f-actel-dev-brd
-#define CONFIG_BOOTARGS			"console=ttyS0,115200 panic=10"
+#define CONFIG_BOOTARGS			"a2f_platform=a2f-actel-dev-brd "\
+					 "console=ttyS0,115200 panic=10"
 #define CONFIG_BOOTCOMMAND		"run flashboot"
 
 /* 
