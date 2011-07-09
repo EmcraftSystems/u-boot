@@ -3193,7 +3193,12 @@ a2f-lnx-evb_config :  unconfig
 	@$(MKCONFIG) $(@:_config=) arm arm_cortexm3 a2f-lnx-evb emcraft NULL
 
 a2f-actel-dev-brd_config :  unconfig
-	@$(MKCONFIG) $(@:_config=) arm arm_cortexm3 a2f-actel-dev-brd actel NULL
+	@$(MKCONFIG) $(@:_config=) arm arm_cortexm3 a2f-actel-dev-brd \
+	actel NULL
+
+a2f-hoermann-brd_config :  unconfig
+	@$(MKCONFIG) $(@:_config=) arm arm_cortexm3 a2f-hoermann-brd \
+	hoermann NULL
 
 #########################################################################
 ## XScale Systems
