@@ -123,6 +123,11 @@
 #define CONFIG_SYS_EMC0CS0CR		0x00002225
 
 /*
+ * Optimized timings for external SRAM in Page Mode
+ */
+#define CONFIG_SYS_EMC0CS0CR_PM		0x000020A5
+
+/*
  * Settings for the EMC MUX register
  */
 #define CONFIG_SYS_EMCMUXCR		0x00000001
@@ -149,7 +154,7 @@
 #define CONFIG_SYS_FLASH_CFI_AMD_RESET	1
 
 /* 
- * U-boot environment configruation
+ * U-boot environment configuration
  */
 #define CONFIG_ENV_IS_IN_FLASH		1
 #define CONFIG_ENV_ADDR			CONFIG_SYS_FLASH_BANK1_BASE
