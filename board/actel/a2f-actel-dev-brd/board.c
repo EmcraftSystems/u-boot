@@ -27,8 +27,77 @@
 
 DECLARE_GLOBAL_DATA_PTR;
 
+/*
+ * FPGA Fabric may include the PSRAM_IP block, which is used to
+ * control the signals on the EMC interface to get access to
+ * the configuration registers of the external PSRAM, which
+ * allows to put the PSRAM into the faster Page Mode. 
+ * The following data structure and the macros provide access
+ * to the control registers of PSRAM_IP.
+ * Note: PSRAM_IP may be accessed only when the EMC interface is
+ * off. In case PSRAM_IP is instantiated in a FPGA design, EMC
+ * is disabled (or Libero wouldn't have allowed to instantiate
+ * PSRAM_IP, since it works on the same signals that are used by EMC).
+ */
+struct psram_ip {
+	uint32_t val;
+	uint32_t data_out;
+	uint32_t addr;
+	uint32_t trans;
+	uint32_t magic;
+};
+
+#define PSRAM_IP_BASE		0x40050300
+#define PSRAM_IP		((volatile struct psram_ip *)(PSRAM_IP_BASE))
+#define PSRAM_IP_MAGIC		0x7777
+
+/*
+ * Check if PSRAM_IP is instantiated, and if so, put PSRAM into Page Mode.
+ * Enable the EMC interface so we are able to access Flash (and then
+ * external RAM after dram_init has run).
+ */
+static void psram_page_mode(void)
+{
+
+	/*
+ 	 * Check if the PSRAM_IP IP block is there in the FPGA fabric.
+ 	 */
+	if (PSRAM_IP->magic == PSRAM_IP_MAGIC) {
+		/*
+		 * If so, perform the sequence to put PSRAM into Page Mode.
+		 */
+		PSRAM_IP->addr = 0xFFFFFFFF;
+		PSRAM_IP->val = 0x90;
+		PSRAM_IP->trans = 0x0;
+	}
+
+	/*
+ 	 * Release the EMC from reset. It may have been put
+ 	 * into reset by a design that installs the IP core
+ 	 * for setting the external PSRAM into Page Mode.
+ 	 */
+        A2F_SYSREG->soft_rst_cr &= ~(1<<3);
+
+	/*
+	 * External memory controller MUX configuration
+	 * The EMC _SEL bit in the EMC_MUX_CR register is used
+	 * to select either FPGA I/O or EMC I/O.
+	 * 1 -> The multiplexed I/Os are allocated to the EMC.
+	 */
+        A2F_SYSREG->emc_mux_cr = CONFIG_SYS_EMCMUXCR;
+
+	/*
+	 * EMC timing parameters for chip select 1
+	 * where the external Flash memory resides on A2F-LNX-EVB.
+	 * We need to enable the Flash because env_init will
+	 * run soon (which needs to access the Flash).
+	 */
+        A2F_SYSREG->emc_cs_1_cr = CONFIG_SYS_EMC0CS1CR;
+}
+
 int board_init(void)
 {
+	psram_page_mode();
 	return 0;
 }
 
@@ -43,30 +112,20 @@ int dram_init (void)
 {
 #if ( CONFIG_NR_DRAM_BANKS > 0 )
 	/*
-	 * External memory controller MUX configuration
-	 * The EMC _SEL bit in the EMC_MUX_CR register is used
-	 * to select either FPGA I/O or EMC I/O.
-	 * 1 -> The multiplexed I/Os are allocated to the EMC.
-	 */
-        A2F_SYSREG->emc_mux_cr = CONFIG_SYS_EMCMUXCR;
-
-	/*
 	 * EMC timing parameters for chip select 0
 	 * where the external SRAM memory resides on A2F-LNX-EVB.
+	 * The settings depend on whether we have put PSRAM
+	 * into Page Mode or not.
 	 */
-        A2F_SYSREG->emc_cs_0_cr = CONFIG_SYS_EMC0CS0CR;
+        A2F_SYSREG->emc_cs_0_cr = PSRAM_IP->magic == PSRAM_IP_MAGIC ?
+					CONFIG_SYS_EMC0CS0CR_PM :
+					CONFIG_SYS_EMC0CS0CR;
 
 	/*
 	 * Fill in global info with description of SRAM configuration.
 	 */
         gd->bd->bi_dram[0].start = CONFIG_SYS_RAM_BASE;
         gd->bd->bi_dram[0].size = CONFIG_SYS_RAM_SIZE;
-
-	/*
-	 * EMC timing parameters for chip select 1
-	 * where the external Flash memory resides on A2F-LNX-EVB.
-	 */
-        A2F_SYSREG->emc_cs_1_cr = CONFIG_SYS_EMC0CS1CR;
 #endif
 
         return 0;

@@ -108,7 +108,6 @@ int checkboard(void)
 	return 0;
 }
 
-
 int dram_init (void)
 {
 #if ( CONFIG_NR_DRAM_BANKS > 0 )

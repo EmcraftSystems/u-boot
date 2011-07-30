@@ -121,8 +121,8 @@
 #define CONFIG_SYS_EMC0CS0CR		0x00002225
 
 /*
- *  * Optimized timings for external SRAM in Page Mode
- *   */
+ * Optimized timings for external SRAM in Page Mode
+ */
 #define CONFIG_SYS_EMC0CS0CR_PM         0x000020A5
 
 /*

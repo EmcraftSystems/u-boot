@@ -116,12 +116,14 @@
 
 
 /*
- * Optimized timings for external SRAM
+ * Optimized timings for external SRAM, including
+ * timings for the external PSRAM in Page Mode
  */
 #if (CONFIG_SYS_BOARD_REV==0x33)
 # error Define configuration for the 3.3V memory
 #else
 # define CONFIG_SYS_EMC0CS0CR		0x00002AAD
+# define CONFIG_SYS_EMC0CS0CR_PM        0x00002AAD
 #endif
 
 /*
