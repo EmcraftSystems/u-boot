@@ -50,25 +50,57 @@ struct psram_ip {
 #define PSRAM_IP_BASE		0x40050300
 #define PSRAM_IP		((volatile struct psram_ip *)(PSRAM_IP_BASE))
 #define PSRAM_IP_MAGIC		0x7777
+#define PSRAM_IP_BUSY		(1<<31)
+
+/*
+ * Software flag: PSRAM in Page Mode
+ */
+static int psram_in_page_mode = 0;
 
 /*
  * Check if PSRAM_IP is instantiated, and if so, put PSRAM into Page Mode.
  * Enable the EMC interface so we are able to access Flash (and then
  * external RAM after dram_init has run).
  */
-static void psram_page_mode(void)
+void psram_page_mode(void)
 {
+	unsigned int v;
 
 	/*
  	 * Check if the PSRAM_IP IP block is there in the FPGA fabric.
  	 */
 	if (PSRAM_IP->magic == PSRAM_IP_MAGIC) {
+
+		/*
+		 * Switch the EMC signals into FPGA mode.
+		 */
+        	A2F_SYSREG->emc_mux_cr &= ~CONFIG_SYS_EMCMUXCR;
+
 		/*
 		 * If so, perform the sequence to put PSRAM into Page Mode.
 		 */
 		PSRAM_IP->addr = 0xFFFFFFFF;
+		PSRAM_IP->trans = 0x10000;
+		while (PSRAM_IP->data_out & PSRAM_IP_BUSY);
+		v = PSRAM_IP->data_out;
+
+		PSRAM_IP->addr = 0xFFFFFFFF;
 		PSRAM_IP->val = 0x90;
 		PSRAM_IP->trans = 0x0;
+		while (PSRAM_IP->data_out & PSRAM_IP_BUSY);
+
+		PSRAM_IP->addr = 0xFFFFFFFF;
+		PSRAM_IP->trans = 0x10000;
+		while (PSRAM_IP->data_out & PSRAM_IP_BUSY);
+		v = PSRAM_IP->data_out;
+
+		/*
+ 		 * If PSRAM has been successfully put into Page Mode,
+ 		 * remember this in a software flag.
+ 		 */
+		if (v == 0x90) {
+			psram_in_page_mode = 1;
+		}
 	}
 
 	/*
@@ -117,7 +149,7 @@ int dram_init (void)
 	 * The settings depend on whether we have put PSRAM
 	 * into Page Mode or not.
 	 */
-        A2F_SYSREG->emc_cs_0_cr = PSRAM_IP->magic == PSRAM_IP_MAGIC ?
+        A2F_SYSREG->emc_cs_0_cr = psram_in_page_mode ?
 					CONFIG_SYS_EMC0CS0CR_PM :
 					CONFIG_SYS_EMC0CS0CR;
 
