@@ -123,7 +123,7 @@
 # error Define configuration for the 3.3V memory
 #else
 # define CONFIG_SYS_EMC0CS0CR		0x00002AAD
-# define CONFIG_SYS_EMC0CS0CR_PM        0x00002AAD
+# define CONFIG_SYS_EMC0CS0CR_PM        0x0000292D
 #endif
 
 /*
