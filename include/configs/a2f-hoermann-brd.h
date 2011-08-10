@@ -138,7 +138,7 @@
 /*
  * Timings for the external Flash
  */
-#define CONFIG_SYS_EMC0CS1CR		0x0000393F
+#define CONFIG_SYS_EMC0CS1CR		0x00011137
 
 /* 
  * Settings for the CFI Flash driver

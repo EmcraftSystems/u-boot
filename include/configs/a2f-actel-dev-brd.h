@@ -142,7 +142,7 @@
 #if (CONFIG_SYS_BOARD_REV==0x33)
 # error Define configuration for the 3.3V memory
 #else
-# define CONFIG_SYS_EMC0CS1CR		0x00000137
+# define CONFIG_SYS_EMC0CS1CR		0x0001B13F
 #endif
 
 /* 
