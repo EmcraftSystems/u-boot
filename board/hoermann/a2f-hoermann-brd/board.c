@@ -135,7 +135,7 @@ int board_init(void)
 
 int checkboard(void)
 {
-	printf("Board: A2F-LNX-EVB Rev %s, www.emcraft.com\n",
+	printf("Board: Hoermann-IMG SmartFusion board %s\n",
 		CONFIG_SYS_BOARD_REV_STR);
 	return 0;
 }
