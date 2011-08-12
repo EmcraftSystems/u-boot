@@ -1,7 +1,7 @@
 /*
- * board/emcraft/a2f-lnx-evb/board.c
+ * board/actel/a2f-dev-brd/board.c
  *
- * Board specific code the the Emcraft A2F-LNX-EVB board.
+ * Board specific code for the Actel SmartFusion Development board.
  *
  * Copyright (C) 2010, 2011
  * Vladimir Khusainov, Emcraft Systems, vlad@emcraft.com
@@ -120,7 +120,7 @@ void psram_page_mode(void)
 
 	/*
 	 * EMC timing parameters for chip select 1
-	 * where the external Flash memory resides on A2F-LNX-EVB.
+	 * where the external Flash memory resides.
 	 * We need to enable the Flash because env_init will
 	 * run soon (which needs to access the Flash).
 	 */
@@ -135,7 +135,7 @@ int board_init(void)
 
 int checkboard(void)
 {
-	printf("Board: A2F-LNX-EVB Rev %s, www.emcraft.com\n",
+	printf("Board: Actel SmartFusion board %s\n",
 		CONFIG_SYS_BOARD_REV_STR);
 	return 0;
 }
@@ -145,7 +145,7 @@ int dram_init (void)
 #if ( CONFIG_NR_DRAM_BANKS > 0 )
 	/*
 	 * EMC timing parameters for chip select 0
-	 * where the external SRAM memory resides on A2F-LNX-EVB.
+	 * where the external SRAM memory resides.
 	 * The settings depend on whether we have put PSRAM
 	 * into Page Mode or not.
 	 */

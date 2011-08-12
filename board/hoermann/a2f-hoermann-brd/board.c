@@ -1,7 +1,7 @@
 /*
- * board/emcraft/hoermann/board.c
+ * board/hoermann/a2f-hoermann-brd/board.c
  *
- * Board specific code for the Hoermann board.
+ * Board specific code for the Hoermann-IMG SmartFusion board.
  *
  * Copyright (C) 2010, 2011
  * Vladimir Khusainov, Emcraft Systems, vlad@emcraft.com
