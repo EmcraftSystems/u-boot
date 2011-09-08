@@ -116,6 +116,29 @@ struct a2f_timer
 static inline void __enable_irq(void)	{ asm volatile ("cpsie i"); }
 static inline void __disable_irq(void)	{ asm volatile ("cpsid i"); }
 
+/*
+ * Clocks enumeration.
+ */
+enum clock {
+	CLOCK_FCLK,
+	CLOCK_PCLK0,
+	CLOCK_PCLK1,
+	CLOCK_ACE,
+	CLOCK_FPGA,
+	CLOCK_END
+};
+
+/*
+ * Return a clock value for the specified clock.
+ * Note that we need this function in RAM because it will be used
+ * during self-upgrade of U-boot into eNMV.
+ * @param clck		id of the clock
+ * @returns		frequency of the clock
+ */
+extern unsigned long  __attribute__((section(".ramcode")))
+		__attribute__ ((long_call))
+		clock_get(enum clock clck);
+
 #endif	/*_MACH_A2F_H_ */
 
 /*

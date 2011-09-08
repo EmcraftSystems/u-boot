@@ -72,20 +72,6 @@
 #define CONFIG_ARCH_CPU_INIT
 
 /*
- * System frequency (FCLK) and the other derivative clocks
- * coming out from reset. These are defined by the Libero
- * project programmed onto SmartFusion.
- * It is possible to read these frequencies from SmartFusion
- * at run-time, however for simplicity of configuration we define these
- * clocks at build-time.
- */
-#define CONFIG_SYS_CLK_FREQ		80000000uL
-#define CONFIG_SYS_CLK_PCLK0		(CONFIG_SYS_CLK_FREQ / 4)
-#define CONFIG_SYS_CLK_PCLK1		(CONFIG_SYS_CLK_FREQ / 4)
-#define CONFIG_SYS_ACE_PCLK1		(CONFIG_SYS_CLK_FREQ / 2)
-#define CONFIG_SYS_FPGA_PCLK1		(CONFIG_SYS_CLK_FREQ / 2)
-
-/* 
  * Number of clock ticks in 1 sec
  */
 #define CONFIG_SYS_HZ			1000
@@ -169,7 +155,7 @@
 #undef CONFIG_NS16550_MIN_FUNCTIONS
 #define CONFIG_SYS_NS16550_SERIAL	1
 #define CONFIG_SYS_NS16550_REG_SIZE     (-4)
-#define CONFIG_SYS_NS16550_CLK          CONFIG_SYS_CLK_PCLK0
+#define CONFIG_SYS_NS16550_CLK		clock_get(CLOCK_PCLK0)
 #define CONFIG_CONS_INDEX               1
 #define CONFIG_SYS_NS16550_COM1         0x40000000
 #define CONFIG_BAUDRATE                 115200

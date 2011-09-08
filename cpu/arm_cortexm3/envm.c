@@ -19,6 +19,7 @@
  */
 
 #include <common.h>
+#include "clock.h"
 
 /*
  * ENVM control & status registers
@@ -121,10 +122,11 @@ static int __attribute__((section(".ramcode")))
 		}
 
 		/*
- 		 * If not done yet, delay
- 		 */
+		 * If not done yet, delay
+		 */
 		A2F_TIMER->timer1_loadval =
-		  MSS_ENVM_WAIT_INTERVAL * (CONFIG_SYS_CLK_PCLK0/ 1000000);
+				MSS_ENVM_WAIT_INTERVAL
+				* (clock_get(CLOCK_PCLK0) / 1000000);
 		while (A2F_TIMER->timer1_val) ;
 	}
 

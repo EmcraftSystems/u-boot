@@ -461,7 +461,12 @@ int	checkicache   (void);
 int	checkdcache   (void);
 void	upmconfig     (unsigned int, unsigned int *, unsigned int);
 ulong	get_tbclk     (void);
-void	reset_cpu     (ulong addr);
+void
+#if defined(CONFIG_SYS_A2F)
+	__attribute__((section(".ramcode")))
+	__attribute__ ((long_call))
+#endif
+	reset_cpu     (ulong addr);
 #if defined (CONFIG_OF_LIBFDT) && defined (CONFIG_OF_BOARD_SETUP)
 void ft_cpu_setup(void *blob, bd_t *bd);
 #ifdef CONFIG_PCI

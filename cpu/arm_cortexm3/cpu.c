@@ -22,6 +22,7 @@
 #include <command.h>
 #include "envm.h"
 #include "wdt.h"
+#include "clock.h"
 
 DECLARE_GLOBAL_DATA_PTR;
 
@@ -36,9 +37,14 @@ int arch_cpu_init(void)
 	envm_init();
 
 	/*
-	 * Initialize the timers. 
+	 * Initialize the timers.
 	 */
 	timer_init();
+
+	/*
+	 * Initialize the clock frequencies.
+	 */
+	clock_init();
 
 	/*
 	 * Architecture number; used by the Linux kernel.
@@ -61,6 +67,12 @@ int arch_cpu_init(void)
 int print_cpuinfo(void)
 {
 	printf("CPU: %s\n", "SmartFusion FPGA (Cortex-M3 Hard IP)");
+#if defined(DEBUG)
+	printf("Frequencies: FCLK=%d, PCLK0=%d, PCLK1=%d, ACE=%d, FPGA=%d\n",
+			clock_get(CLOCK_FCLK), clock_get(CLOCK_PCLK0),
+			clock_get(CLOCK_PCLK1), clock_get(CLOCK_ACE),
+			clock_get(CLOCK_FPGA));
+#endif
 	return 0;
 }
 
@@ -75,8 +87,12 @@ int cleanup_before_linux(void)
 
 /*
  * Perform the low-level reset.
+ * Note that we need for this function to reside in RAM since it
+ * will be used to self-upgrade U-boot in eNMV.
  */
-void reset_cpu(ulong addr)
+void __attribute__((section(".ramcode")))
+		__attribute__ ((long_call))
+		reset_cpu(ulong addr)
 {
 	/*
 	 * Perform reset but keep priority group unchanged.
