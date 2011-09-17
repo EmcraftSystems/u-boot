@@ -30,8 +30,8 @@ extern char _data_lma_start;
 extern char _data_start;
 extern char _data_end;
 
+extern char _mem_stack_base, _mem_stack_end;
 unsigned long _armboot_start;
-extern char armboot_start;
 
 extern char _bss_start;
 extern char _bss_end;
@@ -64,9 +64,8 @@ unsigned int vectors[] __attribute__((section(".vectors"))) = {
 	/*
 	 * The first word is the stack base address (stack grows downwards)
 	 * Stack is defined by reserving an area at high RAM in u-boot.lds.
-	 * All A2F variants have at least 64K of internal Flash.
 	 */
-	[0]		= 0x20010000,
+	[0]		= (unsigned long)&_mem_stack_end,
 
 	/* 
 	 * Reset entry point
@@ -123,7 +122,7 @@ void _start(void)
 	 * the malloc pool right behind the stack. See how armboot_start
 	 * is defined in the CPU specific .lds file.
 	 */  
-	_armboot_start = (unsigned long)&armboot_start;
+	_armboot_start = (unsigned long)&_mem_stack_base;
 	start_armboot();
 }
 

@@ -25,11 +25,16 @@ ENTRY(_start)
 
 MEMORY
 {
-	NVM (r):	ORIGIN = 0x00000000, LENGTH = 256K
-	RAM (rw):	ORIGIN = 0x20000000, LENGTH = 16K
-	RAM_BUF (r):	ORIGIN = 0x20004000, LENGTH = 32K
-	MALLOC (r):	ORIGIN = 0x2000D000, LENGTH = 8K
-	STACK (r):	ORIGIN = 0x2000F000, LENGTH = 4K
+	NVM (r):	ORIGIN = CONFIG_MEM_NVM_BASE, \
+			LENGTH = CONFIG_MEM_NVM_LEN
+	RAM (rw):	ORIGIN = CONFIG_MEM_RAM_BASE, \
+			LENGTH = CONFIG_MEM_RAM_LEN
+	RAM_BUF (r):	ORIGIN = ORIGIN(RAM) + LENGTH(RAM), \
+			LENGTH = CONFIG_MEM_RAM_BUF_LEN
+	MALLOC (r):	ORIGIN = ORIGIN(RAM_BUF) + LENGTH(RAM_BUF), \
+			LENGTH = CONFIG_MEM_MALLOC_LEN
+	STACK (r):	ORIGIN = ORIGIN(MALLOC) + LENGTH(MALLOC), \
+			LENGTH = CONFIG_MEM_STACK_LEN
 }
 
 SECTIONS
@@ -74,7 +79,6 @@ SECTIONS
 
 	.stack :
 	{
-		armboot_start = .;
 		*(.stack)
 	} >STACK
 
@@ -83,3 +87,18 @@ SECTIONS
 		*(*)
 	}
 }
+
+/*
+ * Export memory addresses
+ */
+_mem_nvm_base		= ORIGIN(NVM);
+_mem_nvm_size		= LENGTH(NVM);
+_mem_ram_base		= ORIGIN(RAM);
+_mem_ram_size		= LENGTH(RAM);
+_mem_ram_buf_base	= ORIGIN(RAM_BUF);
+_mem_ram_buf_size	= LENGTH(RAM_BUF);
+_mem_malloc_base	= ORIGIN(MALLOC);
+_mem_malloc_size	= LENGTH(MALLOC);
+_mem_stack_base		= ORIGIN(STACK);
+_mem_stack_size		= LENGTH(STACK);
+_mem_stack_end		= ORIGIN(STACK) + LENGTH(STACK);

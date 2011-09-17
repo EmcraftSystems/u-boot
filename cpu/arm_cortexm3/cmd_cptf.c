@@ -23,8 +23,10 @@
 #include <string.h>
 #include "envm.h"
 
-#define SOC_RAM_BUFFER_BASE	0x20004000
-#define SOC_RAM_BUFFER_SIZE	0x8000
+extern char	_mem_ram_buf_base, _mem_ram_buf_size;
+
+#define SOC_RAM_BUFFER_BASE	(ulong)(&_mem_ram_buf_base)
+#define SOC_RAM_BUFFER_SIZE	(ulong)(&_mem_ram_buf_size)
 
 /*
  * Write the eNVM and, optionally, reset the CPU.
