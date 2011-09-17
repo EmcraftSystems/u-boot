@@ -20,6 +20,7 @@
 
 #include <common.h>
 #include <command.h>
+
 #include "envm.h"
 #include "wdt.h"
 #include "clock.h"
@@ -49,7 +50,11 @@ int arch_cpu_init(void)
 	/*
 	 * Architecture number; used by the Linux kernel.
 	 */
+#if defined(CONFIG_SYS_A2F)
 	gd->bd->bi_arch_number = MACH_TYPE_A2F;
+#else
+# error "Unknown Cortex-M3 SOC."
+#endif
 
 	/*
 	 * Address of the kernel boot parameters.
@@ -62,44 +67,12 @@ int arch_cpu_init(void)
 }
 
 /*
- * Print the CPU specific information
- */
-int print_cpuinfo(void)
-{
-	printf("CPU: %s\n", "SmartFusion FPGA (Cortex-M3 Hard IP)");
-#if defined(DEBUG)
-	printf("Frequencies: FCLK=%d, PCLK0=%d, PCLK1=%d, ACE=%d, FPGA=%d\n",
-			clock_get(CLOCK_FCLK), clock_get(CLOCK_PCLK0),
-			clock_get(CLOCK_PCLK1), clock_get(CLOCK_ACE),
-			clock_get(CLOCK_FPGA));
-#endif
-	return 0;
-}
-
-/*
  * This is called right before passing control to
  * the Linux kernel point.
  */
 int cleanup_before_linux(void)
 {
 	return 0;
-}
-
-/*
- * Perform the low-level reset.
- * Note that we need for this function to reside in RAM since it
- * will be used to self-upgrade U-boot in eNMV.
- */
-void __attribute__((section(".ramcode")))
-		__attribute__ ((long_call))
-		reset_cpu(ulong addr)
-{
-	/*
-	 * Perform reset but keep priority group unchanged.
-	 */
-	A2F_SCB->aircr  = (0x5FA << 16) |
-                          (A2F_SCB->aircr & (7<<8)) |
-                          (1<<2); 
 }
 
 /*

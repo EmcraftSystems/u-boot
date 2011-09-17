@@ -3190,15 +3190,15 @@ smdkc100_config:	unconfig
 	@$(MKCONFIG) $(@:_config=) arm arm_cortexa8 smdkc100 samsung s5pc1xx
 
 a2f-lnx-evb_config :  unconfig
-	@$(MKCONFIG) $(@:_config=) arm arm_cortexm3 a2f-lnx-evb emcraft NULL
+	@$(MKCONFIG) $(@:_config=) arm arm_cortexm3 a2f-lnx-evb emcraft a2f
 
 a2f-actel-dev-brd_config :  unconfig
 	@$(MKCONFIG) $(@:_config=) arm arm_cortexm3 a2f-actel-dev-brd \
-	actel NULL
+	actel a2f
 
 a2f-hoermann-brd_config :  unconfig
 	@$(MKCONFIG) $(@:_config=) arm arm_cortexm3 a2f-hoermann-brd \
-	hoermann NULL
+	hoermann a2f
 
 #########################################################################
 ## XScale Systems

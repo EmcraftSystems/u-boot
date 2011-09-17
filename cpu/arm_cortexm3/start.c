@@ -18,7 +18,6 @@
  * MA 02111-1307 USA
  */
 #include <string.h>
-#include <asm/arch-a2f/a2f.h>
 #include "wdt.h"
 
 /*
@@ -40,7 +39,22 @@ extern char _bss_end;
 void _start(void);
 void default_isr(void);
 
+unsigned char cortex_m3_irq_vec_get(void);
+
 extern void start_armboot(void);
+
+/*
+ * Control IRQs
+ */
+static inline void __attribute__((used)) __enable_irq(void)
+{
+	asm volatile ("cpsie i");
+}
+
+static inline void __attribute__((used)) __disable_irq(void)
+{
+	asm volatile ("cpsid i");
+}
 
 /*
  * Exception-processing vectors:
@@ -88,7 +102,7 @@ void _start(void)
 	 * Copy data and initialize BSS
 	 * This is in lieu of the U-boot "conventional" relocation
 	 * of code & data from Flash to RAM. 
-	 * With the A2F, we execute from NVRAM (internal Flash),
+	 * With Cortex-M3, we execute from NVRAM (internal Flash),
 	 * having relocated data to internal RAM (and having cleared the BSS
 	 * area in internal RAM as well)
 	 * Stack grows downwards; the stack base is set-up by the first
@@ -105,7 +119,7 @@ void _start(void)
 	 * Note initialization of _armboot_start below. The ARM generic
 	 * code expects that this variable is set to the upper boundary of
 	 * the malloc pool area. 
-	 * For A2F, where we do not relocate the code to RAM, I set
+	 * For Cortex-M3, where we do not relocate the code to RAM, I set
 	 * the malloc pool right behind the stack. See how armboot_start
 	 * is defined in the CPU specific .lds file.
 	 */  
@@ -156,7 +170,7 @@ static void __attribute__((used)) dump_ctx(unsigned int *ctx)
 		"PENDSV",
 		"SYSTICK",
 };
-	unsigned char vec = A2F_SCB->icsr & 0xFF;
+	unsigned char vec = cortex_m3_irq_vec_get();
 	int i;
 
 	printf("UNHANDLED EXCEPTION: ");

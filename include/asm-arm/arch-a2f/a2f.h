@@ -113,9 +113,6 @@ struct a2f_timer
 #define A2F_TIMER_BASE	0x40005000
 #define A2F_TIMER		((volatile struct a2f_timer *)(A2F_TIMER_BASE))
 
-static inline void __enable_irq(void)	{ asm volatile ("cpsie i"); }
-static inline void __disable_irq(void)	{ asm volatile ("cpsid i"); }
-
 /*
  * Clocks enumeration.
  */

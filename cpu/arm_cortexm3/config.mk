@@ -20,6 +20,7 @@
 # Foundation, Inc., 59 Temple Place, Suite 330, Boston,
 # MA 02111-1307 USA
 #
-PLATFORM_RELFLAGS += -g2 -mthumb -mcpu=cortex-m3 -fsigned-char -O2 -fno-builtin-puts -fno-common -ffixed-r8
+PLATFORM_CPPFLAGS += -I$(TOPDIR)/cpu/$(CPU)
 
+PLATFORM_RELFLAGS += -g2 -mthumb -mcpu=cortex-m3 -fsigned-char -O2 -fno-builtin-puts -fno-common -ffixed-r8
 

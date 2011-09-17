@@ -27,19 +27,23 @@
 
 include $(TOPDIR)/config.mk
 
-LIB	= $(obj)lib$(CPU).a
+LIB	= $(obj)lib$(SOC).a
 
-START	:= start.o
-COBJS	:= cpu.o cmd_cptf.o
+COBJS	:= clock.o cpu.o envm.o timer.o wdt.o
+SOBJS	:=
 
-SRCS	:= $(START:.o=.c) $(COBJS:.o=.c)
+SRCS	:= $(COBJS:.o=.c)
 OBJS	:= $(addprefix $(obj),$(COBJS))
-START	:= $(addprefix $(obj),$(START))
+SOBJS	:= $(addprefix $(obj),$(SOBJS))
 
-all:	$(obj).depend $(START) $(LIB)
-
-$(LIB):	$(OBJS)
+$(LIB):	$(obj).depend $(OBJS) $(SOBJS)
 	$(AR) $(ARFLAGS) $@ $(OBJS)
+
+clean:
+	rm -f $(SOBJS) $(OBJS)
+
+distclean:
+	rm -f $(LIB) core *.bak $(obj).depend
 
 #########################################################################
 

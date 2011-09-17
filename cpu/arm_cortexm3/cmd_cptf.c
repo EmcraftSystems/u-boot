@@ -23,8 +23,8 @@
 #include <string.h>
 #include "envm.h"
 
-#define A2F_RAM_BUFFER_BASE	0x20004000
-#define A2F_RAM_BUFFER_SIZE	0x8000
+#define SOC_RAM_BUFFER_BASE	0x20004000
+#define SOC_RAM_BUFFER_SIZE	0x8000
 
 /*
  * Write the eNVM and, optionally, reset the CPU.
@@ -69,8 +69,8 @@ static int __attribute__((section(".ramcode")))
 int do_cptf(cmd_tbl_t *cmdtp, int flag, int argc, char *argv[])
 {
 	ulong dst;
-	ulong src = A2F_RAM_BUFFER_BASE;
-	ulong size = A2F_RAM_BUFFER_SIZE;
+	ulong src = SOC_RAM_BUFFER_BASE;
+	ulong size = SOC_RAM_BUFFER_SIZE;
 	int do_reset = 0;
 	int ret = 0;
 
@@ -113,6 +113,6 @@ int do_cptf(cmd_tbl_t *cmdtp, int flag, int argc, char *argv[])
 
 U_BOOT_CMD(
 	cptf,	5,		0,	do_cptf,
-	"copy memory buffer to internal Flash of the A2F",
+	"copy memory buffer to internal Flash of Cortex-M3",
 	"dst [[src] [[size] [do_reset]]]"
 );
