@@ -52,6 +52,8 @@ int arch_cpu_init(void)
 	 */
 #if defined(CONFIG_SYS_A2F)
 	gd->bd->bi_arch_number = MACH_TYPE_A2F;
+#elif defined(CONFIG_SYS_STM32F2)
+	gd->bd->bi_arch_number = MACH_TYPE_STM32F2;
 #else
 # error "Unknown Cortex-M3 SOC."
 #endif

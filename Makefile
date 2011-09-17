@@ -3200,6 +3200,9 @@ a2f-hoermann-brd_config :  unconfig
 	@$(MKCONFIG) $(@:_config=) arm arm_cortexm3 a2f-hoermann-brd \
 	hoermann a2f
 
+stm3220g-eval_config : unconfig
+	@$(MKCONFIG) $(@:_config=) arm arm_cortexm3 stm3220g-eval stm stm32f2
+
 #########################################################################
 ## XScale Systems
 #########################################################################
