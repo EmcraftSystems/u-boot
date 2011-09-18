@@ -28,7 +28,6 @@ LIB	:= $(obj)libserial.a
 COBJS-$(CONFIG_ARM_DCC) += arm_dcc.o
 COBJS-$(CONFIG_AT91RM9200_USART) += at91rm9200_usart.o
 COBJS-$(CONFIG_ATMEL_USART) += atmel_usart.o
-COBJS-$(CONFIG_STM32F2_USART) += stm32f2_usart.o
 COBJS-$(CONFIG_MCFUART) += mcfuart.o
 COBJS-$(CONFIG_NS9750_UART) += ns9750_serial.o
 COBJS-$(CONFIG_SYS_NS16550) += ns16550.o
@@ -53,6 +52,7 @@ COBJS-$(CONFIG_S3C24X0_SERIAL) += serial_s3c24x0.o
 COBJS-$(CONFIG_S3C44B0_SERIAL) += serial_s3c44b0.o
 COBJS-$(CONFIG_XILINX_UARTLITE) += serial_xuartlite.o
 COBJS-$(CONFIG_SCIF_CONSOLE) += serial_sh.o
+COBJS-$(CONFIG_STM32F2_USART_CONSOLE) += stm32f2_usart.o
 COBJS-$(CONFIG_USB_TTY) += usbtty.o
 
 COBJS	:= $(sort $(COBJS-y))

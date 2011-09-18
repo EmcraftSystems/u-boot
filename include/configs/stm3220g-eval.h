@@ -60,6 +60,11 @@
 #define CONFIG_ARCH_CPU_INIT
 
 /*
+ * External oscillator value
+ */
+#define CONFIG_STM32F2_HSE_HZ		25000000
+
+/*
  * Number of clock ticks in 1 sec
  */
 #define CONFIG_SYS_HZ			1000
@@ -111,7 +116,13 @@
 /*
  * Serial console configuration
  */
-#define CONFIG_STM32F2_USART
+#define CONFIG_STM32F2_USART_CONSOLE
+#define CONFIG_STM32F2_USART_PORT	3	/* USART3 */
+#define CONFIG_STM32F2_USART_TX_IO_PORT	3	/* PORTC */
+#define CONFIG_STM32F2_USART_RX_IO_PORT	3	/* PORTC */
+#define CONFIG_STM32F2_USART_TX_IO_PIN	10	/* GPIO10 */
+#define CONFIG_STM32F2_USART_RX_IO_PIN	11	/* GPIO11 */
+
 #define CONFIG_BAUDRATE			115200
 #define CONFIG_SYS_BAUDRATE_TABLE	{ 9600, 19200, 38400, 57600, 115200 }
 
