@@ -93,7 +93,7 @@
  * Memory layout configuration
  */
 #define CONFIG_MEM_NVM_BASE		0x00000000
-#define CONFIG_MEM_NVM_LEN		(256 * 1024)
+#define CONFIG_MEM_NVM_LEN		(512 * 1024)
 
 #define CONFIG_MEM_RAM_BASE		0x20000000
 #define CONFIG_MEM_RAM_LEN		(16 * 1024)
