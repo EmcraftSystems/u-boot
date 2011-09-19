@@ -150,13 +150,13 @@
  * Monitor is actually in eNVM. In terms of U-Boot, it is neither "flash",
  * not RAM, but CONFIG_SYS_MONITOR_BASE must be defined.
  */
-#define CONFIG_SYS_MONITOR_BASE  	0x0
+#define CONFIG_SYS_MONITOR_BASE		0x0
 
 /*
  * Monitor is not in flash. Needs to define this to prevent
  * U-Boot from running flash_protect() on the monitor code.
  */
-#define CONFIG_MONITOR_IS_IN_RAM  	1
+#define CONFIG_MONITOR_IS_IN_RAM	1
 
 /*
  * Enable all those monitor commands that are needed

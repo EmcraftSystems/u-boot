@@ -31,7 +31,7 @@ DECLARE_GLOBAL_DATA_PTR;
  * FPGA Fabric may include the PSRAM_IP block, which is used to
  * control the signals on the EMC interface to get access to
  * the configuration registers of the external PSRAM, which
- * allows to put the PSRAM into the faster Page Mode. 
+ * allows to put the PSRAM into the faster Page Mode.
  * The following data structure and the macros provide access
  * to the control registers of PSRAM_IP.
  * Note: PSRAM_IP may be accessed only when the EMC interface is
@@ -67,14 +67,14 @@ void psram_page_mode(void)
 	unsigned int v;
 
 	/*
- 	 * Check if the PSRAM_IP IP block is there in the FPGA fabric.
- 	 */
+	 * Check if the PSRAM_IP IP block is there in the FPGA fabric.
+	 */
 	if (PSRAM_IP->magic == PSRAM_IP_MAGIC) {
 
 		/*
 		 * Switch the EMC signals into FPGA mode.
 		 */
-        	A2F_SYSREG->emc_mux_cr &= ~CONFIG_SYS_EMCMUXCR;
+		A2F_SYSREG->emc_mux_cr &= ~CONFIG_SYS_EMCMUXCR;
 
 		/*
 		 * If so, perform the sequence to put PSRAM into Page Mode.
@@ -95,19 +95,19 @@ void psram_page_mode(void)
 		v = PSRAM_IP->data_out;
 
 		/*
- 		 * If PSRAM has been successfully put into Page Mode,
- 		 * remember this in a software flag.
- 		 */
+		 * If PSRAM has been successfully put into Page Mode,
+		 * remember this in a software flag.
+		 */
 		if (v == 0x90) {
 			psram_in_page_mode = 1;
 		}
 	}
 
 	/*
- 	 * Release the EMC from reset. It may have been put
- 	 * into reset by a design that installs the IP core
- 	 * for setting the external PSRAM into Page Mode.
- 	 */
+	 * Release the EMC from reset. It may have been put
+	 * into reset by a design that installs the IP core
+	 * for setting the external PSRAM into Page Mode.
+	 */
         A2F_SYSREG->soft_rst_cr &= ~(1<<3);
 
 	/*

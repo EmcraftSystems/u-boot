@@ -58,7 +58,7 @@ static inline void __attribute__((used)) __disable_irq(void)
 
 /*
  * Exception-processing vectors:
- */ 
+ */
 unsigned int vectors[] __attribute__((section(".vectors"))) = {
 
 	/*
@@ -67,23 +67,23 @@ unsigned int vectors[] __attribute__((section(".vectors"))) = {
 	 */
 	[0]		= (unsigned long)&_mem_stack_end,
 
-	/* 
+	/*
 	 * Reset entry point
-	 */ 
+	 */
 	[1]		= (unsigned int)&_start,
 
 	/*
 	 * Other exceptions
-	 */   
+	 */
 	[2 ... 165]	= (unsigned int)&default_isr
 };
 
- /* 
+ /*
   * Reset entry point
-  */ 
+  */
 void _start(void)
 {
-	/* 
+	/*
 	 * Depending on the config parameter, enable or disable the WDT.
 	 */
 #if !defined(CONFIG_HW_WATCHDOG)
@@ -100,7 +100,7 @@ void _start(void)
 	/*
 	 * Copy data and initialize BSS
 	 * This is in lieu of the U-boot "conventional" relocation
-	 * of code & data from Flash to RAM. 
+	 * of code & data from Flash to RAM.
 	 * With Cortex-M3, we execute from NVRAM (internal Flash),
 	 * having relocated data to internal RAM (and having cleared the BSS
 	 * area in internal RAM as well)
@@ -111,17 +111,17 @@ void _start(void)
 	memset(&_bss_start, 0, &_bss_end - &_bss_start);
 
 	/*
-	 * In U-boot (armboot) lingvo, "go to the C code" - 
+	 * In U-boot (armboot) lingvo, "go to the C code" -
 	 * in fact, with M3, we are at the C code from the very beginning.
 	 * In actuality, this is the jump to the ARM generic start code.
 	 * ...
 	 * Note initialization of _armboot_start below. The ARM generic
 	 * code expects that this variable is set to the upper boundary of
-	 * the malloc pool area. 
+	 * the malloc pool area.
 	 * For Cortex-M3, where we do not relocate the code to RAM, I set
 	 * the malloc pool right behind the stack. See how armboot_start
 	 * is defined in the CPU specific .lds file.
-	 */  
+	 */
 	_armboot_start = (unsigned long)&_mem_stack_base;
 	start_armboot();
 }
@@ -133,7 +133,7 @@ void _start(void)
 void __attribute__((naked, noreturn)) default_isr(void);
 void default_isr(void)
 {
-	/* 
+	/*
 	 * Dump the registers
 	 */
 	asm("mov r0, sp; bl dump_ctx");
@@ -145,7 +145,7 @@ void default_isr(void)
 
 /*
  * Dump the registers on an exception we don't know how to process.
- */ 
+ */
 static void __attribute__((used)) dump_ctx(unsigned int *ctx)
 {
 	static char *regs[] = {

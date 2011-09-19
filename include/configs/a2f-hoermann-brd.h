@@ -142,7 +142,7 @@
  */
 #define CONFIG_SYS_EMC0CS1CR		0x00011137
 
-/* 
+/*
  * Settings for the CFI Flash driver
  */
 #define CONFIG_SYS_FLASH_CFI		1
@@ -154,7 +154,7 @@
 #define CONFIG_SYS_FLASH_CFI_AMD_RESET	1
 #define CONFIG_SYS_FLASH_PROTECTION	1
 
-/* 
+/*
  * U-boot environment configruation
  */
 #define CONFIG_ENV_IS_IN_FLASH		1
@@ -187,7 +187,7 @@
 #define CONFIG_SYS_PBSIZE               (CONFIG_SYS_CBSIZE + \
                                         sizeof(CONFIG_SYS_PROMPT) + 16)
 
-/* 
+/*
  * Ethernet driver configuration
  */
 #define CONFIG_NET_MULTI
@@ -204,24 +204,24 @@
 #define CONFIG_SYS_MEMTEST_END		(CONFIG_SYS_RAM_BASE + \
 					CONFIG_SYS_RAM_SIZE)
 
-/* 
+/*
  * Needed by "loadb"
- */ 
+ */
 #define CONFIG_SYS_LOAD_ADDR		CONFIG_SYS_RAM_BASE
 
 /*
- * Monitor is actually in eNVM. In terms of U-Boot, it is neither "flash", 
+ * Monitor is actually in eNVM. In terms of U-Boot, it is neither "flash",
  * not RAM, but CONFIG_SYS_MONITOR_BASE must be defined.
  */
-#define CONFIG_SYS_MONITOR_BASE  	0x0
+#define CONFIG_SYS_MONITOR_BASE		0x0
 
 /*
- * Monitor is not in flash. Needs to define this to prevent 
+ * Monitor is not in flash. Needs to define this to prevent
  * U-Boot from running flash_protect() on the monitor code.
  */
-#define CONFIG_MONITOR_IS_IN_RAM  	1
+#define CONFIG_MONITOR_IS_IN_RAM	1
 
-/* 
+/*
  * Enable all those monitor commands that are needed
  */
 #include <config_cmd_default.h>
@@ -260,7 +260,7 @@
 					"console=ttyS0,115200 panic=10"
 #define CONFIG_BOOTCOMMAND		"run flashboot"
 
-/* 
+/*
  * Short-cuts to some useful commands (macros)
  */
 #define CONFIG_EXTRA_ENV_SETTINGS				\

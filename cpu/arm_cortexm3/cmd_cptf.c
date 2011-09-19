@@ -34,31 +34,31 @@ extern char	_mem_ram_buf_base, _mem_ram_buf_size;
  * which itself runs from the eNVM.
  */
 static int __attribute__((section(".ramcode")))
-           __attribute__ ((long_call)) 
+           __attribute__ ((long_call))
   envm_write_and_reset(ulong dst, ulong src, ulong size, int do_reset)
 {
 	int ret = 0;
 
 	/*
- 	 * Copy the buffer to the destination.
- 	 */
+	 * Copy the buffer to the destination.
+	 */
 	if (envm_write((uint) dst, (void *) src, (uint) size) != size) {
 		ret = -1;
 		goto Done;
 	}
 
 	/*
- 	 * If the user needs a reset, do the reset
- 	 */
+	 * If the user needs a reset, do the reset
+	 */
 	if (do_reset) {
 		/*
-	 	 * Cortex-M3 core reset.
- 	 	 */
+		 * Cortex-M3 core reset.
+		 */
 		reset_cpu(0);
 
 		/*
-	 	 * Should never be here.
-	 	 */
+		 * Should never be here.
+		 */
 	}
 
 	Done:
@@ -86,8 +86,8 @@ int do_cptf(cmd_tbl_t *cmdtp, int flag, int argc, char *argv[])
 	}
 
 	/*
- 	 * Parse the command arguments
- 	 */
+	 * Parse the command arguments
+	 */
 	dst = simple_strtoul(argv[1], NULL, 16);
 	if (argc >= 3) {
 		src = simple_strtoul(argv[2], NULL, 16);
@@ -102,8 +102,8 @@ int do_cptf(cmd_tbl_t *cmdtp, int flag, int argc, char *argv[])
 	printf("%s: Updating eNVM. Please wait ...\n", (char *) argv[0]);
 
 	/*
- 	 * Copy the buffer to the destination.
- 	 */
+	 * Copy the buffer to the destination.
+	 */
 	if (envm_write_and_reset(dst, src, size, do_reset)) {
 		printf("%s: nvm_write_and_reset failed\n", (char *) argv[0]);
 		goto Done;
