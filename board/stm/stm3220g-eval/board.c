@@ -63,7 +63,7 @@ int misc_init_r(void)
 }
 
 /*
- * Setup dynamic RAM.
+ * Setup external RAM.
  */
 int dram_init(void)
 {

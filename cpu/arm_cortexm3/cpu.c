@@ -55,7 +55,7 @@ int arch_cpu_init(void)
 #elif defined(CONFIG_SYS_STM32F2)
 	gd->bd->bi_arch_number = MACH_TYPE_STM32F2;
 #else
-# error "Unknown Cortex-M3 SOC."
+# error "Unsupported Cortex-M3 SOC."
 #endif
 
 	/*

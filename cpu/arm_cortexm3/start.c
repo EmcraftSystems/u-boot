@@ -20,6 +20,11 @@
 #include <string.h>
 #include "wdt.h"
 
+ /*
+ * FIXME: move to the appropriate header
+ */
+unsigned char cortex_m3_irq_vec_get(void);
+
 /*
  * Declare symbols used in the start-up code
  */
@@ -38,8 +43,6 @@ extern char _bss_end;
 
 void _start(void);
 void default_isr(void);
-
-unsigned char cortex_m3_irq_vec_get(void);
 
 extern void start_armboot(void);
 

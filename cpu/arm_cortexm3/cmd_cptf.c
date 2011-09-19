@@ -23,6 +23,14 @@
 #include <string.h>
 #include "envm.h"
 
+/*
+ * Base address and the length of buffer in internal RAM, which
+ * we use as a source for buffer to be written to eNVM.
+ * Size of this buffer is set in the configuration file, address
+ * (position within internal RAM) is calculated automatically, at
+ * linking stage. Thus, the appropriate symbols are exported from
+ * the linker script *.lds.
+ */
 extern char	_mem_ram_buf_base, _mem_ram_buf_size;
 
 #define SOC_RAM_BUFFER_BASE	(ulong)(&_mem_ram_buf_base)
