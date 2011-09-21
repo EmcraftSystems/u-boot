@@ -23,10 +23,10 @@
  * STM32 F2 USART driver; configured with the following options:
  * - CONFIG_STM32F2_USART_CONSOLE
  * - CONFIG_STM32F2_USART_PORT       (1..6)
- * - CONFIG_STM32F2_USART_TX_IO_PORT (1..9 <-> A..I)
- * - CONFIG_STM32F2_USART_RX_IO_PORT (1..9 <-> A..I)
- * - CONFIG_STM32F2_USART_TX_IO_PIN  (1..16)
- * - CONFIG_STM32F2_USART_RX_IO_PIN  (1..16)
+ * - CONFIG_STM32F2_USART_TX_IO_PORT (0..8 <-> A..I)
+ * - CONFIG_STM32F2_USART_RX_IO_PORT (0..8 <-> A..I)
+ * - CONFIG_STM32F2_USART_TX_IO_PIN  (0..15)
+ * - CONFIG_STM32F2_USART_RX_IO_PIN  (0..15)
  */
 
 #include <common.h>
@@ -43,16 +43,16 @@
 # error "Bad CONFIG_STM32F2_USART_PORT value."
 #endif
 
-#if (CONFIG_STM32F2_USART_TX_IO_PORT >= 1) && \
-    (CONFIG_STM32F2_USART_TX_IO_PORT <= 9)
-# define USART_TX_IO_PORT	(CONFIG_STM32F2_USART_TX_IO_PORT - 1)
+#if (CONFIG_STM32F2_USART_TX_IO_PORT >= 0) && \
+    (CONFIG_STM32F2_USART_TX_IO_PORT <= 8)
+# define USART_TX_IO_PORT	(CONFIG_STM32F2_USART_TX_IO_PORT)
 #else
 # error "Bad CONFIG_STM32F2_USART_TX_IO_PORT value."
 #endif
 
-#if (CONFIG_STM32F2_USART_RX_IO_PORT >= 1) && \
-    (CONFIG_STM32F2_USART_RX_IO_PORT <= 9)
-# define USART_RX_IO_PORT	(CONFIG_STM32F2_USART_RX_IO_PORT - 1)
+#if (CONFIG_STM32F2_USART_RX_IO_PORT >= 0) && \
+    (CONFIG_STM32F2_USART_RX_IO_PORT <= 8)
+# define USART_RX_IO_PORT	(CONFIG_STM32F2_USART_RX_IO_PORT)
 #else
 # error "Bad CONFIG_STM32F2_USART_RX_IO_PORT value."
 #endif
@@ -128,65 +128,6 @@
 #define STM32F2_RCC_MSK_USART6	(1 <<  5)
 
 /*
- * STM32F2 GPIOs
- */
-/*
- * GPIO registers bases
- */
-#define STM32F2_GPIOA_BASE	(STM32F2_AHB1PERITH_BASE + 0x0000)
-#define STM32F2_GPIOB_BASE	(STM32F2_AHB1PERITH_BASE + 0x0400)
-#define STM32F2_GPIOC_BASE	(STM32F2_AHB1PERITH_BASE + 0x0800)
-#define STM32F2_GPIOD_BASE	(STM32F2_AHB1PERITH_BASE + 0x0C00)
-#define STM32F2_GPIOE_BASE	(STM32F2_AHB1PERITH_BASE + 0x1000)
-#define STM32F2_GPIOF_BASE	(STM32F2_AHB1PERITH_BASE + 0x1400)
-#define STM32F2_GPIOG_BASE	(STM32F2_AHB1PERITH_BASE + 0x1800)
-#define STM32F2_GPIOH_BASE	(STM32F2_AHB1PERITH_BASE + 0x1C00)
-#define STM32F2_GPIOI_BASE	(STM32F2_AHB1PERITH_BASE + 0x2000)
-
-/*
- * GPIO configuration mode
- */
-#define STM32F2_GPIO_MODE_IN	0x00
-#define STM32F2_GPIO_MODE_OUT	0x01
-#define STM32F2_GPIO_MODE_AF	0x02
-#define STM32F2_GPIO_MODE_AN	0x03
-
-/*
- * GPIO output type
- */
-#define STM32F2_GPIO_OTYPE_PP	0x00
-#define STM32F2_GPIO_OTYPE_OD	0x01
-
-/*
- * GPIO output maximum frequency
- */
-#define STM32F2_GPIO_SPEED_2M	0x00
-#define STM32F2_GPIO_SPEED_25M	0x01
-#define STM32F2_GPIO_SPEED_50M	0x02
-#define STM32F2_GPIO_SPEED_100M	0x03
-
-/*
- * GPIO pullup, pulldown configuration
- */
-#define STM32F2_GPIO_PUPD_NO	0x00
-#define STM32F2_GPIO_PUPD_UP	0x01
-#define STM32F2_GPIO_PUPD_DOWN	0x02
-
-/*
- * AF7 selection
- */
-#define STM32F2_GPIO_AF_USART1	0x07
-#define STM32F2_GPIO_AF_USART2	0x07
-#define STM32F2_GPIO_AF_USART3	0x07
-
-/*
- * AF8 selection
- */
-#define STM32F2_GPIO_AF_USART4	0x08
-#define STM32F2_GPIO_AF_USART5	0x08
-#define STM32F2_GPIO_AF_USART6	0x08
-
-/*
  * U-Boot global data to get the baudrate from
  */
 DECLARE_GLOBAL_DATA_PTR;
@@ -199,14 +140,8 @@ static const unsigned long usart_base[] = {
 	STM32F2_USART4_BASE, STM32F2_USART5_BASE, STM32F2_USART6_BASE
 };
 
-static const unsigned long io_base[] = {
-	STM32F2_GPIOA_BASE, STM32F2_GPIOB_BASE, STM32F2_GPIOC_BASE,
-	STM32F2_GPIOD_BASE, STM32F2_GPIOE_BASE, STM32F2_GPIOF_BASE,
-	STM32F2_GPIOG_BASE, STM32F2_GPIOH_BASE, STM32F2_GPIOI_BASE
-};
-
 /*
- * Regsiter offsets
+ * Register offsets
  */
 static const unsigned long rcc_enr_offset[] = {
 	STM32F2_RCC_ENR_USART1, STM32F2_RCC_ENR_USART2, STM32F2_RCC_ENR_USART3,
@@ -221,9 +156,13 @@ static const unsigned long rcc_msk[] = {
 	STM32F2_RCC_MSK_USART4, STM32F2_RCC_MSK_USART5, STM32F2_RCC_MSK_USART6
 };
 
-static const unsigned long af_val[] = {
-	STM32F2_GPIO_AF_USART1, STM32F2_GPIO_AF_USART2, STM32F2_GPIO_AF_USART3,
-	STM32F2_GPIO_AF_USART4, STM32F2_GPIO_AF_USART5, STM32F2_GPIO_AF_USART6
+/*
+ * GPIO roles
+ */
+static const enum stm32f2_gpio_role gpio_role[] = {
+	STM32F2_GPIO_ROLE_USART1, STM32F2_GPIO_ROLE_USART2,
+	STM32F2_GPIO_ROLE_USART3, STM32F2_GPIO_ROLE_USART4,
+	STM32F2_GPIO_ROLE_USART5, STM32F2_GPIO_ROLE_USART6
 };
 
 /*
@@ -238,73 +177,27 @@ int serial_init(void)
 {
 	static volatile u32			 *usart_enr;
 	static volatile struct stm32f2_rcc_regs	 *rcc_regs;
-	static volatile struct stm32f2_gpio_regs *io_regs[2];
-	static u32				 io_ports[2];
-	static u32				 io_pins[2];
-
-	u32	i, ofs;
-
-	/*
-	 * GPIO params
-	 */
-	io_ports[0] = USART_TX_IO_PORT;
-	io_ports[1] = USART_RX_IO_PORT;
-	io_pins[0]  = USART_TX_IO_PIN;
-	io_pins[1]  = USART_RX_IO_PIN;
 
 	/*
 	 * Setup registers
 	 */
-	usart_regs  = (struct stm32f2_usart_regs *)usart_base[USART_PORT];
-	rcc_regs    = (struct stm32f2_rcc_regs *)STM32F2_RCC_BASE;
-	for (i = 0; i < 2; i++)
-		io_regs[i] = (struct stm32f2_gpio_regs *)io_base[io_ports[i]];
+	usart_regs = (struct stm32f2_usart_regs *)usart_base[USART_PORT];
+	rcc_regs   = (struct stm32f2_rcc_regs *)STM32F2_RCC_BASE;
 
 	usart_enr  = (u32 *)(STM32F2_RCC_BASE + rcc_enr_offset[USART_PORT]);
 
 	/*
-	 * Enable GPIO and USART clocks
+	 * Enable USART clocks
 	 */
-	for (i = 0; i < 2; i++)
-		rcc_regs->ahb1enr |= 1 << io_ports[i];
 	*usart_enr |= rcc_msk[USART_PORT];
 
 	/*
 	 * Configure GPIOs
 	 */
-	for (i = 0; i < 2; i++) {
-		/*
-		 * Connect PXy to USART Tx/Rx
-		 */
-		ofs = (io_pins[i] & 0x07) * 4;
-		io_regs[i]->afr[io_pins[i] >> 3] &= ~(0xF << ofs);
-		io_regs[i]->afr[io_pins[i] >> 3] |= af_val[USART_PORT] << ofs;
-
-		ofs = io_pins[i] * 2;
-		/*
-		 * Set Alternative function mode
-		 */
-		io_regs[i]->moder &= ~(0x3 << ofs);
-		io_regs[i]->moder |= STM32F2_GPIO_MODE_AF << ofs;
-
-		/*
-		 * Output mode configuration
-		 */
-		io_regs[i]->otyper &= ~(0x3 << ofs);
-		io_regs[i]->otyper |= STM32F2_GPIO_OTYPE_PP << ofs;
-
-		/*
-		 * Speed mode configuration
-		 */
-		io_regs[i]->ospeedr &= ~(0x3 << ofs);
-		io_regs[i]->ospeedr |= STM32F2_GPIO_SPEED_50M << ofs;
-
-		/*
-		 * Pull-up, pull down resistor configuration
-		 */
-		io_regs[i]->pupdr &= ~(0x3 << ofs);
-		io_regs[i]->pupdr |= STM32F2_GPIO_PUPD_UP;
-	}
+	stm32f2_gpio_config(USART_TX_IO_PORT, USART_TX_IO_PIN,
+			    gpio_role[USART_PORT]);
+	stm32f2_gpio_config(USART_RX_IO_PORT, USART_RX_IO_PIN,
+			    gpio_role[USART_PORT]);
 
 	/*
 	 * CR1:
