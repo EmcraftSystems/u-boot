@@ -20,6 +20,8 @@
  */
 
 #include <common.h>
+#include <asm/arch/stm32f2.h>
+#include "clock.h"
 
 /*
  * Print the CPU specific information
@@ -27,6 +29,12 @@
 int print_cpuinfo(void)
 {
 	printf("CPU: %s\n", "STM32 F2 series (Cortex-M3)");
+
+#if defined(DEBUG)
+	printf("Frequencies: SYSCLK=%d, HCLK=%d, PCLK1=%d, PCLK2=%d\n",
+		clock_get(CLOCK_SYSCLK), clock_get(CLOCK_HCLK),
+		clock_get(CLOCK_PCLK1), clock_get(CLOCK_PCLK2));
+#endif
 
 	return 0;
 }

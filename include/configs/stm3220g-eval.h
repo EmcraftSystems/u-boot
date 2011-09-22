@@ -65,9 +65,18 @@
 #define CONFIG_ARCH_CPU_INIT
 
 /*
- * External oscillator value
+ * Clock configuration (see stm32f2/clock.c for details):
+ * - use PLL as the system clock;
+ * - use HSE as the PLL source;
+ * - configure PLL to get 120MHz system clock.
  */
-#define CONFIG_STM32F2_HSE_HZ		25000000
+#define CONFIG_STM32F2_SYS_CLK_PLL
+#define CONFIG_STM32F2_PLL_SRC_HSE
+#define CONFIG_STM32F2_HSE_HZ		25000000	/* 25 MHz */
+#define CONFIG_STM32F2_PLL_M		25
+#define CONFIG_STM32F2_PLL_N		240
+#define CONFIG_STM32F2_PLL_P		2
+#define CONFIG_STM32F2_PLL_Q		5
 
 /*
  * Number of clock ticks in 1 sec
