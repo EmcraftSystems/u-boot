@@ -116,47 +116,8 @@ enum clock {
 #define STM32F2_RCC_BASE	(STM32F2_AHB1PERITH_BASE + 0x3800)
 
 /******************************************************************************
- * General Purpose I/O
- ******************************************************************************/
-
-/*
- * GPIO register map
- */
-struct stm32f2_gpio_regs {
-	u32	moder;		/* GPIO port mode			      */
-	u32	otyper;		/* GPIO port output type		      */
-	u32	ospeedr;	/* GPIO port output speed		      */
-	u32	pupdr;		/* GPIO port pull-up/pull-down		      */
-	u32	idr;		/* GPIO port input data			      */
-	u32	odr;		/* GPIO port output data		      */
-	u16	bsrrl;		/* GPIO port bit set/reset low		      */
-	u16	bsrrh;		/* GPIO port bit set/reset high		      */
-	u32	lckr;		/* GPIO port configuration lock		      */
-	u32	afr[2];		/* GPIO alternate function		      */
-};
-
-/*
- * GPIO roles (alternative functions)
- */
-enum stm32f2_gpio_role {
-	STM32F2_GPIO_ROLE_USART1,	/* GPIO is used by USART1	      */
-	STM32F2_GPIO_ROLE_USART2,	/* GPIO is used by USART2	      */
-	STM32F2_GPIO_ROLE_USART3,	/* GPIO is used by USART3	      */
-	STM32F2_GPIO_ROLE_USART4,	/* GPIO is used by USART4	      */
-	STM32F2_GPIO_ROLE_USART5,	/* GPIO is used by USART5	      */
-	STM32F2_GPIO_ROLE_USART6,	/* GPIO is used by USART6	      */
-	STM32F2_GPIO_ROLE_ETHERNET	/* GPIO is used by MAC		      */
-};
-
-/******************************************************************************
  * FIXME: get rid of this
  ******************************************************************************/
-
-/*
- * Configure the specified GPIO for the specified role
- */
-int stm32f2_gpio_config(unsigned int port, unsigned int pin,
-			enum stm32f2_gpio_role role);
 
 /*
  * Return a clock value for the specified clock.

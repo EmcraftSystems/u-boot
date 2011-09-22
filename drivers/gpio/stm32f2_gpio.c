@@ -20,13 +20,15 @@
  */
 
 /*
- * STM32 F2 GPIO driver. Used just for setting Alternative functions
+ * STM32 F2 GPIO driver. Used for instance for setting Alternative functions
  * for GPIOs utilized for USART or Ethernet communications
  */
 
 #include <common.h>
+#include <asm/errno.h>
 
 #include <asm/arch/stm32f2.h>
+#include <asm/arch/stm32f2_gpio.h>
 
 /*
  * GPIO registers bases
@@ -90,6 +92,22 @@
 #define STM32F2_GPIO_AF_MAC	0x0B
 
 /*
+ * GPIO register map
+ */
+struct stm32f2_gpio_regs {
+	u32	moder;		/* GPIO port mode			      */
+	u32	otyper;		/* GPIO port output type		      */
+	u32	ospeedr;	/* GPIO port output speed		      */
+	u32	pupdr;		/* GPIO port pull-up/pull-down		      */
+	u32	idr;		/* GPIO port input data			      */
+	u32	odr;		/* GPIO port output data		      */
+	u16	bsrrl;		/* GPIO port bit set/reset low		      */
+	u16	bsrrh;		/* GPIO port bit set/reset high		      */
+	u32	lckr;		/* GPIO port configuration lock		      */
+	u32	afr[2];		/* GPIO alternate function		      */
+};
+
+/*
  * Register map bases
  */
 static const unsigned long io_base[] = {
@@ -123,8 +141,8 @@ int stm32f2_gpio_config(unsigned int port, unsigned int pin,
 	 * Check params
 	 */
 	if (port > 8 || pin > 15) {
-		printf("%s: bad params %d.%d.\n", __func__, port, pin);
-		rv = -1;
+		printf("%s: incorrect params %d.%d.\n", __func__, port, pin);
+		rv = -EINVAL;
 		goto out;
 	}
 
@@ -148,8 +166,8 @@ int stm32f2_gpio_config(unsigned int port, unsigned int pin,
 		pupd   = STM32F2_GPIO_PUPD_NO;
 		break;
 	default:
-		printf("%s: bad role %d.\n", __func__, role);
-		rv = -1;
+		printf("%s: incorrect role %d.\n", __func__, role);
+		rv = -EINVAL;
 		goto out;
 	}
 

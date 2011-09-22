@@ -32,6 +32,7 @@
 #include <common.h>
 
 #include <asm/arch/stm32f2.h>
+#include <asm/arch/stm32f2_gpio.h>
 
 /*
  * Set up configuration
