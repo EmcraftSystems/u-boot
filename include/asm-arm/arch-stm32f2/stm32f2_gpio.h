@@ -32,7 +32,8 @@ enum stm32f2_gpio_role {
 	STM32F2_GPIO_ROLE_USART4,	/* GPIO is used by USART4	      */
 	STM32F2_GPIO_ROLE_USART5,	/* GPIO is used by USART5	      */
 	STM32F2_GPIO_ROLE_USART6,	/* GPIO is used by USART6	      */
-	STM32F2_GPIO_ROLE_ETHERNET	/* GPIO is used by MAC		      */
+	STM32F2_GPIO_ROLE_ETHERNET,	/* GPIO is used by MAC		      */
+	STM32F2_GPIO_ROLE_MCO		/* GPIO is used for MC ext output clk */
 };
 
 /*

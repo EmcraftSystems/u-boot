@@ -122,7 +122,8 @@ static const unsigned long io_base[] = {
 static const u32 af_val[] = {
 	STM32F2_GPIO_AF_USART1, STM32F2_GPIO_AF_USART2, STM32F2_GPIO_AF_USART3,
 	STM32F2_GPIO_AF_USART4, STM32F2_GPIO_AF_USART5, STM32F2_GPIO_AF_USART6,
-	STM32F2_GPIO_AF_MAC
+	STM32F2_GPIO_AF_MAC,
+	0
 };
 
 /*
@@ -161,6 +162,7 @@ int stm32f2_gpio_config(unsigned int port, unsigned int pin,
 		pupd   = STM32F2_GPIO_PUPD_UP;
 		break;
 	case STM32F2_GPIO_ROLE_ETHERNET:
+	case STM32F2_GPIO_ROLE_MCO:
 		otype  = STM32F2_GPIO_OTYPE_PP;
 		ospeed = STM32F2_GPIO_SPEED_100M;
 		pupd   = STM32F2_GPIO_PUPD_NO;
@@ -182,12 +184,14 @@ int stm32f2_gpio_config(unsigned int port, unsigned int pin,
 	 */
 	rcc_regs->ahb1enr |= 1 << port;
 
-	/*
-	 * Connect PXy to the specified controller (role)
-	 */
-	i = (pin & 0x07) * 4;
-	gpio_regs->afr[pin >> 3] &= ~(0xF << i);
-	gpio_regs->afr[pin >> 3] |= af_val[role] << i;
+	if (role != STM32F2_GPIO_ROLE_MCO) {
+		/*
+		 * Connect PXy to the specified controller (role)
+		 */
+		i = (pin & 0x07) * 4;
+		gpio_regs->afr[pin >> 3] &= ~(0xF << i);
+		gpio_regs->afr[pin >> 3] |= af_val[role] << i;
+	}
 
 	i = pin * 2;
 
