@@ -129,6 +129,25 @@
 #define STM32F2_RCC_MSK_USART6	(1 <<  5)
 
 /*
+ * USART register map
+ */
+struct stm32f2_usart_regs {
+	u16	sr;		/* Status				      */
+	u16	rsv0;
+	u16	dr;		/* Data					      */
+	u16	rsv1;
+	u16	brr;		/* Baud rate				      */
+	u16	rsv2;
+	u16	cr1;		/* Control 1				      */
+	u16	rsv3;
+	u16	cr2;		/* Control 2				      */
+	u16	rsv4;
+	u16	cr3;		/* Control 3				      */
+	u16	rsv5;
+	u16	gtpr;		/* Guard time and prescaler		      */
+};
+
+/*
  * U-Boot global data to get the baudrate from
  */
 DECLARE_GLOBAL_DATA_PTR;
@@ -179,6 +198,8 @@ int serial_init(void)
 	static volatile u32			 *usart_enr;
 	static volatile struct stm32f2_rcc_regs	 *rcc_regs;
 
+	int	rv;
+
 	/*
 	 * Setup registers
 	 */
@@ -195,10 +216,14 @@ int serial_init(void)
 	/*
 	 * Configure GPIOs
 	 */
-	stm32f2_gpio_config(USART_TX_IO_PORT, USART_TX_IO_PIN,
-			    gpio_role[USART_PORT]);
-	stm32f2_gpio_config(USART_RX_IO_PORT, USART_RX_IO_PIN,
-			    gpio_role[USART_PORT]);
+	rv = stm32f2_gpio_config(USART_TX_IO_PORT, USART_TX_IO_PIN,
+				 gpio_role[USART_PORT]);
+	if (rv != 0)
+		goto out;
+	rv = stm32f2_gpio_config(USART_RX_IO_PORT, USART_RX_IO_PIN,
+				 gpio_role[USART_PORT]);
+	if (rv != 0)
+		goto out;
 
 	/*
 	 * CR1:
@@ -230,7 +255,9 @@ int serial_init(void)
 	 */
 	usart_regs->cr1 |= STM32F2_USART_CR1_UE;
 
-	return 0;
+	rv = 0;
+out:
+	return rv;
 }
 
 /*
@@ -298,5 +325,3 @@ int serial_tstc(void)
 {
 	return (usart_regs->sr & STM32F2_USART_SR_RXNE) ? 1 : 0;
 }
-
-

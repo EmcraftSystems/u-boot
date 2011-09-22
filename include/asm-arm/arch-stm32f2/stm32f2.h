@@ -36,29 +36,6 @@
 #define STM32F2_AHB2PERITH_BASE	(STM32F2_PERIPH_BASE + 0x10000000)
 
 /******************************************************************************
- * Universal Synchronous Asynchronous Receiver Transmitter
- ******************************************************************************/
-
-/*
- * USART register map
- */
-struct stm32f2_usart_regs {
-	u16	sr;		/* Status				      */
-	u16	rsv0;
-	u16	dr;		/* Data					      */
-	u16	rsv1;
-	u16	brr;		/* Baud rate				      */
-	u16	rsv2;
-	u16	cr1;		/* Control 1				      */
-	u16	rsv3;
-	u16	cr2;		/* Control 2				      */
-	u16	rsv4;
-	u16	cr3;		/* Control 3				      */
-	u16	rsv5;
-	u16	gtpr;		/* Guard time and prescaler		      */
-};
-
-/******************************************************************************
  * Reset and Clock Control
  ******************************************************************************/
 
