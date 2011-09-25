@@ -86,6 +86,7 @@ int uli526x_initialize(bd_t *bis);
 int sh_eth_initialize(bd_t *bis);
 int dm9000_initialize(bd_t *bis);
 int core_eth_init(bd_t *bis);
+int stm32f2_eth_init(bd_t *bis);
 
 /* Boards with PCI network controllers can call this from their board_eth_init()
  * function to initialize whatever's on board.

@@ -100,9 +100,9 @@
 #define CONFIG_MEM_NVM_LEN		(1024 * 1024)
 
 #define CONFIG_MEM_RAM_BASE		0x20000000
-#define CONFIG_MEM_RAM_LEN		(16 * 1024)
+#define CONFIG_MEM_RAM_LEN		(32 * 1024)
 #define CONFIG_MEM_RAM_BUF_LEN		(32 * 1024)
-#define CONFIG_MEM_MALLOC_LEN		(12 * 1024)
+#define CONFIG_MEM_MALLOC_LEN		(60 * 1024)
 #define CONFIG_MEM_STACK_LEN		(4 * 1024)
 
 /*
@@ -126,7 +126,7 @@
  * Store env in memory only
  */
 #define CONFIG_ENV_IS_NOWHERE
-#define CONFIG_ENV_SIZE			(8 * 1024)
+#define CONFIG_ENV_SIZE			(4 * 1024)
 
 /*
  * Serial console configuration
@@ -140,6 +140,13 @@
 
 #define CONFIG_BAUDRATE			115200
 #define CONFIG_SYS_BAUDRATE_TABLE	{ 9600, 19200, 38400, 57600, 115200 }
+
+/*
+ * Ethernet
+ */
+#define CONFIG_NET_MULTI
+#define CONFIG_STM32F2_ETH
+#define CONFIG_SYS_RX_ETH_BUFFER	4	/* 4 rx buffer */
 
 /*
  * Console I/O buffer size
@@ -187,7 +194,8 @@
 #undef CONFIG_CMD_IMLS
 #undef CONFIG_CMD_LOADS
 #undef CONFIG_CMD_MISC
-#undef CONFIG_CMD_NET
+#define CONFIG_CMD_PING
+#define CONFIG_CMD_NET
 #undef CONFIG_CMD_NFS
 #undef CONFIG_CMD_SOURCE
 #undef CONFIG_CMD_XIMG
@@ -216,7 +224,8 @@
  * Short-cuts to some useful commands (macros)
  */
 #define CONFIG_EXTRA_ENV_SETTINGS				\
-	"loadaddr=60000000\0"					\
+	/* FIXME: load to external RAM */			\
+	"loadaddr=0x20008000\0"					\
 	"addip=setenv bootargs ${bootargs} ip=${ipaddr}:${serverip}:${gatewayip}:${netmask}:${hostname}:eth0:off\0"				\
 	"ethaddr=C0:B1:3C:88:88:88\0"				\
 	"ipaddr=172.17.4.206\0"					\

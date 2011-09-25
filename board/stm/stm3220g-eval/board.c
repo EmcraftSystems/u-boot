@@ -24,6 +24,7 @@
  */
 
 #include <common.h>
+#include <netdev.h>
 
 DECLARE_GLOBAL_DATA_PTR;
 
@@ -73,3 +74,14 @@ int dram_init(void)
 
 	return 0;
 }
+
+#ifdef CONFIG_STM32F2_ETH
+/*
+ * Register ethernet driver
+ */
+int board_eth_init(bd_t *bis)
+{
+	return stm32f2_eth_init(bis);
+}
+#endif
+
