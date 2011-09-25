@@ -28,13 +28,19 @@
  */
 int print_cpuinfo(void)
 {
-	printf("CPU: %s\n", "SmartFusion FPGA (Cortex-M3 Hard IP)");
-#if defined(DEBUG)
-	printf("Frequencies: FCLK=%d, PCLK0=%d, PCLK1=%d, ACE=%d, FPGA=%d\n",
-			clock_get(CLOCK_FCLK), clock_get(CLOCK_PCLK0),
-			clock_get(CLOCK_PCLK1), clock_get(CLOCK_ACE),
-			clock_get(CLOCK_FPGA));
-#endif
+	char	buf[5][32];
+
+	printf("CPU  : %s\n", "SmartFusion FPGA (Cortex-M3 Hard IP)");
+
+	strmhz(buf[0], clock_get(CLOCK_FCLK));
+	strmhz(buf[1], clock_get(CLOCK_PCLK0));
+	strmhz(buf[2], clock_get(CLOCK_PCLK1));
+	strmhz(buf[3], clock_get(CLOCK_ACE));
+	strmhz(buf[4], clock_get(CLOCK_FPGA));
+	printf("Freqs: FCLK=%sMHz,PCLK0=%sMHz,PCLK1=%sMHz,ACE=%sMHz,"
+		"FPGA=%sMHz\n",
+		buf[0], buf[1], buf[2], buf[3], buf[4]);
+
 	return 0;
 }
 
