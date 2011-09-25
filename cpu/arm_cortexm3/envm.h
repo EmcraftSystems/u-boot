@@ -23,16 +23,24 @@
 /*
  * Initialize the eNVM interface
  */
-extern void envm_init(void);
+void envm_init(void);
 
 /*
  * Write a data buffer to eNVM.
  * Note that we need for this function to reside in RAM since it
  * will be used to self-upgrade U-boot in eNMV.
  */
-extern unsigned int
+unsigned int
 	__attribute__((section(".ramcode")))
 	__attribute__ ((long_call))
 	envm_write(unsigned int offset, void * buf, unsigned int size);
+
+#if defined(CONFIG_SYS_STM32F2)
+/*
+ * Enable instruction cache, prefetch and set the Flash wait latency
+ * according to the clock configuration used (HCLK value).
+ */
+void envm_config(u32 wait_states);
+#endif /* CONFIG_SYS_STM32F2 */
 
 #endif /* __ENVM_H__ */

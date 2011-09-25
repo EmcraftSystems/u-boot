@@ -20,8 +20,57 @@
  */
 
 #include <common.h>
+#include <asm/arch/stm32f2.h>
 
 #include "envm.h"
+
+/*
+ * Flash registers base
+ */
+#define STM32F2_FLASH_BASE		(STM32F2_AHB1PERITH_BASE + 0x3C00)
+
+/*
+ * Flash ACR definitions
+ */
+#define STM32F2_FLASH_ACR_LAT_BIT	0	/* Latency		     */
+#define STM32F2_FLASH_ACR_LAT_MSK	0x3
+
+#define STM32F2_FLASH_ACR_PRFTEN	(1 << 8)  /* Prefetch enable	     */
+#define STM32F2_FLASH_ACR_ICEN		(1 << 9)  /* Instruction cache enable*/
+
+/*
+ * Flash register map
+ */
+struct stm32f2_flash_regs {
+	u32	acr;				/* Access control	      */
+	u32	keyr;				/* Key			      */
+	u32	optkeyr;			/* Option key		      */
+	u32	sr;				/* Status		      */
+	u32	cr;				/* Control		      */
+	u32	optcr;				/* Option control	      */
+};
+
+/*
+ * Enable instruction cache, prefetch and set the Flash wait latency
+ * according to the clock configuration used (HCLK value).
+ * We _must_ do this before changing System clock source (or will crash on
+ * fetching instructions of while() wait cycle).
+ * In case of HSI clock - no Sys clock change happens, but, for consistency,
+ * we configure Flash this way as well.
+ */
+void envm_config(u32 wait_states)
+{
+	volatile struct stm32f2_flash_regs	*flash_regs;
+
+	flash_regs = (struct stm32f2_flash_regs *)STM32F2_FLASH_BASE;
+
+	if (wait_states > STM32F2_FLASH_ACR_LAT_MSK)
+		wait_states = STM32F2_FLASH_ACR_LAT_MSK;
+
+	flash_regs->acr = STM32F2_FLASH_ACR_PRFTEN |
+			  STM32F2_FLASH_ACR_ICEN |
+			  (wait_states << STM32F2_FLASH_ACR_LAT_BIT);
+}
 
 /*
  * Initialize internal Flash interface
