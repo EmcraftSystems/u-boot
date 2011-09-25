@@ -187,12 +187,6 @@
 #define CONFIG_SYS_BAUDRATE_TABLE       { 9600, 19200, 38400, 57600, 115200 }
 
 /*
- * MALLOC_LEN can't be more than the specified size!
- * Refer to u-boot.lds for further details.
- */
-#define CONFIG_SYS_MALLOC_LEN		(1024*8)
-
-/*
  * Console I/O buffer size
  */
 #define CONFIG_SYS_CBSIZE		256
