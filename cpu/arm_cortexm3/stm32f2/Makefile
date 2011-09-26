@@ -29,13 +29,9 @@ include $(TOPDIR)/config.mk
 
 LIB	= $(obj)lib$(SOC).a
 
+COBJS	:= clock.o cpu.o envm.o timer.o wdt.o
 SOBJS	:=
 
-COBJS-y					:= clock.o cpu.o envm.o timer.o wdt.o
-COBJS-$(CONFIG_STM32F2_GPIO)		+= gpio.o
-COBJS-$(CONFIG_STM32F2_USART_CONSOLE)	+= serial.o
-
-COBJS	:= $(COBJS-y)
 SRCS	:= $(COBJS:.o=.c)
 OBJS	:= $(addprefix $(obj),$(COBJS))
 SOBJS	:= $(addprefix $(obj),$(SOBJS))
