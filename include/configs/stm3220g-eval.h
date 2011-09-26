@@ -146,6 +146,14 @@
  */
 #define CONFIG_NET_MULTI
 #define CONFIG_STM32F2_ETH
+
+/*
+ * Ethernet RX buffers are malloced from the internal SRAM (more precisely,
+ * from CONFIG_SYS_MALLOC_LEN part of it). Each RX buffer has size of 1536B.
+ * So, keep this in mind when changing the value of the following config,
+ * which determines the number of ethernet RX buffers (number of frames which
+ * may be received without processing until overflow happens).
+ */
 #define CONFIG_SYS_RX_ETH_BUFFER	4
 
 /*
