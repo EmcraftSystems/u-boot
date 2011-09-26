@@ -142,11 +142,11 @@
 #define CONFIG_SYS_BAUDRATE_TABLE	{ 9600, 19200, 38400, 57600, 115200 }
 
 /*
- * Ethernet
+ * Ethernet configuration
  */
 #define CONFIG_NET_MULTI
 #define CONFIG_STM32F2_ETH
-#define CONFIG_SYS_RX_ETH_BUFFER	4	/* 4 rx buffer */
+#define CONFIG_SYS_RX_ETH_BUFFER	4
 
 /*
  * Console I/O buffer size
@@ -194,7 +194,6 @@
 #undef CONFIG_CMD_IMLS
 #undef CONFIG_CMD_LOADS
 #undef CONFIG_CMD_MISC
-#define CONFIG_CMD_PING
 #define CONFIG_CMD_NET
 #undef CONFIG_CMD_NFS
 #undef CONFIG_CMD_SOURCE

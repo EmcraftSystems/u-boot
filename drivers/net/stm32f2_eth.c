@@ -26,7 +26,7 @@
 #include <config.h>
 
 /*
- * Define this to 'printf()' any 'debug()' below
+ * Define DEBUG to enable debug() messages in this module
  */
 #undef DEBUG
 
@@ -417,6 +417,9 @@ int stm32f2_eth_init(bd_t *bd)
 
 	rv = eth_register(netdev);
 out:
+	if (rv != 0 && mac)
+		free(mac);
+
 	return rv;
 }
 
