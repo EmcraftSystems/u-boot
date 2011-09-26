@@ -66,21 +66,17 @@ struct a2f_sysreg {
 	unsigned int	iomux_cr[83];
 };
 
-#define A2F_SYSREG_BASE	0xE0042000
-#define A2F_SYSREG	((volatile struct a2f_sysreg *)(A2F_SYSREG_BASE))
+#define A2F_SYSREG_BASE			0xE0042000
+#define A2F_SYSREG		((volatile struct a2f_sysreg *)(A2F_SYSREG_BASE))
 
-struct a2f_scb {
-	unsigned int	cpuid;
-	unsigned int	icsr;
-	unsigned int	vtor;
-	unsigned int	aircr;
-};
+#define A2F_SOFT_RST_TIMER_SR		(1<<6)
 
-#define A2F_SCB_BASE	0xE000ED00
-#define A2F_SCB		((volatile struct a2f_scb *)(A2F_SCB_BASE))
+#define A2F_SYSTICK_NOREF		(1<<25)
+#define A2F_SYSTICK_STCLK_DIV_SHIFT	28
+#define A2F_SYSTICK_STCLK_DIV_32	3
+#define A2F_SYSTICK_TENMS_MSK		(0x00FFFFFF)
 
-#define A2F_SCS_BASE	0xE000E000
-
+#define A2F_SCS_BASE			0xE000E000
 
 struct a2f_timer
 {
@@ -110,9 +106,13 @@ struct a2f_timer
 	unsigned int timer64_mode;
 };
 
-#define A2F_TIMER_BASE	0x40005000
+#define A2F_TIMER_BASE			0x40005000
 #define A2F_TIMER		((volatile struct a2f_timer *)(A2F_TIMER_BASE))
 
+#define A2F_TIM64_64MODE_EN		1
+
+#define A2F_TIM_CTRL_MODE_ONESHOT	2
+#define A2F_TIM_CTRL_EN			1
 /*
  * Clocks enumeration.
  */

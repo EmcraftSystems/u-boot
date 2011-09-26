@@ -1,6 +1,5 @@
 /*
  * (C) Copyright 2010,2011
- *
  * Sergei Poselenov, Emcraft Systems, sposelenov@emcraft.com
  *
  * This program is free software; you can redistribute it and/or
@@ -15,62 +14,59 @@
  *
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
- * Foundation, Inc., 59 Temple Place, Suite 330, Boston,
- * MA 02111-1307 USA
+ * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 #include <common.h>
-
-struct systick {
-	uint32_t ctrl;		/* Control and Status Register */
-	uint32_t load;		/* Reload Value Register       */
-	uint32_t val;		/* Current Value Register      */
-	uint32_t cal;		/* Calibration Register        */
-};
 
 /* system core clock /32 */
 #define CONFIG_SYSTICK_FREQ	3125000
 
-/* SysTick Base Address */
-#define A2F_SYSTICK_BASE	(A2F_SCS_BASE +  0x0010)
-
-#define A2F_SYSTICK		((volatile struct systick *)(A2F_SYSTICK_BASE))
-
-#define SYSTICK_LOAD_RELOAD_POS	0
-#define SYSTICK_CTRL_ENABLE_POS	0
-#define SYSTICK_LOAD_RELOAD_MSK	(0xFFFFFFul << SYSTICK_LOAD_RELOAD_POS)
-#define SYSTICK_CTRL_ENABLE_MSK	(1ul << SYSTICK_CTRL_ENABLE_POS)
-
 /* Internal tick units */
-static unsigned long long timestamp; /* Monotonic incrementing timer */
-static unsigned long lastdec;	/* Last decrementer snapshot */
+static unsigned long long timestamp;	/* Monotonic incrementing timer */
+static ulong              lastdec;	/* Last decrementer snapshot */
 
 int timer_init()
 {
-	A2F_SYSREG->soft_rst_cr &= ~(1 << 6); /* Release systimer from reset */
-	A2F_TIMER->timer64_mode = 0;   /* enable 32bit timer1 */
-	A2F_TIMER->timer1_ctrl = 0x03; /* timer1 is used by envm driver */
+	volatile struct a2f_sysreg *a2f_sysreg =
+		(volatile struct a2f_sysreg *)A2F_SYSREG_BASE;
+	volatile struct a2f_timer *a2f_timer =
+		(volatile struct a2f_timer *)A2F_TIMER_BASE;
+	volatile struct cm3_systick *systick =
+		(volatile struct cm3_systick *)CM3_SYSTICK_BASE;
 
-	A2F_SYSREG->systick_cr &= ~(1 << 25);	/* en noref */
-	A2F_SYSREG->systick_cr |= (3 << 28);	/* div by 32 */
-	A2F_SYSREG->systick_cr &= ~0xffffff;
-	A2F_SYSREG->systick_cr |= 0x7a12;
-	A2F_SYSTICK->load = SYSTICK_LOAD_RELOAD_MSK - 1;
-	A2F_SYSTICK->val = 0;
+	/* Release systimer from reset */
+	a2f_sysreg->soft_rst_cr &= ~A2F_SOFT_RST_TIMER_SR;
+	/* enable 32bit timer1 */
+	a2f_timer->timer64_mode &= ~A2F_TIM64_64MODE_EN;
+	/* timer1 is used by envm driver */
+	a2f_timer->timer1_ctrl = A2F_TIM_CTRL_MODE_ONESHOT|A2F_TIM_CTRL_EN;
+	/* No reference clock */
+	a2f_sysreg->systick_cr &= ~A2F_SYSTICK_NOREF;
+	/* div by 32 */
+	a2f_sysreg->systick_cr |= (A2F_SYSTICK_STCLK_DIV_32 <<
+				A2F_SYSTICK_STCLK_DIV_SHIFT);
+	a2f_sysreg->systick_cr &= ~A2F_SYSTICK_TENMS_MSK;
+	a2f_sysreg->systick_cr |= 0x7a12;
+
+	systick->load = CM3_SYSTICK_LOAD_RELOAD_MSK - 1;
+	systick->val = 0;
 	/* we don't want ints to be enabled */
-	A2F_SYSTICK->ctrl = SYSTICK_CTRL_ENABLE_MSK;
+	systick->ctrl = CM3_SYSTICK_CTRL_EN;
 	timestamp = 0;
 
 	return 0;
 }
 
-unsigned long get_timer(unsigned long base)
+ulong get_timer(ulong base)
 {
-	unsigned long now = A2F_SYSTICK->val;
+	volatile struct cm3_systick *systick =
+		(volatile struct cm3_systick *)CM3_SYSTICK_BASE;
+	ulong now = systick->val;
 
 	if (lastdec >= now)
 		timestamp += lastdec - now;
 	else
-		timestamp += lastdec + SYSTICK_LOAD_RELOAD_MSK - 1 - now;
+		timestamp += lastdec + CM3_SYSTICK_LOAD_RELOAD_MSK - 1 - now;
 
 	lastdec = now;
 
@@ -79,27 +75,32 @@ unsigned long get_timer(unsigned long base)
 
 void reset_timer(void)
 {
-	lastdec = A2F_SYSTICK->val;
+	volatile struct cm3_systick *systick =
+		(volatile struct cm3_systick *)(CM3_SYSTICK_BASE);
+	lastdec = systick->val;
 	timestamp = 0;
 }
 
 /* delay x useconds */
-void __udelay(unsigned long usec)
+void __udelay(ulong usec)
 {
-	unsigned long clc, tmp;
+	ulong clc, tmp;
+	volatile struct cm3_systick *systick =
+		(volatile struct cm3_systick *)(CM3_SYSTICK_BASE);
+
 
 	clc = usec * (CONFIG_SYSTICK_FREQ / 1000000);
 
 	/* get current timestamp */
-	tmp = A2F_SYSTICK->val;
+	tmp = systick->val;
 
 	if (tmp < clc) {
 		/* loop till event */
-		while (A2F_SYSTICK->val < tmp ||
-			   A2F_SYSTICK->val > (SYSTICK_LOAD_RELOAD_MSK - 1 -
+		while (systick->val < tmp ||
+			   systick->val > (CM3_SYSTICK_LOAD_RELOAD_MSK - 1 -
 				clc + tmp)) ;	/* nop */
 	} else {
-		while (A2F_SYSTICK->val > (tmp - clc)) ;
+		while (systick->val > (tmp - clc)) ;
 	}
 }
 
@@ -107,7 +108,7 @@ void __udelay(unsigned long usec)
  * This function is derived from PowerPC code (timebase clock frequency).
  * On ARM it returns the number of timer ticks per second.
  */
-unsigned long get_tbclk(void)
+ulong get_tbclk(void)
 {
 	return CONFIG_SYSTICK_FREQ;
 }

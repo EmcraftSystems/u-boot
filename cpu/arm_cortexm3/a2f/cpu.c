@@ -21,7 +21,6 @@
 #include <common.h>
 
 #include "clock.h"
-#include "asm/arch-a2f/a2f.h"
 
 /*
  * Print the CPU specific information
@@ -47,12 +46,14 @@ void __attribute__((section(".ramcode")))
 		__attribute__ ((long_call))
 		reset_cpu(ulong addr)
 {
+	volatile struct cm3_scb *scb = (volatile struct cm3_scb *)CM3_SCB_BASE;
 	/*
 	 * Perform reset but keep priority group unchanged.
 	 */
-	A2F_SCB->aircr  = (0x5FA << 16) |
-			  (A2F_SCB->aircr & (7<<8)) |
-			  (1<<2);
+	scb->aircr  = (CM3_AIRCR_VECTKEY << CM3_AIRCR_VECTKEY_SHIFT) |
+			  (scb->aircr &
+			  (CM3_AIRCR_PRIGROUP_MSK << CM3_AIRCR_PRIGROUP_SHIFT)) |
+			  CM3_AIRCR_SYSRESET;
 }
 
 /*
@@ -60,5 +61,6 @@ void __attribute__((section(".ramcode")))
  */
 unsigned char cortex_m3_irq_vec_get(void)
 {
-	return A2F_SCB->icsr & 0xFF;
+	volatile struct cm3_scb *scb = (volatile struct cm3_scb *)CM3_SCB_BASE;
+	return scb->icsr & CM3_ICSR_VECTACT_MSK;
 }

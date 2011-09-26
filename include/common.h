@@ -110,8 +110,14 @@ typedef volatile unsigned char	vu_char;
 #ifdef CONFIG_SOC_DA8XX
 #include <asm/arch/hardware.h>
 #endif
+#ifdef CONFIG_SYS_ARMCORTEXM3
+#include <asm/arch-cortexm3/hardware.h>
+#endif
 #ifdef CONFIG_SYS_A2F
 #include <asm/arch-a2f/a2f.h>
+#endif
+#ifdef CONFIG_SYS_STM32F2
+#include <asm/arch-stm32f2/stm32f2.h>
 #endif
 
 #include <part.h>
