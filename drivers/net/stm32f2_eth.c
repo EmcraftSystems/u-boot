@@ -356,7 +356,7 @@ struct stm_mac_gpio {
  * ETH_MII_RXD3 ---------------------> PH7
  * ETH_MII_RX_ER --------------------> PI10
  */
-static struct stm_mac_gpio mac_gpio[] = {
+static struct stm32f2_gpio_dsc mac_gpio[] = {
 	{0,  1}, {0,  2}, {0,  7},
 	{1,  5}, {1,  8},
 	{2,  1}, {2,  2}, {2,  3}, {2,  4}, {2,  5},
@@ -775,14 +775,15 @@ static void stm_mac_address_set(struct stm_eth_dev *mac)
 /*
  * Init GPIOs used by MAC
  */
-static void stm_mac_gpio_init(struct stm_eth_dev *mac)
+static int stm_mac_gpio_init(struct stm_eth_dev *mac)
 {
+	static struct stm32f2_gpio_dsc		mco_gpio = {0, 8};
 	static int				gpio_inited;
 
 	volatile struct stm32f2_rcc_regs	*rcc_regs;
 	volatile struct stm32f2_syscfg_regs	*syscfg_regs;
 	u32					val;
-	int					i;
+	int					i, rv;
 
 	/*
 	 * Init GPIOs only once at start. Otherwise, reiniting then on
@@ -792,8 +793,10 @@ static void stm_mac_gpio_init(struct stm_eth_dev *mac)
 	 * on wires. Probably, some synchronization with PHY is lost if
 	 * we do this GPIO re-initialization.
 	 */
-	if (gpio_inited)
+	if (gpio_inited) {
+		rv = 0;
 		goto out;
+	}
 
 	/*
 	 * Get reg bases, enable SYSCFG clock
@@ -806,7 +809,9 @@ static void stm_mac_gpio_init(struct stm_eth_dev *mac)
 	/*
 	 * Configure MC0: PA8
 	 */
-	stm32f2_gpio_config(0, 8, STM32F2_GPIO_ROLE_MCO);
+	rv = stm32f2_gpio_config(&mco_gpio, STM32F2_GPIO_ROLE_MCO);
+	if (rv != 0)
+		goto out;
 
 	/*
 	 * Output HSE clock (25MHz) on MCO pin (PA8) to clock the PHY
@@ -833,13 +838,16 @@ static void stm_mac_gpio_init(struct stm_eth_dev *mac)
 	 * Set GPIOs Alternative function
 	 */
 	for (i = 0; i < sizeof(mac_gpio)/sizeof(mac_gpio[0]); i++) {
-		stm32f2_gpio_config(mac_gpio[i].port, mac_gpio[i].pin,
-				    STM32F2_GPIO_ROLE_ETHERNET);
+		rv = stm32f2_gpio_config(&mac_gpio[i],
+					 STM32F2_GPIO_ROLE_ETHERNET);
+		if (rv != 0)
+			goto out;
 	}
 
 	gpio_inited = 1;
+	rv = 0;
 out:
-	return;
+	return rv;
 }
 
 /*
@@ -854,7 +862,9 @@ static int stm_mac_hw_init(struct stm_eth_dev *mac)
 	/*
 	 * Init GPIOs
 	 */
-	stm_mac_gpio_init(mac);
+	rv = stm_mac_gpio_init(mac);
+	if (rv != 0)
+		goto out;
 
 	/*
 	 * Enable Ethernet clocks

@@ -92,6 +92,11 @@
 #define STM32F2_GPIO_AF_MAC	0x0B
 
 /*
+ * AF12 selection
+ */
+#define STM32F2_GPIO_AF_FSMC	0x0C
+
+/*
  * GPIO register map
  */
 struct stm32f2_gpio_regs {
@@ -123,13 +128,14 @@ static const u32 af_val[] = {
 	STM32F2_GPIO_AF_USART1, STM32F2_GPIO_AF_USART2, STM32F2_GPIO_AF_USART3,
 	STM32F2_GPIO_AF_USART4, STM32F2_GPIO_AF_USART5, STM32F2_GPIO_AF_USART6,
 	STM32F2_GPIO_AF_MAC,
-	0
+	0,
+	STM32F2_GPIO_AF_FSMC
 };
 
 /*
  * Configure the specified GPIO for the specified role
  */
-int stm32f2_gpio_config(unsigned int port, unsigned int pin,
+int stm32f2_gpio_config(struct stm32f2_gpio_dsc *dsc,
 			enum stm32f2_gpio_role role)
 {
 	volatile struct stm32f2_gpio_regs	*gpio_regs;
@@ -141,8 +147,10 @@ int stm32f2_gpio_config(unsigned int port, unsigned int pin,
 	/*
 	 * Check params
 	 */
-	if (port > 8 || pin > 15) {
-		printf("%s: incorrect params %d.%d.\n", __func__, port, pin);
+	if (!dsc || dsc->port > 8 || dsc->pin > 15) {
+		printf("%s: incorrect params %d.%d.\n", __func__,
+			dsc ? dsc->port : -1,
+			dsc ? dsc->pin  : -1);
 		rv = -EINVAL;
 		goto out;
 	}
@@ -163,6 +171,7 @@ int stm32f2_gpio_config(unsigned int port, unsigned int pin,
 		break;
 	case STM32F2_GPIO_ROLE_ETHERNET:
 	case STM32F2_GPIO_ROLE_MCO:
+	case STM32F2_GPIO_ROLE_FSMC:
 		otype  = STM32F2_GPIO_OTYPE_PP;
 		ospeed = STM32F2_GPIO_SPEED_100M;
 		pupd   = STM32F2_GPIO_PUPD_NO;
@@ -177,23 +186,23 @@ int stm32f2_gpio_config(unsigned int port, unsigned int pin,
 	 * Get reg base
 	 */
 	rcc_regs  = (struct stm32f2_rcc_regs *)STM32F2_RCC_BASE;
-	gpio_regs = (struct stm32f2_gpio_regs *)io_base[port];
+	gpio_regs = (struct stm32f2_gpio_regs *)io_base[dsc->port];
 
 	/*
 	 * Enable GPIO clocks
 	 */
-	rcc_regs->ahb1enr |= 1 << port;
+	rcc_regs->ahb1enr |= 1 << dsc->port;
 
 	if (role != STM32F2_GPIO_ROLE_MCO) {
 		/*
 		 * Connect PXy to the specified controller (role)
 		 */
-		i = (pin & 0x07) * 4;
-		gpio_regs->afr[pin >> 3] &= ~(0xF << i);
-		gpio_regs->afr[pin >> 3] |= af_val[role] << i;
+		i = (dsc->pin & 0x07) * 4;
+		gpio_regs->afr[dsc->pin >> 3] &= ~(0xF << i);
+		gpio_regs->afr[dsc->pin >> 3] |= af_val[role] << i;
 	}
 
-	i = pin * 2;
+	i = dsc->pin * 2;
 
 	/*
 	 * Set Alternative function mode
