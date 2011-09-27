@@ -53,8 +53,6 @@ void reset_timer(void)
 	/*
 	 * TBD
 	 */
-
-	return 0;
 }
 
 /*
@@ -65,8 +63,6 @@ void __udelay(unsigned long usec)
 	/*
 	 * TBD
 	 */
-
-	return 0;
 }
 
 /*

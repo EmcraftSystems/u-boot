@@ -22,6 +22,7 @@
 #include <common.h>
 
 #include "clock.h"
+#include "envm.h"
 
 /*
  * STM32F2 Clock configuration is set by the number of CONFIG options.
@@ -199,58 +200,14 @@
 #define STM32F2_RCC_PLLCFGR_PLLQ_MSK	0xF
 
 /*
- * Flash registers base
- */
-#define STM32F2_FLASH_BASE		(STM32F2_AHB1PERITH_BASE + 0x3C00)
-
-/*
- * Flash ACR definitions
- */
-#define STM32F2_FLASH_ACR_LAT_BIT	0	/* Latency		     */
-#define STM32F2_FLASH_ACR_LAT_MSK	0x3
-
-#define STM32F2_FLASH_ACR_PRFTEN	(1 << 8)  /* Prefetch enable	     */
-#define STM32F2_FLASH_ACR_ICEN		(1 << 9)  /* Instruction cache enable*/
-
-/*
  * Timeouts (in cycles)
  */
 #define STM32F2_HSE_STARTUP_TIMEOUT	0x0500
 
 /*
- * Flash register map
- */
-struct stm32f2_flash_regs {
-	u32	acr;				/* Access control	      */
-	u32	keyr;				/* Key			      */
-	u32	optkeyr;			/* Option key		      */
-	u32	sr;				/* Status		      */
-	u32	cr;				/* Control		      */
-	u32	optcr;				/* Option control	      */
-};
-
-/*
  * Clock values
  */
 static u32 clock_val[CLOCK_END];
-
-/*
- * Enable instruction cache, prefetch and set the Flash wait latency
- * according to the clock configuration used (HCLK value).
- * We _must_ do this before changing System clock source (or will crash on
- * fetching instructions of while() wait cycle).
- * In case of HSI clock - no Sys clock change happens, but, for consistency,
- * we configure Flash this way as well.
- */
-static void flash_setup(void)
-{
-	volatile struct stm32f2_flash_regs	*flash_regs;
-
-	flash_regs = (struct stm32f2_flash_regs *)STM32F2_FLASH_BASE;
-	flash_regs->acr = STM32F2_FLASH_ACR_PRFTEN |
-			  STM32F2_FLASH_ACR_ICEN |
-			  (STM32F2_FLASH_WS << STM32F2_FLASH_ACR_LAT_BIT);
-}
 
 #if !defined(CONFIG_STM32F2_SYS_CLK_HSI)
 /*
@@ -350,7 +307,7 @@ static void clock_setup(void)
 	 * Configure Flash prefetch, Instruction cache, and wait
 	 * latency.
 	 */
-	flash_setup();
+	envm_config(STM32F2_FLASH_WS);
 
 	/*
 	 * Change system clock source, and wait (infinite!) till it done
@@ -387,7 +344,7 @@ void clock_init(void)
 	/*
 	 * For consistency with !HSI configs, enable prefetch and cache
 	 */
-	flash_setup();
+	envm_config(STM32F2_FLASH_WS);
 #endif
 
 	/*
