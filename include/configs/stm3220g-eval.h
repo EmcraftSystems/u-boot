@@ -111,10 +111,11 @@
 #define CONFIG_SYS_MALLOC_LEN		CONFIG_MEM_MALLOC_LEN
 
 /*
- * Configuration of the external memory
+ * Configuration of the external memory:
+ * 2MB SRAM connected to CS2 of Bank1 (NOR/PSRAM)
  */
 #define CONFIG_NR_DRAM_BANKS		1
-#define CONFIG_SYS_RAM_BASE		0x60000000
+#define CONFIG_SYS_RAM_BASE		0x64000000
 #define CONFIG_SYS_RAM_SIZE		(2 * 1024 * 1024)
 
 /*
@@ -231,8 +232,7 @@
  * Short-cuts to some useful commands (macros)
  */
 #define CONFIG_EXTRA_ENV_SETTINGS				\
-	/* FIXME: load to external RAM */			\
-	"loadaddr=0x20008000\0"					\
+	"loadaddr=0x64000000\0"					\
 	"addip=setenv bootargs ${bootargs} ip=${ipaddr}:${serverip}:${gatewayip}:${netmask}:${hostname}:eth0:off\0"				\
 	"ethaddr=C0:B1:3C:88:88:88\0"				\
 	"ipaddr=172.17.4.206\0"					\
