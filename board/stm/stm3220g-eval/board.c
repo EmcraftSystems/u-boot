@@ -34,52 +34,6 @@
  */
 #define STM32F2_RCC_ENR_FSMC		(1 << 0)	/* FSMC module clock  */
 
-/*
- * STM32F2 FSMC (Flexible static memory controller) definitions
- */
-#define STM32F2_FSMC_BASE		0xA0000000
-
-/*
- * BCR reg fields
- */
-#define STM32F2_FSMC_BCR_MBKEN		(1 << 0)	/* Memory bank enble  */
-#define STM32F2_FSMC_BCR_MTYP_BIT	2		/* Memory type	      */
-#define STM32F2_FSMC_BCR_MTYP_SRAM_ROM	0x0		/* SRAM, ROM	      */
-#define STM32F2_FSMC_BCR_MWID_BIT	4		/* Databus width      */
-#define STM32F2_FSMC_BCR_MWID_16	0x1		/* 16 bits	      */
-#define STM32F2_FSMC_BCR_WREN		(1 << 12)	/* Write enable	      */
-
-/*
- * BTR reg fields
- */
-#define STM32F2_FSMC_BTR_DATAST_BIT	8		/* Data-phase time    */
-#define STM32F2_FSMC_BTR_BUSTURN_BIT	16		/* BusTurnaround time */
-
-/*
- * BWTR regs fields
- */
-#define STM32F2_FSMC_BWTR_ADDSET_BIT	0		/* Address setup time */
-#define STM32F2_FSMC_BWTR_ADDHLD_BIT	4		/* Address-hold time  */
-#define STM32F2_FSMC_BWTR_DATAST_BIT	8		/* Data-phase time    */
-#define STM32F2_FSMC_BWTR_BUSTURN_BIT	16		/* BusTurnaround time */
-#define STM32F2_FSMC_BWTR_CLKDIV_BIT	20		/* Clock divide ratio */
-#define STM32F2_FSMC_BWTR_DATLAN_BIT	24		/* Data latency	      */
-
-/*
- * STM32F2 FSMC NOR/PSRAM controller register map
- */
-struct stm32f2_fsmc_regs {
-	struct {
-		u32	bcr;		/* Chip-select control		      */
-		u32	btr;		/* Chip-select timing		      */
-	} cs[4];
-	u32	rsv0[57];
-	struct {
-		u32	wtr;		/* Write timing			      */
-		u32	rsv1;
-	} wt[4];
-};
-
 DECLARE_GLOBAL_DATA_PTR;
 
 /*
