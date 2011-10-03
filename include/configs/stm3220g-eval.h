@@ -128,6 +128,7 @@
  */
 #define CONFIG_ENV_IS_NOWHERE
 #define CONFIG_ENV_SIZE			(4 * 1024)
+#define CONFIG_ENV_OVERWRITE		1
 
 /*
  * Serial console configuration
