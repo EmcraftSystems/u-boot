@@ -225,8 +225,8 @@
 #define CONFIG_BOOTDELAY		3
 #define CONFIG_ZERO_BOOTDELAY_CHECK
 #define CONFIG_HOSTNAME			stm3220g-eval
-#define CONFIG_BOOTARGS			"stm32f2_platform=stm3220g-eval "\
-					"console=ttyS0,115200 panic=10"
+#define CONFIG_BOOTARGS			"stm32_platform=stm3220g-eval "\
+					"console=ttyS2,115200 panic=10"
 #define CONFIG_BOOTCOMMAND		"run netboot"
 
 /*
@@ -238,7 +238,7 @@
 	"ethaddr=C0:B1:3C:88:88:88\0"				\
 	"ipaddr=172.17.4.206\0"					\
 	"serverip=172.17.0.1\0"					\
-	"image=stm32f2/uImage\0"				\
+	"image=stm32/uImage\0"					\
 	"netboot=tftp ${image};run addip;bootm\0"
 
 /*
