@@ -19,7 +19,7 @@
 #include <common.h>
 
 /* system core clock /32 */
-#define CONFIG_SYSTICK_FREQ	3125000
+#define SYSTICK_FREQ	(clock_get(CLOCK_FCLK)/32)
 
 /* Internal tick units */
 static unsigned long long timestamp;	/* Monotonic incrementing timer */
@@ -50,7 +50,7 @@ int timer_init()
 
 	systick->load = CM3_SYSTICK_LOAD_RELOAD_MSK - 1;
 	systick->val = 0;
-	/* we don't want ints to be enabled */
+	/* Use external clock, no ints */
 	systick->ctrl = CM3_SYSTICK_CTRL_EN;
 	timestamp = 0;
 
@@ -70,7 +70,7 @@ ulong get_timer(ulong base)
 
 	lastdec = now;
 
-	return timestamp / (CONFIG_SYSTICK_FREQ / 1000) - base;
+	return timestamp / (SYSTICK_FREQ / 1000) - base;
 }
 
 void reset_timer(void)
@@ -89,7 +89,7 @@ void __udelay(ulong usec)
 		(volatile struct cm3_systick *)(CM3_SYSTICK_BASE);
 
 
-	clc = usec * (CONFIG_SYSTICK_FREQ / 1000000);
+	clc = usec * (SYSTICK_FREQ / 1000000);
 
 	/* get current timestamp */
 	tmp = systick->val;
@@ -110,5 +110,5 @@ void __udelay(ulong usec)
  */
 ulong get_tbclk(void)
 {
-	return CONFIG_SYSTICK_FREQ;
+	return SYSTICK_FREQ;
 }
