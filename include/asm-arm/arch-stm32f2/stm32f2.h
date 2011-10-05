@@ -120,8 +120,6 @@ struct stm32f2_fsmc_regs {
  * BCR reg fields
  */
 #define STM32F2_FSMC_BCR_MBKEN		(1 << 0)	/* Memory bank enble  */
-#define STM32F2_FSMC_BCR_MTYP_BIT	2		/* Memory type	      */
-#define STM32F2_FSMC_BCR_MTYP_SRAM_ROM	0x0		/* SRAM, ROM	      */
 #define STM32F2_FSMC_BCR_MWID_BIT	4		/* Databus width      */
 #define STM32F2_FSMC_BCR_MWID_16	0x1		/* 16 bits	      */
 #define STM32F2_FSMC_BCR_WREN		(1 << 12)	/* Write enable	      */

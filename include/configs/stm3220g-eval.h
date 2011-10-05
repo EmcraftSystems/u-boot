@@ -115,8 +115,14 @@
  * 2MB SRAM connected to CS2 of Bank1 (NOR/PSRAM)
  */
 #define CONFIG_NR_DRAM_BANKS		1
-#define CONFIG_SYS_RAM_BASE		0x64000000
 #define CONFIG_SYS_RAM_SIZE		(2 * 1024 * 1024)
+#define CONFIG_SYS_RAM_CS		2
+#define CONFIG_SYS_FSMC_BCR		0x00001011
+#define CONFIG_SYS_FSMC_BTR		0x00010200
+#undef CONFIG_SYS_FSMC_BWR
+
+#define CONFIG_SYS_RAM_BASE		(0x60000000 + \
+					 ((CONFIG_SYS_RAM_CS - 1) * 0x4000000))
 
 /*
  * Have no external Flash memory
