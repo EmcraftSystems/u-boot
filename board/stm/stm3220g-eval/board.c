@@ -29,6 +29,36 @@
 #include <asm/arch/stm32f2.h>
 #include <asm/arch/stm32f2_gpio.h>
 
+#if (CONFIG_NR_DRAM_BANKS > 0)
+/*
+ * Warn if DRAM configuration isn't set, and use the following defaults:
+ *
+ * IS61WV102416BLL at Bank1 SRAM 2:
+ * - 16 bit data bus, SRAM, Mode 1, Enabled.
+ * - CLK period is HCLK (8.4s);
+ * - ADDSET  = 0 x CLK;
+ * - DATASET = 2 x CLK (16.8ns);
+ * - BUSTURN = 1 x CLK (8.4ns).
+ * - these timings used both for read & write accesses (not-extended
+ *   mode - WTR register isn't used).
+ */
+# if (!!defined(CONFIG_SYS_RAM_CS) + !!defined(CONFIG_SYS_FSMC_BCR) +	       \
+      !!defined(CONFIG_SYS_FSMC_BTR) != 3)
+#  warning "Incorrect FSMC configuration. Using defaults."
+#  undef CONFIG_SYS_RAM_CS
+#  undef CONFIG_SYS_FSMC_BCR
+#  undef CONFIG_SYS_FSMC_BTR
+#  undef CONFIG_SYS_FSMC_BWR
+#  define CONFIG_SYS_RAM_CS	2
+#  define CONFIG_SYS_FSMC_BCR	(STM32F2_FSMC_BCR_WREN |		       \
+				 (STM32F2_FSMC_BCR_MWID_16 <<		       \
+				  STM32F2_FSMC_BCR_MWID_BIT) |		       \
+				 STM32F2_FSMC_BCR_MBKEN)
+#  define CONFIG_SYS_FSMC_BTR	(1 << STM32F2_FSMC_BTR_BUSTURN_BIT) |	       \
+				(2 << STM32F2_FSMC_BTR_DATAST_BIT)
+# endif
+#endif /* CONFIG_NR_DRAM_BANKS */
+
 /*
  * STM32F2 RCC FSMC specific definitions
  */
@@ -129,35 +159,22 @@ int dram_init(void)
 	rcc_regs->ahb3enr |= STM32F2_RCC_ENR_FSMC;
 
 	/*
-	 * Configure and enable Bank1 SRAM 2:
-	 * - 16 bit data bus, SRAM, Mode 1, Enabled.
-	 *
-	 * The timings assume a IS61WV102416BLL high-speed asynchronous
-	 * CMOS static RAM with 10ns access times, and maximum (120M) HCLK.
-	 * Configure FSMC to acceptable minimals:
-	 * - CLK period is HCLK (8.4s);
-	 * - ADDSET  = 0 x CLK;
-	 * - DATASET = 2 x CLK (16.8ns);
-	 * - BUSTURN = 1 x CLK (8.4ns).
-	 *
-	 * These timings used both for read & write accesses (not-extended
-	 * mode - WTR register isn't used).
+	 * Configure FSMC
 	 */
 	fsmc_regs = (struct stm32f2_fsmc_regs *)STM32F2_FSMC_BASE;
+	i = CONFIG_SYS_RAM_CS - 1;
 
 	/*
 	 * Fake BCR read; if don't do this, then BCR remains configured
 	 * with defaults.
 	 */
-	rv = fsmc_regs->cs[1].bcr;
-	fsmc_regs->cs[1].bcr = STM32F2_FSMC_BCR_WREN |
-			       (STM32F2_FSMC_BCR_MWID_16 <<
-				STM32F2_FSMC_BCR_MWID_BIT) |
-			       (STM32F2_FSMC_BCR_MTYP_SRAM_ROM <<
-				STM32F2_FSMC_BCR_MTYP_BIT) |
-			       STM32F2_FSMC_BCR_MBKEN;
-	fsmc_regs->cs[1].btr = (1 << STM32F2_FSMC_BTR_BUSTURN_BIT) |
-			       (2 << STM32F2_FSMC_BTR_DATAST_BIT);
+	rv = fsmc_regs->cs[i].bcr;
+
+	fsmc_regs->cs[i].bcr = CONFIG_SYS_FSMC_BCR;
+	fsmc_regs->cs[i].btr = CONFIG_SYS_FSMC_BTR;
+#if defined(CONFIG_SYS_FSMC_BWR)
+	fsmc_regs->wt[i].wtr = CONFIG_SYS_FSMC_BWR;
+#endif
 
 	/*
 	 * Fill in global info with description of SRAM configuration
