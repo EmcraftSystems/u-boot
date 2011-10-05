@@ -129,11 +129,19 @@ int dram_init(void)
 	rcc_regs->ahb3enr |= STM32F2_RCC_ENR_FSMC;
 
 	/*
-	 * Configure and enable Bank1 SRAM:
-	 * - 16 bit data bus;
-	 * - SRAM;
-	 * - Enabled;
-	 * - Maximum timings.
+	 * Configure and enable Bank1 SRAM 2:
+	 * - 16 bit data bus, SRAM, Mode 1, Enabled.
+	 *
+	 * The timings assume a IS61WV102416BLL high-speed asynchronous
+	 * CMOS static RAM with 10ns access times, and maximum (120M) HCLK.
+	 * Configure FSMC to acceptable minimals:
+	 * - CLK period is HCLK (8.4s);
+	 * - ADDSET  = 0 x CLK;
+	 * - DATASET = 2 x CLK (16.8ns);
+	 * - BUSTURN = 1 x CLK (8.4ns).
+	 *
+	 * These timings used both for read & write accesses (not-extended
+	 * mode - WTR register isn't used).
 	 */
 	fsmc_regs = (struct stm32f2_fsmc_regs *)STM32F2_FSMC_BASE;
 
@@ -149,13 +157,7 @@ int dram_init(void)
 				STM32F2_FSMC_BCR_MTYP_BIT) |
 			       STM32F2_FSMC_BCR_MBKEN;
 	fsmc_regs->cs[1].btr = (1 << STM32F2_FSMC_BTR_BUSTURN_BIT) |
-			       (4 << STM32F2_FSMC_BTR_DATAST_BIT);
-	fsmc_regs->wt[1].wtr = (0x0F << STM32F2_FSMC_BWTR_DATLAN_BIT) |
-			       (0x0F << STM32F2_FSMC_BWTR_CLKDIV_BIT) |
-			       (0x0F << STM32F2_FSMC_BWTR_BUSTURN_BIT) |
-			       (0xFF << STM32F2_FSMC_BWTR_DATAST_BIT) |
-			       (0x0F << STM32F2_FSMC_BWTR_ADDHLD_BIT) |
-			       (0x0F << STM32F2_FSMC_BWTR_ADDSET_BIT);
+			       (2 << STM32F2_FSMC_BTR_DATAST_BIT);
 
 	/*
 	 * Fill in global info with description of SRAM configuration

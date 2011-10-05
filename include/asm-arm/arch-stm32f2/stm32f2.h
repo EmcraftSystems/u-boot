@@ -132,16 +132,6 @@ struct stm32f2_fsmc_regs {
 #define STM32F2_FSMC_BTR_DATAST_BIT	8		/* Data-phase time    */
 #define STM32F2_FSMC_BTR_BUSTURN_BIT	16		/* BusTurnaround time */
 
-/*
- * BWTR regs fields
- */
-#define STM32F2_FSMC_BWTR_ADDSET_BIT	0		/* Address setup time */
-#define STM32F2_FSMC_BWTR_ADDHLD_BIT	4		/* Address-hold time  */
-#define STM32F2_FSMC_BWTR_DATAST_BIT	8		/* Data-phase time    */
-#define STM32F2_FSMC_BWTR_BUSTURN_BIT	16		/* BusTurnaround time */
-#define STM32F2_FSMC_BWTR_CLKDIV_BIT	20		/* Clock divide ratio */
-#define STM32F2_FSMC_BWTR_DATLAN_BIT	24		/* Data latency	      */
-
 /******************************************************************************
  * FIXME: get rid of this
  ******************************************************************************/
