@@ -89,3 +89,32 @@ void hw_watchdog_reset(void)
 	wdt_strobe();
 }
 #endif
+
+/*
+ * Perform the low-level reset.
+ * Note that we need for this function to reside in RAM since it
+ * can be used to self-upgrade U-boot in eNMV.
+ */
+void __attribute__((section(".ramcode")))
+		__attribute__ ((long_call))
+		cortex_m3_reset_cpu(ulong addr)
+{
+	volatile struct cm3_scb *scb = (volatile struct cm3_scb *)CM3_SCB_BASE;
+	/*
+	 * Perform reset but keep priority group unchanged.
+	 */
+	scb->aircr  = (CM3_AIRCR_VECTKEY << CM3_AIRCR_VECTKEY_SHIFT) |
+			  (scb->aircr &
+			  (CM3_AIRCR_PRIGROUP_MSK << CM3_AIRCR_PRIGROUP_SHIFT)) |
+			  CM3_AIRCR_SYSRESET;
+
+}
+
+/*
+ * Dump the registers on an exception we don't know how to process.
+ */
+unsigned char cortex_m3_irq_vec_get(void)
+{
+	volatile struct cm3_scb *scb = (volatile struct cm3_scb *)CM3_SCB_BASE;
+	return scb->icsr & CM3_ICSR_VECTACT_MSK;
+}

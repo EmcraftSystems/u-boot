@@ -52,21 +52,5 @@ void __attribute__((section(".ramcode")))
 		__attribute__ ((long_call))
 		reset_cpu(ulong addr)
 {
-	/*
-	 * TBD
-	 */
-
-	return;
-}
-
-/*
- * Dump the registers on an exception we don't know how to process.
- */
-unsigned char cortex_m3_irq_vec_get(void)
-{
-	/*
-	 * TBD
-	 */
-
-	return 0;
+	cortex_m3_reset_cpu(addr);
 }

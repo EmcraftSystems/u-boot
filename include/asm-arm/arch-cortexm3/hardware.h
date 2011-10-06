@@ -59,4 +59,8 @@ struct cm3_systick {
 #define CM3_SYSTICK_LOAD_RELOAD_MSK	(0x00FFFFFF)
 #define CM3_SYSTICK_CTRL_EN		1
 
+void __attribute__((section(".ramcode"))) __attribute__ ((long_call))
+cortex_m3_reset_cpu(ulong addr);
+unsigned char cortex_m3_irq_vec_get(void);
+
 #endif
