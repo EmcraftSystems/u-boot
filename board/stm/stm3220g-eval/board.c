@@ -42,8 +42,8 @@
  * - these timings used both for read & write accesses (not-extended
  *   mode - WTR register isn't used).
  */
-# if (!!defined(CONFIG_SYS_RAM_CS) + !!defined(CONFIG_SYS_FSMC_BCR) +	       \
-      !!defined(CONFIG_SYS_FSMC_BTR) != 3)
+# if !defined(CONFIG_SYS_RAM_CS) || !defined(CONFIG_SYS_FSMC_BCR) ||	       \
+     !defined(CONFIG_SYS_FSMC_BTR)
 #  warning "Incorrect FSMC configuration. Using defaults."
 #  undef CONFIG_SYS_RAM_CS
 #  undef CONFIG_SYS_FSMC_BCR
@@ -56,7 +56,7 @@
 				 STM32F2_FSMC_BCR_MBKEN)
 #  define CONFIG_SYS_FSMC_BTR	(1 << STM32F2_FSMC_BTR_BUSTURN_BIT) |	       \
 				(2 << STM32F2_FSMC_BTR_DATAST_BIT)
-# endif
+# endif /* !CONFIG_SYS_RAM_CS || !CONFIG_SYS_FSMC_BCR || !CONFIG_SYS_FSMC_BTR */
 #endif /* CONFIG_NR_DRAM_BANKS */
 
 /*
