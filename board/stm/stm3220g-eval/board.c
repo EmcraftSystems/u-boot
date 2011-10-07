@@ -50,19 +50,19 @@
 #  undef CONFIG_SYS_FSMC_BTR
 #  undef CONFIG_SYS_FSMC_BWR
 #  define CONFIG_SYS_RAM_CS	2
-#  define CONFIG_SYS_FSMC_BCR	(STM32F2_FSMC_BCR_WREN |		       \
-				 (STM32F2_FSMC_BCR_MWID_16 <<		       \
-				  STM32F2_FSMC_BCR_MWID_BIT) |		       \
-				 STM32F2_FSMC_BCR_MBKEN)
-#  define CONFIG_SYS_FSMC_BTR	(1 << STM32F2_FSMC_BTR_BUSTURN_BIT) |	       \
-				(2 << STM32F2_FSMC_BTR_DATAST_BIT)
+#  define CONFIG_SYS_FSMC_BCR	(STM32_FSMC_BCR_WREN |			       \
+				 (STM32_FSMC_BCR_MWID_16 <<		       \
+				  STM32_FSMC_BCR_MWID_BIT) |		       \
+				 STM32_FSMC_BCR_MBKEN)
+#  define CONFIG_SYS_FSMC_BTR	(1 << STM32_FSMC_BTR_BUSTURN_BIT) |	       \
+				(2 << STM32_FSMC_BTR_DATAST_BIT)
 # endif /* !CONFIG_SYS_RAM_CS || !CONFIG_SYS_FSMC_BCR || !CONFIG_SYS_FSMC_BTR */
 #endif /* CONFIG_NR_DRAM_BANKS */
 
 /*
- * STM32F2 RCC FSMC specific definitions
+ * STM32 RCC FSMC specific definitions
  */
-#define STM32F2_RCC_ENR_FSMC		(1 << 0)	/* FSMC module clock  */
+#define STM32_RCC_ENR_FSMC		(1 << 0)	/* FSMC module clock  */
 
 DECLARE_GLOBAL_DATA_PTR;
 
@@ -138,9 +138,9 @@ int dram_init(void)
 	int					rv = 0;
 
 #if (CONFIG_NR_DRAM_BANKS > 0)
-	volatile struct stm32f2_fsmc_regs	*fsmc_regs;
-	volatile struct stm32f2_rcc_regs	*rcc_regs;
-	int					i;
+	volatile struct stm32_fsmc_regs	*fsmc_regs;
+	volatile struct stm32_rcc_regs	*rcc_regs;
+	int				i;
 
 	/*
 	 * Connect GPIOs to FSMC controller
@@ -155,13 +155,13 @@ int dram_init(void)
 	/*
 	 * Enable FSMC interface clock
 	 */
-	rcc_regs = (struct stm32f2_rcc_regs *)STM32F2_RCC_BASE;
-	rcc_regs->ahb3enr |= STM32F2_RCC_ENR_FSMC;
+	rcc_regs = (struct stm32_rcc_regs *)STM32_RCC_BASE;
+	rcc_regs->ahb3enr |= STM32_RCC_ENR_FSMC;
 
 	/*
 	 * Configure FSMC
 	 */
-	fsmc_regs = (struct stm32f2_fsmc_regs *)STM32F2_FSMC_BASE;
+	fsmc_regs = (struct stm32_fsmc_regs *)STM32_FSMC_BASE;
 	i = CONFIG_SYS_RAM_CS - 1;
 
 	/*
@@ -188,13 +188,13 @@ out:
 	return rv;
 }
 
-#ifdef CONFIG_STM32F2_ETH
+#ifdef CONFIG_STM32_ETH
 /*
  * Register ethernet driver
  */
 int board_eth_init(bd_t *bis)
 {
-	return stm32f2_eth_init(bis);
+	return stm32_eth_init(bis);
 }
 #endif
 

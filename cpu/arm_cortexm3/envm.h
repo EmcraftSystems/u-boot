@@ -35,12 +35,12 @@ unsigned int
 	__attribute__ ((long_call))
 	envm_write(unsigned int offset, void * buf, unsigned int size);
 
-#if defined(CONFIG_SYS_STM32F2)
+#if defined(CONFIG_SYS_STM32)
 /*
  * Enable instruction cache, prefetch and set the Flash wait latency
  * according to the clock configuration used (HCLK value).
  */
 void envm_config(u32 wait_states);
-#endif /* CONFIG_SYS_STM32F2 */
+#endif /* CONFIG_SYS_STM32 */
 
 #endif /* __ENVM_H__ */

@@ -20,20 +20,20 @@
  */
 
 /*
- * STM32F2 processor definitions
+ * STM32 processor definitions
  */
-#ifndef _MACH_STM32F2_H_
-#define _MACH_STM32F2_H_
+#ifndef _MACH_STM32_H_
+#define _MACH_STM32_H_
 
 /******************************************************************************
  * Peripheral memory map
  ******************************************************************************/
 
-#define STM32F2_PERIPH_BASE	0x40000000
-#define STM32F2_APB1PERITH_BASE	(STM32F2_PERIPH_BASE + 0x00000000)
-#define STM32F2_APB2PERITH_BASE	(STM32F2_PERIPH_BASE + 0x00010000)
-#define STM32F2_AHB1PERITH_BASE	(STM32F2_PERIPH_BASE + 0x00020000)
-#define STM32F2_AHB2PERITH_BASE	(STM32F2_PERIPH_BASE + 0x10000000)
+#define STM32_PERIPH_BASE	0x40000000
+#define STM32_APB1PERITH_BASE	(STM32_PERIPH_BASE + 0x00000000)
+#define STM32_APB2PERITH_BASE	(STM32_PERIPH_BASE + 0x00010000)
+#define STM32_AHB1PERITH_BASE	(STM32_PERIPH_BASE + 0x00020000)
+#define STM32_AHB2PERITH_BASE	(STM32_PERIPH_BASE + 0x10000000)
 
 /******************************************************************************
  * Reset and Clock Control
@@ -42,7 +42,7 @@
 /*
  * RCC register map
  */
-struct stm32f2_rcc_regs {
+struct stm32_rcc_regs {
 	u32	cr;		/* RCC clock control			      */
 	u32	pllcfgr;	/* RCC PLL configuration		      */
 	u32	cfgr;		/* RCC clock configuration		      */
@@ -90,8 +90,8 @@ enum clock {
 /*
  * RCC registers base
  */
-#define STM32F2_RCC_BASE		(STM32F2_AHB1PERITH_BASE + 0x3800)
-#define STM32F2_RCC	((volatile struct stm32f2_rcc_regs *)STM32F2_RCC_BASE)
+#define STM32_RCC_BASE		(STM32_AHB1PERITH_BASE + 0x3800)
+#define STM32_RCC	((volatile struct stm32_rcc_regs *)STM32_RCC_BASE)
 
 /******************************************************************************
  * Flexible static memory controller
@@ -100,7 +100,7 @@ enum clock {
 /*
  * FSMC NOR/PSRAM controller register map
  */
-struct stm32f2_fsmc_regs {
+struct stm32_fsmc_regs {
 	struct {
 		u32	bcr;		/* Chip-select control		      */
 		u32	btr;		/* Chip-select timing		      */
@@ -115,21 +115,21 @@ struct stm32f2_fsmc_regs {
 /*
  * FSMC registers base
  */
-#define STM32F2_FSMC_BASE		0xA0000000
+#define STM32_FSMC_BASE			0xA0000000
 
 /*
  * BCR reg fields
  */
-#define STM32F2_FSMC_BCR_MBKEN		(1 << 0)	/* Memory bank enble  */
-#define STM32F2_FSMC_BCR_MWID_BIT	4		/* Databus width      */
-#define STM32F2_FSMC_BCR_MWID_16	0x1		/* 16 bits	      */
-#define STM32F2_FSMC_BCR_WREN		(1 << 12)	/* Write enable	      */
+#define STM32_FSMC_BCR_MBKEN		(1 << 0)	/* Memory bank enble  */
+#define STM32_FSMC_BCR_MWID_BIT		4		/* Databus width      */
+#define STM32_FSMC_BCR_MWID_16		0x1		/* 16 bits	      */
+#define STM32_FSMC_BCR_WREN		(1 << 12)	/* Write enable	      */
 
 /*
  * BTR reg fields
  */
-#define STM32F2_FSMC_BTR_DATAST_BIT	8		/* Data-phase time    */
-#define STM32F2_FSMC_BTR_BUSTURN_BIT	16		/* BusTurnaround time */
+#define STM32_FSMC_BTR_DATAST_BIT	8		/* Data-phase time    */
+#define STM32_FSMC_BTR_BUSTURN_BIT	16		/* BusTurnaround time */
 
 /******************************************************************************
  * FIXME: get rid of this
@@ -146,4 +146,4 @@ unsigned long  __attribute__((section(".ramcode")))
 	       __attribute__ ((long_call))
 	       clock_get(enum clock clck);
 
-#endif /* _MACH_STM32F2_H_ */
+#endif /* _MACH_STM32_H_ */

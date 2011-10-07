@@ -116,7 +116,7 @@ typedef volatile unsigned char	vu_char;
 #ifdef CONFIG_SYS_A2F
 #include <asm/arch-a2f/a2f.h>
 #endif
-#ifdef CONFIG_SYS_STM32F2
+#ifdef CONFIG_SYS_STM32
 #include <asm/arch-stm32/stm32.h>
 #endif
 
@@ -468,7 +468,7 @@ int	checkdcache   (void);
 void	upmconfig     (unsigned int, unsigned int *, unsigned int);
 ulong	get_tbclk     (void);
 void
-#if defined(CONFIG_SYS_A2F) || defined(CONFIG_SYS_STM32F2)
+#if defined(CONFIG_SYS_A2F) || defined(CONFIG_SYS_STM32)
 	__attribute__((section(".ramcode")))
 	__attribute__ ((long_call))
 #endif

@@ -39,7 +39,7 @@
 /*
  * This is the STM32-F2 device
  */
-#define CONFIG_SYS_STM32F2
+#define CONFIG_SYS_STM32
 
 /*
  * Enable GPIO driver
@@ -70,13 +70,13 @@
  * - use HSE as the PLL source;
  * - configure PLL to get 120MHz system clock.
  */
-#define CONFIG_STM32F2_SYS_CLK_PLL
-#define CONFIG_STM32F2_PLL_SRC_HSE
-#define CONFIG_STM32F2_HSE_HZ		25000000	/* 25 MHz */
-#define CONFIG_STM32F2_PLL_M		25
-#define CONFIG_STM32F2_PLL_N		240
-#define CONFIG_STM32F2_PLL_P		2
-#define CONFIG_STM32F2_PLL_Q		5
+#define CONFIG_STM32_SYS_CLK_PLL
+#define CONFIG_STM32_PLL_SRC_HSE
+#define CONFIG_STM32_HSE_HZ		25000000	/* 25 MHz */
+#define CONFIG_STM32_PLL_M		25
+#define CONFIG_STM32_PLL_N		240
+#define CONFIG_STM32_PLL_P		2
+#define CONFIG_STM32_PLL_Q		5
 
 /*
  * Number of clock ticks in 1 sec
@@ -119,7 +119,7 @@
 #define CONFIG_SYS_RAM_CS		2
 #define CONFIG_SYS_FSMC_BCR		0x00001011
 #define CONFIG_SYS_FSMC_BTR		0x00010200
-#undef CONFIG_SYS_FSMC_BWR
+#undef  CONFIG_SYS_FSMC_BWR
 
 #define CONFIG_SYS_RAM_BASE		(0x60000000 + \
 					 ((CONFIG_SYS_RAM_CS - 1) * 0x4000000))
@@ -139,12 +139,12 @@
 /*
  * Serial console configuration
  */
-#define CONFIG_STM32F2_USART_CONSOLE
-#define CONFIG_STM32F2_USART_PORT	3	/* USART3 */
-#define CONFIG_STM32F2_USART_TX_IO_PORT	2	/* PORTC */
-#define CONFIG_STM32F2_USART_RX_IO_PORT	2	/* PORTC */
-#define CONFIG_STM32F2_USART_TX_IO_PIN	10	/* GPIO10 */
-#define CONFIG_STM32F2_USART_RX_IO_PIN	11	/* GPIO11 */
+#define CONFIG_STM32_USART_CONSOLE
+#define CONFIG_STM32_USART_PORT		3	/* USART3 */
+#define CONFIG_STM32_USART_TX_IO_PORT	2	/* PORTC */
+#define CONFIG_STM32_USART_RX_IO_PORT	2	/* PORTC */
+#define CONFIG_STM32_USART_TX_IO_PIN	10	/* GPIO10 */
+#define CONFIG_STM32_USART_RX_IO_PIN	11	/* GPIO11 */
 
 #define CONFIG_BAUDRATE			115200
 #define CONFIG_SYS_BAUDRATE_TABLE	{ 9600, 19200, 38400, 57600, 115200 }
@@ -153,7 +153,7 @@
  * Ethernet configuration
  */
 #define CONFIG_NET_MULTI
-#define CONFIG_STM32F2_ETH
+#define CONFIG_STM32_ETH
 
 /*
  * Ethernet RX buffers are malloced from the internal SRAM (more precisely,

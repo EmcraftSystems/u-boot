@@ -27,7 +27,7 @@
 /*
  * Flash registers base
  */
-#define STM32F2_FLASH_BASE		(STM32F2_AHB1PERITH_BASE + 0x3C00)
+#define STM32F2_FLASH_BASE		(STM32_AHB1PERITH_BASE + 0x3C00)
 
 /*
  * Flash ACR definitions

@@ -3,7 +3,7 @@
 # Wolfgang Denk, DENX Software Engineering, wd@denx.de.
 #
 # (C) Copyright 2011
-# Port to STM32F2
+# Port to STM32
 # Yuri Tikhonov, Emcraft Systems, yur@emcraft.com.
 #
 # See file CREDITS for list of people who contributed to this
