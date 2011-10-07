@@ -26,7 +26,7 @@
 #include <common.h>
 #include <netdev.h>
 
-#include <asm/arch/stm32f2.h>
+#include <asm/arch/stm32.h>
 #include <asm/arch/stm32f2_gpio.h>
 
 #if (CONFIG_NR_DRAM_BANKS > 0)

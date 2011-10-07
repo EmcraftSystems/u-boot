@@ -20,7 +20,7 @@
  */
 
 #include <common.h>
-#include <asm/arch/stm32f2.h>
+#include <asm/arch/stm32.h>
 
 #include "envm.h"
 

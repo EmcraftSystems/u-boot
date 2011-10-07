@@ -117,7 +117,7 @@ typedef volatile unsigned char	vu_char;
 #include <asm/arch-a2f/a2f.h>
 #endif
 #ifdef CONFIG_SYS_STM32F2
-#include <asm/arch-stm32f2/stm32f2.h>
+#include <asm/arch-stm32/stm32.h>
 #endif
 
 #include <part.h>
