@@ -116,6 +116,7 @@ struct stm32_fsmc_regs {
  * FSMC registers base
  */
 #define STM32_FSMC_BASE			0xA0000000
+#define STM32_FSMC	((volatile struct stm32_fsmc_regs *)STM32_FSMC_BASE)
 
 /*
  * BCR reg fields

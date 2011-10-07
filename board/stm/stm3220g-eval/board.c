@@ -135,12 +135,10 @@ int misc_init_r(void)
  */
 int dram_init(void)
 {
-	int					rv = 0;
+	int	rv = 0;
 
 #if (CONFIG_NR_DRAM_BANKS > 0)
-	volatile struct stm32_fsmc_regs	*fsmc_regs;
-	volatile struct stm32_rcc_regs	*rcc_regs;
-	int				i;
+	int	i;
 
 	/*
 	 * Connect GPIOs to FSMC controller
@@ -155,25 +153,23 @@ int dram_init(void)
 	/*
 	 * Enable FSMC interface clock
 	 */
-	rcc_regs = (struct stm32_rcc_regs *)STM32_RCC_BASE;
-	rcc_regs->ahb3enr |= STM32_RCC_ENR_FSMC;
+	STM32_RCC->ahb3enr |= STM32_RCC_ENR_FSMC;
 
 	/*
 	 * Configure FSMC
 	 */
-	fsmc_regs = (struct stm32_fsmc_regs *)STM32_FSMC_BASE;
 	i = CONFIG_SYS_RAM_CS - 1;
 
 	/*
 	 * Fake BCR read; if don't do this, then BCR remains configured
 	 * with defaults.
 	 */
-	rv = fsmc_regs->cs[i].bcr;
+	rv = STM32_FSMC->cs[i].bcr;
 
-	fsmc_regs->cs[i].bcr = CONFIG_SYS_FSMC_BCR;
-	fsmc_regs->cs[i].btr = CONFIG_SYS_FSMC_BTR;
+	STM32_FSMC->cs[i].bcr = CONFIG_SYS_FSMC_BCR;
+	STM32_FSMC->cs[i].btr = CONFIG_SYS_FSMC_BTR;
 #if defined(CONFIG_SYS_FSMC_BWR)
-	fsmc_regs->wt[i].wtr = CONFIG_SYS_FSMC_BWR;
+	STM32_FSMC->wt[i].wtr = CONFIG_SYS_FSMC_BWR;
 #endif
 
 	/*
