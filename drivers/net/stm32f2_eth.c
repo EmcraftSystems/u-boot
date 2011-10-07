@@ -264,6 +264,7 @@ struct stm32f2_mac_regs {
 	u32	dmachtbar;	/* DMA current host transmit buffer address   */
 	u32	dmachrbar;	/* DMA current host receive buffer address    */
 };
+#define STM32F2_MAC	((volatile struct stm32f2_mac_regs *)STM32F2_MAC_BASE)
 
 /*
  * SYSCFG register map
@@ -296,11 +297,6 @@ struct stm_eth_dev {
 	 * Standard ethernet device
 	 */
 	struct eth_device		netdev;
-
-	/*
-	 * STM32F2 MAC reg map
-	 */
-	volatile struct stm32f2_mac_regs *regs;
 
 	/*
 	 * PHY settings
@@ -402,7 +398,6 @@ int stm32f2_eth_init(bd_t *bd)
 	 * Map registers
 	 */
 	netdev->iobase = STM32F2_MAC_BASE;
-	mac->regs = (struct stm32f2_mac_regs *)STM32F2_MAC_BASE;
 
 	/*
 	 * Autodetect PHY
@@ -562,7 +557,7 @@ static int stm_phy_link_setup(struct stm_eth_dev *mac)
 	}
 
 link_set:
-	cr_val = mac->regs->maccr;
+	cr_val = STM32F2_MAC->maccr;
 	printf("%s: link UP ", mac->netdev.name);
 	if (speed == 100) {
 		printf("(100/");
@@ -579,7 +574,7 @@ link_set:
 		printf("Half)\n");
 		cr_val &= ~STM32F2_MAC_CR_DM;
 	}
-	mac->regs->maccr = cr_val;
+	STM32F2_MAC->maccr = cr_val;
 
 	link_inited = 1;
 	rv = 0;
@@ -597,9 +592,9 @@ static int stm_phy_write(struct stm_eth_dev *mac, u16 reg, u16 val)
 	int	rv;
 
 	tmp = 0;
-	while ((mac->regs->macmiiar & STM32F2_MAC_MIIAR_MB) &&
+	while ((STM32F2_MAC->macmiiar & STM32F2_MAC_MIIAR_MB) &&
 	       (tmp++ < STM32F2_PHY_WRITE_TIMEOUT));
-	if (mac->regs->macmiiar & STM32F2_MAC_MIIAR_MB) {
+	if (STM32F2_MAC->macmiiar & STM32F2_MAC_MIIAR_MB) {
 		/*
 		 * MII is busy
 		 */
@@ -615,7 +610,7 @@ static int stm_phy_write(struct stm_eth_dev *mac, u16 reg, u16 val)
 	 * - set write mode
 	 * - set MII Busy
 	 */
-	tmp = mac->regs->macmiiar;
+	tmp = STM32F2_MAC->macmiiar;
 	tmp &= STM32F2_MAC_MIIAR_CR_MSK << STM32F2_MAC_MIIAR_CR_BIT;
 
 	adr &= STM32F2_MAC_MIIAR_PA_MSK;
@@ -629,13 +624,13 @@ static int stm_phy_write(struct stm_eth_dev *mac, u16 reg, u16 val)
 	/*
 	 * Write to regs, and wait for completion
 	 */
-	mac->regs->macmiidr = val;
-	mac->regs->macmiiar = tmp;
+	STM32F2_MAC->macmiidr = val;
+	STM32F2_MAC->macmiiar = tmp;
 
 	tmp = 0;
-	while ((mac->regs->macmiiar & STM32F2_MAC_MIIAR_MB) &&
+	while ((STM32F2_MAC->macmiiar & STM32F2_MAC_MIIAR_MB) &&
 	       (tmp++ < STM32F2_PHY_WRITE_TIMEOUT));
-	if (mac->regs->macmiiar & STM32F2_MAC_MIIAR_MB) {
+	if (STM32F2_MAC->macmiiar & STM32F2_MAC_MIIAR_MB) {
 		/*
 		 * Transaction failed: Write timeout
 		 */
@@ -661,9 +656,9 @@ static int stm_phy_read(struct stm_eth_dev *mac, u16 reg, u16 *val)
 	int	rv;
 
 	tmp = 0;
-	while ((mac->regs->macmiiar & STM32F2_MAC_MIIAR_MB) &&
+	while ((STM32F2_MAC->macmiiar & STM32F2_MAC_MIIAR_MB) &&
 	       (tmp++ < STM32F2_PHY_READ_TIMEOUT));
-	if (mac->regs->macmiiar & STM32F2_MAC_MIIAR_MB) {
+	if (STM32F2_MAC->macmiiar & STM32F2_MAC_MIIAR_MB) {
 		/*
 		 * MII is busy
 		 */
@@ -679,7 +674,7 @@ static int stm_phy_read(struct stm_eth_dev *mac, u16 reg, u16 *val)
 	 * - set read mode
 	 * - set MII Busy
 	 */
-	tmp = mac->regs->macmiiar;
+	tmp = STM32F2_MAC->macmiiar;
 	tmp &= STM32F2_MAC_MIIAR_CR_MSK << STM32F2_MAC_MIIAR_CR_BIT;
 
 	adr &= STM32F2_MAC_MIIAR_PA_MSK;
@@ -693,12 +688,12 @@ static int stm_phy_read(struct stm_eth_dev *mac, u16 reg, u16 *val)
 	/*
 	 * Write to reg, and wait for completion
 	 */
-	mac->regs->macmiiar  = tmp;
+	STM32F2_MAC->macmiiar  = tmp;
 
 	tmp = 0;
-	while ((mac->regs->macmiiar & STM32F2_MAC_MIIAR_MB) &&
+	while ((STM32F2_MAC->macmiiar & STM32F2_MAC_MIIAR_MB) &&
 	       (tmp++ < STM32F2_PHY_READ_TIMEOUT));
-	if (mac->regs->macmiiar & STM32F2_MAC_MIIAR_MB) {
+	if (STM32F2_MAC->macmiiar & STM32F2_MAC_MIIAR_MB) {
 		/*
 		 * Transaction failed: read timeout
 		 */
@@ -709,7 +704,7 @@ static int stm_phy_read(struct stm_eth_dev *mac, u16 reg, u16 *val)
 	/*
 	 * Transaction OK
 	 */
-	*val = mac->regs->macmiidr;
+	*val = STM32F2_MAC->macmiidr;
 
 	rv = 0;
 out:
@@ -750,8 +745,8 @@ static void stm_mac_bd_init(struct stm_eth_dev *mac)
 	/*
 	 * Program DMA with the addresses of descriptor chains
 	 */
-	mac->regs->dmatdlar = (u32)&mac->tx_bd;
-	mac->regs->dmardlar = (u32)&mac->rx_bd[0];
+	STM32F2_MAC->dmatdlar = (u32)&mac->tx_bd;
+	STM32F2_MAC->dmardlar = (u32)&mac->rx_bd[0];
 }
 
 /*
@@ -766,12 +761,12 @@ static void stm_mac_address_set(struct stm_eth_dev *mac)
 	      netdev->enetaddr[2], netdev->enetaddr[3],
 	      netdev->enetaddr[4], netdev->enetaddr[5]);
 
-	mac->regs->maca0hr = (netdev->enetaddr[5] <<  8) |
-			     (netdev->enetaddr[4] <<  0);
-	mac->regs->maca0lr = (netdev->enetaddr[3] << 24) |
-			     (netdev->enetaddr[2] << 16) |
-			     (netdev->enetaddr[1] <<  8) |
-			     (netdev->enetaddr[0] <<  0);
+	STM32F2_MAC->maca0hr = (netdev->enetaddr[5] <<  8) |
+			       (netdev->enetaddr[4] <<  0);
+	STM32F2_MAC->maca0lr = (netdev->enetaddr[3] << 24) |
+			       (netdev->enetaddr[2] << 16) |
+			       (netdev->enetaddr[1] <<  8) |
+			       (netdev->enetaddr[0] <<  0);
 }
 
 /*
@@ -875,13 +870,13 @@ static int stm_mac_hw_init(struct stm_eth_dev *mac)
 	STM32F2_RCC->ahb1rstr |= STM32F2_RCC_AHB1RSTR_MAC;
 	STM32F2_RCC->ahb1rstr &= ~STM32F2_RCC_AHB1RSTR_MAC;
 
-	mac->regs->dmabmr |= STM32F2_MAC_DMABMR_SR;
+	STM32F2_MAC->dmabmr |= STM32F2_MAC_DMABMR_SR;
 	i = 0;
-	while (mac->regs->dmabmr & STM32F2_MAC_DMABMR_SR) {
+	while (STM32F2_MAC->dmabmr & STM32F2_MAC_DMABMR_SR) {
 		if (i++ > STM32F2_MAC_INIT_TIMEOUT)
 			break;
 	}
-	if (mac->regs->dmabmr & STM32F2_MAC_DMABMR_SR) {
+	if (STM32F2_MAC->dmabmr & STM32F2_MAC_DMABMR_SR) {
 		printf("%s: failed reset MAC subsystem.\n", __func__);
 		rv = -EBUSY;
 		goto out;
@@ -894,13 +889,13 @@ static int stm_mac_hw_init(struct stm_eth_dev *mac)
 	 * - round-robin DMA arbitration Rx:Tx<->2:1;
 	 * - enable use of separate PBL for Rx and Tx.
 	 */
-	mac->regs->dmabmr = (32 << STM32F2_MAC_DMABMR_PBL_BIT) |
-			    (STM32F2_MAC_DMABMR_RTPR_2_1 <<
-			     STM32F2_MAC_DMABMR_RTPR_BIT) |
-			    STM32F2_MAC_DMABMR_FB |
-			    (32 << STM32F2_MAC_DMABMR_RDP_BIT) |
-			    STM32F2_MAC_DMABMR_USP |
-			    STM32F2_MAC_DMABMR_AAB;
+	STM32F2_MAC->dmabmr = (32 << STM32F2_MAC_DMABMR_PBL_BIT) |
+			      (STM32F2_MAC_DMABMR_RTPR_2_1 <<
+			       STM32F2_MAC_DMABMR_RTPR_BIT) |
+			      STM32F2_MAC_DMABMR_FB |
+			      (32 << STM32F2_MAC_DMABMR_RDP_BIT) |
+			      STM32F2_MAC_DMABMR_USP |
+			      STM32F2_MAC_DMABMR_AAB;
 
 	/*
 	 * Configure Ethernet CSR Clock Range
@@ -920,11 +915,11 @@ static int stm_mac_hw_init(struct stm_eth_dev *mac)
 		tmp = STM32F2_MAC_MIIAR_CR_DIV62 << STM32F2_MAC_MIIAR_CR_BIT;
 	}
 
-	if (mac->regs->macmiiar & STM32F2_MAC_MIIAR_MB) {
+	if (STM32F2_MAC->macmiiar & STM32F2_MAC_MIIAR_MB) {
 		i = 0;
-		while ((mac->regs->macmiiar & STM32F2_MAC_MIIAR_MB) &&
+		while ((STM32F2_MAC->macmiiar & STM32F2_MAC_MIIAR_MB) &&
 		       (i++ < STM32F2_PHY_READ_TIMEOUT));
-		if (mac->regs->macmiiar & STM32F2_MAC_MIIAR_MB) {
+		if (STM32F2_MAC->macmiiar & STM32F2_MAC_MIIAR_MB) {
 			/*
 			 * MII is busy
 			 */
@@ -932,7 +927,7 @@ static int stm_mac_hw_init(struct stm_eth_dev *mac)
 			goto out;
 		}
 	}
-	mac->regs->macmiiar = tmp;
+	STM32F2_MAC->macmiiar = tmp;
 
 	/*
 	 * Init PHY
@@ -979,24 +974,24 @@ static int stm_eth_init(struct eth_device *dev, bd_t *bd)
 	/*
 	 * Enable TX
 	 */
-	mac->regs->maccr |= STM32F2_MAC_CR_TE;
+	STM32F2_MAC->maccr |= STM32F2_MAC_CR_TE;
 
 	/*
 	 * Flush Transmit FIFO
 	 */
-	mac->regs->dmaomr |= STM32F2_MAC_DMAOMR_FTF;
-	while (mac->regs->dmaomr & STM32F2_MAC_DMAOMR_FTF);
+	STM32F2_MAC->dmaomr |= STM32F2_MAC_DMAOMR_FTF;
+	while (STM32F2_MAC->dmaomr & STM32F2_MAC_DMAOMR_FTF);
 
 	/*
 	 * Enable RX
 	 */
-	mac->regs->maccr |= STM32F2_MAC_CR_RE;
+	STM32F2_MAC->maccr |= STM32F2_MAC_CR_RE;
 
 	/*
 	 * Start DMA TX and RX
 	 */
-	mac->regs->dmaomr |= STM32F2_MAC_DMAOMR_ST;
-	mac->regs->dmaomr |= STM32F2_MAC_DMAOMR_SR;
+	STM32F2_MAC->dmaomr |= STM32F2_MAC_DMAOMR_ST;
+	STM32F2_MAC->dmaomr |= STM32F2_MAC_DMAOMR_SR;
 out:
 	if (rv != 0)
 		printf("%s: failed (%d).\n", __func__, rv);
@@ -1032,14 +1027,14 @@ static int stm_eth_send(struct eth_device *dev, volatile void *pkt, int len)
 	mac->tx_bd.buf   = pkt;
 	mac->tx_bd.ctrl  = len;
 	mac->tx_bd.stat |= STM32F2_DMA_TBD_FS | STM32F2_DMA_TBD_LS |
-			       STM32F2_DMA_TBD_DMA_OWN;
+			   STM32F2_DMA_TBD_DMA_OWN;
 
 	/*
 	 * If Tx buffer unavailable flag is set, then clear it and resume
 	 */
-	if (mac->regs->dmasr & STM32F2_MAC_DMASR_TBUS) {
-		mac->regs->dmasr &= ~STM32F2_MAC_DMASR_TBUS;
-		mac->regs->dmatpdr = 0;
+	if (STM32F2_MAC->dmasr & STM32F2_MAC_DMASR_TBUS) {
+		STM32F2_MAC->dmasr &= ~STM32F2_MAC_DMASR_TBUS;
+		STM32F2_MAC->dmatpdr = 0;
 	}
 
 	/*
@@ -1113,13 +1108,13 @@ static int stm_eth_recv(struct eth_device *dev)
 		 * If rx buf unavailable flag is set, clear it and resume
 		 * reception
 		 */
-		if (mac->regs->dmasr & STM32F2_MAC_DMASR_RBUS) {
+		if (STM32F2_MAC->dmasr & STM32F2_MAC_DMASR_RBUS) {
 			/*
 			 * This is actually overflow, frame(s) lost
 			 */
 			printf("%s: RX overflow.\n", __func__);
-			mac->regs->dmasr &= ~STM32F2_MAC_DMASR_RBUS;
-			mac->regs->dmarpdr = 0;
+			STM32F2_MAC->dmasr &= ~STM32F2_MAC_DMASR_RBUS;
+			STM32F2_MAC->dmarpdr = 0;
 		}
 	}
 
@@ -1131,11 +1126,9 @@ static int stm_eth_recv(struct eth_device *dev)
  */
 static void stm_eth_halt(struct eth_device *dev)
 {
-	struct stm_eth_dev	*mac = to_stm_eth(dev);
-
 	/*
 	 * Stop DMA, and disable receiver and transmitter
 	 */
-	mac->regs->dmaomr &= ~(STM32F2_MAC_DMAOMR_ST | STM32F2_MAC_DMAOMR_SR);
-	mac->regs->maccr  &= ~(STM32F2_MAC_CR_TE | STM32F2_MAC_CR_RE);
+	STM32F2_MAC->dmaomr &= ~(STM32F2_MAC_DMAOMR_ST | STM32F2_MAC_DMAOMR_SR);
+	STM32F2_MAC->maccr  &= ~(STM32F2_MAC_CR_TE | STM32F2_MAC_CR_RE);
 }
