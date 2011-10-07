@@ -139,7 +139,6 @@ int stm32f2_gpio_config(struct stm32f2_gpio_dsc *dsc,
 			enum stm32f2_gpio_role role)
 {
 	volatile struct stm32f2_gpio_regs	*gpio_regs;
-	volatile struct stm32f2_rcc_regs	*rcc_regs;
 
 	u32	otype, ospeed, pupd, i;
 	int	rv;
@@ -185,13 +184,12 @@ int stm32f2_gpio_config(struct stm32f2_gpio_dsc *dsc,
 	/*
 	 * Get reg base
 	 */
-	rcc_regs  = (struct stm32f2_rcc_regs *)STM32F2_RCC_BASE;
 	gpio_regs = (struct stm32f2_gpio_regs *)io_base[dsc->port];
 
 	/*
 	 * Enable GPIO clocks
 	 */
-	rcc_regs->ahb1enr |= 1 << dsc->port;
+	STM32F2_RCC->ahb1enr |= 1 << dsc->port;
 
 	if (role != STM32F2_GPIO_ROLE_MCO) {
 		/*

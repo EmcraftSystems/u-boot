@@ -195,12 +195,11 @@ static volatile struct stm32f2_usart_regs	*usart_regs;
  */
 int serial_init(void)
 {
-	static struct stm32f2_gpio_dsc		tx_gpio = { USART_TX_IO_PORT,
-							    USART_TX_IO_PIN };
-	static struct stm32f2_gpio_dsc		rx_gpio = { USART_RX_IO_PORT,
-							    USART_RX_IO_PIN };
-	static volatile u32			 *usart_enr;
-	static volatile struct stm32f2_rcc_regs	 *rcc_regs;
+	static struct stm32f2_gpio_dsc	tx_gpio = { USART_TX_IO_PORT,
+						    USART_TX_IO_PIN };
+	static struct stm32f2_gpio_dsc	rx_gpio = { USART_RX_IO_PORT,
+						    USART_RX_IO_PIN };
+	static volatile u32		*usart_enr;
 
 	int	rv;
 
@@ -208,7 +207,6 @@ int serial_init(void)
 	 * Setup registers
 	 */
 	usart_regs = (struct stm32f2_usart_regs *)usart_base[USART_PORT];
-	rcc_regs   = (struct stm32f2_rcc_regs *)STM32F2_RCC_BASE;
 
 	usart_enr  = (u32 *)(STM32F2_RCC_BASE + rcc_enr_offset[USART_PORT]);
 

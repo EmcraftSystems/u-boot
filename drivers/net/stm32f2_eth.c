@@ -275,6 +275,8 @@ struct stm32f2_syscfg_regs {
 	u32	rsv0[2];
 	u32	cmpcr;		/* Compensation cell control		      */
 };
+#define STM32F2_SYSCFG	((volatile struct stm32f2_syscfg_regs *)	       \
+			 STM32F2_SYSCFG_BASE)
 
 /*
  * STM32F2 ETH Normal DMA buffer descriptors
@@ -777,13 +779,11 @@ static void stm_mac_address_set(struct stm_eth_dev *mac)
  */
 static int stm_mac_gpio_init(struct stm_eth_dev *mac)
 {
-	static struct stm32f2_gpio_dsc		mco_gpio = {0, 8};
-	static int				gpio_inited;
+	static struct stm32f2_gpio_dsc	mco_gpio = {0, 8};
+	static int			gpio_inited;
 
-	volatile struct stm32f2_rcc_regs	*rcc_regs;
-	volatile struct stm32f2_syscfg_regs	*syscfg_regs;
-	u32					val;
-	int					i, rv;
+	u32	val;
+	int	i, rv;
 
 	/*
 	 * Init GPIOs only once at start. Otherwise, reiniting then on
@@ -799,12 +799,9 @@ static int stm_mac_gpio_init(struct stm_eth_dev *mac)
 	}
 
 	/*
-	 * Get reg bases, enable SYSCFG clock
+	 * Enable SYSCFG clock
 	 */
-	rcc_regs = (struct stm32f2_rcc_regs *)STM32F2_RCC_BASE;
-	syscfg_regs = (struct stm32f2_syscfg_regs *)STM32F2_SYSCFG_BASE;
-
-	rcc_regs->apb2enr |= STM32F2_RXX_ENR_SYSCFG;
+	STM32F2_RCC->apb2enr |= STM32F2_RXX_ENR_SYSCFG;
 
 	/*
 	 * Configure MC0: PA8
@@ -816,7 +813,7 @@ static int stm_mac_gpio_init(struct stm_eth_dev *mac)
 	/*
 	 * Output HSE clock (25MHz) on MCO pin (PA8) to clock the PHY
 	 */
-	val  = rcc_regs->cfgr;
+	val  = STM32F2_RCC->cfgr;
 
 	val &= ~(STM32F2_RCC_CFGR_MCO1_MSK << STM32F2_RCC_CFGR_MCO1_BIT);
 	val |= STM32F2_RCC_CFGR_MCO1_HSE << STM32F2_RCC_CFGR_MCO1_BIT;
@@ -824,15 +821,15 @@ static int stm_mac_gpio_init(struct stm_eth_dev *mac)
 	val &= ~(STM32F2_RCC_CFGR_MCO1PRE_MSK << STM32F2_RCC_CFGR_MCO1PRE_BIT);
 	val |= STM32F2_RCC_CFGR_MCO1PRE_DIVNO << STM32F2_RCC_CFGR_MCO1PRE_BIT;
 
-	rcc_regs->cfgr = val;
+	STM32F2_RCC->cfgr = val;
 
 	/*
 	 * Set MII mode
 	 */
-	val = syscfg_regs->pmc;
+	val = STM32F2_SYSCFG->pmc;
 	val &= STM32F2_SYSCFG_PMC_SEL_MSK << STM32F2_SYSCFG_PMC_SEL_BIT;
 	val |= STM32F2_SYSCFG_PMC_SEL_MII << STM32F2_SYSCFG_PMC_SEL_BIT;
-	syscfg_regs->pmc = val;
+	STM32F2_SYSCFG->pmc = val;
 
 	/*
 	 * Set GPIOs Alternative function
@@ -855,7 +852,6 @@ out:
  */
 static int stm_mac_hw_init(struct stm_eth_dev *mac)
 {
-	volatile struct stm32f2_rcc_regs	*rcc_regs;
 	u32	tmp, hclk;
 	int	i, rv;
 
@@ -869,16 +865,15 @@ static int stm_mac_hw_init(struct stm_eth_dev *mac)
 	/*
 	 * Enable Ethernet clocks
 	 */
-	rcc_regs = (struct stm32f2_rcc_regs *)STM32F2_RCC_BASE;
-	rcc_regs->ahb1enr |= STM32F2_RCC_ENR_ETHMACEN   |
-			     STM32F2_RCC_ENR_ETHMACTXEN |
-			     STM32F2_RCC_ENR_ETHMACRXEN;
+	STM32F2_RCC->ahb1enr |= STM32F2_RCC_ENR_ETHMACEN   |
+				STM32F2_RCC_ENR_ETHMACTXEN |
+				STM32F2_RCC_ENR_ETHMACRXEN;
 
 	/*
 	 * Reset all MAC subsystem internal regs and logic
 	 */
-	rcc_regs->ahb1rstr |= STM32F2_RCC_AHB1RSTR_MAC;
-	rcc_regs->ahb1rstr &= ~STM32F2_RCC_AHB1RSTR_MAC;
+	STM32F2_RCC->ahb1rstr |= STM32F2_RCC_AHB1RSTR_MAC;
+	STM32F2_RCC->ahb1rstr &= ~STM32F2_RCC_AHB1RSTR_MAC;
 
 	mac->regs->dmabmr |= STM32F2_MAC_DMABMR_SR;
 	i = 0;

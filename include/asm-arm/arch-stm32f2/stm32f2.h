@@ -91,6 +91,7 @@ enum clock {
  * RCC registers base
  */
 #define STM32F2_RCC_BASE		(STM32F2_AHB1PERITH_BASE + 0x3800)
+#define STM32F2_RCC	((volatile struct stm32f2_rcc_regs *)STM32F2_RCC_BASE)
 
 /******************************************************************************
  * Flexible static memory controller

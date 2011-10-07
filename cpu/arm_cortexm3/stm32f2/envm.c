@@ -49,6 +49,8 @@ struct stm32f2_flash_regs {
 	u32	cr;				/* Control		      */
 	u32	optcr;				/* Option control	      */
 };
+#define STM32F2_FLASH	((volatile struct stm32f2_flash_regs *)		       \
+			 STM32F2_FLASH_BASE)
 
 /*
  * Enable instruction cache, prefetch and set the Flash wait latency
@@ -60,16 +62,12 @@ struct stm32f2_flash_regs {
  */
 void envm_config(u32 wait_states)
 {
-	volatile struct stm32f2_flash_regs	*flash_regs;
-
-	flash_regs = (struct stm32f2_flash_regs *)STM32F2_FLASH_BASE;
-
 	if (wait_states > STM32F2_FLASH_ACR_LAT_MSK)
 		wait_states = STM32F2_FLASH_ACR_LAT_MSK;
 
-	flash_regs->acr = STM32F2_FLASH_ACR_PRFTEN |
-			  STM32F2_FLASH_ACR_ICEN |
-			  (wait_states << STM32F2_FLASH_ACR_LAT_BIT);
+	STM32F2_FLASH->acr = STM32F2_FLASH_ACR_PRFTEN |
+			     STM32F2_FLASH_ACR_ICEN |
+			     (wait_states << STM32F2_FLASH_ACR_LAT_BIT);
 }
 
 /*

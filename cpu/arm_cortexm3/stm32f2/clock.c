@@ -215,32 +215,26 @@ static u32 clock_val[CLOCK_END];
  */
 static void clock_setup(void)
 {
-	volatile struct stm32f2_rcc_regs	*rcc_regs;
 	u32	val;
 	int	i;
 
 	/*
-	 * Get RCC regs base
-	 */
-	rcc_regs = (struct stm32f2_rcc_regs *)STM32F2_RCC_BASE;
-
-	/*
 	 * Enable HSE, and wait it becomes ready
 	 */
-	rcc_regs->cr |= STM32F2_RCC_CR_HSEON;
+	STM32F2_RCC->cr |= STM32F2_RCC_CR_HSEON;
 	for (i = 0; i < STM32F2_HSE_STARTUP_TIMEOUT; i++) {
-		if (rcc_regs->cr & STM32F2_RCC_CR_HSERDY)
+		if (STM32F2_RCC->cr & STM32F2_RCC_CR_HSERDY)
 			break;
 	}
 
-	if (!(rcc_regs->cr & STM32F2_RCC_CR_HSERDY)) {
+	if (!(STM32F2_RCC->cr & STM32F2_RCC_CR_HSERDY)) {
 		/*
 		 * Have no HSE clock
 		 */
 		goto out;
 	}
 
-	val = rcc_regs->cfgr;
+	val = STM32F2_RCC->cfgr;
 
 	/*
 	 * HCLK = SYSCLK / 1
@@ -260,7 +254,7 @@ static void clock_setup(void)
 	val &= ~(STM32F2_RCC_CFGR_PPRE1_MSK << STM32F2_RCC_CFGR_PPRE1_BIT);
 	val |= STM32F2_RCC_CFGR_PPRE1_DIV4 << STM32F2_RCC_CFGR_PPRE1_BIT;
 
-	rcc_regs->cfgr = val;
+	STM32F2_RCC->cfgr = val;
 
 # if defined(CONFIG_STM32F2_SYS_CLK_PLL)
 	/*
@@ -278,7 +272,7 @@ static void clock_setup(void)
 	       STM32F2_RCC_PLLCFGR_PLLP_BIT;
 	val |= CONFIG_STM32F2_PLL_Q << STM32F2_RCC_PLLCFGR_PLLQ_BIT;
 
-	rcc_regs->pllcfgr = val;
+	STM32F2_RCC->pllcfgr = val;
 
 	/*
 	 * Enable the main PLL, and wait until main PLL becomes ready.
@@ -286,13 +280,13 @@ static void clock_setup(void)
 	 * PLL to lock is probably not a constant. There's no timeout here in
 	 * STM lib code as well.
 	 */
-	rcc_regs->cr |= STM32F2_RCC_CR_PLLON;
-	while (rcc_regs->cr & STM32F2_RCC_CR_PLLRDY);
+	STM32F2_RCC->cr |= STM32F2_RCC_CR_PLLON;
+	while (STM32F2_RCC->cr & STM32F2_RCC_CR_PLLRDY);
 
 	/*
 	 * Select PLL as system source if it's setup OK, and HSE otherwise
 	 */
-	if (!(rcc_regs->cr & STM32F2_RCC_CR_PLLRDY))
+	if (!(STM32F2_RCC->cr & STM32F2_RCC_CR_PLLRDY))
 		val = STM32F2_RCC_CFGR_SWS_PLL;
 	else
 		val = STM32F2_RCC_CFGR_SWS_HSE;
@@ -312,10 +306,10 @@ static void clock_setup(void)
 	/*
 	 * Change system clock source, and wait (infinite!) till it done
 	 */
-	rcc_regs->cfgr &= ~(STM32F2_RCC_CFGR_SW_MSK <<
+	STM32F2_RCC->cfgr &= ~(STM32F2_RCC_CFGR_SW_MSK <<
 			    STM32F2_RCC_CFGR_SW_BIT);
-	rcc_regs->cfgr |= val << STM32F2_RCC_CFGR_SW_BIT;
-	while ((rcc_regs->cfgr & (STM32F2_RCC_CFGR_SWS_MSK <<
+	STM32F2_RCC->cfgr |= val << STM32F2_RCC_CFGR_SW_BIT;
+	while ((STM32F2_RCC->cfgr & (STM32F2_RCC_CFGR_SWS_MSK <<
 				  STM32F2_RCC_CFGR_SWS_BIT)) !=
 	       (val << STM32F2_RCC_CFGR_SWS_BIT));
 out:
@@ -331,8 +325,6 @@ void clock_init(void)
 	static u32 apbahb_presc_tbl[] = {0, 0, 0, 0, 1, 2, 3, 4,
 					 1, 2, 3, 4, 6, 7, 8, 9};
 
-	volatile struct stm32f2_rcc_regs *rcc_regs =
-		(struct stm32f2_rcc_regs *)STM32F2_RCC_BASE;
 	u32 tmp, presc, pllvco, pllp, pllm;
 
 #if !defined(CONFIG_STM32F2_SYS_CLK_HSI)
@@ -350,7 +342,7 @@ void clock_init(void)
 	/*
 	 * Get SYSCLK
 	 */
-	tmp  = rcc_regs->cfgr >> STM32F2_RCC_CFGR_SWS_BIT;
+	tmp  = STM32F2_RCC->cfgr >> STM32F2_RCC_CFGR_SWS_BIT;
 	tmp &= STM32F2_RCC_CFGR_SWS_MSK;
 	switch (tmp) {
 	case STM32F2_RCC_CFGR_SWS_HSI:
@@ -367,21 +359,21 @@ void clock_init(void)
 		 * PLL_VCO = (HSE_VALUE or HSI_VALUE / PLLM) * PLLN
 		 * SYSCLK = PLL_VCO / PLLP
 		 */
-		pllm  = rcc_regs->pllcfgr >> STM32F2_RCC_PLLCFGR_PLLM_BIT;
+		pllm  = STM32F2_RCC->pllcfgr >> STM32F2_RCC_PLLCFGR_PLLM_BIT;
 		pllm &= STM32F2_RCC_PLLCFGR_PLLM_MSK;
 
-		if (rcc_regs->pllcfgr & STM32F2_RCC_PLLCFGR_HSESRC) {
+		if (STM32F2_RCC->pllcfgr & STM32F2_RCC_PLLCFGR_HSESRC) {
 			/* HSE used as PLL clock source */
 			tmp = CONFIG_STM32F2_HSE_HZ;
 		} else {
 			/* HSI used as PLL clock source */
 			tmp = STM32F2_HSI_HZ;
 		}
-		pllvco  = rcc_regs->pllcfgr >> STM32F2_RCC_PLLCFGR_PLLN_BIT;
+		pllvco  = STM32F2_RCC->pllcfgr >> STM32F2_RCC_PLLCFGR_PLLN_BIT;
 		pllvco &= STM32F2_RCC_PLLCFGR_PLLN_MSK;
 		pllvco *= tmp / pllm;
 
-		pllp  = rcc_regs->pllcfgr >> STM32F2_RCC_PLLCFGR_PLLP_BIT;
+		pllp  = STM32F2_RCC->pllcfgr >> STM32F2_RCC_PLLCFGR_PLLP_BIT;
 		pllp &= STM32F2_RCC_PLLCFGR_PLLP_MSK;
 		pllp  = (pllp + 1) * 2;
 
@@ -395,7 +387,7 @@ void clock_init(void)
 	/*
 	 * Get HCLK
 	 */
-	tmp  = rcc_regs->cfgr >> STM32F2_RCC_CFGR_HPRE_BIT;
+	tmp  = STM32F2_RCC->cfgr >> STM32F2_RCC_CFGR_HPRE_BIT;
 	tmp &= STM32F2_RCC_CFGR_HPRE_MSK;
 	presc = apbahb_presc_tbl[tmp];
 	clock_val[CLOCK_HCLK] = clock_val[CLOCK_SYSCLK] >> presc;
@@ -403,7 +395,7 @@ void clock_init(void)
 	/*
 	 * Get PCLK1
 	 */
-	tmp  = rcc_regs->cfgr >> STM32F2_RCC_CFGR_PPRE1_BIT;
+	tmp  = STM32F2_RCC->cfgr >> STM32F2_RCC_CFGR_PPRE1_BIT;
 	tmp &= STM32F2_RCC_CFGR_PPRE1_MSK;
 	presc = apbahb_presc_tbl[tmp];
 	clock_val[CLOCK_PCLK1] = clock_val[CLOCK_HCLK] >> presc;
@@ -411,7 +403,7 @@ void clock_init(void)
 	/*
 	 * Get PCLK2
 	 */
-	tmp  = rcc_regs->cfgr >> STM32F2_RCC_CFGR_PPRE2_BIT;
+	tmp  = STM32F2_RCC->cfgr >> STM32F2_RCC_CFGR_PPRE2_BIT;
 	tmp &= STM32F2_RCC_CFGR_PPRE2_MSK;
 	presc = apbahb_presc_tbl[tmp];
 	clock_val[CLOCK_PCLK2] = clock_val[CLOCK_HCLK] >> presc;
