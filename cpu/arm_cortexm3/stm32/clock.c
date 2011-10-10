@@ -268,8 +268,7 @@ static void clock_setup(void)
 
 	val |= CONFIG_STM32_PLL_M << STM32_RCC_PLLCFGR_PLLM_BIT;
 	val |= CONFIG_STM32_PLL_N << STM32_RCC_PLLCFGR_PLLN_BIT;
-	val |= ((CONFIG_STM32_PLL_P >> 1) - 1) <<
-	       STM32_RCC_PLLCFGR_PLLP_BIT;
+	val |= ((CONFIG_STM32_PLL_P >> 1) - 1) << STM32_RCC_PLLCFGR_PLLP_BIT;
 	val |= CONFIG_STM32_PLL_Q << STM32_RCC_PLLCFGR_PLLQ_BIT;
 
 	STM32_RCC->pllcfgr = val;
@@ -306,11 +305,10 @@ static void clock_setup(void)
 	/*
 	 * Change system clock source, and wait (infinite!) till it done
 	 */
-	STM32_RCC->cfgr &= ~(STM32_RCC_CFGR_SW_MSK <<
-			    STM32_RCC_CFGR_SW_BIT);
+	STM32_RCC->cfgr &= ~(STM32_RCC_CFGR_SW_MSK << STM32_RCC_CFGR_SW_BIT);
 	STM32_RCC->cfgr |= val << STM32_RCC_CFGR_SW_BIT;
 	while ((STM32_RCC->cfgr & (STM32_RCC_CFGR_SWS_MSK <<
-				  STM32_RCC_CFGR_SWS_BIT)) !=
+				   STM32_RCC_CFGR_SWS_BIT)) !=
 	       (val << STM32_RCC_CFGR_SWS_BIT));
 out:
 	return;

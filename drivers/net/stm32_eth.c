@@ -731,8 +731,7 @@ static void stm_mac_bd_init(struct stm_eth_dev *mac)
 	 */
 	for (i = 0; i < PKTBUFSRX; i++) {
 		mac->rx_bd[i].stat = STM32_DMA_RBD_DMA_OWN;
-		mac->rx_bd[i].ctrl = STM32_DMA_RBD_RCH |
-					 PKTSIZE_ALIGN;
+		mac->rx_bd[i].ctrl = STM32_DMA_RBD_RCH | PKTSIZE_ALIGN;
 		mac->rx_bd[i].buf  = &mac->rx_buf[i][0];
 		mac->rx_bd[i].next = &mac->rx_bd[(i + 1) % PKTBUFSRX];
 	}
@@ -762,11 +761,11 @@ static void stm_mac_address_set(struct stm_eth_dev *mac)
 	      netdev->enetaddr[4], netdev->enetaddr[5]);
 
 	STM32_MAC->maca0hr = (netdev->enetaddr[5] <<  8) |
-			       (netdev->enetaddr[4] <<  0);
+			     (netdev->enetaddr[4] <<  0);
 	STM32_MAC->maca0lr = (netdev->enetaddr[3] << 24) |
-			       (netdev->enetaddr[2] << 16) |
-			       (netdev->enetaddr[1] <<  8) |
-			       (netdev->enetaddr[0] <<  0);
+			     (netdev->enetaddr[2] << 16) |
+			     (netdev->enetaddr[1] <<  8) |
+			     (netdev->enetaddr[0] <<  0);
 }
 
 /*
@@ -861,8 +860,8 @@ static int stm_mac_hw_init(struct stm_eth_dev *mac)
 	 * Enable Ethernet clocks
 	 */
 	STM32_RCC->ahb1enr |= STM32_RCC_ENR_ETHMACEN   |
-				STM32_RCC_ENR_ETHMACTXEN |
-				STM32_RCC_ENR_ETHMACRXEN;
+			      STM32_RCC_ENR_ETHMACTXEN |
+			      STM32_RCC_ENR_ETHMACRXEN;
 
 	/*
 	 * Reset all MAC subsystem internal regs and logic
@@ -890,12 +889,11 @@ static int stm_mac_hw_init(struct stm_eth_dev *mac)
 	 * - enable use of separate PBL for Rx and Tx.
 	 */
 	STM32_MAC->dmabmr = (32 << STM32_MAC_DMABMR_PBL_BIT) |
-			      (STM32_MAC_DMABMR_RTPR_2_1 <<
-			       STM32_MAC_DMABMR_RTPR_BIT) |
-			      STM32_MAC_DMABMR_FB |
-			      (32 << STM32_MAC_DMABMR_RDP_BIT) |
-			      STM32_MAC_DMABMR_USP |
-			      STM32_MAC_DMABMR_AAB;
+			    (32 << STM32_MAC_DMABMR_RDP_BIT) |
+			    (STM32_MAC_DMABMR_RTPR_2_1 <<
+			     STM32_MAC_DMABMR_RTPR_BIT) |
+			    STM32_MAC_DMABMR_FB | STM32_MAC_DMABMR_USP |
+			    STM32_MAC_DMABMR_AAB;
 
 	/*
 	 * Configure Ethernet CSR Clock Range
