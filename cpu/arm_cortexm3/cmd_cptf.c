@@ -40,8 +40,12 @@ extern char	_mem_ram_buf_base, _mem_ram_buf_size;
  * Write the eNVM and, optionally, reset the CPU.
  * We need it in RAM so as to be able to update U-boot,
  * which itself runs from the eNVM.
+ * NOTE: This function is only used locally, nevertheless, the "static"
+ * attrubute was removed. This was done because otherwise GCC optimizes
+ * this function to be inlined into do_cptf(), which is located in flash.
+ * This makes the U-Boot crash while performing self-upgrade.
  */
-static int __attribute__((section(".ramcode")))
+int __attribute__((section(".ramcode")))
            __attribute__ ((long_call))
   envm_write_and_reset(ulong dst, ulong src, ulong size, int do_reset)
 {
