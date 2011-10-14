@@ -29,7 +29,20 @@
  * Flash data area definitions
  */
 #define STM32_FLASH_BASE		0x08000000
-#define STM32_FLASH_SIZE	        (8*128*1024)
+#define STM32_FLASH_SIZE	        ((4 * 16 + 64 + 7 * 128) * 1024)
+/*
+ * This array defines the layout of the Embedded Flash on the STM32F2x chips
+ */
+static u32 flash_bsize[] = {
+	[0 ... 3]	=  16 * 1024,
+	[4]		=  64 * 1024,
+	[5 ... 11]	= 128 * 1024
+	};
+
+/*
+ * Number of flash blocks for STM32F2x chips
+ */
+#define STM32_FLASH_BLOCKS	(sizeof(flash_bsize)/sizeof(flash_bsize[0]))
 
 /*
  * Flash registers base
@@ -40,15 +53,15 @@
  * Flash register map
  */
 struct stm32_flash_regs {
-	u32	acr;				/* Access control		*/
-	u32	keyr;				/* Key				*/
-	u32	optkeyr;			/* Option key			*/
-	u32	sr;				/* Status			*/
-	u32	cr;				/* Control			*/
-	u32	optcr;				/* Option control		*/
+	u32	acr;		/* Access control		*/
+	u32	keyr;		/* Key				*/
+	u32	optkeyr;	/* Option key			*/
+	u32	sr;		/* Status			*/
+	u32	cr;		/* Control			*/
+	u32	optcr;		/* Option control		*/
 };
-#define STM32_FLASH_REGS	((volatile struct stm32_flash_regs *)		\
-			 STM32_FLASHREGS_BASE)
+#define STM32_FLASH_REGS	((volatile struct stm32_flash_regs *)	\
+				STM32_FLASHREGS_BASE)
 
  /*
  * Flash CR definitions
@@ -69,16 +82,16 @@ struct stm32_flash_regs {
 /*
  * Flash ACR definitions
  */
-#define STM32_FLASH_ACR_LAT_BIT		0         /* Latency			*/
-#define STM32_FLASH_ACR_LAT_MSK		0x3
-#define STM32_FLASH_ACR_PRFTEN		(1 << 8)  /* Prefetch enable		*/
-#define STM32_FLASH_ACR_ICEN		(1 << 9)  /* Instruction cache enable	*/
+#define STM32_FLASH_ACR_LAT_BIT		0	 /* Latency */
+#define STM32_FLASH_ACR_LAT_MSK		0x7
+#define STM32_FLASH_ACR_PRFTEN		(1 << 8) /* Prefetch enable		*/
+#define STM32_FLASH_ACR_ICEN		(1 << 9) /* Instruction cache enable	*/
 
 /*
  * Flash KEYR definitions
  */
-#define STM32_FLASH_KEYR_KEY1		0x45670123  /* KEY1 value to unlock CR	*/
-#define STM32_FLASH_KEYR_KEY2		0xCDEF89AB  /* KEY2 value to unlock CR	*/
+#define STM32_FLASH_KEYR_KEY1		0x45670123	/* KEY1 to unlock CR */
+#define STM32_FLASH_KEYR_KEY2		0xCDEF89AB	/* KEY2 to unlock CR */
 
 /*
  * Flash SR definitions
@@ -115,33 +128,81 @@ stm32_flash_cr_lock(void)
 }
 
 /*
- * Erase the whole embedded flash of the STM32.
+ * Given the flash address, return the block number.
+ * Return error if the address is not a start block address.
  */
-static int __attribute__((section(".ramcode")))
-	     __attribute__ ((long_call))
-stm32_flash_erase(uint32_t offset, uint32_t size)
+
+static s32 stm32_flash_get_block(u8 *addr)
 {
-	int32_t ret = -EBUSY;
-	/* No sanity check of address here, proceed to erase */
+	s32 i = 0;
+	u8 *base = (u8 *)STM32_FLASH_BASE;
+
+	while (i < STM32_FLASH_BLOCKS) {
+		if (addr == base)
+			break;
+		base += flash_bsize[i];
+		i++;
+	}
+
+	if (i == STM32_FLASH_BLOCKS)
+		i = -EINVAL;
+
+	return i;
+}
+
+/*
+ * Erase the embedded flash of the STM32. Start block is calculated from the
+ * given offset, end block - from size.
+ */
+static s32 __attribute__((section(".ramcode")))
+	     __attribute__ ((long_call))
+stm32_flash_erase(u32 offset, u32 size)
+{
+	s32 ret;
+	s32 n, num;
+	u32 erasesize;
+
+	if ((n = stm32_flash_get_block((u8 *)offset)) < 0) {
+		printf("%s: Address %#x is not block-aligned\n", __func__,
+			offset);
+		ret = n;
+		goto xit;
+	}
+
+	/* Calculate the number of blocks to erase */
+	erasesize = 0;
+	num = n;
+	while (erasesize < size) {
+		erasesize += flash_bsize[num];
+		num++;
+	}
 
 	/* Check there is no pending operations */
 	if (STM32_FLASH_REGS->sr & STM32_FLASH_SR_BSY) {
 		printf("%s: Flash is busy\n", __func__);
+		ret = -EBUSY;
 		goto xit;
 	}
+
 	stm32_flash_cr_unlock();
 
-	STM32_FLASH_REGS->cr |= STM32_FLASH_CR_MER;
-	STM32_FLASH_REGS->cr |= STM32_FLASH_CR_START;
+	while (n < num) {
+		STM32_FLASH_REGS->cr &= ~(STM32_FLASH_CR_SECT_MSK <<
+					STM32_FLASH_CR_SECT_SHIFT);
+		STM32_FLASH_REGS->cr |= ((n << STM32_FLASH_CR_SECT_SHIFT) |
+					STM32_FLASH_CR_SER);
+		STM32_FLASH_REGS->cr |= STM32_FLASH_CR_START;
+		/*
+		 * Warning! As soon as the erase operation starts, you can't
+		 * access U-Boot functions except of marked as ".ramcode"!
+		 */
+		while (STM32_FLASH_REGS->sr & STM32_FLASH_SR_BSY)
+			;
+		n++;
+	}
 
-	/*
-	 * Warning! As soon as the erase operation starts, you can't access
-	 * U-Boot functions except of marked as ".ramcode".
-	 */
-	while (STM32_FLASH_REGS->sr & STM32_FLASH_SR_BSY)
-		;
-
-	STM32_FLASH_REGS->cr &= ~STM32_FLASH_CR_MER;
+	STM32_FLASH_REGS->cr &= ~(STM32_FLASH_CR_SER |
+			(STM32_FLASH_CR_SECT_MSK << STM32_FLASH_CR_SECT_SHIFT));
 	stm32_flash_cr_lock();
 
 	ret = 0;
@@ -149,22 +210,23 @@ xit:
 	return ret;
 }
 
-static int __attribute__((section(".ramcode")))
+static s32 __attribute__((section(".ramcode")))
 	     __attribute__ ((long_call))
-stm32_flash_program(uint32_t offset, void *buf, uint32_t size)
+stm32_flash_program(u32 offset, void *buf, u32 size)
 {
-	uint32_t *src = (uint32_t *)buf;
-	uint32_t *dst = (uint32_t *)offset;
-	/* I know I can read 1-3 bytes beyond the input buffer, but this is OK */
-	uint32_t words = (size + sizeof(uint32_t) - 1)/ sizeof(uint32_t);
-	int32_t ret = -EBUSY;
+	u32 *src = (u32 *)buf;
+	u32 *dst = (u32 *)offset;
+	/* I can read 1-3 bytes beyond the input buffer, but this is OK */
+	u32 words = (size + sizeof(u32) - 1) / sizeof(u32);
+	s32 ret;
 
 	/* No sanity check on flash address here, proceed to program */
 
 	/* Check there is no pending operations */
-	if (STM32_FLASH_REGS->sr & STM32_FLASH_SR_BSY)
+	if (STM32_FLASH_REGS->sr & STM32_FLASH_SR_BSY) {
+		ret = -EBUSY;
 		goto xit;
-
+	}
 	stm32_flash_cr_unlock();
 	STM32_FLASH_REGS->cr |= STM32_FLASH_CR_PG;
 
@@ -219,16 +281,17 @@ void envm_init(void)
  * Note that we need for this function to reside in RAM since it
  * will be used to self-upgrade U-boot in internal Flash.
  */
-unsigned int __attribute__((section(".ramcode")))
+u32 __attribute__((section(".ramcode")))
 	     __attribute__ ((long_call))
-envm_write(uint32_t offset, void * buf, uint32_t size)
+envm_write(u32 offset, void * buf, u32 size)
 {
-	int32_t ret = 0;
+	s32 ret = 0;
 
-	/* Sanity check */
+	/* Basic sanity check. More checking in the "get_block" routine */
 	if ((offset < STM32_FLASH_BASE) ||
 		((offset + size) > (STM32_FLASH_BASE + STM32_FLASH_SIZE))) {
-		printf("Offset %#x is not in flash or size %d is too big\n", offset, size);
+		printf("%s: Address %#x is not in flash or size %d is too big\n",
+			__func__, offset, size);
 		goto xit;
 	}
 
