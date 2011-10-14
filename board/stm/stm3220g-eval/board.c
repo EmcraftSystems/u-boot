@@ -31,32 +31,12 @@
 
 #if (CONFIG_NR_DRAM_BANKS > 0)
 /*
- * Warn if DRAM configuration isn't set, and use the following defaults:
- *
- * IS61WV102416BLL at Bank1 SRAM 2:
- * - 16 bit data bus, SRAM, Mode 1, Enabled.
- * - CLK period is HCLK (8.4s);
- * - ADDSET  = 0 x CLK;
- * - DATASET = 2 x CLK (16.8ns);
- * - BUSTURN = 1 x CLK (8.4ns).
- * - these timings used both for read & write accesses (not-extended
- *   mode - WTR register isn't used).
+ * Check if RAM configured
  */
-# if !defined(CONFIG_SYS_RAM_CS) || !defined(CONFIG_SYS_FSMC_BCR) ||	       \
-     !defined(CONFIG_SYS_FSMC_BTR)
-#  warning "Incorrect FSMC configuration. Using defaults."
-#  undef CONFIG_SYS_RAM_CS
-#  undef CONFIG_SYS_FSMC_BCR
-#  undef CONFIG_SYS_FSMC_BTR
-#  undef CONFIG_SYS_FSMC_BWR
-#  define CONFIG_SYS_RAM_CS	2
-#  define CONFIG_SYS_FSMC_BCR	(STM32_FSMC_BCR_WREN |			       \
-				 (STM32_FSMC_BCR_MWID_16 <<		       \
-				  STM32_FSMC_BCR_MWID_BIT) |		       \
-				 STM32_FSMC_BCR_MBKEN)
-#  define CONFIG_SYS_FSMC_BTR	(1 << STM32_FSMC_BTR_BUSTURN_BIT) |	       \
-				(2 << STM32_FSMC_BTR_DATAST_BIT)
-# endif /* !CONFIG_SYS_RAM_CS || !CONFIG_SYS_FSMC_BCR || !CONFIG_SYS_FSMC_BTR */
+# if !defined(CONFIG_SYS_RAM_CS) || !defined(CONFIG_SYS_FSMC_PSRAM_BCR) ||     \
+     !defined(CONFIG_SYS_FSMC_PSRAM_BTR)
+#  error "Incorrect FSMC configuration."
+# endif
 #endif /* CONFIG_NR_DRAM_BANKS */
 
 /*
@@ -66,6 +46,7 @@
 
 DECLARE_GLOBAL_DATA_PTR;
 
+#if (CONFIG_NR_DRAM_BANKS > 0) || !defined(CONFIG_SYS_NO_FLASH)
 /*
  * External SRAM GPIOs for FSMC:
  *
@@ -86,17 +67,36 @@ static struct stm32f2_gpio_dsc fsmc_gpio[] = {
 	/* Port G: */
 	{6,  0}, {6,  1}, {6,  2}, {6,  3}, {6,  4}, {6,  5}, {6,  9}
 };
+#endif
 
 /*
  * Early hardware init.
  */
 int board_init(void)
 {
-	/*
-	 * TBD
-	 */
+	int	rv = 0;
 
-	return 0;
+#if (CONFIG_NR_DRAM_BANKS > 0) || !defined(CONFIG_SYS_NO_FLASH)
+	/*
+	 * Some external memory is used. Connect GPIOs to FSMC controller
+	 */
+	int	i;
+
+	for (i = 0; i < sizeof(fsmc_gpio)/sizeof(fsmc_gpio[0]); i++) {
+		rv = stm32f2_gpio_config(&fsmc_gpio[i],
+					 STM32F2_GPIO_ROLE_FSMC);
+		if (rv != 0)
+			break;
+	}
+
+	/*
+	 * Enable FSMC interface clock
+	 */
+	if (rv == 0)
+		STM32_RCC->ahb3enr |= STM32_RCC_ENR_FSMC;
+#endif
+
+	return rv;
 }
 
 /*
@@ -115,9 +115,25 @@ int checkboard(void)
  */
 int misc_init_r(void)
 {
+#if !defined(CONFIG_SYS_NO_FLASH)
+	int	i, rv;
+
 	/*
-	 * TBD
+	 * Configure FSMC Flash block
 	 */
+	i = CONFIG_SYS_FLASH_CS - 1;
+
+	/*
+	 * FIXME: not sure if this fake read is necessary here
+	 */
+	rv = STM32_FSMC->cs[i].bcr;
+
+	STM32_FSMC->cs[i].bcr = CONFIG_SYS_FSMC_FLASH_BCR;
+	STM32_FSMC->cs[i].btr = CONFIG_SYS_FSMC_FLASH_BTR;
+# if defined(CONFIG_SYS_FSMC_FLASH_BWR)
+	STM32_FSMC->wt[i].wtr = CONFIG_SYS_FSMC_FLASH_BWR;
+# endif
+#endif /* CONFIG_SYS_NO_FLASH */
 
 	return 0;
 }
@@ -134,22 +150,7 @@ int dram_init(void)
 	int				i;
 
 	/*
-	 * Connect GPIOs to FSMC controller
-	 */
-	for (i = 0; i < sizeof(fsmc_gpio)/sizeof(fsmc_gpio[0]); i++) {
-		rv = stm32f2_gpio_config(&fsmc_gpio[i],
-					 STM32F2_GPIO_ROLE_FSMC);
-		if (rv != 0)
-			goto out;
-	}
-
-	/*
-	 * Enable FSMC interface clock
-	 */
-	STM32_RCC->ahb3enr |= STM32_RCC_ENR_FSMC;
-
-	/*
-	 * Configure FSMC
+	 * Configure FSMC PSRAM block
 	 */
 	i = CONFIG_SYS_RAM_CS - 1;
 
@@ -159,17 +160,17 @@ int dram_init(void)
 	 */
 	rv = STM32_FSMC->cs[i].bcr;
 
-	STM32_FSMC->cs[i].bcr = CONFIG_SYS_FSMC_BCR;
-	STM32_FSMC->cs[i].btr = CONFIG_SYS_FSMC_BTR;
-#if defined(CONFIG_SYS_FSMC_BWR)
-	STM32_FSMC->wt[i].wtr = CONFIG_SYS_FSMC_BWR;
-#endif
+	STM32_FSMC->cs[i].bcr = CONFIG_SYS_FSMC_PSRAM_BCR;
+	STM32_FSMC->cs[i].btr = CONFIG_SYS_FSMC_PSRAM_BTR;
+# if defined(CONFIG_SYS_FSMC_PSRAM_BWR)
+	STM32_FSMC->wt[i].wtr = CONFIG_SYS_FSMC_PSRAM_BWR;
+# endif
 
-#if defined(CONFIG_SYS_RAM_BURST)
+# if defined(CONFIG_SYS_RAM_BURST)
 	/*
 	 * TBD
 	 */
-#else
+# else
 	/*
 	 * Switch PSRAM in the Asyncronous Read/Write Mode
 	 */
@@ -177,7 +178,7 @@ int dram_init(void)
 	if (rv != 0)
 		goto out;
 	stm32f2_gpout_set(&ctrl_gpio, 0);
-#endif /* CONFIG_SYS_RAM_BURST */
+# endif /* CONFIG_SYS_RAM_BURST */
 
 	/*
 	 * Fill in global info with description of SRAM configuration
@@ -188,6 +189,7 @@ int dram_init(void)
 	rv = 0;
 out:
 #endif /* CONFIG_NR_DRAM_BANKS */
+
 	return rv;
 }
 
