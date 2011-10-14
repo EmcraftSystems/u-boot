@@ -160,23 +160,59 @@ int dram_init(void)
 	 */
 	rv = STM32_FSMC->cs[i].bcr;
 
+	/* Step.1 */
 	STM32_FSMC->cs[i].bcr = CONFIG_SYS_FSMC_PSRAM_BCR;
 	STM32_FSMC->cs[i].btr = CONFIG_SYS_FSMC_PSRAM_BTR;
 # if defined(CONFIG_SYS_FSMC_PSRAM_BWR)
 	STM32_FSMC->wt[i].wtr = CONFIG_SYS_FSMC_PSRAM_BWR;
 # endif
 
+	rv = stm32f2_gpio_config(&ctrl_gpio, STM32F2_GPIO_ROLE_GPOUT);
+	if (rv != 0)
+		goto out;
+
 # if defined(CONFIG_SYS_RAM_BURST)
 	/*
-	 * TBD
+	 * FIXME: all this hardcoded stuff, and wiki 'Step.X' remarks...
 	 */
+
+	/* Step.2 */
+	stm32f2_gpout_set(&ctrl_gpio, 1);
+
+	/* Step.3 */
+	*(volatile u16 *)(CONFIG_SYS_RAM_BASE + 0x4101F) = 0;
+
+	/* Step.4-5 */
+	stm32f2_gpout_set(&ctrl_gpio, 0);
+
+	/* Step.6 */
+	STM32_FSMC->cs[i].bcr = 0x00087959;
+	STM32_FSMC->cs[i].btr = 0x0010FFFF;
+
+	/* Step.7 */
+	rv = *(volatile u16 *)(CONFIG_SYS_RAM_BASE + 0x000000);
+
+	/* Step.8 */
+	STM32_FSMC->cs[i].bcr = 0x00005059;
+	STM32_FSMC->cs[i].btr = 0x100106F2;
+	STM32_FSMC->wt[i].wtr = 0x100107F2;
+
+	/* Step.9 */
+	stm32f2_gpout_set(&ctrl_gpio, 1);
+
+	/* Step.10 */
+	*(volatile u16 *)(CONFIG_SYS_RAM_BASE + 0x4101F) = 0;
+
+	/* Step.11 */
+	stm32f2_gpout_set(&ctrl_gpio, 0);
+
+	/* Step.12 */
+	STM32_FSMC->cs[i].bcr = 0x00087959;
+	STM32_FSMC->cs[i].btr = 0x0010FFFF;
 # else
 	/*
 	 * Switch PSRAM in the Asyncronous Read/Write Mode
 	 */
-	rv = stm32f2_gpio_config(&ctrl_gpio, STM32F2_GPIO_ROLE_GPOUT);
-	if (rv != 0)
-		goto out;
 	stm32f2_gpout_set(&ctrl_gpio, 0);
 # endif /* CONFIG_SYS_RAM_BURST */
 
