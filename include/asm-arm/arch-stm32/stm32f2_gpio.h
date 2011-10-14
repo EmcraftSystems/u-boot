@@ -34,7 +34,10 @@ enum stm32f2_gpio_role {
 	STM32F2_GPIO_ROLE_USART6,	/* USART6			      */
 	STM32F2_GPIO_ROLE_ETHERNET,	/* MAC				      */
 	STM32F2_GPIO_ROLE_MCO,		/* MC external output clock	      */
-	STM32F2_GPIO_ROLE_FSMC		/* FSMC static memory controller      */
+	STM32F2_GPIO_ROLE_FSMC,		/* FSMC static memory controller      */
+	STM32F2_GPIO_ROLE_GPOUT,	/* GPOUT			      */
+
+	STM32F2_GPIO_ROLE_LAST		/* for internal usage, must be last   */
 };
 
 /*
@@ -50,5 +53,10 @@ struct stm32f2_gpio_dsc {
  */
 int stm32f2_gpio_config(struct stm32f2_gpio_dsc *gpio_dsc,
 			enum stm32f2_gpio_role role);
+
+/*
+ * Set GPOUT to the state specified (1, 0)
+ */
+int stm32f2_gpout_set(struct stm32f2_gpio_dsc *dsc, int state);
 
 #endif /* _STM32F2_GPIO_H_ */
