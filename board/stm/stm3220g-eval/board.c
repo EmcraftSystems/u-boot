@@ -180,7 +180,7 @@ int dram_init(void)
 	stm32f2_gpout_set(&ctrl_gpio, 1);
 
 	/* Step.3 */
-	*(volatile u16 *)(CONFIG_SYS_RAM_BASE + 0x4101F) = 0;
+	*(volatile u8 *)(CONFIG_SYS_RAM_BASE + 0x4101F) = 0;
 
 	/* Step.4-5 */
 	stm32f2_gpout_set(&ctrl_gpio, 0);
@@ -190,7 +190,7 @@ int dram_init(void)
 	STM32_FSMC->cs[i].btr = 0x0010FFFF;
 
 	/* Step.7 */
-	rv = *(volatile u16 *)(CONFIG_SYS_RAM_BASE + 0x000000);
+	rv = *(volatile u8 *)(CONFIG_SYS_RAM_BASE + 0x000000);
 
 	/* Step.8 */
 	STM32_FSMC->cs[i].bcr = 0x00005059;
@@ -201,7 +201,7 @@ int dram_init(void)
 	stm32f2_gpout_set(&ctrl_gpio, 1);
 
 	/* Step.10 */
-	*(volatile u16 *)(CONFIG_SYS_RAM_BASE + 0x4101F) = 0;
+	*(volatile u8 *)(CONFIG_SYS_RAM_BASE + 0x4101F) = 0;
 
 	/* Step.11 */
 	stm32f2_gpout_set(&ctrl_gpio, 0);
