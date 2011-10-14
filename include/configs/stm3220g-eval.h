@@ -111,15 +111,16 @@
 #define CONFIG_SYS_MALLOC_LEN		CONFIG_MEM_MALLOC_LEN
 
 /*
- * Configuration of the external memory:
- * 2MB SRAM connected to CS2 of Bank1 (NOR/PSRAM)
+ * Configuration of the external memory
  */
 #define CONFIG_NR_DRAM_BANKS		1
-#define CONFIG_SYS_RAM_SIZE		(2 * 1024 * 1024)
+#define CONFIG_SYS_RAM_SIZE		(16 * 1024 * 1024)
 #define CONFIG_SYS_RAM_CS		2
-#define CONFIG_SYS_FSMC_BCR		0x00001011
-#define CONFIG_SYS_FSMC_BTR		0x00010200
-#undef  CONFIG_SYS_FSMC_BWR
+
+#undef CONFIG_SYS_RAM_BURST
+#define CONFIG_SYS_FSMC_BCR		0x00005059
+#define CONFIG_SYS_FSMC_BTR		0x100106F2
+#define CONFIG_SYS_FSMC_BWR		0x100107F2
 
 #define CONFIG_SYS_RAM_BASE		(0x60000000 + \
 					 ((CONFIG_SYS_RAM_CS - 1) * 0x4000000))

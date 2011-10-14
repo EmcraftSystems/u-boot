@@ -130,7 +130,8 @@ int dram_init(void)
 	int	rv = 0;
 
 #if (CONFIG_NR_DRAM_BANKS > 0)
-	int	i;
+	static struct stm32f2_gpio_dsc	ctrl_gpio = {8, 8};
+	int				i;
 
 	/*
 	 * Connect GPIOs to FSMC controller
@@ -163,6 +164,20 @@ int dram_init(void)
 #if defined(CONFIG_SYS_FSMC_BWR)
 	STM32_FSMC->wt[i].wtr = CONFIG_SYS_FSMC_BWR;
 #endif
+
+#if defined(CONFIG_SYS_RAM_BURST)
+	/*
+	 * TBD
+	 */
+#else
+	/*
+	 * Switch PSRAM in the Asyncronous Read/Write Mode
+	 */
+	rv = stm32f2_gpio_config(&ctrl_gpio, STM32F2_GPIO_ROLE_GPOUT);
+	if (rv != 0)
+		goto out;
+	stm32f2_gpout_set(&ctrl_gpio, 0);
+#endif /* CONFIG_SYS_RAM_BURST */
 
 	/*
 	 * Fill in global info with description of SRAM configuration
