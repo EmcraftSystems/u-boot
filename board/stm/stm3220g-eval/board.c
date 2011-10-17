@@ -187,7 +187,7 @@ int dram_init(void)
 
 #if (CONFIG_NR_DRAM_BANKS > 0)
 	static struct stm32f2_gpio_dsc	ctrl_gpio = {STM32F2_GPIO_PORT_I,
-						     STM32F2_GPIO_PIN_8};
+						     STM32F2_GPIO_PIN_9};
 	int				i;
 
 	/*
