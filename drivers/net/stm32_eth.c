@@ -336,12 +336,29 @@ struct stm_mac_gpio {
  * ETH_MII_RX_ER --------------------> PI10
  */
 static struct stm32f2_gpio_dsc mac_gpio[] = {
-	{0,  1}, {0,  2}, {0,  7},
-	{1,  5}, {1,  8},
-	{2,  1}, {2,  2}, {2,  3}, {2,  4}, {2,  5},
-	{6, 11}, {6, 13}, {6, 14},
-	{7,  2}, {7,  3}, {7,  6}, {7,  7},
-	{8, 10}
+	{STM32F2_GPIO_PORT_A, 1},
+	{STM32F2_GPIO_PORT_A, 2},
+	{STM32F2_GPIO_PORT_A, 7},
+
+	{STM32F2_GPIO_PORT_B, 5},
+	{STM32F2_GPIO_PORT_B, 8},
+
+	{STM32F2_GPIO_PORT_C, 1},
+	{STM32F2_GPIO_PORT_C, 2},
+	{STM32F2_GPIO_PORT_C, 3},
+	{STM32F2_GPIO_PORT_C, 4},
+	{STM32F2_GPIO_PORT_C, 5},
+
+	{STM32F2_GPIO_PORT_G, 11},
+	{STM32F2_GPIO_PORT_G, 13},
+	{STM32F2_GPIO_PORT_G, 14},
+
+	{STM32F2_GPIO_PORT_H, 2},
+	{STM32F2_GPIO_PORT_H, 3},
+	{STM32F2_GPIO_PORT_H, 6},
+	{STM32F2_GPIO_PORT_H, 7},
+
+	{STM32F2_GPIO_PORT_I, 10}
 };
 
 /*

@@ -23,10 +23,47 @@
 #define _STM32F2_GPIO_H_
 
 /*
+ * GPIO ports
+ */
+enum stm32f2_gpio_port {
+	STM32F2_GPIO_PORT_A	= 0,
+	STM32F2_GPIO_PORT_B,
+	STM32F2_GPIO_PORT_C,
+	STM32F2_GPIO_PORT_D,
+	STM32F2_GPIO_PORT_E,
+	STM32F2_GPIO_PORT_F,
+	STM32F2_GPIO_PORT_G,
+	STM32F2_GPIO_PORT_H,
+	STM32F2_GPIO_PORT_I
+};
+
+/*
+ * GPIO port pins
+ */
+enum stm32f2_gpio_pin {
+	STM32F2_GPIO_PIN_0	= 0,
+	STM32F2_GPIO_PIN_1,
+	STM32F2_GPIO_PIN_2,
+	STM32F2_GPIO_PIN_3,
+	STM32F2_GPIO_PIN_4,
+	STM32F2_GPIO_PIN_5,
+	STM32F2_GPIO_PIN_6,
+	STM32F2_GPIO_PIN_7,
+	STM32F2_GPIO_PIN_8,
+	STM32F2_GPIO_PIN_9,
+	STM32F2_GPIO_PIN_10,
+	STM32F2_GPIO_PIN_11,
+	STM32F2_GPIO_PIN_12,
+	STM32F2_GPIO_PIN_13,
+	STM32F2_GPIO_PIN_14,
+	STM32F2_GPIO_PIN_15
+};
+
+/*
  * GPIO roles (alternative functions); role determines by whom GPIO is used
  */
 enum stm32f2_gpio_role {
-	STM32F2_GPIO_ROLE_USART1,	/* USART1			      */
+	STM32F2_GPIO_ROLE_USART1 = 0,	/* USART1			      */
 	STM32F2_GPIO_ROLE_USART2,	/* USART2			      */
 	STM32F2_GPIO_ROLE_USART3,	/* USART3			      */
 	STM32F2_GPIO_ROLE_USART4,	/* USART4			      */
@@ -44,8 +81,8 @@ enum stm32f2_gpio_role {
  * GPIO descriptor
  */
 struct stm32f2_gpio_dsc {
-	u32		port;		/* GPIO port			      */
-	u32		pin;		/* GPIO pin			      */
+	enum stm32f2_gpio_port	port;	/* GPIO port			      */
+	enum stm32f2_gpio_pin	pin;	/* GPIO pin			      */
 };
 
 /*
@@ -57,6 +94,6 @@ int stm32f2_gpio_config(struct stm32f2_gpio_dsc *gpio_dsc,
 /*
  * Set GPOUT to the state specified (1, 0)
  */
-int stm32f2_gpout_set(struct stm32f2_gpio_dsc *dsc, int state);
+int stm32f2_gpout_set(struct stm32f2_gpio_dsc *gpio_dsc, int state);
 
 #endif /* _STM32F2_GPIO_H_ */
