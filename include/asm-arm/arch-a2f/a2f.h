@@ -122,6 +122,7 @@ enum clock {
 	CLOCK_PCLK1,
 	CLOCK_ACE,
 	CLOCK_FPGA,
+	CLOCK_SYSTICK,
 	CLOCK_END
 };
 

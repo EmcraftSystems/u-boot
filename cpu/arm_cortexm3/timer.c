@@ -1,7 +1,6 @@
 /*
- * (C) Copyright 2011
- *
- * Yuri Tikhonov, Emcraft Systems, yur@emcraft.com
+ * (C) Copyright 2010,2011
+ * Sergei Poselenov, Emcraft Systems, sposelenov@emcraft.com
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License as
@@ -15,23 +14,15 @@
  *
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
- * Foundation, Inc., 59 Temple Place, Suite 330, Boston,
- * MA 02111-1307 USA
+ * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
-
 #include <common.h>
-
-/* HCLK/8 */
-#define SYSTICK_FREQ	(clock_get(CLOCK_HCLK)/8)
 
 /* Internal tick units */
 static unsigned long long timestamp;	/* Monotonic incrementing timer */
 static ulong              lastdec;	/* Last decrementer snapshot */
 
-/*
- * Init timer.
- */
-int timer_init(void)
+int timer_init()
 {
 	volatile struct cm3_systick *systick =
 		(volatile struct cm3_systick *)CM3_SYSTICK_BASE;
@@ -45,10 +36,7 @@ int timer_init(void)
 	return 0;
 }
 
-/*
- * Return difference between timer ticks and 'base'.
- */
-unsigned long get_timer(unsigned long base)
+ulong get_timer(ulong base)
 {
 	volatile struct cm3_systick *systick =
 		(volatile struct cm3_systick *)CM3_SYSTICK_BASE;
@@ -61,12 +49,9 @@ unsigned long get_timer(unsigned long base)
 
 	lastdec = now;
 
-	return timestamp / (SYSTICK_FREQ / 1000) - base;
+	return timestamp / (clock_get(CLOCK_SYSTICK) / 1000) - base;
 }
 
-/*
- * Reset timer.
- */
 void reset_timer(void)
 {
 	volatile struct cm3_systick *systick =
@@ -75,17 +60,15 @@ void reset_timer(void)
 	timestamp = 0;
 }
 
-/*
- * Delay for 'usec' useconds.
- */
-void __udelay(unsigned long usec)
+/* delay x useconds */
+void __udelay(ulong usec)
 {
 	ulong clc, tmp;
 	volatile struct cm3_systick *systick =
 		(volatile struct cm3_systick *)(CM3_SYSTICK_BASE);
 
 
-	clc = usec * (SYSTICK_FREQ / 1000000);
+	clc = usec * (clock_get(CLOCK_SYSTICK) / 1000000);
 
 	/* get current timestamp */
 	tmp = systick->val;
@@ -104,7 +87,7 @@ void __udelay(unsigned long usec)
  * This function is derived from PowerPC code (timebase clock frequency).
  * On ARM it returns the number of timer ticks per second.
  */
-unsigned long get_tbclk(void)
+ulong get_tbclk(void)
 {
-	return SYSTICK_FREQ;
+	return clock_get(CLOCK_SYSTICK);
 }

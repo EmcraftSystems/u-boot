@@ -66,7 +66,7 @@
 #define SYSBOOT_VERSION_2_X	0x00020000
 #define MAX_SYSBOOT_VERSION	0x00030000
 
-static unsigned long clock[5];
+static unsigned long clock[CLOCK_END];
 
 /*
  * Retrieve the system clock frequency from eNVM spare page if available.
@@ -181,6 +181,33 @@ void clock_init(void)
 	clock[CLOCK_PCLK1]	= clock[CLOCK_FCLK] / pclk1_div;
 	clock[CLOCK_ACE]	= clock[CLOCK_FCLK] / ace_div;
 	clock[CLOCK_FPGA]	= (clock[CLOCK_FCLK] * fpga_div_half) / fpga_div;
+
+	/*
+	 * Now, initialize the system timer clock source.
+	 * Release systimer from reset
+	 */
+	A2F_SYSREG->soft_rst_cr &= ~A2F_SOFT_RST_TIMER_SR;
+	/*
+	 * enable 32bit timer1
+	 */
+	A2F_TIMER->timer64_mode &= ~A2F_TIM64_64MODE_EN;
+	/*
+	 * timer1 is used by envm driver
+	 */
+	A2F_TIMER->timer1_ctrl = A2F_TIM_CTRL_MODE_ONESHOT | A2F_TIM_CTRL_EN;
+	/*
+	 * No reference clock
+	 */
+	A2F_SYSREG->systick_cr &= ~A2F_SYSTICK_NOREF;
+	/*
+	 * div by 32
+	 */
+	A2F_SYSREG->systick_cr |= (A2F_SYSTICK_STCLK_DIV_32 <<
+				A2F_SYSTICK_STCLK_DIV_SHIFT);
+	A2F_SYSREG->systick_cr &= ~A2F_SYSTICK_TENMS_MSK;
+	A2F_SYSREG->systick_cr |= 0x7a12;
+
+	clock[CLOCK_SYSTICK] = clock[CLOCK_FCLK] / 32;
 }
 
 /*
@@ -202,4 +229,3 @@ unsigned long __attribute__((section(".ramcode")))
 
 	return res;
 }
-

@@ -406,6 +406,11 @@ void clock_init(void)
 	presc = apbahb_presc_tbl[tmp];
 	clock_val[CLOCK_PCLK2] = clock_val[CLOCK_HCLK] >> presc;
 
+	/*
+	 * Set SYSTICK. Divider "8" is the SOC hardcoded.
+	 */
+	 clock_val[CLOCK_SYSTICK] = clock_val[CLOCK_HCLK] / 8;
+
 	return;
 }
 

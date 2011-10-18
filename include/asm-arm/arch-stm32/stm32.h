@@ -83,7 +83,7 @@ enum clock {
 	CLOCK_HCLK,		/* HCLK clock frequency expressed in Hz       */
 	CLOCK_PCLK1,		/* PCLK1 clock frequency expressed in Hz      */
 	CLOCK_PCLK2,		/* PCLK2 clock frequency expressed in Hz      */
-
+	CLOCK_SYSTICK,		/* Systimer clock frequency expressed in Hz   */
 	CLOCK_END		/* for internal usage			      */
 };
 
