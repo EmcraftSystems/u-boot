@@ -36,6 +36,7 @@ struct cm3_scb {
 	uint32_t vtor;			/* Vector Table Offset Register */
 	uint32_t aircr;			/* App Interrupt and Reset Control Register */
 };
+#define CM3_SCB_REGS		((volatile struct cm3_scb *)CM3_SCB_BASE)
 
 #define CM3_AIRCR_VECTKEY		0x5fa
 #define CM3_AIRCR_VECTKEY_SHIFT		16
@@ -59,8 +60,6 @@ struct cm3_systick {
 #define CM3_SYSTICK_LOAD_RELOAD_MSK	(0x00FFFFFF)
 #define CM3_SYSTICK_CTRL_EN		1
 
-void __attribute__((section(".ramcode"))) __attribute__ ((long_call))
-cortex_m3_reset_cpu(ulong addr);
-unsigned char cortex_m3_irq_vec_get(void);
+u8 cortex_m3_irq_vec_get(void);
 
 #endif

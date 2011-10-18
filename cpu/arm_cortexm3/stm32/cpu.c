@@ -42,15 +42,3 @@ int print_cpuinfo(void)
 
 	return 0;
 }
-
-/*
- * Perform the low-level reset.
- * Note that we need for this function to reside in RAM since it
- * will be used to self-upgrade U-boot in eNMV.
- */
-void __attribute__((section(".ramcode")))
-		__attribute__ ((long_call))
-		reset_cpu(ulong addr)
-{
-	cortex_m3_reset_cpu(addr);
-}
