@@ -155,23 +155,6 @@
 /*
  * STM32 RCC MAC specific definitions
  */
-#define STM32_RCC_CFGR_MCO1_BIT		21		/* MC clock output 1  */
-#define STM32_RCC_CFGR_MCO1_MSK		0x3
-
-#define STM32_RCC_CFGR_MCO1_HSI		0x0		/* Clock source	      */
-#define STM32_RCC_CFGR_MCO1_LSE		0x1
-#define STM32_RCC_CFGR_MCO1_HSE		0x2
-#define STM32_RCC_CFGR_MCO1_PLL		0x3
-
-#define STM32_RCC_CFGR_MCO1PRE_BIT	24		/* MCO1 prescaler     */
-#define STM32_RCC_CFGR_MCO1PRE_MSK	0x7
-
-#define STM32_RCC_CFGR_MCO1PRE_DIVNO	0x0		/* Division by X      */
-#define STM32_RCC_CFGR_MCO1PRE_DIV2	0x4
-#define STM32_RCC_CFGR_MCO1PRE_DIV3	0x5
-#define STM32_RCC_CFGR_MCO1PRE_DIV4	0x6
-#define STM32_RCC_CFGR_MCO1PRE_DIV5	0x7
-
 #define STM32_RCC_AHB1RSTR_MAC		(1 << 25)	/* Reset MAC	      */
 
 #define STM32_RXX_ENR_SYSCFG		(1 << 14)	/* SYSCFG clock	      */
@@ -333,8 +316,6 @@ struct stm_mac_gpio {
 /*
  * Ethernet GPIOs:
  *
- * MCO ------------------------------> PA8
- *
  * ETH_MII_RX_CLK/ETH_RMII_REF_CLK---> PA1
  * ETH_MDIO -------------------------> PA2
  * ETH_MII_RX_DV/ETH_RMII_CRS_DV ----> PA7
@@ -355,12 +336,29 @@ struct stm_mac_gpio {
  * ETH_MII_RX_ER --------------------> PI10
  */
 static struct stm32f2_gpio_dsc mac_gpio[] = {
-	{0,  1}, {0,  2}, {0,  7},
-	{1,  5}, {1,  8},
-	{2,  1}, {2,  2}, {2,  3}, {2,  4}, {2,  5},
-	{6, 11}, {6, 13}, {6, 14},
-	{7,  2}, {7,  3}, {7,  6}, {7,  7},
-	{8, 10}
+	{STM32F2_GPIO_PORT_A, 1},
+	{STM32F2_GPIO_PORT_A, 2},
+	{STM32F2_GPIO_PORT_A, 7},
+
+	{STM32F2_GPIO_PORT_B, 5},
+	{STM32F2_GPIO_PORT_B, 8},
+
+	{STM32F2_GPIO_PORT_C, 1},
+	{STM32F2_GPIO_PORT_C, 2},
+	{STM32F2_GPIO_PORT_C, 3},
+	{STM32F2_GPIO_PORT_C, 4},
+	{STM32F2_GPIO_PORT_C, 5},
+
+	{STM32F2_GPIO_PORT_G, 11},
+	{STM32F2_GPIO_PORT_G, 13},
+	{STM32F2_GPIO_PORT_G, 14},
+
+	{STM32F2_GPIO_PORT_H, 2},
+	{STM32F2_GPIO_PORT_H, 3},
+	{STM32F2_GPIO_PORT_H, 6},
+	{STM32F2_GPIO_PORT_H, 7},
+
+	{STM32F2_GPIO_PORT_I, 10}
 };
 
 /*
@@ -773,11 +771,10 @@ static void stm_mac_address_set(struct stm_eth_dev *mac)
  */
 static int stm_mac_gpio_init(struct stm_eth_dev *mac)
 {
-	static struct stm32f2_gpio_dsc	mco_gpio = {0, 8};
-	static int			gpio_inited;
+	static int	gpio_inited;
 
-	u32	val;
-	int	i, rv;
+	u32		val;
+	int		i, rv;
 
 	/*
 	 * Init GPIOs only once at start. Otherwise, reiniting then on
@@ -796,26 +793,6 @@ static int stm_mac_gpio_init(struct stm_eth_dev *mac)
 	 * Enable SYSCFG clock
 	 */
 	STM32_RCC->apb2enr |= STM32_RXX_ENR_SYSCFG;
-
-	/*
-	 * Configure MC0: PA8
-	 */
-	rv = stm32f2_gpio_config(&mco_gpio, STM32F2_GPIO_ROLE_MCO);
-	if (rv != 0)
-		goto out;
-
-	/*
-	 * Output HSE clock (25MHz) on MCO pin (PA8) to clock the PHY
-	 */
-	val  = STM32_RCC->cfgr;
-
-	val &= ~(STM32_RCC_CFGR_MCO1_MSK << STM32_RCC_CFGR_MCO1_BIT);
-	val |= STM32_RCC_CFGR_MCO1_HSE << STM32_RCC_CFGR_MCO1_BIT;
-
-	val &= ~(STM32_RCC_CFGR_MCO1PRE_MSK << STM32_RCC_CFGR_MCO1PRE_BIT);
-	val |= STM32_RCC_CFGR_MCO1PRE_DIVNO << STM32_RCC_CFGR_MCO1PRE_BIT;
-
-	STM32_RCC->cfgr = val;
 
 	/*
 	 * Set MII mode

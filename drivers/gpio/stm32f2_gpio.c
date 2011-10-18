@@ -106,8 +106,7 @@ struct stm32f2_gpio_regs {
 	u32	pupdr;		/* GPIO port pull-up/pull-down		      */
 	u32	idr;		/* GPIO port input data			      */
 	u32	odr;		/* GPIO port output data		      */
-	u16	bsrrl;		/* GPIO port bit set/reset low		      */
-	u16	bsrrh;		/* GPIO port bit set/reset high		      */
+	u32	bsrr;		/* GPIO port bit set/reset		      */
 	u32	lckr;		/* GPIO port configuration lock		      */
 	u32	afr[2];		/* GPIO alternate function		      */
 };
@@ -124,12 +123,13 @@ static const unsigned long io_base[] = {
 /*
  * AF values (note, indexed by enum stm32f2_gpio_role)
  */
-static const u32 af_val[] = {
+static const u32 af_val[STM32F2_GPIO_ROLE_LAST] = {
 	STM32F2_GPIO_AF_USART1, STM32F2_GPIO_AF_USART2, STM32F2_GPIO_AF_USART3,
 	STM32F2_GPIO_AF_USART4, STM32F2_GPIO_AF_USART5, STM32F2_GPIO_AF_USART6,
 	STM32F2_GPIO_AF_MAC,
-	0,
-	STM32F2_GPIO_AF_FSMC
+	(u32)-1,
+	STM32F2_GPIO_AF_FSMC,
+	(u32)-1
 };
 
 /*
@@ -140,7 +140,7 @@ int stm32f2_gpio_config(struct stm32f2_gpio_dsc *dsc,
 {
 	volatile struct stm32f2_gpio_regs	*gpio_regs;
 
-	u32	otype, ospeed, pupd, i;
+	u32	otype, ospeed, pupd, mode, i;
 	int	rv;
 
 	/*
@@ -167,6 +167,7 @@ int stm32f2_gpio_config(struct stm32f2_gpio_dsc *dsc,
 		otype  = STM32F2_GPIO_OTYPE_PP;
 		ospeed = STM32F2_GPIO_SPEED_50M;
 		pupd   = STM32F2_GPIO_PUPD_UP;
+		mode   = STM32F2_GPIO_MODE_AF;
 		break;
 	case STM32F2_GPIO_ROLE_ETHERNET:
 	case STM32F2_GPIO_ROLE_MCO:
@@ -174,6 +175,13 @@ int stm32f2_gpio_config(struct stm32f2_gpio_dsc *dsc,
 		otype  = STM32F2_GPIO_OTYPE_PP;
 		ospeed = STM32F2_GPIO_SPEED_100M;
 		pupd   = STM32F2_GPIO_PUPD_NO;
+		mode   = STM32F2_GPIO_MODE_AF;
+		break;
+	case STM32F2_GPIO_ROLE_GPOUT:
+		otype  = STM32F2_GPIO_OTYPE_PP;
+		ospeed = STM32F2_GPIO_SPEED_50M;
+		pupd   = STM32F2_GPIO_PUPD_NO;
+		mode   = STM32F2_GPIO_MODE_OUT;
 		break;
 	default:
 		printf("%s: incorrect role %d.\n", __func__, role);
@@ -191,7 +199,7 @@ int stm32f2_gpio_config(struct stm32f2_gpio_dsc *dsc,
 	 */
 	STM32_RCC->ahb1enr |= 1 << dsc->port;
 
-	if (role != STM32F2_GPIO_ROLE_MCO) {
+	if (af_val[role] != (u32)-1) {
 		/*
 		 * Connect PXy to the specified controller (role)
 		 */
@@ -206,7 +214,7 @@ int stm32f2_gpio_config(struct stm32f2_gpio_dsc *dsc,
 	 * Set Alternative function mode
 	 */
 	gpio_regs->moder &= ~(0x3 << i);
-	gpio_regs->moder |= STM32F2_GPIO_MODE_AF << i;
+	gpio_regs->moder |= mode << i;
 
 	/*
 	 * Output mode configuration
@@ -231,3 +239,32 @@ out:
 	return rv;
 }
 
+/*
+ * Set GPOUT to the state specified (1, 0)
+ */
+int stm32f2_gpout_set(struct stm32f2_gpio_dsc *dsc, int state)
+{
+	volatile struct stm32f2_gpio_regs	*gpio_regs;
+	int					rv;
+
+	if (!dsc || dsc->port > 8 || dsc->pin > 15) {
+		printf("%s: incorrect params %d.%d.\n", __func__,
+			dsc ? dsc->port : -1,
+			dsc ? dsc->pin  : -1);
+		rv = -EINVAL;
+		goto out;
+	}
+
+	gpio_regs = (struct stm32f2_gpio_regs *)io_base[dsc->port];
+
+	rv = !!state;
+	if (rv) {
+		/* Set */
+		gpio_regs->bsrr = 1 << dsc->pin;
+	} else {
+		/* Reset */
+		gpio_regs->bsrr = 1 << (dsc->pin + 16);
+	}
+out:
+	return rv;
+}
