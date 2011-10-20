@@ -78,12 +78,12 @@
 /*
  * USART registers bases
  */
-#define STM32_USART1_BASE	(STM32_APB2PERITH_BASE + 0x1000)
-#define STM32_USART2_BASE	(STM32_APB1PERITH_BASE + 0x4400)
-#define STM32_USART3_BASE	(STM32_APB1PERITH_BASE + 0x4800)
-#define STM32_USART4_BASE	(STM32_APB1PERITH_BASE + 0x4C00)
-#define STM32_USART5_BASE	(STM32_APB1PERITH_BASE + 0x5000)
-#define STM32_USART6_BASE	(STM32_APB2PERITH_BASE + 0x1400)
+#define STM32_USART1_BASE	(STM32_APB2PERIPH_BASE + 0x1000)
+#define STM32_USART2_BASE	(STM32_APB1PERIPH_BASE + 0x4400)
+#define STM32_USART3_BASE	(STM32_APB1PERIPH_BASE + 0x4800)
+#define STM32_USART4_BASE	(STM32_APB1PERIPH_BASE + 0x4C00)
+#define STM32_USART5_BASE	(STM32_APB1PERIPH_BASE + 0x5000)
+#define STM32_USART6_BASE	(STM32_APB2PERIPH_BASE + 0x1400)
 
 /*
  * SR bit masks
@@ -193,7 +193,7 @@ static volatile struct stm32_usart_regs	*usart_regs;
 /*
  * Initialize the serial port.
  */
-int serial_init(void)
+s32 serial_init(void)
 {
 	static struct stm32f2_gpio_dsc	tx_gpio = { USART_TX_IO_PORT,
 						    USART_TX_IO_PIN };
@@ -201,7 +201,7 @@ int serial_init(void)
 						    USART_RX_IO_PIN };
 	static volatile u32		*usart_enr;
 
-	int	rv;
+	s32	rv;
 
 	/*
 	 * Setup registers
@@ -289,7 +289,7 @@ void serial_setbrg(void)
 /*
  * Read a single character from the serial port.
  */
-int serial_getc(void)
+s32 serial_getc(void)
 {
 	while (!(usart_regs->sr & STM32_USART_SR_RXNE));
 
@@ -321,7 +321,7 @@ void serial_puts(const char *s)
 /*
  * Test whether a character in in the RX buffer.
  */
-int serial_tstc(void)
+s32 serial_tstc(void)
 {
 	return (usart_regs->sr & STM32_USART_SR_RXNE) ? 1 : 0;
 }

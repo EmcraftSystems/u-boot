@@ -54,7 +54,7 @@
 /*
  * MAC registers base
  */
-#define STM32_MAC_BASE			(STM32_AHB1PERITH_BASE + 0x8000)
+#define STM32_MAC_BASE			(STM32_AHB1PERIPH_BASE + 0x8000)
 
 /*
  * MACCR reg fields
@@ -141,7 +141,7 @@
 /*
  * STM32 SYSCFG definitions
  */
-#define STM32_SYSCFG_BASE		(STM32_APB2PERITH_BASE + 0x3800)
+#define STM32_SYSCFG_BASE		(STM32_APB2PERIPH_BASE + 0x3800)
 
 /*
  * PMC reg fields
@@ -247,7 +247,8 @@ struct stm32_mac_regs {
 	u32	dmachtbar;	/* DMA current host transmit buffer address   */
 	u32	dmachrbar;	/* DMA current host receive buffer address    */
 };
-#define STM32_MAC	((volatile struct stm32_mac_regs *)STM32_MAC_BASE)
+#define STM32_MAC			((volatile struct stm32_mac_regs *) \
+					STM32_MAC_BASE)
 
 /*
  * SYSCFG register map
@@ -259,8 +260,8 @@ struct stm32_syscfg_regs {
 	u32	rsv0[2];
 	u32	cmpcr;		/* Compensation cell control		      */
 };
-#define STM32_SYSCFG	((volatile struct stm32_syscfg_regs *)		       \
-			 STM32_SYSCFG_BASE)
+#define STM32_SYSCFG			((volatile struct stm32_syscfg_regs *) \
+					STM32_SYSCFG_BASE)
 
 /*
  * STM32 ETH Normal DMA buffer descriptors
@@ -294,7 +295,7 @@ struct stm_eth_dev {
 	 */
 	volatile struct stm_eth_dma_bd	tx_bd;
 	volatile struct stm_eth_dma_bd	rx_bd[PKTBUFSRX];
-	int				rx_bd_idx;
+	s32				rx_bd_idx;
 
 	/*
 	 * ETH DMAed buffers:
@@ -364,22 +365,22 @@ static struct stm32f2_gpio_dsc mac_gpio[] = {
 /*
  * Prototypes
  */
-static  int stm_eth_init(struct eth_device *dev, bd_t *bd);
-static  int stm_eth_send(struct eth_device *dev, volatile void *pkt, int len);
-static  int stm_eth_recv(struct eth_device *dev);
+static  s32 stm_eth_init(struct eth_device *dev, bd_t *bd);
+static  s32 stm_eth_send(struct eth_device *dev, volatile void *pkt, s32 len);
+static  s32 stm_eth_recv(struct eth_device *dev);
 static void stm_eth_halt(struct eth_device *dev);
 
-static  int stm_phy_write(struct stm_eth_dev *mac, u16 reg, u16 val);
-static  int stm_phy_read(struct stm_eth_dev *mac, u16 reg, u16 *val);
+static  s32 stm_phy_write(struct stm_eth_dev *mac, u16 reg, u16 val);
+static  s32 stm_phy_read(struct stm_eth_dev *mac, u16 reg, u16 *val);
 
 /*
  * Initialize driver
  */
-int stm32_eth_init(bd_t *bd)
+s32 stm32_eth_init(bd_t *bd)
 {
 	struct stm_eth_dev	*mac;
 	struct eth_device	*netdev;
-	int			rv;
+	s32			rv;
 
 	mac = malloc(sizeof(struct stm_eth_dev));
 	if (!mac) {
@@ -421,9 +422,9 @@ out:
 /*
  * Initialize PHY
  */
-static int stm_phy_init(struct stm_eth_dev *mac)
+static s32 stm_phy_init(struct stm_eth_dev *mac)
 {
-	int	i, rv;
+	s32	i, rv;
 	u16	val;
 
 	/*
@@ -465,11 +466,11 @@ out:
 /*
  * Get link status
  */
-static int stm_phy_link_get(struct stm_eth_dev *mac,
-			    int *link_up, int *full_dup, int *speed)
+static s32 stm_phy_link_get(struct stm_eth_dev *mac,
+			    s32 *link_up, s32 *full_dup, s32 *speed)
 {
 	u16	val;
-	int	rv;
+	s32	rv;
 
 	rv = stm_phy_read(mac, PHY_BMSR, &val);
 	if (rv != 0)
@@ -490,11 +491,11 @@ out:
 /*
  * Setup link status
  */
-static int stm_phy_link_setup(struct stm_eth_dev *mac)
+static s32 stm_phy_link_setup(struct stm_eth_dev *mac)
 {
-	static int	link_inited;
+	static s32	link_inited;
 
-	int		link_up, full_dup, speed, rv, i;
+	s32		link_up, full_dup, speed, rv, i;
 	u32		cr_val;
 	u16		val;
 
@@ -583,11 +584,11 @@ out:
 /*
  * Write PHY
  */
-static int stm_phy_write(struct stm_eth_dev *mac, u16 reg, u16 val)
+static s32 stm_phy_write(struct stm_eth_dev *mac, u16 reg, u16 val)
 {
 	u16	adr = mac->phy_adr;
 	u32	tmp;
-	int	rv;
+	s32	rv;
 
 	tmp = 0;
 	while ((STM32_MAC->macmiiar & STM32_MAC_MIIAR_MB) &&
@@ -647,11 +648,11 @@ out:
 /*
  * Read PHY
  */
-static int stm_phy_read(struct stm_eth_dev *mac, u16 reg, u16 *val)
+static s32 stm_phy_read(struct stm_eth_dev *mac, u16 reg, u16 *val)
 {
 	u16	adr = mac->phy_adr;
 	u32	tmp;
-	int	rv;
+	s32	rv;
 
 	tmp = 0;
 	while ((STM32_MAC->macmiiar & STM32_MAC_MIIAR_MB) &&
@@ -714,7 +715,7 @@ out:
  */
 static void stm_mac_bd_init(struct stm_eth_dev *mac)
 {
-	int	i;
+	s32	i;
 
 	/*
 	 * Init Tx buffer descriptor
@@ -769,12 +770,12 @@ static void stm_mac_address_set(struct stm_eth_dev *mac)
 /*
  * Init GPIOs used by MAC
  */
-static int stm_mac_gpio_init(struct stm_eth_dev *mac)
+static s32 stm_mac_gpio_init(struct stm_eth_dev *mac)
 {
-	static int	gpio_inited;
+	static s32	gpio_inited;
 
 	u32		val;
-	int		i, rv;
+	s32		i, rv;
 
 	/*
 	 * Init GPIOs only once at start. Otherwise, reiniting then on
@@ -821,10 +822,10 @@ out:
 /*
  * Init STM32 MAC hardware
  */
-static int stm_mac_hw_init(struct stm_eth_dev *mac)
+static s32 stm_mac_hw_init(struct stm_eth_dev *mac)
 {
 	u32	tmp, hclk;
-	int	i, rv;
+	s32	i, rv;
 
 	/*
 	 * Init GPIOs
@@ -924,10 +925,10 @@ out:
 /*
  * Init STM32 MAC and DMA
  */
-static int stm_eth_init(struct eth_device *dev, bd_t *bd)
+static s32 stm_eth_init(struct eth_device *dev, bd_t *bd)
 {
 	struct stm_eth_dev	*mac = to_stm_eth(dev);
-	int			rv;
+	s32			rv;
 
 	/*
 	 * Init hw
@@ -976,10 +977,10 @@ out:
 /*
  * Send frame
  */
-static int stm_eth_send(struct eth_device *dev, volatile void *pkt, int len)
+static s32 stm_eth_send(struct eth_device *dev, volatile void *pkt, s32 len)
 {
 	struct stm_eth_dev	*mac = to_stm_eth(dev);
-	int			rv, tout;
+	s32			rv, tout;
 
 	if (len > PKTSIZE_ALIGN) {
 		printf("%s: frame too long (%d).\n", __func__, len);
@@ -1037,7 +1038,7 @@ out:
 /*
  * Process received frames (if any)
  */
-static int stm_eth_recv(struct eth_device *dev)
+static s32 stm_eth_recv(struct eth_device *dev)
 {
 	volatile struct stm_eth_dma_bd	*bd;
 	struct stm_eth_dev		*mac = to_stm_eth(dev);

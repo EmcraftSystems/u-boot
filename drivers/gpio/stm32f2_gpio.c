@@ -33,15 +33,15 @@
 /*
  * GPIO registers bases
  */
-#define STM32F2_GPIOA_BASE	(STM32_AHB1PERITH_BASE + 0x0000)
-#define STM32F2_GPIOB_BASE	(STM32_AHB1PERITH_BASE + 0x0400)
-#define STM32F2_GPIOC_BASE	(STM32_AHB1PERITH_BASE + 0x0800)
-#define STM32F2_GPIOD_BASE	(STM32_AHB1PERITH_BASE + 0x0C00)
-#define STM32F2_GPIOE_BASE	(STM32_AHB1PERITH_BASE + 0x1000)
-#define STM32F2_GPIOF_BASE	(STM32_AHB1PERITH_BASE + 0x1400)
-#define STM32F2_GPIOG_BASE	(STM32_AHB1PERITH_BASE + 0x1800)
-#define STM32F2_GPIOH_BASE	(STM32_AHB1PERITH_BASE + 0x1C00)
-#define STM32F2_GPIOI_BASE	(STM32_AHB1PERITH_BASE + 0x2000)
+#define STM32F2_GPIOA_BASE	(STM32_AHB1PERIPH_BASE + 0x0000)
+#define STM32F2_GPIOB_BASE	(STM32_AHB1PERIPH_BASE + 0x0400)
+#define STM32F2_GPIOC_BASE	(STM32_AHB1PERIPH_BASE + 0x0800)
+#define STM32F2_GPIOD_BASE	(STM32_AHB1PERIPH_BASE + 0x0C00)
+#define STM32F2_GPIOE_BASE	(STM32_AHB1PERIPH_BASE + 0x1000)
+#define STM32F2_GPIOF_BASE	(STM32_AHB1PERIPH_BASE + 0x1400)
+#define STM32F2_GPIOG_BASE	(STM32_AHB1PERIPH_BASE + 0x1800)
+#define STM32F2_GPIOH_BASE	(STM32_AHB1PERIPH_BASE + 0x1C00)
+#define STM32F2_GPIOI_BASE	(STM32_AHB1PERIPH_BASE + 0x2000)
 
 /*
  * GPIO configuration mode
@@ -135,13 +135,13 @@ static const u32 af_val[STM32F2_GPIO_ROLE_LAST] = {
 /*
  * Configure the specified GPIO for the specified role
  */
-int stm32f2_gpio_config(struct stm32f2_gpio_dsc *dsc,
+s32 stm32f2_gpio_config(struct stm32f2_gpio_dsc *dsc,
 			enum stm32f2_gpio_role role)
 {
 	volatile struct stm32f2_gpio_regs	*gpio_regs;
 
 	u32	otype, ospeed, pupd, mode, i;
-	int	rv;
+	s32	rv;
 
 	/*
 	 * Check params
@@ -242,10 +242,10 @@ out:
 /*
  * Set GPOUT to the state specified (1, 0)
  */
-int stm32f2_gpout_set(struct stm32f2_gpio_dsc *dsc, int state)
+s32 stm32f2_gpout_set(struct stm32f2_gpio_dsc *dsc, int state)
 {
 	volatile struct stm32f2_gpio_regs	*gpio_regs;
-	int					rv;
+	s32					rv;
 
 	if (!dsc || dsc->port > 8 || dsc->pin > 15) {
 		printf("%s: incorrect params %d.%d.\n", __func__,

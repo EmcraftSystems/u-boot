@@ -30,10 +30,10 @@
  ******************************************************************************/
 
 #define STM32_PERIPH_BASE	0x40000000
-#define STM32_APB1PERITH_BASE	(STM32_PERIPH_BASE + 0x00000000)
-#define STM32_APB2PERITH_BASE	(STM32_PERIPH_BASE + 0x00010000)
-#define STM32_AHB1PERITH_BASE	(STM32_PERIPH_BASE + 0x00020000)
-#define STM32_AHB2PERITH_BASE	(STM32_PERIPH_BASE + 0x10000000)
+#define STM32_APB1PERIPH_BASE	(STM32_PERIPH_BASE + 0x00000000)
+#define STM32_APB2PERIPH_BASE	(STM32_PERIPH_BASE + 0x00010000)
+#define STM32_AHB1PERIPH_BASE	(STM32_PERIPH_BASE + 0x00020000)
+#define STM32_AHB2PERIPH_BASE	(STM32_PERIPH_BASE + 0x10000000)
 
 /******************************************************************************
  * Reset and Clock Control
@@ -90,8 +90,9 @@ enum clock {
 /*
  * RCC registers base
  */
-#define STM32_RCC_BASE		(STM32_AHB1PERITH_BASE + 0x3800)
-#define STM32_RCC	((volatile struct stm32_rcc_regs *)STM32_RCC_BASE)
+#define STM32_RCC_BASE			(STM32_AHB1PERIPH_BASE + 0x3800)
+#define STM32_RCC			((volatile struct stm32_rcc_regs *) \
+					STM32_RCC_BASE)
 
 /******************************************************************************
  * Flexible static memory controller
@@ -116,7 +117,8 @@ struct stm32_fsmc_regs {
  * FSMC registers base
  */
 #define STM32_FSMC_BASE			0xA0000000
-#define STM32_FSMC	((volatile struct stm32_fsmc_regs *)STM32_FSMC_BASE)
+#define STM32_FSMC			((volatile struct stm32_fsmc_regs *) \
+					STM32_FSMC_BASE)
 
 /*
  * BCR reg fields

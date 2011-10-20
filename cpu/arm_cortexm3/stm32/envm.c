@@ -42,26 +42,26 @@ static u32 flash_bsize[] = {
 /*
  * Number of flash blocks for STM32F2x chips
  */
-#define STM32_FLASH_BLOCKS	(sizeof(flash_bsize)/sizeof(flash_bsize[0]))
+#define STM32_FLASH_BLOCKS		ARRAY_SIZE(flash_bsize)
 
 /*
  * Flash registers base
  */
-#define STM32_FLASHREGS_BASE		(STM32_AHB1PERITH_BASE + 0x3C00)
+#define STM32_FLASHREGS_BASE		(STM32_AHB1PERIPH_BASE + 0x3C00)
 
 /*
  * Flash register map
  */
 struct stm32_flash_regs {
-	u32	acr;		/* Access control		*/
-	u32	keyr;		/* Key				*/
-	u32	optkeyr;	/* Option key			*/
-	u32	sr;		/* Status			*/
-	u32	cr;		/* Control			*/
-	u32	optcr;		/* Option control		*/
+	u32	acr;			/* Access control		*/
+	u32	keyr;			/* Key				*/
+	u32	optkeyr;		/* Option key			*/
+	u32	sr;			/* Status			*/
+	u32	cr;			/* Control			*/
+	u32	optcr;			/* Option control		*/
 };
-#define STM32_FLASH_REGS	((volatile struct stm32_flash_regs *)	\
-				STM32_FLASHREGS_BASE)
+#define STM32_FLASH_REGS		((volatile struct stm32_flash_regs *) \
+					STM32_FLASHREGS_BASE)
 
  /*
  * Flash CR definitions
@@ -82,10 +82,10 @@ struct stm32_flash_regs {
 /*
  * Flash ACR definitions
  */
-#define STM32_FLASH_ACR_LAT_BIT		0	 /* Latency */
+#define STM32_FLASH_ACR_LAT_BIT		0		/* Latency           */
 #define STM32_FLASH_ACR_LAT_MSK		0x7
-#define STM32_FLASH_ACR_PRFTEN		(1 << 8) /* Prefetch enable		*/
-#define STM32_FLASH_ACR_ICEN		(1 << 9) /* Instruction cache enable	*/
+#define STM32_FLASH_ACR_PRFTEN		(1 << 8)	/* Prefetch enable   */
+#define STM32_FLASH_ACR_ICEN		(1 << 9)	/* Icache enable     */
 
 /*
  * Flash KEYR definitions
