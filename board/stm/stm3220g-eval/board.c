@@ -227,7 +227,7 @@ int dram_init(void)
 	stm32f2_gpout_set(&ctrl_gpio, 0);
 
 	/* Step.6 */
-	STM32_FSMC->cs[i].bcr = 0x00081115;
+	STM32_FSMC->cs[i].bcr = 0x00083115;
 	STM32_FSMC->cs[i].btr = 0x0010FFFF;
 
 	/* Step.7 */
@@ -242,13 +242,13 @@ int dram_init(void)
 	stm32f2_gpout_set(&ctrl_gpio, 1);
 
 	/* Step.10 */
-	*(volatile u16 *)(CONFIG_SYS_RAM_BASE + 0x01102234) = 0;
+	*(volatile u16 *)(CONFIG_SYS_RAM_BASE + 0x0110223E) = 0;
 
 	/* Step.11 */
 	stm32f2_gpout_set(&ctrl_gpio, 0);
 
 	/* Step.12 */
-	STM32_FSMC->cs[i].bcr = 0x00081115;
+	STM32_FSMC->cs[i].bcr = 0x00083115;
 	STM32_FSMC->cs[i].btr = 0x0010FFFF;
 
 	/* Step.13 */
