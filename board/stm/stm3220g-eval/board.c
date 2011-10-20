@@ -170,8 +170,8 @@ int misc_init_r(void)
 
 	STM32_FSMC->cs[i].bcr = CONFIG_SYS_FSMC_FLASH_BCR;
 	STM32_FSMC->cs[i].btr = CONFIG_SYS_FSMC_FLASH_BTR;
-# if defined(CONFIG_SYS_FSMC_FLASH_BWR)
-	STM32_FSMC->wt[i].wtr = CONFIG_SYS_FSMC_FLASH_BWR;
+# if defined(CONFIG_SYS_FSMC_FLASH_BWTR)
+	STM32_FSMC->wt[i].bwtr = CONFIG_SYS_FSMC_FLASH_BWTR;
 # endif
 #endif /* CONFIG_SYS_NO_FLASH */
 
@@ -204,8 +204,8 @@ int dram_init(void)
 	/* Step.1 */
 	STM32_FSMC->cs[i].bcr = CONFIG_SYS_FSMC_PSRAM_BCR;
 	STM32_FSMC->cs[i].btr = CONFIG_SYS_FSMC_PSRAM_BTR;
-# if defined(CONFIG_SYS_FSMC_PSRAM_BWR)
-	STM32_FSMC->wt[i].wtr = CONFIG_SYS_FSMC_PSRAM_BWR;
+# if defined(CONFIG_SYS_FSMC_PSRAM_BWTR)
+	STM32_FSMC->wt[i].bwtr = CONFIG_SYS_FSMC_PSRAM_BWTR;
 # endif
 
 	rv = stm32f2_gpio_config(&ctrl_gpio, STM32F2_GPIO_ROLE_GPOUT);
@@ -236,7 +236,7 @@ int dram_init(void)
 	/* Step.8 */
 	STM32_FSMC->cs[i].bcr = 0x00005059;
 	STM32_FSMC->cs[i].btr = 0x100106F2;
-	STM32_FSMC->wt[i].wtr = 0x100107F2;
+	STM32_FSMC->wt[i].bwtr = 0x100107F2;
 
 	/* Step.9 */
 	stm32f2_gpout_set(&ctrl_gpio, 1);
