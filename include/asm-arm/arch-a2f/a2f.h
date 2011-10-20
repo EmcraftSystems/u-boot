@@ -128,14 +128,8 @@ enum clock {
 
 /*
  * Return a clock value for the specified clock.
- * Note that we need this function in RAM because it will be used
- * during self-upgrade of U-boot into eNMV.
- * @param clck		id of the clock
- * @returns		frequency of the clock
  */
-extern unsigned long  __attribute__((section(".ramcode")))
-		__attribute__ ((long_call))
-		clock_get(enum clock clck);
+extern ulong clock_get(enum clock clck);
 
 #endif	/*_MACH_A2F_H_ */
 

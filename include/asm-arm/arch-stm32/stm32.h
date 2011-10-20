@@ -108,7 +108,7 @@ struct stm32_fsmc_regs {
 	} cs[4];
 	u32	rsv0[57];
 	struct {
-		u32	wtr;		/* Write timing			      */
+		u32	bwtr;		/* Write timing			      */
 		u32	rsv1;
 	} wt[4];
 };

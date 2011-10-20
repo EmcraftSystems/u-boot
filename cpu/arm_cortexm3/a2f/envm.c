@@ -25,20 +25,21 @@
  * ENVM control & status registers
  */
 struct mss_envm {
-	unsigned int status;
-	unsigned int control;
-	unsigned int enable;
-	unsigned int reserved0;
-	unsigned int config_0;
-	unsigned int config_1;
-	unsigned int page_status_0;
-	unsigned int page_status_1;
-	unsigned int segment;
-	unsigned int envm_select;
+	u32 status;
+	u32 control;
+	u32 enable;
+	u32 reserved0;
+	u32 config_0;
+	u32 config_1;
+	u32 page_status_0;
+	u32 page_status_1;
+	u32 segment;
+	u32 envm_select;
 };
 
 #define MSS_ENVM_REGS_BASE		0x60100000
-#define MSS_ENVM	((volatile struct mss_envm *)(MSS_ENVM_REGS_BASE))
+#define MSS_ENVM			((volatile struct mss_envm *) \
+					(MSS_ENVM_REGS_BASE))
 
 /*
  * Base address of the eNVM Flash
@@ -91,12 +92,9 @@ void envm_init(void)
  * Note that we need for this function to reside in RAM since it
  * will be used to self-upgrade U-boot in eNMV.
  */
-static int __attribute__((section(".ramcode")))
+static s32 __attribute__((section(".ramcode")))
   mss_envm_exec_cmd(unsigned int addr, unsigned int cmd)
 {
-	unsigned int status;
-	int wait;
-
 	/*
 	 * Get the page address.
 	 */
@@ -115,29 +113,10 @@ static int __attribute__((section(".ramcode")))
 	/*
 	 * Wait for the command to finish
 	 */
-	for (wait = 0; wait < MSS_ENVM_MAX_WAIT_CNT; wait++) {
-		status = MSS_ENVM->status;
-		if (!(status & MSS_ENVM_STATUS_BUSY)) {
-			break;
-		}
+	while (MSS_ENVM->status & MSS_ENVM_STATUS_BUSY)
+		;
 
-		/*
-		 * If not done yet, delay
-		 */
-		A2F_TIMER->timer1_loadval =
-				MSS_ENVM_WAIT_INTERVAL
-				* (clock_get(CLOCK_PCLK0) / 1000000);
-		while (A2F_TIMER->timer1_val) ;
-	}
-
-	/*
-	 * Check the status
-	 */
-	if (status & MSS_ENVM_STATUS_BUSY) {
-		return -1;
-	}
-
-	if (status & MSS_ENVM_STATUS_ERROR_MASK) {
+	if (MSS_ENVM->status & MSS_ENVM_STATUS_ERROR_MASK) {
 		/*
 		 * This code below is a workaround for an occurance
 		 * of the write count has exceeded the 10-year retention
@@ -152,7 +131,7 @@ static int __attribute__((section(".ramcode")))
 		 * on the board I have has that problem, and the code below
 		 * allows to actually program that page with new content.
 		 */
-		if ((status & 0x180) == 0x180)  {
+		if ((MSS_ENVM->status & 0x180) == 0x180)  {
 			/*
 			 * Assume the page has been programmed successfully
 			 */
@@ -172,14 +151,14 @@ static int __attribute__((section(".ramcode")))
  * Note that we need for this function to reside in RAM since it
  * will be used to self-upgrade U-boot in eNMV.
  */
-unsigned int __attribute__((section(".ramcode")))
+u32 __attribute__((section(".ramcode")))
              __attribute__ ((long_call))
-  envm_write(unsigned int offset, void * buf, unsigned int size)
+  envm_write(u32 offset, void * buf, u32 size)
 {
-	unsigned int addr = MSS_ENVM_BASE + offset;
-	unsigned char * src = (unsigned char *) buf;
-	unsigned int i, written = 0;
-	int ret = 0;
+	u32 addr = MSS_ENVM_BASE + offset;
+	u8 *src = (u8 *) buf;
+	u32 i, written = 0;
+	s32 ret = 0;
 
 	/*
 	 * Check the sanity of the request.
