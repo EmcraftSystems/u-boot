@@ -150,8 +150,11 @@
 /*
  * Store env in memory only
  */
-#define CONFIG_ENV_IS_NOWHERE
+#define CONFIG_ENV_IS_IN_FLASH
 #define CONFIG_ENV_SIZE			(4 * 1024)
+#define CONFIG_ENV_ADDR			CONFIG_SYS_FLASH_BANK1_BASE
+#define CONFIG_INFERNO			1
+#define CONFIG_ENV_OVERWRITE		1
 #define CONFIG_ENV_OVERWRITE		1
 
 /*

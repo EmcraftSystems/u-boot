@@ -984,6 +984,13 @@ int flash_erase (flash_info_t * info, int s_first, int s_last)
 				flash_unlock_seq (info, sect);
 				flash_write_cmd (info, sect, 0,
 						 AMD_CMD_ERASE_SECTOR);
+				/* Wait before checking the status.
+				 * This is added after the similar delay in
+				 * linux/drivers/mtd/chips/cfi_cmdset_0002.c:do_erase_oneblock().
+				 * FIXME: why erase_blk_tout is so big, vs to
+				 * the value in the Linux mtd driver?
+				 */
+				udelay(500000);
 				break;
 #ifdef CONFIG_FLASH_CFI_LEGACY
 			case CFI_CMDSET_AMD_LEGACY:
