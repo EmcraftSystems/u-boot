@@ -30,6 +30,8 @@
 #include <asm/arch/stm32.h>
 #include <asm/arch/stm32f2_gpio.h>
 
+DECLARE_GLOBAL_DATA_PTR;
+
 /*
  * GPIO registers bases
  */
@@ -134,6 +136,7 @@ static const u32 af_val[STM32F2_GPIO_ROLE_LAST] = {
 
 /*
  * Configure the specified GPIO for the specified role
+ * Returns 0 on success, -EINVAL otherwise.
  */
 s32 stm32f2_gpio_config(struct stm32f2_gpio_dsc *dsc,
 			enum stm32f2_gpio_role role)
@@ -147,9 +150,10 @@ s32 stm32f2_gpio_config(struct stm32f2_gpio_dsc *dsc,
 	 * Check params
 	 */
 	if (!dsc || dsc->port > 8 || dsc->pin > 15) {
-		printf("%s: incorrect params %d.%d.\n", __func__,
-			dsc ? dsc->port : -1,
-			dsc ? dsc->pin  : -1);
+		if (gd->have_console)
+			printf("%s: incorrect params %d.%d.\n", __func__,
+				dsc ? dsc->port : -1,
+				dsc ? dsc->pin  : -1);
 		rv = -EINVAL;
 		goto out;
 	}
@@ -184,7 +188,8 @@ s32 stm32f2_gpio_config(struct stm32f2_gpio_dsc *dsc,
 		mode   = STM32F2_GPIO_MODE_OUT;
 		break;
 	default:
-		printf("%s: incorrect role %d.\n", __func__, role);
+		if (gd->have_console)
+			printf("%s: incorrect role %d.\n", __func__, role);
 		rv = -EINVAL;
 		goto out;
 	}
@@ -240,7 +245,8 @@ out:
 }
 
 /*
- * Set GPOUT to the state specified (1, 0)
+ * Set GPOUT to the state specified (1, 0).
+ * Returns 0 on success, -EINVAL otherwise.
  */
 s32 stm32f2_gpout_set(struct stm32f2_gpio_dsc *dsc, int state)
 {
@@ -248,23 +254,24 @@ s32 stm32f2_gpout_set(struct stm32f2_gpio_dsc *dsc, int state)
 	s32					rv;
 
 	if (!dsc || dsc->port > 8 || dsc->pin > 15) {
-		printf("%s: incorrect params %d.%d.\n", __func__,
-			dsc ? dsc->port : -1,
-			dsc ? dsc->pin  : -1);
+		if (gd->have_console)
+			printf("%s: incorrect params %d.%d.\n", __func__,
+				dsc ? dsc->port : -1,
+				dsc ? dsc->pin  : -1);
 		rv = -EINVAL;
 		goto out;
 	}
 
 	gpio_regs = (struct stm32f2_gpio_regs *)io_base[dsc->port];
 
-	rv = !!state;
-	if (rv) {
+	if (state) {
 		/* Set */
 		gpio_regs->bsrr = 1 << dsc->pin;
 	} else {
 		/* Reset */
 		gpio_regs->bsrr = 1 << (dsc->pin + 16);
 	}
+	rv = 0;
 out:
 	return rv;
 }
