@@ -66,9 +66,45 @@
 
 /*
  * Clock configuration (see cpu/arm_cortexm3/lpc178x/clock.c for details)
- *
- * TBD
  */
+/*
+ * This should be setup to the board specific rate for the external oscillator
+ */
+#define CONFIG_LPC178X_EXTOSC_RATE		12000000
+
+/*
+ * PLL0 is enabled, therefore
+ * the values of CONFIG_LPC178X_PLL0_M and CONFIG_LPC178X_PLL0_PSEL must
+ * be setup to configure the PLL0 rate based on the selected input clock.
+ * See the LCP178x/7x User's Manual for information on setting these
+ * values correctly. SYSCLK is used as the PLL0 input clock.
+ */
+/*
+ * PLL0_CLK_OUT = CONFIG_LPC178X_PLL0_M * CONFIG_LPC178X_EXTOSC_RATE
+ *
+ * PLL0_FCCO must be between 156MHz and 320MHz
+ *  where PLL0_FFC0 = PLL0_CLK_OUT * 2 * P
+ * PLL0_CLK_OUT must be between 9.75MHz and 160MHz
+ */
+/*
+ * PLL Multiplier value (1..32)
+ */
+/* TODO: change M to 10 in order to reach 120 MHz CPU clock */
+#define CONFIG_LPC178X_PLL0_M		9	/* 12 MHz * 9 = 108 MHz */
+/*
+ * PSEL (a 0..3 code for PLL Divider value)
+ * P (PPL divider value) = 2 in the power of PSEL
+ * PSEL = 0..3 make P = 1, 2, 4 or 8.
+ */
+#define CONFIG_LPC178X_PLL0_PSEL	0	/* P = 1 */
+
+/*
+ * CCLKDIV value. Selects the divide value for creating the CPU clock (CCLK)
+ * from the selected clock source.
+ * CONFIG_LPC178X_CPU_DIV=1 means that the input clock is divided by 1
+ * to produce the CPU clock.
+ */
+#define CONFIG_LPC178X_CPU_DIV		1
 
 /*
  * Number of clock ticks in 1 sec
