@@ -119,6 +119,9 @@ typedef volatile unsigned char	vu_char;
 #ifdef CONFIG_SYS_STM32
 #include <asm/arch-stm32/stm32.h>
 #endif
+#ifdef CONFIG_SYS_LPC178X
+#include <asm/arch-lpc178x/lpc178x.h>
+#endif
 
 #include <part.h>
 #include <flash.h>
@@ -468,7 +471,8 @@ int	checkdcache   (void);
 void	upmconfig     (unsigned int, unsigned int *, unsigned int);
 ulong	get_tbclk     (void);
 void
-#if defined(CONFIG_SYS_A2F) || defined(CONFIG_SYS_STM32)
+#if defined(CONFIG_SYS_A2F) || defined(CONFIG_SYS_STM32) || \
+    defined(CONFIG_SYS_LPC178X)
 	__attribute__((section(".ramcode")))
 	__attribute__ ((long_call))
 #endif

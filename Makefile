@@ -3203,6 +3203,9 @@ a2f-hoermann-brd_config :  unconfig
 stm3220g-eval_config : unconfig
 	@$(MKCONFIG) $(@:_config=) arm arm_cortexm3 stm3220g-eval stm stm32
 
+ea-lpc1788_config : unconfig
+	@$(MKCONFIG) $(@:_config=) arm arm_cortexm3 ea-lpc1788 nxp lpc178x
+
 #########################################################################
 ## XScale Systems
 #########################################################################

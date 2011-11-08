@@ -54,6 +54,8 @@ int arch_cpu_init(void)
 	gd->bd->bi_arch_number = MACH_TYPE_A2F;
 #elif defined(CONFIG_SYS_STM32)
 	gd->bd->bi_arch_number = MACH_TYPE_STM32;
+#elif defined(CONFIG_SYS_LPC178X)
+	gd->bd->bi_arch_number = MACH_TYPE_LPC178X;
 #else
 # error "Unsupported Cortex-M3 SOC."
 #endif
