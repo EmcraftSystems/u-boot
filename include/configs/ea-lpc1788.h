@@ -210,6 +210,11 @@
 #define CONFIG_BOOTCOMMAND		"run netboot"
 
 /*
+ * This ensures that the board-specific misc_init_r() gets invoked.
+ */
+#define CONFIG_MISC_INIT_R
+
+/*
  * Short-cuts to some useful commands (macros)
  */
 #define CONFIG_EXTRA_ENV_SETTINGS				\

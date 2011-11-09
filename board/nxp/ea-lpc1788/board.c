@@ -50,11 +50,13 @@ int checkboard(void)
 /*
  * Configure board specific parts.
  */
+#ifdef CONFIG_MISC_INIT_R
 int misc_init_r(void)
 {
 	/* TBD */
 	return 0;
 }
+#endif /* CONFIG_MISC_INIT_R */
 
 /*
  * Setup external RAM.
