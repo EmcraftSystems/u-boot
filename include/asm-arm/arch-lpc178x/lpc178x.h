@@ -41,8 +41,7 @@
  * PLL register map
  * Used for PLL0 at 0x400FC080 and for PLL1 at 0x400FC0A0.
  */
-struct lpc178x_pll_regs
-{
+struct lpc178x_pll_regs {
 	u32 con;	/* PLL Control register */
 	u32 cfg;	/* PLL Configuration register */
 	u32 stat;	/* PLL Status register */
