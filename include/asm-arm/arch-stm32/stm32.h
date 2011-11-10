@@ -95,46 +95,6 @@ enum clock {
 					STM32_RCC_BASE)
 
 /******************************************************************************
- * Flexible static memory controller
- ******************************************************************************/
-
-/*
- * FSMC NOR/PSRAM controller register map
- */
-struct stm32_fsmc_regs {
-	struct {
-		u32	bcr;		/* Chip-select control		      */
-		u32	btr;		/* Chip-select timing		      */
-	} cs[4];
-	u32	rsv0[57];
-	struct {
-		u32	bwtr;		/* Write timing			      */
-		u32	rsv1;
-	} wt[4];
-};
-
-/*
- * FSMC registers base
- */
-#define STM32_FSMC_BASE			0xA0000000
-#define STM32_FSMC			((volatile struct stm32_fsmc_regs *) \
-					STM32_FSMC_BASE)
-
-/*
- * BCR reg fields
- */
-#define STM32_FSMC_BCR_MBKEN		(1 << 0)	/* Memory bank enble  */
-#define STM32_FSMC_BCR_MWID_BIT		4		/* Databus width      */
-#define STM32_FSMC_BCR_MWID_16		0x1		/* 16 bits	      */
-#define STM32_FSMC_BCR_WREN		(1 << 12)	/* Write enable	      */
-
-/*
- * BTR reg fields
- */
-#define STM32_FSMC_BTR_DATAST_BIT	8		/* Data-phase time    */
-#define STM32_FSMC_BTR_BUSTURN_BIT	16		/* BusTurnaround time */
-
-/******************************************************************************
  * FIXME: get rid of this
  ******************************************************************************/
 
@@ -148,5 +108,7 @@ struct stm32_fsmc_regs {
 unsigned long  __attribute__((section(".ramcode")))
 	       __attribute__ ((long_call))
 	       clock_get(enum clock clck);
+
+#define PAGE_SIZE	4096
 
 #endif /* _MACH_STM32_H_ */
