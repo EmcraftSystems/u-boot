@@ -175,6 +175,73 @@ static u32 clock_val[CLOCK_END];
 #define LPC178X_PLL_FEED_KEY2	0x55
 
 /*
+ * PLL register map
+ * Used for PLL0 at 0x400FC080 and for PLL1 at 0x400FC0A0.
+ */
+struct lpc178x_pll_regs {
+	u32 con;	/* PLL Control register */
+	u32 cfg;	/* PLL Configuration register */
+	u32 stat;	/* PLL Status register */
+	u32 feed;	/* PLL Feed register */
+};
+
+/*
+ * SCC (System and Clock Control) register map
+ * Should be mapped at 0x400FC000.
+ */
+/*
+ * TODO: convert to STM32/SmartFusion structure style,
+ * i.e. use "rsvN[M]" hole fillers instead of "union"s for alignment.
+ * (Not doing this until most lpc178x device drivers are implemented
+ * and all necessary registers in this structure are known.)
+ */
+struct lpc178x_scc_regs {
+	/* 0x400FC000: Flash Accelerator Configuration Register */
+	union {
+		u8 align0[0x80];
+	};
+
+	/* 0x400FC080: PLL0 registers */
+	union {
+		u8 align1[0x20];
+		struct lpc178x_pll_regs pll0; /* PLL0 registers */
+	};
+
+	/* 0x400FC0A0: PLL1 registers */
+	union {
+		u8 align2[0x20];
+		struct lpc178x_pll_regs pll1; /* PLL1 registers */
+	};
+
+	/* 0x400FC0C0: Power control registers */
+	union {
+		u8 align3[0x40];
+	};
+
+	/* 0x400FC100: Clock control */
+	union {
+		u8 align4[0xA0];
+		struct {
+			u32 emcclksel;	/* External Memory Controller
+						Clock Selection register */
+			u32 cclksel;	/* CPU Clock Selection register */
+			u32 usbclksel;	/* USB Clock Selection register */
+			u32 clksrcsel;	/* Clock Source Selection register */
+		};
+	};
+
+	/* 0x400FC1A0: System Controls and Status register */
+	u32 scs;
+};
+
+/*
+ * SCC registers base
+ */
+#define LPC178X_SCC_BASE		(LPC178X_APB1PERIPH_BASE + 0x0007C000)
+#define LPC178X_SCC			((volatile struct lpc178x_scc_regs *) \
+					LPC178X_SCC_BASE)
+
+/*
  * Apply changes made in PLLCON and PLLCFG
  *
  * `pll_regs` can be either `&LPC178X_SCC->pll0` or `&LPC178X_SCC->pll1`.
