@@ -25,6 +25,19 @@
 #ifndef _MACH_LPC178X_H_
 #define _MACH_LPC178X_H_
 
+#include <asm/byteorder.h>
+
+/*
+ * This LPC178X port assumes that the CPU works in little-endian mode.
+ * Switching to big-endian will require different bit offsets in peripheral
+ * devices' registers. Also, some bit groups may lay on byte edges, so issue
+ * with big-endian cannot be fixed only by defining bit offsets differently
+ * for the big-endian mode.
+ */
+#ifndef __LITTLE_ENDIAN
+#error This LPC178X port assumes that the CPU works in little-endian mode
+#endif
+
 /******************************************************************************
  * Peripheral memory map
  ******************************************************************************/
