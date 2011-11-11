@@ -53,7 +53,6 @@ COBJS-$(CONFIG_S3C44B0_SERIAL) += serial_s3c44b0.o
 COBJS-$(CONFIG_XILINX_UARTLITE) += serial_xuartlite.o
 COBJS-$(CONFIG_SCIF_CONSOLE) += serial_sh.o
 COBJS-$(CONFIG_STM32_USART_CONSOLE) += stm32_usart.o
-COBJS-$(CONFIG_LPC178X_UART_CONSOLE) += lpc178x_uart.o
 COBJS-$(CONFIG_USB_TTY) += usbtty.o
 
 COBJS	:= $(sort $(COBJS-y))

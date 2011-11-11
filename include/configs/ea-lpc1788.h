@@ -65,6 +65,11 @@
 #define CONFIG_ARCH_CPU_INIT
 
 /*
+ * This ensures that the SoC-specific cortex_m3_soc_init() gets invoked.
+ */
+#define CONFIG_ARMCORTEXM3_SOC_INIT
+
+/*
  * Clock configuration (see cpu/arm_cortexm3/lpc178x/clock.c for details)
  */
 /*
@@ -171,7 +176,29 @@
 /*
  * Serial console configuration
  */
-#define CONFIG_LPC178X_UART_CONSOLE
+#define CONFIG_SYS_NS16550		1
+#undef CONFIG_NS16550_MIN_FUNCTIONS
+#define CONFIG_SYS_NS16550_SERIAL	1
+/*
+ * Registers are 32-bit. The negative value tells the ns16550 driver that
+ * registers should be post-padded with zeroes (because the CPU is in
+ * little-endian mode.)
+ */
+#define CONFIG_SYS_NS16550_REG_SIZE     (-4)
+/*
+ * UARTs use the LPC178x/7x Peripheral clock
+ */
+#define CONFIG_SYS_NS16550_CLK		clock_get(CLOCK_PCLK)
+#define CONFIG_CONS_INDEX               1
+/*
+ * UART0 registers base: 0x4000C000
+ * UART1 registers base: 0x40010000
+ * UART2 registers base: 0x40098000
+ * UART3 registers base: 0x4009C000
+ * UART4 registers base: 0x400A4000
+ */
+#define CONFIG_LPC178X_UART_PORT	0	/* Used for UART power-on */
+#define CONFIG_SYS_NS16550_COM1         0x4000C000
 
 #define CONFIG_BAUDRATE			115200
 #define CONFIG_SYS_BAUDRATE_TABLE	{ 9600, 19200, 38400, 57600, 115200 }

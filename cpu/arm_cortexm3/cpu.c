@@ -27,6 +27,10 @@
 
 DECLARE_GLOBAL_DATA_PTR;
 
+#if defined(CONFIG_ARMCORTEXM3_SOC_INIT)
+extern void cortex_m3_soc_init(void);
+#endif
+
 /*
  * CPU specific initilization
  */
@@ -58,6 +62,13 @@ int arch_cpu_init(void)
 	gd->bd->bi_arch_number = MACH_TYPE_LPC178X;
 #else
 # error "Unsupported Cortex-M3 SOC."
+#endif
+
+	/*
+	 * SoC configuration code that cannot be put into drivers
+	 */
+#if defined(CONFIG_ARMCORTEXM3_SOC_INIT)
+	cortex_m3_soc_init();
 #endif
 
 	/*

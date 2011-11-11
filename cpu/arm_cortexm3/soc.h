@@ -1,6 +1,5 @@
 /*
  * (C) Copyright 2011
- *
  * Alexander Potashev, Emcraft Systems, aspotashev@emcraft.com
  *
  * This program is free software; you can redistribute it and/or
@@ -18,80 +17,14 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston,
  * MA 02111-1307 USA
  */
+#ifndef __ARM_CORTEXM3_SOC_H__
+#define __ARM_CORTEXM3_SOC_H__
 
 /*
- * EA-LPC178X UART driver
+ * SoC initialization code that cannot be put into drivers.
  */
+#ifdef CONFIG_ARMCORTEXM3_SOC_INIT
+extern void cortex_m3_soc_init(void);
+#endif
 
-#include <common.h>
-
-/*
- * Initialize the serial port.
- */
-int serial_init(void)
-{
-	/*
-	 * TBD
-	 */
-
-	return 0;
-}
-
-/*
- * Set new baudrate.
- */
-void serial_setbrg(void)
-{
-	/*
-	 * TBD
-	 */
-
-	return;
-}
-
-/*
- * Read a single character from the serial port.
- */
-int serial_getc(void)
-{
-	/*
-	 * TBD
-	 */
-
-	return 0;
-}
-
-/*
- * Put a single character to the serial port.
- */
-void serial_putc(const char c)
-{
-	/*
-	 * TBD
-	 */
-
-	return;
-}
-
-/*
- * Put a string ('\0'-terminated) to the serial port.
- */
-void serial_puts(const char *s)
-{
-	while (*s)
-		serial_putc(*s++);
-}
-
-/*
- * Test whether a character in in the RX buffer.
- */
-int serial_tstc(void)
-{
-	/*
-	 * TBD
-	 */
-
-	return 0;
-}
-
-
+#endif /* __ARM_CORTEXM3_SOC_H__ */
