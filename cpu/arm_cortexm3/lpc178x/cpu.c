@@ -29,7 +29,14 @@
  */
 int print_cpuinfo(void)
 {
+	char buf[2][32];
+
 	printf("CPU  : %s\n", "LPC178x/7x series (Cortex-M3)");
+
+	strmhz(buf[0], clock_get(CLOCK_SYSTICK));
+	strmhz(buf[1], clock_get(CLOCK_PCLK));
+	printf("Freqs: SYSTICK=%sMHz,PCLK=%sMHz,\n",
+		buf[0], buf[1]);
 
 	return 0;
 }
