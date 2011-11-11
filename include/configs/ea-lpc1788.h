@@ -248,7 +248,7 @@
 #define CONFIG_BOOTDELAY		3
 #define CONFIG_ZERO_BOOTDELAY_CHECK
 #define CONFIG_HOSTNAME			ea-lpc1788
-#define CONFIG_BOOTARGS			"lpc17xx_platform=ea-lpc1788 "\
+#define CONFIG_BOOTARGS			"lpc178x_platform=ea-lpc1788 "\
 					"console=ttyS2,115200 panic=10"
 #define CONFIG_BOOTCOMMAND		"run netboot"
 
