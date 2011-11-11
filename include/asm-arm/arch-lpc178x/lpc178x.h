@@ -51,6 +51,7 @@
  */
 enum clock {
 	CLOCK_SYSTICK,		/* Systimer clock frequency expressed in Hz   */
+	CLOCK_PCLK,		/* Peripheral clock frequency expressed in Hz */
 	CLOCK_END		/* for internal usage			      */
 };
 

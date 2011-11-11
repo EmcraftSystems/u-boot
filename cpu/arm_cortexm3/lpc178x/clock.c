@@ -42,7 +42,7 @@
 /*
  * Set CONFIG_LPC178X_PLL0_ENABLE to enable PLL0. If PLL0 is enabled,
  * the values of CONFIG_LPC178X_PLL0_M and CONFIG_LPC178X_PLL0_PSEL must also
- * be setup to configure the PLL0 rate based on the selected input clock.
+ * be set to configure the PLL0 rate based on the selected input clock.
  * See the LCP178x/7x User's Manual for information on setting these
  * values correctly. SYSCLK is used as the PLL0 input clock.
  */
@@ -120,32 +120,60 @@ static u32 clock_val[CLOCK_END];
 #endif
 
 /*
- * Set LPC178X_CPU_RATE to the CPU clock.
+ * Clock at the output of CPU clock selector
+ *
+ * This is also the input clock for:
+ *   1. CPU clock divider
+ *   2. Peripheral clock divider
+ *   3. EMC clock divider
  */
 #ifdef CONFIG_LPC178X_PLL0_FOR_CPU
-#define LPC178X_CPU_RATE	(LPC178X_PLL0_CLK_OUT / CONFIG_LPC178X_CPU_DIV)
+#define LPC178X_CPU_CLK_SEL_OUT		LPC178X_PLL0_CLK_OUT
 #else
-#define LPC178X_CPU_RATE	(LPC178X_OSC_RATE / CONFIG_LPC178X_CPU_DIV)
+#define LPC178X_CPU_CLK_SEL_OUT		LPC178X_OSC_RATE
 #endif
+
+/*
+ * Set LPC178X_CPU_RATE to the CPU clock.
+ */
+#define LPC178X_CPU_RATE	(LPC178X_CPU_CLK_SEL_OUT / CONFIG_LPC178X_CPU_DIV)
+
+/*
+ * Set LPC178X_PCLK_RATE to the peripheral clock.
+ */
+#define LPC178X_PCLK_RATE	(LPC178X_CPU_CLK_SEL_OUT / CONFIG_LPC178X_PCLK_DIV)
 
 /*
  * Compile time sanity checks for defined board clock setup
  */
 #ifndef CONFIG_LPC178X_EXTOSC_RATE
-#error CONFIG_LPC178X_EXTOSC_RATE is not setup, set to the external osc rate
+#error CONFIG_LPC178X_EXTOSC_RATE is not set, set to the external osc rate
 #endif
 
 /*
  * Verify CPU divider
  */
 #ifndef CONFIG_LPC178X_CPU_DIV
-#error CONFIG_LPC178X_CPU_DIV is not setup, must be between 1 and 31
+#error CONFIG_LPC178X_CPU_DIV is not set, must be between 1 and 31
 #endif
 #if CONFIG_LPC178X_CPU_DIV < 1
 #error CONFIG_LPC178X_CPU_DIV is too low, 1 is the minimum
 #endif
 #if CONFIG_LPC178X_CPU_DIV > 31
 #error CONFIG_LPC178X_CPU_DIV is too high, 31 is the maximum
+#endif
+
+/*
+ * Verify peripheral divider
+ */
+#ifndef CONFIG_LPC178X_PCLK_DIV
+#error CONFIG_LPC178X_PCLK_DIV is not set, must be between 1 and 31
+#endif
+#if CONFIG_LPC178X_PCLK_DIV < 1
+#error CONFIG_LPC178X_PCLK_DIV is too low, 1 is the minimum
+#endif
+#if CONFIG_LPC178X_PCLK_DIV > 31
+#error CONFIG_LPC178X_PCLK_DIV is too high, 31 is the maximum
 #endif
 
 /*
@@ -230,8 +258,10 @@ struct lpc178x_scc_regs {
 		};
 	};
 
-	/* 0x400FC1A0: System Controls and Status register */
-	u32 scs;
+	/* 0x400FC1A0 */
+	u32 scs;	/* System Controls and Status register */
+	u32 rsv0;
+	u32 pclksel;	/* Peripheral Clock Selection register */
 };
 
 /*
@@ -302,6 +332,13 @@ static void clock_setup(void)
 		(1 << LPC178X_SCC_CCLKSEL_CCLKSEL_BIT) |
 #endif
 		(CONFIG_LPC178X_CPU_DIV << LPC178X_SCC_CCLKSEL_CCLKDIV_BITS);
+
+	/*
+	 * Peripheral clock (used for UARTs, etc)
+	 *
+	 * Only PCLKDIV bit group used in PCLKSEL, therefore not using |=
+	 */
+	LPC178X_SCC->pclksel = CONFIG_LPC178X_PCLK_DIV;
 }
 
 /*
@@ -318,6 +355,11 @@ void clock_init(void)
 	 * CPU clock.
 	 */
 	clock_val[CLOCK_SYSTICK] = LPC178X_CPU_RATE;
+
+	/*
+	 * Set peripheral clock rate
+	 */
+	clock_val[CLOCK_PCLK] = LPC178X_PCLK_RATE;
 }
 
 /*

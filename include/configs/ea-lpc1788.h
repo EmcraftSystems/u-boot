@@ -107,6 +107,13 @@
 #define CONFIG_LPC178X_CPU_DIV		1
 
 /*
+ * Peripheral clock selector. This divider, between 1 and 31, is used to
+ * generate the clock to the peripherals. The rate is divided from the
+ * selected clock source (PLL0, internal or main oscillator).
+ */
+#define CONFIG_LPC178X_PCLK_DIV		2
+
+/*
  * Number of clock ticks in 1 sec
  */
 #define CONFIG_SYS_HZ			1000
