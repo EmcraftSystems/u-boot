@@ -307,14 +307,6 @@ struct stm_eth_dev {
 #define to_stm_eth(_nd)	container_of(_nd, struct stm_eth_dev, netdev)
 
 /*
- * GPIO configuration
- */
-struct stm_mac_gpio {
-	u32			port;
-	u32			pin;
-};
-
-/*
  * Ethernet GPIOs:
  *
  * ETH_MII_RX_CLK/ETH_RMII_REF_CLK---> PA1
