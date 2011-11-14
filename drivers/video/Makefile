@@ -38,7 +38,6 @@ COBJS-$(CONFIG_SED156X) += sed156x.o
 COBJS-$(CONFIG_VIDEO_SM501) += sm501.o
 COBJS-$(CONFIG_VIDEO_SMI_LYNXEM) += smiLynxEM.o
 COBJS-$(CONFIG_VIDEO_VCXK) += bus_vcxk.o
-COBJS-$(CONFIG_LCD_ILI932x) += ili932x.o
 COBJS-y += videomodes.o
 
 COBJS	:= $(COBJS-y)

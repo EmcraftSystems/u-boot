@@ -25,11 +25,9 @@
 
 #include <common.h>
 #include <netdev.h>
-#include <ili932x.h>
 
 #include <asm/arch/stm32.h>
 #include <asm/arch/stm32f2_gpio.h>
-#include <asm/arch/fsmc.h>
 
 #if (CONFIG_NR_DRAM_BANKS > 0)
 /*
@@ -37,38 +35,108 @@
  */
 # if !defined(CONFIG_SYS_RAM_CS) || !defined(CONFIG_SYS_FSMC_PSRAM_BCR) ||     \
      !defined(CONFIG_SYS_FSMC_PSRAM_BTR)
-#  error "Incorrect PSRAM FSMC configuration."
+#  error "Incorrect FSMC configuration."
 # endif
 #endif /* CONFIG_NR_DRAM_BANKS */
 
+/*
+ * STM32 RCC FSMC specific definitions
+ */
+#define STM32_RCC_ENR_FSMC		(1 << 0)	/* FSMC module clock  */
+
 DECLARE_GLOBAL_DATA_PTR;
+
+#if (CONFIG_NR_DRAM_BANKS > 0) || !defined(CONFIG_SYS_NO_FLASH)
+/*
+ * External SRAM GPIOs for FSMC:
+ *
+ * D0..D15, A0..A23, NE2/1, NOE, NWE, NBL1/0, CLK, NL, NWAIT
+ */
+static struct stm32f2_gpio_dsc fsmc_gpio[] = {
+	{STM32F2_GPIO_PORT_B, STM32F2_GPIO_PIN_7},
+
+	{STM32F2_GPIO_PORT_D, STM32F2_GPIO_PIN_0},
+	{STM32F2_GPIO_PORT_D, STM32F2_GPIO_PIN_1},
+	{STM32F2_GPIO_PORT_D, STM32F2_GPIO_PIN_3},
+	{STM32F2_GPIO_PORT_D, STM32F2_GPIO_PIN_4},
+	{STM32F2_GPIO_PORT_D, STM32F2_GPIO_PIN_5},
+	{STM32F2_GPIO_PORT_D, STM32F2_GPIO_PIN_6},
+	{STM32F2_GPIO_PORT_D, STM32F2_GPIO_PIN_7},
+	{STM32F2_GPIO_PORT_D, STM32F2_GPIO_PIN_8},
+	{STM32F2_GPIO_PORT_D, STM32F2_GPIO_PIN_9},
+	{STM32F2_GPIO_PORT_D, STM32F2_GPIO_PIN_10},
+	{STM32F2_GPIO_PORT_D, STM32F2_GPIO_PIN_11},
+	{STM32F2_GPIO_PORT_D, STM32F2_GPIO_PIN_12},
+	{STM32F2_GPIO_PORT_D, STM32F2_GPIO_PIN_13},
+	{STM32F2_GPIO_PORT_D, STM32F2_GPIO_PIN_14},
+	{STM32F2_GPIO_PORT_D, STM32F2_GPIO_PIN_15},
+
+	{STM32F2_GPIO_PORT_E, STM32F2_GPIO_PIN_0},
+	{STM32F2_GPIO_PORT_E, STM32F2_GPIO_PIN_1},
+	{STM32F2_GPIO_PORT_E, STM32F2_GPIO_PIN_2},
+	{STM32F2_GPIO_PORT_E, STM32F2_GPIO_PIN_3},
+	{STM32F2_GPIO_PORT_E, STM32F2_GPIO_PIN_4},
+	{STM32F2_GPIO_PORT_E, STM32F2_GPIO_PIN_5},
+	{STM32F2_GPIO_PORT_E, STM32F2_GPIO_PIN_6},
+	{STM32F2_GPIO_PORT_E, STM32F2_GPIO_PIN_7},
+	{STM32F2_GPIO_PORT_E, STM32F2_GPIO_PIN_8},
+	{STM32F2_GPIO_PORT_E, STM32F2_GPIO_PIN_9},
+	{STM32F2_GPIO_PORT_E, STM32F2_GPIO_PIN_10},
+	{STM32F2_GPIO_PORT_E, STM32F2_GPIO_PIN_11},
+	{STM32F2_GPIO_PORT_E, STM32F2_GPIO_PIN_12},
+	{STM32F2_GPIO_PORT_E, STM32F2_GPIO_PIN_13},
+	{STM32F2_GPIO_PORT_E, STM32F2_GPIO_PIN_14},
+	{STM32F2_GPIO_PORT_E, STM32F2_GPIO_PIN_15},
+
+	{STM32F2_GPIO_PORT_F, STM32F2_GPIO_PIN_0},
+	{STM32F2_GPIO_PORT_F, STM32F2_GPIO_PIN_1},
+	{STM32F2_GPIO_PORT_F, STM32F2_GPIO_PIN_2},
+	{STM32F2_GPIO_PORT_F, STM32F2_GPIO_PIN_3},
+	{STM32F2_GPIO_PORT_F, STM32F2_GPIO_PIN_4},
+	{STM32F2_GPIO_PORT_F, STM32F2_GPIO_PIN_5},
+	{STM32F2_GPIO_PORT_F, STM32F2_GPIO_PIN_12},
+	{STM32F2_GPIO_PORT_F, STM32F2_GPIO_PIN_13},
+	{STM32F2_GPIO_PORT_F, STM32F2_GPIO_PIN_14},
+	{STM32F2_GPIO_PORT_F, STM32F2_GPIO_PIN_15},
+
+	{STM32F2_GPIO_PORT_G, STM32F2_GPIO_PIN_0},
+	{STM32F2_GPIO_PORT_G, STM32F2_GPIO_PIN_1},
+	{STM32F2_GPIO_PORT_G, STM32F2_GPIO_PIN_2},
+	{STM32F2_GPIO_PORT_G, STM32F2_GPIO_PIN_3},
+	{STM32F2_GPIO_PORT_G, STM32F2_GPIO_PIN_4},
+	{STM32F2_GPIO_PORT_G, STM32F2_GPIO_PIN_5},
+	{STM32F2_GPIO_PORT_G, STM32F2_GPIO_PIN_9}
+};
+#endif
 
 /*
  * Early hardware init.
  */
 int board_init(void)
 {
-	int rv;
+	int	rv = 0;
 
-#if !defined(CONFIG_SYS_NO_FLASH)
-	if ((rv = fsmc_nor_psram_init(CONFIG_SYS_FLASH_CS, CONFIG_SYS_FSMC_FLASH_BCR,
-			CONFIG_SYS_FSMC_FLASH_BTR,
-			CONFIG_SYS_FSMC_FLASH_BWTR)))
-		return rv;
-#endif
-
-#if defined(CONFIG_LCD)
+#if (CONFIG_NR_DRAM_BANKS > 0) || !defined(CONFIG_SYS_NO_FLASH)
 	/*
-	 * Configure FSMC for accessing the LCD controller
+	 * Some external memory is used. Connect GPIOs to FSMC controller
 	 */
-	if ((rv = fsmc_nor_psram_init(CONFIG_LCD_CS, CONFIG_LCD_FSMC_BCR,
-			CONFIG_LCD_FSMC_BTR, CONFIG_LCD_FSMC_BWTR)))
-		return rv;
+	int	i;
 
-	gd->fb_base = CONFIG_FB_ADDR;
+	for (i = 0; i < sizeof(fsmc_gpio)/sizeof(fsmc_gpio[0]); i++) {
+		rv = stm32f2_gpio_config(&fsmc_gpio[i],
+					 STM32F2_GPIO_ROLE_FSMC);
+		if (rv != 0)
+			break;
+	}
+
+	/*
+	 * Enable FSMC interface clock
+	 */
+	if (rv == 0)
+		STM32_RCC->ahb3enr |= STM32_RCC_ENR_FSMC;
 #endif
 
-	return 0;
+	return rv;
 }
 
 /*
@@ -82,26 +150,65 @@ int checkboard(void)
 	return 0;
 }
 
+#ifdef CONFIG_MISC_INIT_R
+/*
+ * Configure board specific parts.
+ */
+int misc_init_r(void)
+{
+#if !defined(CONFIG_SYS_NO_FLASH)
+	int	i, rv;
+
+	/*
+	 * Configure FSMC Flash block
+	 */
+	i = CONFIG_SYS_FLASH_CS - 1;
+
+	/*
+	 * FIXME: not sure if this fake read is necessary here
+	 */
+	rv = STM32_FSMC->cs[i].bcr;
+
+	STM32_FSMC->cs[i].bcr = CONFIG_SYS_FSMC_FLASH_BCR;
+	STM32_FSMC->cs[i].btr = CONFIG_SYS_FSMC_FLASH_BTR;
+# if defined(CONFIG_SYS_FSMC_FLASH_BWTR)
+	STM32_FSMC->wt[i].bwtr = CONFIG_SYS_FSMC_FLASH_BWTR;
+# endif
+#endif /* CONFIG_SYS_NO_FLASH */
+
+	return 0;
+}
+#endif
+
 /*
  * Setup external RAM.
  */
 int dram_init(void)
 {
+	int	rv = 0;
+
+#if (CONFIG_NR_DRAM_BANKS > 0)
 	static struct stm32f2_gpio_dsc	ctrl_gpio = {STM32F2_GPIO_PORT_I,
 						     STM32F2_GPIO_PIN_9};
-	int				rv = 0;
+	int				i;
 
-	rv = fsmc_nor_psram_init(CONFIG_SYS_RAM_CS,
-			CONFIG_SYS_FSMC_PSRAM_BCR,
-			CONFIG_SYS_FSMC_PSRAM_BTR,
-#ifdef CONFIG_SYS_FSMC_PSRAM_BWTR
-			CONFIG_SYS_FSMC_PSRAM_BWTR
-#else
-			(u32)-1
-#endif
-		);
-	if (rv != 0)
-		goto out;
+	/*
+	 * Configure FSMC PSRAM block
+	 */
+	i = CONFIG_SYS_RAM_CS - 1;
+
+	/*
+	 * Fake BCR read; if don't do this, then BCR remains configured
+	 * with defaults.
+	 */
+	rv = STM32_FSMC->cs[i].bcr;
+
+	/* Step.1 */
+	STM32_FSMC->cs[i].bcr = CONFIG_SYS_FSMC_PSRAM_BCR;
+	STM32_FSMC->cs[i].btr = CONFIG_SYS_FSMC_PSRAM_BTR;
+# if defined(CONFIG_SYS_FSMC_PSRAM_BWTR)
+	STM32_FSMC->wt[i].bwtr = CONFIG_SYS_FSMC_PSRAM_BWTR;
+# endif
 
 	rv = stm32f2_gpio_config(&ctrl_gpio, STM32F2_GPIO_ROLE_GPOUT);
 	if (rv != 0)
@@ -122,15 +229,16 @@ int dram_init(void)
 	stm32f2_gpout_set(&ctrl_gpio, 0);
 
 	/* Step.6 */
-	fsmc_nor_psram_init(CONFIG_SYS_RAM_CS, 0x00083115,
-			0x0010FFFF, -1);
+	STM32_FSMC->cs[i].bcr = 0x00083115;
+	STM32_FSMC->cs[i].btr = 0x0010FFFF;
 
 	/* Step.7 */
 	rv = *(volatile u16 *)(CONFIG_SYS_RAM_BASE + 0x000000);
 
 	/* Step.8 */
-	fsmc_nor_psram_init(CONFIG_SYS_RAM_CS, 0x00005059,
-			0x10000702, 0x10000602);
+	STM32_FSMC->cs[i].bcr = 0x00005059;
+	STM32_FSMC->cs[i].btr = 0x10000702;
+	STM32_FSMC->wt[i].bwtr = 0x10000602;
 
 	/* Step.9 */
 	stm32f2_gpout_set(&ctrl_gpio, 1);
@@ -142,8 +250,8 @@ int dram_init(void)
 	stm32f2_gpout_set(&ctrl_gpio, 0);
 
 	/* Step.12 */
-	fsmc_nor_psram_init(CONFIG_SYS_RAM_CS, 0x00083115,
-			0x0010FFFF, -1);
+	STM32_FSMC->cs[i].bcr = 0x00083115;
+	STM32_FSMC->cs[i].btr = 0x0010FFFF;
 
 	/* Step.13 */
 	rv = *(volatile u16 *)(CONFIG_SYS_RAM_BASE + 0x01000000);
@@ -162,8 +270,9 @@ int dram_init(void)
 	gd->bd->bi_dram[0].size  = CONFIG_SYS_RAM_SIZE;
 
 	rv = 0;
-	
 out:
+#endif /* CONFIG_NR_DRAM_BANKS */
+
 	return rv;
 }
 

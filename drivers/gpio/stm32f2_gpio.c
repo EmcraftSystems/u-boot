@@ -138,7 +138,7 @@ static const u32 af_val[STM32F2_GPIO_ROLE_LAST] = {
  * Configure the specified GPIO for the specified role
  * Returns 0 on success, -EINVAL otherwise.
  */
-s32 stm32f2_gpio_config(const struct stm32f2_gpio_dsc *dsc,
+s32 stm32f2_gpio_config(struct stm32f2_gpio_dsc *dsc,
 			enum stm32f2_gpio_role role)
 {
 	volatile struct stm32f2_gpio_regs	*gpio_regs;
@@ -248,7 +248,7 @@ out:
  * Set GPOUT to the state specified (1, 0).
  * Returns 0 on success, -EINVAL otherwise.
  */
-s32 stm32f2_gpout_set(const struct stm32f2_gpio_dsc *dsc, int state)
+s32 stm32f2_gpout_set(struct stm32f2_gpio_dsc *dsc, int state)
 {
 	volatile struct stm32f2_gpio_regs	*gpio_regs;
 	s32					rv;
