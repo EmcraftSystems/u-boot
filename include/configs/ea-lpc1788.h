@@ -44,7 +44,7 @@
 /*
  * Enable GPIO driver
  */
-/* TBD */
+#define CONFIG_LPC178X_GPIO
 
 /*
  * Display CPU and Board information

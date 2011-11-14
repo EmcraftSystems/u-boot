@@ -25,14 +25,51 @@
 
 #include <common.h>
 
-DECLARE_GLOBAL_DATA_PTR;
+#include <asm/arch/lpc178x_gpio.h>
+
+/*
+ * GPIO pin configuration table for EA-LPC1788
+ */
+static const struct lpc178x_gpio_pin_config ea_lpc1788_gpio[] = {
+#if CONFIG_LPC178X_UART_PORT == 0
+	/* P0.2 (D) = UART0 TXD */
+	{{0,  2}, LPC178X_GPIO_CONFIG_D(1, LPC178X_NO_PULLUP, 0, 0, 0, 0)},
+	/* P0.3 (D) = UART0 RXD */
+	{{0,  3}, LPC178X_GPIO_CONFIG_D(1, LPC178X_NO_PULLUP, 0, 0, 0, 0)},
+#elif CONFIG_LPC178X_UART_PORT == 2
+	/* P0.10 (D) = U2_TXD */
+	{{0, 10}, LPC178X_GPIO_CONFIG_D(1, LPC178X_NO_PULLUP, 0, 0, 0, 0)},
+	/* P0.11 (D) = U2_RXD */
+	{{0, 11}, LPC178X_GPIO_CONFIG_D(1, LPC178X_NO_PULLUP, 0, 0, 0, 0)},
+#else /* Neither UART0 nor UART2 */
+#error This configuration of GPIO pins supports only UART0 or UART2
+#endif
+};
+
+/*
+ * Configure all necessary GPIO pins
+ */
+static void gpio_init(void)
+{
+	/*
+	 * Enable power on GPIO. This is not really necessary, because power
+	 * on GPIO is enabled on SoC reset.
+	 */
+	lpc178x_periph_enable(LPC178X_SCC_PCONP_PCGPIO_MSK, 1);
+
+	/*
+	 * Configure GPIO pins
+	 */
+	lpc178x_gpio_config_table(ea_lpc1788_gpio, ARRAY_SIZE(ea_lpc1788_gpio));
+}
 
 /*
  * Early hardware init.
  */
 int board_init(void)
 {
-	/* TBD */
+	gpio_init();
+
 	return 0;
 }
 
