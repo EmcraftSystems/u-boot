@@ -65,10 +65,6 @@
 #define CONFIG_ARCH_CPU_INIT
 
 /*
- * We want to call the board misc_init_r()
- */
-#define CONFIG_MISC_INIT_R
-/*
  * Clock configuration (see stm32f2/clock.c for details):
  * - use PLL as the system clock;
  * - use HSE as the PLL source;
@@ -114,6 +110,9 @@
  */
 #define CONFIG_SYS_MALLOC_LEN		CONFIG_MEM_MALLOC_LEN
 
+#define FSMC_NOR_PSRAM_CS_ADDR(n) \
+	(0x60000000 + ((n) - 1) * 0x4000000)
+
 /*
  * Configuration of the external PSRAM memory
  */
@@ -126,8 +125,41 @@
 #define CONFIG_SYS_FSMC_PSRAM_BTR	0x10000702
 #define CONFIG_SYS_FSMC_PSRAM_BWTR	0x10000602
 
-#define CONFIG_SYS_RAM_BASE		(0x60000000 +			\
-					 ((CONFIG_SYS_RAM_CS - 1) * 0x4000000))
+#define CONFIG_SYS_RAM_BASE		FSMC_NOR_PSRAM_CS_ADDR(CONFIG_SYS_RAM_CS)
+
+#define CONFIG_LCD
+#ifdef CONFIG_LCD
+#define LCD_BPP				LCD_COLOR16
+#define CONFIG_BMP_16BPP		1
+#define CONFIG_SPLASH_SCREEN		1
+#define CONFIG_CMD_BMP
+#define CONFIG_FB_ADDR				\
+	(CONFIG_SYS_RAM_BASE + CONFIG_SYS_RAM_SIZE - \
+		roundup(calc_fbsize(), PAGE_SIZE))
+#define CONFIG_LCD_CS			3
+#define CONFIG_LCD_FSMC_BCR			\
+	STM32_FSMC_BCR_MBKEN |			\
+	STM32_FSMC_BCR_WREN |			\
+	(STM32_FSMC_BCR_MWID_16 << STM32_FSMC_BCR_MWID_BIT)
+#define CONFIG_LCD_FSMC_BTR			\
+	(1 << STM32_FSMC_BTR_ADDRST_BIT) |	\
+	(0 << STM32_FSMC_BTR_ADDHOLD_BIT) |	\
+	(9 << STM32_FSMC_BTR_DATAST_BIT) |	\
+	(0 << STM32_FSMC_BTR_BUSTURN_BIT) |	\
+	(0 << STM32_FSMC_BTR_CLKDIV_BIT) |	\
+	(0 << STM32_FSMC_BTR_DATLAT_BIT) |	\
+	STM32_FSMC_BWTR_ACCMOD_A
+#define CONFIG_LCD_FSMC_BWTR			\
+	(1 << STM32_FSMC_BWTR_ADDRST_BIT) |	\
+	(0 << STM32_FSMC_BWTR_ADDHOLD_BIT) |	\
+	(9 << STM32_FSMC_BWTR_DATAST_BIT) |	\
+	(0 << STM32_FSMC_BWTR_CLKDIV_BIT) |	\
+	(0 << STM32_FSMC_BWTR_DATLAT_BIT) |	\
+	STM32_FSMC_BWTR_ACCMOD_A
+#define CONFIG_LCD_ILI932x
+#define CONFIG_LCD_ILI932x_BASE		FSMC_NOR_PSRAM_CS_ADDR(CONFIG_LCD_CS)
+#define CONFIG_LCD_ILI932x_DOUBLE_BUFFER
+#endif
 
 /*
  * Configuration of the external Flash memory
@@ -138,9 +170,7 @@
 #define CONFIG_SYS_FSMC_FLASH_BTR	0x00010903
 #define CONFIG_SYS_FSMC_FLASH_BWTR	0x00010803
 
-#define CONFIG_SYS_FLASH_BANK1_BASE	(0x60000000 +			\
-					 ((CONFIG_SYS_FLASH_CS - 1) *	\
-					  0x4000000))
+#define CONFIG_SYS_FLASH_BANK1_BASE	FSMC_NOR_PSRAM_CS_ADDR(CONFIG_SYS_FLASH_CS)
 
 #define CONFIG_SYS_FLASH_CFI		1
 #define CONFIG_FLASH_CFI_DRIVER		1
@@ -158,7 +188,6 @@
 #define CONFIG_ENV_SIZE			(4 * 1024)
 #define CONFIG_ENV_ADDR			CONFIG_SYS_FLASH_BANK1_BASE
 #define CONFIG_INFERNO			1
-#define CONFIG_ENV_OVERWRITE		1
 #define CONFIG_ENV_OVERWRITE		1
 
 /*
@@ -260,6 +289,8 @@
 					"console=ttyS2,115200 panic=10"
 #define CONFIG_BOOTCOMMAND		"run netboot"
 
+#define CONFIG_SYS_CONSOLE_IS_IN_ENV
+
 /*
  * Short-cuts to some useful commands (macros)
  */
@@ -270,6 +301,7 @@
 	"ipaddr=172.17.4.206\0"					\
 	"serverip=172.17.0.1\0"					\
 	"image=stm32/uImage\0"					\
+	"stdin=serial\0"					\
 	"netboot=tftp ${image};run addip;bootm\0"
 
 /*

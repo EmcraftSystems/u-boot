@@ -88,12 +88,12 @@ struct stm32f2_gpio_dsc {
 /*
  * Configure the specified GPIO for the specified role
  */
-int stm32f2_gpio_config(struct stm32f2_gpio_dsc *gpio_dsc,
+int stm32f2_gpio_config(const struct stm32f2_gpio_dsc *gpio_dsc,
 			enum stm32f2_gpio_role role);
 
 /*
  * Set GPOUT to the state specified (1, 0)
  */
-int stm32f2_gpout_set(struct stm32f2_gpio_dsc *gpio_dsc, int state);
+int stm32f2_gpout_set(const struct stm32f2_gpio_dsc *gpio_dsc, int state);
 
 #endif /* _STM32F2_GPIO_H_ */

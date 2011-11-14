@@ -53,6 +53,10 @@
 #include <atmel_lcdc.h>
 #endif
 
+#if defined(CONFIG_LCD_ILI932x)
+#include <ili932x.h>
+#endif
+
 /************************************************************************/
 /* ** FONT DATA								*/
 /************************************************************************/
@@ -785,6 +789,10 @@ int lcd_display_bitmap(ulong bmp_image, int x, int y)
 	default:
 		break;
 	};
+
+#ifdef CONFIG_LCD_ILI932x
+	ili932x_update();
+#endif
 
 	return (0);
 }
