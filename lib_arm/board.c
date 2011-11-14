@@ -244,7 +244,13 @@ init_fnc_t *init_sequence[] = {
 #if defined(CONFIG_USE_IRQ)
 	interrupt_init,		/* set up exceptions */
 #endif
+#if !defined(CONFIG_ARCH_CPU_INIT)
+	/*
+	 * `arch_cpu_init` always calls `timer_init`,
+	 * no need to call it twice
+	 */
 	timer_init,		/* initialize timer */
+#endif
 #ifdef CONFIG_FSL_ESDHC
 	get_clocks,
 #endif
