@@ -19,6 +19,7 @@
 #include <common.h>
 #include <asm/arch/stm32.h>
 #include <asm/arch/stm32f2_gpio.h>
+#include <asm/errno.h>
 
 /*
  * STM32 RCC FSMC specific definitions
@@ -51,7 +52,7 @@ struct stm32_fsmc_regs {
  *
  * D0..D15, A0..A23, NOE, NWE, NBL1/0, CLK, NL, NWAIT
  */
-static const struct stm32f2_gpio_dsc fsmc_gpio[] = {
+static const struct stm32f2_gpio_dsc ext_ram_fsmc_gpio[] = {
 	{STM32F2_GPIO_PORT_B, STM32F2_GPIO_PIN_7},
 
 	{STM32F2_GPIO_PORT_D, STM32F2_GPIO_PIN_0},
@@ -103,23 +104,30 @@ static const struct stm32f2_gpio_dsc fsmc_gpio[] = {
 	{STM32F2_GPIO_PORT_G, STM32F2_GPIO_PIN_3},
 	{STM32F2_GPIO_PORT_G, STM32F2_GPIO_PIN_4},
 	{STM32F2_GPIO_PORT_G, STM32F2_GPIO_PIN_5},
+
+#ifdef CONFIG_FSMC_NOR_PSRAM_CS1_ENABLE
+	{STM32F2_GPIO_PORT_D, STM32F2_GPIO_PIN_7},
+#endif
+#ifdef CONFIG_FSMC_NOR_PSRAM_CS2_ENABLE
+	{STM32F2_GPIO_PORT_G, STM32F2_GPIO_PIN_9},
+#endif
+#ifdef CONFIG_FSMC_NOR_PSRAM_CS3_ENABLE
+	{STM32F2_GPIO_PORT_G, STM32F2_GPIO_PIN_10},
+#endif
+#ifdef CONFIG_FSMC_NOR_PSRAM_CS4_ENABLE
+	{STM32F2_GPIO_PORT_G, STM32F2_GPIO_PIN_12},
+#endif
 };
 
-int fsmc_nor_psram_init(u32 num, u32 bcr, u32 btr, u32 bwtr)
+int fsmc_nor_psram_init(u32 cs, u32 bcr, u32 btr, u32 bwtr)
 {
 	int rv = 0;
 	static int common_init_done = 0;
-	static const struct stm32f2_gpio_dsc fsmc_cs[] = {
-		{STM32F2_GPIO_PORT_D, STM32F2_GPIO_PIN_7},
-		{STM32F2_GPIO_PORT_G, STM32F2_GPIO_PIN_9},
-		{STM32F2_GPIO_PORT_G, STM32F2_GPIO_PIN_10},
-		{STM32F2_GPIO_PORT_G, STM32F2_GPIO_PIN_12},
-	};
 
-	num--;
+	cs--;
 
-	if (num > 3)
-		return -1;
+	if (cs > 3)
+		return -EINVAL;
 
 	if (!common_init_done) {
 		int	i;
@@ -127,8 +135,8 @@ int fsmc_nor_psram_init(u32 num, u32 bcr, u32 btr, u32 bwtr)
 		/*
 		 * Connect GPIOs to FSMC controller
 		 */
-		for (i = 0; i < sizeof(fsmc_gpio)/sizeof(fsmc_gpio[0]); i++) {
-			rv = stm32f2_gpio_config(&fsmc_gpio[i],
+		for (i = 0; i < ARRAY_SIZE(ext_ram_fsmc_gpio); i++) {
+			rv = stm32f2_gpio_config(&ext_ram_fsmc_gpio[i],
 					STM32F2_GPIO_ROLE_FSMC);
 			if (rv != 0)
 				goto out;
@@ -142,20 +150,16 @@ int fsmc_nor_psram_init(u32 num, u32 bcr, u32 btr, u32 bwtr)
 		common_init_done = 1;
 	}
 
-	rv = stm32f2_gpio_config(&fsmc_cs[num], STM32F2_GPIO_ROLE_FSMC);
-	if (rv != 0)
-		goto out;
-
 	/*
 	 * Fake BCR read; if don't do this, then BCR remains configured
 	 * with defaults.
 	 */
-	rv = STM32_FSMC->cs[num].bcr;
+	rv = STM32_FSMC->cs[cs].bcr;
 
-	STM32_FSMC->cs[num].btr = btr;
+	STM32_FSMC->cs[cs].btr = btr;
 	if (bwtr != (u32)-1)
-		STM32_FSMC->wt[num].bwtr = bwtr;
-	STM32_FSMC->cs[num].bcr = bcr;
+		STM32_FSMC->wt[cs].bwtr = bwtr;
+	STM32_FSMC->cs[cs].bcr = bcr;
 
 	rv = 0;
 out:
