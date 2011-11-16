@@ -124,6 +124,13 @@
 #define CONFIG_SYS_HZ			1000
 
 /*
+ * Use internal clock (CPU clock) for the Cortex-M3 systick timer, because
+ * the external clock pin (STCLK) cannot be used on this board (it is already
+ * used for SDRAM.)
+ */
+#define CONFIG_ARMCORTEXM3_SYSTICK_CPU
+
+/*
  * Enable/disable h/w watchdog
  */
 #undef CONFIG_HW_WATCHDOG
