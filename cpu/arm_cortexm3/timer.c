@@ -49,7 +49,7 @@ ulong get_timer(ulong base)
 
 	lastdec = now;
 
-	return timestamp / (clock_get(CLOCK_SYSTICK) / 1000) - base;
+	return timestamp / (clock_get(CLOCK_SYSTICK) / CONFIG_SYS_HZ) - base;
 }
 
 void reset_timer(void)
