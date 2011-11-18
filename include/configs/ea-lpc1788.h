@@ -165,6 +165,10 @@
 #define CONFIG_SYS_RAM_BASE		(0xA0000000 +			\
 					 (CONFIG_SYS_RAM_CS * 0x10000000))
 #define CONFIG_SYS_RAM_SIZE		(32 * 1024 * 1024)
+/*
+ * Use the CPU_CLOCK/2 for EMC
+ */
+#define CONFIG_LPC178X_EMC_HALFCPU
 
 /*
  * Configuration of the external Flash memory

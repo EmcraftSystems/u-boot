@@ -105,7 +105,7 @@ static inline int lpc178x_validate_gpio(const struct lpc178x_gpio_dsc *dsc)
  * Configure the specified GPIO pin.
  * Returns 0 on success, -EINVAL otherwise.
  */
-static int lpc178x_gpio_config(const struct lpc178x_gpio_dsc *dsc, u32 regval)
+int lpc178x_gpio_config(const struct lpc178x_gpio_dsc *dsc, u32 regval)
 {
 	int rv;
 

@@ -89,7 +89,14 @@ struct lpc178x_gpio_pin_config {
 };
 
 /*
- * Configure a set of GPIO pins using the given configuration table
+ * Configure the specified GPIO pin.
+ * Returns 0 on success, -EINVAL otherwise.
+ */
+int lpc178x_gpio_config(const struct lpc178x_gpio_dsc *dsc, u32 regval);
+
+/*
+ * Configure a set of GPIO pins using the given configuration table.
+ * Returns 0 on success.
  */
 extern int lpc178x_gpio_config_table(
 	const struct lpc178x_gpio_pin_config *table, unsigned int len);

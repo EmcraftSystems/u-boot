@@ -56,6 +56,7 @@
 #define LPC178X_SCC_PCONP_PCUART0_MSK	(1 << 3)
 #define LPC178X_SCC_PCONP_PCUART1_MSK	(1 << 4)
 #define LPC178X_SCC_PCONP_PCUART4_MSK	(1 << 8)
+#define LPC178X_SCC_PCONP_PCEMC_MSK	(1 << 11)
 #define LPC178X_SCC_PCONP_PCGPIO_MSK	(1 << 15)
 #define LPC178X_SCC_PCONP_PCUART2_MSK	(1 << 24)
 #define LPC178X_SCC_PCONP_PCUART3_MSK	(1 << 25)
@@ -126,6 +127,19 @@ struct lpc178x_scc_regs {
 	u32 scs;	/* System Controls and Status register */
 	u32 rsv0;
 	u32 pclksel;	/* Peripheral Clock Selection register */
+	/* 0x400FC1AC */
+	u32 rsv1[7];
+
+	/* 0x400FC1C8 */
+	u32 clkoutcfg;
+	u32 rstcon0;
+	u32 rstcon1;
+	/* 0x400FC1D4 */
+	u32 rsv2[2];
+
+	/* 0x400FC1DC */
+	u32 emcdlyctl;
+	u32 emccal;
 };
 
 /*
@@ -145,6 +159,7 @@ extern void lpc178x_periph_enable(u32 pconp_mask, int enable);
  */
 enum clock {
 	CLOCK_SYSTICK,		/* Systimer clock frequency expressed in Hz   */
+	CLOCK_EMCCLK,		/* EMC clock frequency expressed in Hz        */
 	CLOCK_PCLK,		/* Peripheral clock frequency expressed in Hz */
 	CLOCK_END		/* for internal usage			      */
 };

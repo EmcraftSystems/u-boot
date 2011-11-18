@@ -91,6 +91,11 @@ static u32 clock_val[CLOCK_END];
 #define LPC178X_SCC_CCLKSEL_CCLKSEL_BIT		8
 
 /*
+ * EMC Clock Selection register
+ */
+#define LPC178X_SCC_EMCCLKSEL_HALFCPU_MSK	(1 << 0)
+
+/*
  * Calculate clock rates
  */
 /*
@@ -142,6 +147,15 @@ static u32 clock_val[CLOCK_END];
  * Set LPC178X_PCLK_RATE to the peripheral clock.
  */
 #define LPC178X_PCLK_RATE	(LPC178X_CPU_CLK_SEL_OUT / CONFIG_LPC178X_PCLK_DIV)
+
+/*
+ * Set LPC178X_EMC_RATE to the EMC clock
+ */
+#ifdef CONFIG_LPC178X_EMC_HALFCPU
+#define LPC178X_EMC_RATE	(LPC178X_CPU_CLK_SEL_OUT / 2)
+#else
+#define LPC178X_EMC_RATE	(LPC178X_CPU_CLK_SEL_OUT)
+#endif
 
 /*
  * Compile time sanity checks for defined board clock setup
@@ -270,6 +284,17 @@ static void clock_setup(void)
 	 * Only PCLKDIV bit group used in PCLKSEL, therefore not using |=
 	 */
 	LPC178X_SCC->pclksel = CONFIG_LPC178X_PCLK_DIV;
+
+#ifdef CONFIG_NR_DRAM_BANKS
+	/*
+	 * EMC clock
+	 */
+#ifdef CONFIG_LPC178X_EMC_HALFCPU
+	LPC178X_SCC->emcclksel = LPC178X_SCC_EMCCLKSEL_HALFCPU_MSK;
+#else /* CONFIG_LPC178X_EMC_HALFCPU */
+	LPC178X_SCC->emcclksel = 0;
+#endif /* CONFIG_LPC178X_EMC_HALFCPU */
+#endif /* CONFIG_NR_DRAM_BANKS */
 }
 
 /*
@@ -291,6 +316,11 @@ void clock_init(void)
 	 * Set peripheral clock rate
 	 */
 	clock_val[CLOCK_PCLK] = LPC178X_PCLK_RATE;
+
+	/*
+	 * Set EMC clock rate
+	 */
+	clock_val[CLOCK_EMCCLK] = LPC178X_EMC_RATE;
 }
 
 /*
