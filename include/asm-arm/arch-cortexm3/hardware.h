@@ -58,7 +58,10 @@ struct cm3_systick {
 };
 
 #define CM3_SYSTICK_LOAD_RELOAD_MSK	(0x00FFFFFF)
-#define CM3_SYSTICK_CTRL_EN		1
+/* System Tick counter enable */
+#define CM3_SYSTICK_CTRL_EN		(1 << 0)
+/* System Tick clock source selection: 1=CPU, 0=STCLK (external clock pin) */
+#define CM3_SYSTICK_CTRL_SYSTICK_CPU	(1 << 2)
 
 u8 cortex_m3_irq_vec_get(void);
 

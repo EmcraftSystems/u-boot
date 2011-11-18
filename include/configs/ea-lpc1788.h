@@ -44,7 +44,7 @@
 /*
  * Enable GPIO driver
  */
-/* TBD */
+#define CONFIG_LPC178X_GPIO
 
 /*
  * Display CPU and Board information
@@ -122,6 +122,13 @@
  * Number of clock ticks in 1 sec
  */
 #define CONFIG_SYS_HZ			1000
+
+/*
+ * Use internal clock (CPU clock) for the Cortex-M3 systick timer, because
+ * the external clock pin (STCLK) cannot be used on this board (it is already
+ * used for SDRAM.)
+ */
+#define CONFIG_ARMCORTEXM3_SYSTICK_CPU
 
 /*
  * Enable/disable h/w watchdog

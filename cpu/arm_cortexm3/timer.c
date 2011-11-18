@@ -29,8 +29,15 @@ int timer_init()
 
 	systick->load = CM3_SYSTICK_LOAD_RELOAD_MSK - 1;
 	systick->val = 0;
+
+#ifdef CONFIG_ARMCORTEXM3_SYSTICK_CPU
+	/* Use CPU clock, no ints */
+	systick->ctrl = CM3_SYSTICK_CTRL_EN | CM3_SYSTICK_CTRL_SYSTICK_CPU;
+#else
 	/* Use external clock, no ints */
 	systick->ctrl = CM3_SYSTICK_CTRL_EN;
+#endif
+
 	timestamp = 0;
 
 	return 0;
@@ -49,7 +56,7 @@ ulong get_timer(ulong base)
 
 	lastdec = now;
 
-	return timestamp / (clock_get(CLOCK_SYSTICK) / 1000) - base;
+	return timestamp / (clock_get(CLOCK_SYSTICK) / CONFIG_SYS_HZ) - base;
 }
 
 void reset_timer(void)

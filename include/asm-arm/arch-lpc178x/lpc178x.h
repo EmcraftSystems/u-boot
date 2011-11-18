@@ -46,6 +46,8 @@
 #define LPC178X_APB0PERIPH_BASE		(LPC178X_APB_PERIPH_BASE + 0x00000000)
 #define LPC178X_APB1PERIPH_BASE		(LPC178X_APB_PERIPH_BASE + 0x00080000)
 
+#define LPC178X_AHB_PERIPH_BASE		0x20080000
+
 /*
  * 1-bit masks for PCONP (Power Control for Peripherals register) for different
  * peripherals that enable power on them. One of these masks should be passed
@@ -54,6 +56,7 @@
 #define LPC178X_SCC_PCONP_PCUART0_MSK	(1 << 3)
 #define LPC178X_SCC_PCONP_PCUART1_MSK	(1 << 4)
 #define LPC178X_SCC_PCONP_PCUART4_MSK	(1 << 8)
+#define LPC178X_SCC_PCONP_PCGPIO_MSK	(1 << 15)
 #define LPC178X_SCC_PCONP_PCUART2_MSK	(1 << 24)
 #define LPC178X_SCC_PCONP_PCUART3_MSK	(1 << 25)
 
