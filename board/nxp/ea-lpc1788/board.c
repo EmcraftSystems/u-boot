@@ -78,7 +78,7 @@ int board_init(void)
  */
 int checkboard(void)
 {
-	printf("Board: EA-LPC1788 board %s\n",
+	printf("Board: EA-LPC1788 rev %s\n",
 		CONFIG_SYS_BOARD_REV_STR);
 
 	return 0;
