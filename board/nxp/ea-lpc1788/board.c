@@ -24,6 +24,7 @@
  */
 
 #include <common.h>
+#include <netdev.h>
 
 #include <asm/arch/lpc178x_gpio.h>
 
@@ -251,6 +252,9 @@ DECLARE_GLOBAL_DATA_PTR;
  * the code in `gpio_init()`.
  */
 static const struct lpc178x_gpio_pin_config ea_lpc1788_gpio[] = {
+	/*
+	 * GPIO configuration for UART
+	 */
 #if CONFIG_LPC178X_UART_PORT == 0
 	/* P0.2 (D) = UART0 TXD */
 	{{0,  2}, LPC178X_GPIO_CONFIG_D(1, LPC178X_NO_PULLUP, 0, 0, 0, 0)},
@@ -266,6 +270,9 @@ static const struct lpc178x_gpio_pin_config ea_lpc1788_gpio[] = {
 #endif
 
 #ifdef CONFIG_NR_DRAM_BANKS
+	/*
+	 * GPIO configuration for SDRAM
+	 */
 #define LPC178X_GPIO_EMC_REGVAL \
 	(LPC178X_GPIO_CONFIG_D(1, LPC178X_NO_PULLUP, 0, 0, 1, 0))
 
@@ -294,7 +301,33 @@ static const struct lpc178x_gpio_pin_config ea_lpc1788_gpio[] = {
 	{{2, 29}, LPC178X_GPIO_EMC_REGVAL},
 	{{2, 30}, LPC178X_GPIO_EMC_REGVAL},
 	{{2, 31}, LPC178X_GPIO_EMC_REGVAL},
-#endif
+#endif /* CONFIG_NR_DRAM_BANKS */
+
+#ifdef CONFIG_LPC178X_ETH
+	/*
+	 * GPIO configuration for Ethernet
+	 */
+	/* P1.0 (D) = RMII ENET_TXD0 */
+	{{1,  0}, LPC178X_GPIO_CONFIG_D(1, LPC178X_NO_PULLUP, 0, 0, 1, 0)},
+	/* P1.1 (D) = RMII ENET_TXD1 */
+	{{1,  1}, LPC178X_GPIO_CONFIG_D(1, LPC178X_NO_PULLUP, 0, 0, 1, 0)},
+	/* P1.4 (D) = RMII ENET_TX_EN */
+	{{1,  4}, LPC178X_GPIO_CONFIG_D(1, LPC178X_NO_PULLUP, 0, 0, 1, 0)},
+	/* P1.8 (D) = RMII CRS */
+	{{1,  8}, LPC178X_GPIO_CONFIG_D(1, LPC178X_NO_PULLUP, 0, 0, 1, 0)},
+	/* P1.9 (D) = RMII RXD0 */
+	{{1,  9}, LPC178X_GPIO_CONFIG_D(1, LPC178X_NO_PULLUP, 0, 0, 1, 0)},
+	/* P1.10 (D) = RMII RXD1 */
+	{{1, 10}, LPC178X_GPIO_CONFIG_D(1, LPC178X_NO_PULLUP, 0, 0, 1, 0)},
+	/* P1.14 (D) = RMII RXER */
+	{{1, 14}, LPC178X_GPIO_CONFIG_D(1, LPC178X_NO_PULLUP, 0, 0, 0, 0)},
+	/* P1.15 (D) = RMII CLK */
+	{{1, 15}, LPC178X_GPIO_CONFIG_D(1, LPC178X_NO_PULLUP, 0, 0, 0, 0)},
+	/* P1.16 (D) = RMII MCD */
+	{{1, 16}, LPC178X_GPIO_CONFIG_D(1, LPC178X_NO_PULLUP, 0, 0, 0, 0)},
+	/* P1.17 (D) = RMII MDIO */
+	{{1, 17}, LPC178X_GPIO_CONFIG_D(1, LPC178X_NO_PULLUP, 0, 0, 0, 0)},
+#endif /* CONFIG_LPC178X_ETH */
 };
 
 /*
@@ -471,4 +504,14 @@ int dram_init(void)
 
 	return 0;
 }
+
+#ifdef CONFIG_LPC178X_ETH
+/*
+ * Register ethernet driver
+ */
+int board_eth_init(bd_t *bis)
+{
+	return lpc178x_eth_driver_init(bis);
+}
+#endif
 

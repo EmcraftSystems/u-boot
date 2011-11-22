@@ -166,6 +166,10 @@
 					 (CONFIG_SYS_RAM_CS * 0x10000000))
 #define CONFIG_SYS_RAM_SIZE		(32 * 1024 * 1024)
 /*
+ * Buffers for Ethernet DMA (cannot be in the internal System RAM)
+ */
+#define CONFIG_MEM_ETH_DMA_BUF_BASE	0xA1F00000	/* 31st megabyte */
+/*
  * Use the CPU_CLOCK/2 for EMC
  */
 #define CONFIG_LPC178X_EMC_HALFCPU
@@ -217,7 +221,21 @@
 /*
  * Ethernet configuration
  */
-/* TBD */
+#define CONFIG_NET_MULTI
+#define CONFIG_LPC178X_ETH
+#define CONFIG_LPC178X_ENET_USE_PHY_RMII
+#define CONFIG_LPC178X_ETH_DIV_SEL	7	/* HCLK/28 */
+
+/*
+ * Ethernet RX buffers are malloced from the internal SRAM (more precisely,
+ * from CONFIG_SYS_MALLOC_LEN part of it). Each RX buffer has size of 1536B.
+ * So, keep this in mind when changing the value of the following config,
+ * which determines the number of ethernet RX buffers (number of frames which
+ * may be received without processing until overflow happens).
+ */
+#define CONFIG_SYS_RX_ETH_BUFFER	4
+
+#define CONFIG_SYS_TX_ETH_BUFFER	4
 
 /*
  * Console I/O buffer size
@@ -265,7 +283,7 @@
 #undef CONFIG_CMD_IMLS
 #undef CONFIG_CMD_LOADS
 #undef CONFIG_CMD_MISC
-#undef CONFIG_CMD_NET
+#define CONFIG_CMD_NET	/* Obligatory for the Ethernet driver to build */
 #undef CONFIG_CMD_NFS
 #undef CONFIG_CMD_SOURCE
 #undef CONFIG_CMD_XIMG

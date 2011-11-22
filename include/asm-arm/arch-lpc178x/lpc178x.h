@@ -58,6 +58,7 @@
 #define LPC178X_SCC_PCONP_PCGPIO_MSK	(1 << 15)
 #define LPC178X_SCC_PCONP_PCUART2_MSK	(1 << 24)
 #define LPC178X_SCC_PCONP_PCUART3_MSK	(1 << 25)
+#define LPC178X_SCC_PCONP_PCENET_MSK	(1 << 30)
 
 /*
  * PLL register map
