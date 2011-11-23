@@ -64,12 +64,16 @@
 /*
  * PLL register map
  * Used for PLL0 at 0x400FC080 and for PLL1 at 0x400FC0A0.
+ *
+ * This structure is 0x20 bytes long, it is important when it embedding into
+ * `struct lpc178x_scc_regs`.
  */
 struct lpc178x_pll_regs {
 	u32 con;	/* PLL Control register */
 	u32 cfg;	/* PLL Configuration register */
 	u32 stat;	/* PLL Status register */
 	u32 feed;	/* PLL Feed register */
+	u32 rsv0[4];
 };
 
 /*
@@ -78,64 +82,44 @@ struct lpc178x_pll_regs {
  *
  * This structure is used by the code in `clock.c` and `power.c`.
  */
-/*
- * TODO: convert to STM32/SmartFusion structure style,
- * i.e. use "rsvN[M]" hole fillers instead of "union"s for alignment.
- * (Not doing this until most lpc178x device drivers are implemented
- * and all necessary registers in this structure are known.)
- */
 struct lpc178x_scc_regs {
 	/* 0x400FC000: Flash Accelerator Configuration Register */
-	union {
-		u8 align0[0x80];
-	};
+	u32 rsv0[32];
 
 	/* 0x400FC080: PLL0 registers */
-	union {
-		u8 align1[0x20];
-		struct lpc178x_pll_regs pll0; /* PLL0 registers */
-	};
+	struct lpc178x_pll_regs pll0; /* PLL0 registers */
 
 	/* 0x400FC0A0: PLL1 registers */
-	union {
-		u8 align2[0x20];
-		struct lpc178x_pll_regs pll1; /* PLL1 registers */
-	};
+	struct lpc178x_pll_regs pll1; /* PLL1 registers */
 
 	/* 0x400FC0C0: Power control registers */
-	union {
-		u8 align3[0x40];
-		struct {
-			u32 pcon;       /* Power Control register */
-			u32 pconp;      /* Power Control for Peripherals */
-		};
-	};
+	u32 pcon;       /* Power Control register */
+	u32 pconp;      /* Power Control for Peripherals */
+	/* 0x400FC0C8 */
+	u32 rsv1[14];
 
 	/* 0x400FC100: Clock control */
-	union {
-		u8 align4[0xA0];
-		struct {
-			u32 emcclksel;	/* External Memory Controller
-						Clock Selection register */
-			u32 cclksel;	/* CPU Clock Selection register */
-			u32 usbclksel;	/* USB Clock Selection register */
-			u32 clksrcsel;	/* Clock Source Selection register */
-		};
-	};
+	u32 emcclksel;	/* External Memory Controller
+				Clock Selection register */
+	u32 cclksel;	/* CPU Clock Selection register */
+	u32 usbclksel;	/* USB Clock Selection register */
+	u32 clksrcsel;	/* Clock Source Selection register */
+	/* 0x400FC110 */
+	u32 rsv2[36];
 
 	/* 0x400FC1A0 */
 	u32 scs;	/* System Controls and Status register */
-	u32 rsv0;
+	u32 rsv3;
 	u32 pclksel;	/* Peripheral Clock Selection register */
 	/* 0x400FC1AC */
-	u32 rsv1[7];
+	u32 rsv4[7];
 
 	/* 0x400FC1C8 */
 	u32 clkoutcfg;
 	u32 rstcon0;
 	u32 rstcon1;
 	/* 0x400FC1D4 */
-	u32 rsv2[2];
+	u32 rsv5[2];
 
 	/* 0x400FC1DC */
 	u32 emcdlyctl;
