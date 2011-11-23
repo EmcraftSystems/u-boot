@@ -64,31 +64,39 @@ static u32 clock_val[CLOCK_END];
 /*
  * System Controls and Status register bits
  */
-#define LPC178X_SCC_SCS_OSCRANGE_BIT		4
-#define LPC178X_SCC_SCS_OSCEN_BIT		5
-#define LPC178X_SCC_SCS_OSCSTAT_BIT		6
+#define LPC178X_SCC_SCS_OSCRANGE_MSK		(1 << 4)
+#define LPC178X_SCC_SCS_OSCEN_MSK		(1 << 5)
+#define LPC178X_SCC_SCS_OSCSTAT_MSK		(1 << 6)
 
 /*
  * Clock Source Selection register bits
  */
-#define LPC178X_SCC_CLKSRCSEL_CLKSRC_BIT	0
+#define LPC178X_SCC_CLKSRCSEL_CLKSRC_MSK	(1 << 0)
 
 /*
  * PLL Configuration register bits
  */
 #define LPC178X_SCC_PLLCFG_MSEL_BITS		0
+#define LPC178X_SCC_PLLCFG_MSEL_MSK		((1 << 5) - 1)	/* bits 4:0 */
 #define LPC178X_SCC_PLLCFG_PSEL_BITS		5
 
 /*
  * PLL Status register bits
  */
-#define LPC178X_SCC_PLLSTAT_PLOCK_BIT		10
+#define LPC178X_SCC_PLLSTAT_PLOCK_MSK		(1 << 10)
 
 /*
  * CPU Clock Selection register bits
  */
 #define LPC178X_SCC_CCLKSEL_CCLKDIV_BITS	0
-#define LPC178X_SCC_CCLKSEL_CCLKSEL_BIT		8
+#define LPC178X_SCC_CCLKSEL_CCLKDIV_MSK		((1 << 5) - 1)	/* bits 4:0 */
+#define LPC178X_SCC_CCLKSEL_CCLKSEL_MSK		(1 << 8)
+
+/*
+ * Peripheral Clock Selection register
+ */
+#define LPC178X_SCC_PCLKSEL_PCLKDIV_BITS	0
+#define LPC178X_SCC_PCLKSEL_PCLKDIV_MSK		((1 << 5) - 1)	/* bits 4:0 */
 
 /*
  * EMC Clock Selection register
@@ -239,16 +247,16 @@ static void clock_setup(void)
 	 */
 	LPC178X_SCC->scs |=
 #if CONFIG_LPC178X_EXTOSC_RATE > 15000000
-		(1 << LPC178X_SCC_SCS_OSCRANGE_BIT) |
+		LPC178X_SCC_SCS_OSCRANGE_MSK |
 #endif
-		(1 << LPC178X_SCC_SCS_OSCEN_BIT);
-	while (!(LPC178X_SCC->scs & (1 << LPC178X_SCC_SCS_OSCSTAT_BIT)));
+		LPC178X_SCC_SCS_OSCEN_MSK;
+	while (!(LPC178X_SCC->scs & LPC178X_SCC_SCS_OSCSTAT_MSK));
 
 	/*
 	 * Switch PLL0 and SYSCLK to the external oscillator.
 	 * Only one bit used in CLKSRCSEL register, therefore not using |=
 	 */
-	LPC178X_SCC->clksrcsel = (1 << LPC178X_SCC_CLKSRCSEL_CLKSRC_BIT);
+	LPC178X_SCC->clksrcsel = LPC178X_SCC_CLKSRCSEL_CLKSRC_MSK;
 #endif /* !CONFIG_LPC178X_SYS_CLK_IRC */
 
 #ifdef CONFIG_LPC178X_PLL0_ENABLE
@@ -264,7 +272,7 @@ static void clock_setup(void)
 	pll_latch(&LPC178X_SCC->pll0);
 
 	/* Wait for lock */
-	while (!(LPC178X_SCC->pll0.stat & (1 << LPC178X_SCC_PLLSTAT_PLOCK_BIT)));
+	while (!(LPC178X_SCC->pll0.stat & LPC178X_SCC_PLLSTAT_PLOCK_MSK));
 #endif /* CONFIG_LPC178X_PLL0_ENABLE */
 
 	/* TBD: enable PLL1 (necessary only for USB?) */
@@ -274,7 +282,7 @@ static void clock_setup(void)
 	 */
 	LPC178X_SCC->cclksel =
 #ifdef CONFIG_LPC178X_PLL0_FOR_CPU
-		(1 << LPC178X_SCC_CCLKSEL_CCLKSEL_BIT) |
+		LPC178X_SCC_CCLKSEL_CCLKSEL_MSK |
 #endif
 		(CONFIG_LPC178X_CPU_DIV << LPC178X_SCC_CCLKSEL_CCLKDIV_BITS);
 
@@ -283,7 +291,8 @@ static void clock_setup(void)
 	 *
 	 * Only PCLKDIV bit group used in PCLKSEL, therefore not using |=
 	 */
-	LPC178X_SCC->pclksel = CONFIG_LPC178X_PCLK_DIV;
+	LPC178X_SCC->pclksel =
+		(CONFIG_LPC178X_PCLK_DIV << LPC178X_SCC_PCLKSEL_PCLKDIV_BITS);
 
 #ifdef CONFIG_NR_DRAM_BANKS
 	/*

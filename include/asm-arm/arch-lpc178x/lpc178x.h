@@ -38,14 +38,12 @@
 #error This LPC178X port assumes that the CPU works in little-endian mode
 #endif
 
-/******************************************************************************
+/*
  * Peripheral memory map
- ******************************************************************************/
-
+ */
 #define LPC178X_APB_PERIPH_BASE		0x40000000
 #define LPC178X_APB0PERIPH_BASE		(LPC178X_APB_PERIPH_BASE + 0x00000000)
 #define LPC178X_APB1PERIPH_BASE		(LPC178X_APB_PERIPH_BASE + 0x00080000)
-
 #define LPC178X_AHB_PERIPH_BASE		0x20080000
 
 /*
