@@ -129,3 +129,26 @@ u8 cortex_m3_irq_vec_get(void)
 {
 	return CM3_SCB_REGS->icsr & CM3_ICSR_VECTACT_MSK;
 }
+
+/*
+ * Add a custom MPU region
+ *
+ * region = Region Number
+ * address = Region Base Address
+ * attr = Region Attributes and Size
+ */
+void cortex_m3_mpu_add_region(u32 region, u32 address, u32 attr)
+{
+	CM3_MPU_REGS->rnr = region;
+	CM3_MPU_REGS->rbar = address;
+	CM3_MPU_REGS->rasr = attr;
+}
+
+/*
+ * Enable or disable configurable MPU memory regions
+ */
+void cortex_m3_mpu_enable(int enable)
+{
+	CM3_MPU_REGS->ctrl =
+		enable ? (CM3_MPU_CTRL_EN_MSK | CM3_MPU_CTRL_HFNMI_EN_MSK) : 0;
+}

@@ -55,5 +55,18 @@ void cortex_m3_soc_init(void)
 	 */
 	lpc178x_periph_enable(uart_pconp_mask[CONFIG_LPC178X_UART_PORT], 1);
 #endif
+
+	/*
+	 * Configure the memory protection unit (MPU) to allow full access to
+	 * the whole 4GB address space.
+	 *
+	 * This is required, because in the default configuration code
+	 * execution is not permitted at the addresses above 0xA0000000
+	 * (including SDRAM.)
+	 */
+	cortex_m3_mpu_add_region(0, 0x00000000,
+		CM3_MPU_RASR_AP_RW_RW | CM3_MPU_RASR_SIZE_4GB |
+		CM3_MPU_RASR_EN);
+	cortex_m3_mpu_enable(1);
 }
 #endif
