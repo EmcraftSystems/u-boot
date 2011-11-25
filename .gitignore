@@ -34,6 +34,7 @@
 /u-boot.dis
 /u-boot.lds
 /u-boot.ubl
+/u-boot-lpc.hex
 
 #
 # Generated files

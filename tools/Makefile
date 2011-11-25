@@ -64,6 +64,7 @@ BIN_FILES-$(CONFIG_INCA_IP) += inca-swap-bytes$(SFX)
 BIN_FILES-y += mkimage$(SFX)
 BIN_FILES-$(CONFIG_NETCONSOLE) += ncb$(SFX)
 BIN_FILES-$(CONFIG_SHA1_CHECK_UB_IMG) += ubsha1$(SFX)
+BIN_FILES-$(CONFIG_LPC178X_FCG) += lpc178x_fcg$(SFX)
 
 # Source files which exist outside the tools directory
 EXT_OBJ_FILES-y += common/env_embedded.o
@@ -87,6 +88,7 @@ NOPED_OBJ_FILES-y += mkimage.o
 OBJ_FILES-$(CONFIG_NETCONSOLE) += ncb.o
 NOPED_OBJ_FILES-y += os_support.o
 OBJ_FILES-$(CONFIG_SHA1_CHECK_UB_IMG) += ubsha1.o
+OBJ_FILES-$(CONFIG_LPC178X_FCG) += lpc178x_fcg.o
 
 # Don't build by default
 #ifeq ($(ARCH),ppc)
@@ -190,6 +192,9 @@ $(obj)ncb$(SFX):	$(obj)ncb.o
 	$(HOSTSTRIP) $@
 
 $(obj)ubsha1$(SFX):	$(obj)os_support.o $(obj)sha1.o $(obj)ubsha1.o
+	$(HOSTCC) $(HOSTCFLAGS) $(HOSTLDFLAGS) -o $@ $^
+
+$(obj)lpc178x_fcg$(SFX):	$(obj)lpc178x_fcg.o
 	$(HOSTCC) $(HOSTCFLAGS) $(HOSTLDFLAGS) -o $@ $^
 
 # Some of the tool objects need to be accessed from outside the tools directory

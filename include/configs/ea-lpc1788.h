@@ -42,6 +42,12 @@
 #define CONFIG_SYS_LPC178X
 
 /*
+ * Embed the calculated checksum into the U-Boot image
+ * (needed for execution of images from LPC178x eNVM).
+ */
+#define CONFIG_LPC178X_FCG
+
+/*
  * Enable GPIO driver
  */
 #define CONFIG_LPC178X_GPIO

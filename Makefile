@@ -280,6 +280,10 @@ NAND_SPL = nand_spl
 U_BOOT_NAND = $(obj)u-boot-nand.bin
 endif
 
+ifeq ($(CONFIG_LPC178X_FCG),y)
+U_BOOT_LPC178X_FCG = $(obj)u-boot-lpc.hex
+endif
+
 ifeq ($(CONFIG_ONENAND_U_BOOT),y)
 ONENAND_IPL = onenand_ipl
 U_BOOT_ONENAND = $(obj)u-boot-onenand.bin
@@ -293,7 +297,7 @@ __LIBS := $(subst $(obj),,$(LIBS)) $(subst $(obj),,$(LIBBOARD))
 #########################################################################
 
 # Always append ALL so that arch config.mk's can add custom ones
-ALL += $(obj)u-boot.srec $(obj)u-boot.bin $(obj)System.map $(U_BOOT_NAND) $(U_BOOT_ONENAND)
+ALL += $(obj)u-boot.srec $(obj)u-boot.bin $(obj)System.map $(U_BOOT_NAND) $(U_BOOT_ONENAND) $(U_BOOT_LPC178X_FCG)
 
 all:		$(ALL)
 
@@ -305,6 +309,12 @@ $(obj)u-boot.srec:	$(obj)u-boot
 
 $(obj)u-boot.bin:	$(obj)u-boot
 		$(OBJCOPY) ${OBJCFLAGS} -O binary $< $@
+
+$(obj)u-boot-lpc.bin:  $(obj)u-boot.bin
+		$(obj)tools/lpc178x_fcg $(obj)u-boot.bin $(obj)u-boot-lpc.bin
+
+$(obj)u-boot-lpc.hex:  $(obj)u-boot-lpc.bin
+		$(OBJCOPY) ${OBJCFLAGS} -O ihex $< $@ -I binary
 
 $(obj)u-boot.upgrade:	$(obj)u-boot.bin
 		split -b 32768 -a 1 -d u-boot.bin u-boot.bin-
@@ -3768,7 +3778,8 @@ clean:
 	       $(obj)tools/gdb/{astest,gdbcont,gdbsend}			  \
 	       $(obj)tools/gen_eth_addr    $(obj)tools/img2srec		  \
 	       $(obj)tools/mkimage	   $(obj)tools/mpc86x_clk	  \
-	       $(obj)tools/ncb		   $(obj)tools/ubsha1
+	       $(obj)tools/ncb		   $(obj)tools/ubsha1		  \
+	       $(obj)tools/lpc178x_fcg
 	@rm -f $(obj)board/cray/L1/{bootscript.c,bootscript.image}	  \
 	       $(obj)board/netstar/{eeprom,crcek,crcit,*.srec,*.bin}	  \
 	       $(obj)board/trab/trab_fkt   $(obj)board/voiceblue/eeprom   \
