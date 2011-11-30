@@ -421,14 +421,15 @@ void clock_init(void)
 
 /*
  * Return a clock value for the specified clock.
- * Note that we need this function in RAM because it will be used
- * during self-upgrade of U-boot into eNMV.
+ *
+ * Note that we do not need this function in RAM (.ramcode) because it will
+ * be used during self-upgrade of U-boot into eNMV only once, before the data
+ * in the eNMV will be actually changed.
+ *
  * @param clck          id of the clock
  * @returns             frequency of the clock
  */
-unsigned long  __attribute__((section(".ramcode")))
-	       __attribute__ ((long_call))
-	       clock_get(enum clock clck)
+unsigned long clock_get(enum clock clck)
 {
 	return clock_val[clck];
 }
