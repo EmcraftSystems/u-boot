@@ -239,9 +239,9 @@
  * which determines the number of ethernet RX buffers (number of frames which
  * may be received without processing until overflow happens).
  */
-#define CONFIG_SYS_RX_ETH_BUFFER	4
+#define CONFIG_SYS_RX_ETH_BUFFER	5
 
-#define CONFIG_SYS_TX_ETH_BUFFER	4
+#define CONFIG_SYS_TX_ETH_BUFFER	8
 
 /*
  * Console I/O buffer size

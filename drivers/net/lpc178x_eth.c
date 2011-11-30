@@ -777,7 +777,6 @@ static void lpc178x_mac_reset(void)
 		LPC178X_ETH_COMMAND_REG_RST_MSK |
 		LPC178X_ETH_COMMAND_TX_RST_MSK |
 		LPC178X_ETH_COMMAND_RX_RST_MSK;
-	udelay(10000);
 }
 
 /*
@@ -811,7 +810,6 @@ static int lpc178x_mac_hw_init(struct lpc178x_eth_dev *mac)
 		LPC178X_ETH_MAC2_CRC_EN_MSK |
 		LPC178X_ETH_MAC2_PAD_CRC_EN_MSK;
 	LPC178X_ETH->maxf = PKTSIZE_ALIGN;
-	udelay(10000);
 
 	/*
 	 * Maximum number of retries, 0x37 collision window, gap
@@ -833,7 +831,6 @@ static int lpc178x_mac_hw_init(struct lpc178x_eth_dev *mac)
 	/* MII setup */
 	LPC178X_ETH->command = LPC178X_ETH_COMMAND_PASS_RUNT_MSK;
 #endif
-	udelay(10000);
 
 	/*
 	 * Init PHY
@@ -919,7 +916,7 @@ static int lpc178x_eth_send(struct eth_device *dev, volatile void *pkt, int len)
 {
 	struct lpc178x_eth_dev *mac = to_lpc178x_eth(dev);
 	int rv, timeout;
-	u32 idx, cidx, fb;
+	u32 idx, free_bufs;
 
 	if (len > PKTSIZE_ALIGN) {
 		printf("%s: frame too long (%d).\n", __func__, len);
@@ -932,18 +929,11 @@ static int lpc178x_eth_send(struct eth_device *dev, volatile void *pkt, int len)
 	timeout = LPC178X_MAC_TX_TIMEOUT;
 	rv = -ETIMEDOUT;
 	while (timeout-- > 0) {
-		idx = LPC178X_ETH->txprodidx;
-		cidx = LPC178X_ETH->txconsidx;
+		free_bufs = (CONFIG_SYS_TX_ETH_BUFFER +
+			LPC178X_ETH->txconsidx - idx - 1) %
+			CONFIG_SYS_TX_ETH_BUFFER;
 
-		if (idx == cidx)
-			fb = CONFIG_SYS_TX_ETH_BUFFER;
-		else if (cidx > idx)
-			fb = (CONFIG_SYS_TX_ETH_BUFFER - 1) -
-				((idx + CONFIG_SYS_TX_ETH_BUFFER) - cidx);
-		else
-			fb = (CONFIG_SYS_TX_ETH_BUFFER - 1) - (cidx - idx);
-
-		if (fb == 0)
+		if (free_bufs <= 1) /* full or almost full */
 			udelay(1);
 		else {
 			timeout = 0;
