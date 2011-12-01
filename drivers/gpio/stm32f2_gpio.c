@@ -150,10 +150,11 @@ s32 stm32f2_gpio_config(const struct stm32f2_gpio_dsc *dsc,
 	 * Check params
 	 */
 	if (!dsc || dsc->port > 8 || dsc->pin > 15) {
-		if (gd->have_console)
+		if (gd->have_console) {
 			printf("%s: incorrect params %d.%d.\n", __func__,
 				dsc ? dsc->port : -1,
 				dsc ? dsc->pin  : -1);
+		}
 		rv = -EINVAL;
 		goto out;
 	}
@@ -254,10 +255,11 @@ s32 stm32f2_gpout_set(const struct stm32f2_gpio_dsc *dsc, int state)
 	s32					rv;
 
 	if (!dsc || dsc->port > 8 || dsc->pin > 15) {
-		if (gd->have_console)
+		if (gd->have_console) {
 			printf("%s: incorrect params %d.%d.\n", __func__,
 				dsc ? dsc->port : -1,
 				dsc ? dsc->pin  : -1);
+		}
 		rv = -EINVAL;
 		goto out;
 	}
