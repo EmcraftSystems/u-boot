@@ -353,13 +353,20 @@
  */
 #define CONFIG_EXTRA_ENV_SETTINGS				\
 	"loadaddr=0xA0000000\0"					\
-	"addip=setenv bootargs ${bootargs} ip=${ipaddr}:${serverip}:${gatewayip}:${netmask}:${hostname}:eth0:off\0"				\
+	"addip=setenv bootargs ${bootargs} "			\
+		"ip=${ipaddr}:${serverip}:${gatewayip}:"	\
+			"${netmask}:${hostname}:eth0:off "	\
+	/* Loadable kernel modules do not work generally in  */	\
+	/* configurations where there is more than 16 MBytes */	\
+	/* of RAM available. The following is the workaround */	\
+	/* for this defect.                                  */	\
+		"mem=16M\0"					\
 	"flashaddr=80020000\0"					\
 	"flashboot=run addip;bootm ${flashaddr}\0"		\
 	"ethaddr=C0:B1:3C:88:88:88\0"				\
 	"ipaddr=172.17.4.206\0"					\
 	"serverip=172.17.0.1\0"					\
-	"image=lpc178x/uImage\0"					\
+	"image=lpc178x/uImage\0"				\
 	"netboot=tftp ${image};run addip;bootm\0"
 
 /*
