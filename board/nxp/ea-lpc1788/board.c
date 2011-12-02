@@ -117,8 +117,13 @@
 
 /* EMC data pins (DQ0..DQ31) */
 #define LPC178X_EMC_DATA_PINS	31
+#if !defined(CONFIG_SYS_FLASH_CS)
 /* EMC row/column address pins (A0..A11) */
 #define LPC178X_EMC_ADDR_PINS	12
+#else
+/* ..and NOR Flash pins up to A22 */
+#define LPC178X_EMC_ADDR_PINS	22
+#endif
 
 /*
  * Dynamic Memory Control register
@@ -198,6 +203,20 @@ struct lpc178x_emc_dy_regs {
 };
 
 /*
+ * EMC controls for Static Memory CS. Each block occupies 0x20 bytes.
+ */
+struct lpc178x_emc_st_regs {
+	u32 cfg;	/* Static Memory Configuration register */
+	u32 we;		/* CS to WE delay register */
+	u32 oe;		/* CS to OE delay register */
+	u32 rd;		/* CS to Read delay register */
+	u32 page;	/* async page mode access delay */
+	u32 wr;		/* CS to Write delay register */
+	u32 ta;		/* number of turnaround cycles */
+	u32 rsv0[1];
+};
+
+/*
  * EMC (External Memory Controller) register map
  * Should be mapped at 0x2009C000.
  */
@@ -237,6 +256,9 @@ struct lpc178x_emc_regs {
 
 	/* 0x2009C100 */
 	struct lpc178x_emc_dy_regs dy[4];	/* 4 DRAM chips are possible */
+	u32 rsv3[32];
+	/* 0x2009C200 */
+	struct lpc178x_emc_st_regs st[4];	/* 4 Static RAM devices (flash) */
 };
 
 #define LPC178X_EMC_BASE		(LPC178X_AHB_PERIPH_BASE + 0x0001C000)
@@ -328,6 +350,22 @@ static const struct lpc178x_gpio_pin_config ea_lpc1788_gpio[] = {
 	/* P1.17 (D) = RMII MDIO */
 	{{1, 17}, LPC178X_GPIO_CONFIG_D(1, LPC178X_NO_PULLUP, 0, 0, 0, 0)},
 #endif /* CONFIG_LPC178X_ETH */
+#ifdef CONFIG_SYS_FLASH_CS
+	/*
+	 * GPIO configuration for Flash.
+	 */
+	/* P4.30 (D) = NOR FLash CS0 */
+	{{4, 30}, LPC178X_GPIO_CONFIG_D(1, LPC178X_NO_PULLUP, 0, 0, 1, 0)},
+	/* P4.24 (D) = NOR FLash BOE */
+	{{4, 24}, LPC178X_GPIO_CONFIG_D(1, LPC178X_NO_PULLUP, 0, 0, 1, 0)},
+	/* P4.25 (D) = NOR FLash BWE */
+	{{4, 25}, LPC178X_GPIO_CONFIG_D(1, LPC178X_NO_PULLUP, 0, 0, 1, 0)},
+	/* P4.26 (D) = Data Buffer BLS0 */
+	{{4, 26}, LPC178X_GPIO_CONFIG_D(1, LPC178X_NO_PULLUP, 0, 0, 1, 0)},
+	/* P4.27 (D) = Data Buffer BLS1 */
+	{{4, 27}, LPC178X_GPIO_CONFIG_D(1, LPC178X_NO_PULLUP, 0, 0, 1, 0)},
+
+#endif
 };
 
 /*
@@ -357,7 +395,10 @@ static void gpio_init(void)
 	for (dsc.pin = 0; dsc.pin <= LPC178X_EMC_DATA_PINS; dsc.pin++)
 		lpc178x_gpio_config(&dsc, LPC178X_GPIO_EMC_REGVAL);
 
-	/* Configure EMC row/column address pins (A0..A11) */
+	/*
+	 * Configure EMC row/column address pins (A0..A11) and
+	 * NOR FLash address pins.
+	*/
 	dsc.port = 4;
 	for (dsc.pin = 0; dsc.pin <= LPC178X_EMC_ADDR_PINS; dsc.pin++)
 		lpc178x_gpio_config(&dsc, LPC178X_GPIO_EMC_REGVAL);
@@ -369,8 +410,45 @@ static void gpio_init(void)
  */
 int board_init(void)
 {
+	volatile struct lpc178x_emc_st_regs *st;
+
+	/*
+	 * Enable power on EMC
+	 */
+	lpc178x_periph_enable(LPC178X_SCC_PCONP_PCEMC_MSK, 1);
+
+	/*
+	 * Clock delay for EMC
+	 */
+	LPC178X_SCC->emcdlyctl =
+		(LPC178X_EMC_CMDDLY << LPC178X_SCC_EMCDLYCTL_CMDDLY_BITS) |
+		(LPC178X_EMC_FBCLKDLY << LPC178X_SCC_EMCDLYCTL_FBCLKDLY_BITS);
+
+	/*
+	 * Enable EMC
+	 */
+	LPC178X_EMC->emcctrl = LPC178X_EMC_CTRL_EN_MSK;
+	/*
+	 * Little-endian mode
+	 */
+	LPC178X_EMC->emccfg = 0;
+
+	/*
+	 * Enable GPIO pins
+	 */
 	gpio_init();
 
+#ifdef CONFIG_SYS_FLASH_CS
+	/* Set timing for flash */
+	st = &LPC178X_EMC->st[CONFIG_SYS_FLASH_CS];
+	st->cfg = CONFIG_SYS_FLASH_CFG;
+	st->we = CONFIG_SYS_FLASH_WE;
+	st->oe = CONFIG_SYS_FLASH_OE;
+	st->rd = CONFIG_SYS_FLASH_RD;
+	st->page  = CONFIG_SYS_FLASH_PAGE;
+	st->wr = CONFIG_SYS_FLASH_WR;
+	st->ta = CONFIG_SYS_FLASH_TA;
+#endif
 	return 0;
 }
 
@@ -405,27 +483,6 @@ int dram_init(void)
 	u32 tmp32;
 
 	dy = &LPC178X_EMC->dy[CONFIG_SYS_RAM_CS];
-
-	/*
-	 * Enable power on EMC
-	 */
-	lpc178x_periph_enable(LPC178X_SCC_PCONP_PCEMC_MSK, 1);
-
-	/*
-	 * Clock delay
-	 */
-	LPC178X_SCC->emcdlyctl =
-		(LPC178X_EMC_CMDDLY << LPC178X_SCC_EMCDLYCTL_CMDDLY_BITS) |
-		(LPC178X_EMC_FBCLKDLY << LPC178X_SCC_EMCDLYCTL_FBCLKDLY_BITS);
-
-	/*
-	 * Enable EMC
-	 */
-	LPC178X_EMC->emcctrl = LPC178X_EMC_CTRL_EN_MSK;
-	/*
-	 * Little-endian mode
-	 */
-	LPC178X_EMC->emccfg = 0;
 
 	/*
 	 * Address mapping (see Table 133 from the LPC178x/7x User Manual)
@@ -515,3 +572,15 @@ int board_eth_init(bd_t *bis)
 }
 #endif
 
+#ifdef CONFIG_FLASH_CFI_LEGACY
+ulong board_flash_get_legacy (ulong base, int banknum, flash_info_t *info)
+{
+	if (banknum == 0) {	/* non-CFI flash */
+		info->portwidth = FLASH_CFI_16BIT;
+		info->chipwidth = FLASH_CFI_BY16;
+		info->interface = FLASH_CFI_X16;
+		return 1;
+	} else
+		return 0;
+}
+#endif

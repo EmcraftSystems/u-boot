@@ -29,7 +29,7 @@
 /*
  * Disable debug messages
  */
-#undef DEBUG
+//#undef DEBUG
 
 /*
  * This is an ARM Cortex-M3 CPU core
@@ -183,12 +183,41 @@
 /*
  * Configuration of the external Flash memory
  */
-#define CONFIG_SYS_NO_FLASH
+/* Define this to enable NOR FLash support */
+#define CONFIG_SYS_FLASH_CS		0
+
+#if defined(CONFIG_SYS_FLASH_CS)
+#define CONFIG_SYS_FLASH_CFG		0x81 /* 16 bit, Byte Lane enabled */
+#define CONFIG_SYS_FLASH_WE		0x2
+#define CONFIG_SYS_FLASH_OE		0x2
+#define CONFIG_SYS_FLASH_RD		0x1f
+#define CONFIG_SYS_FLASH_PAGE		0x1f
+#define CONFIG_SYS_FLASH_WR		0x1f
+#define CONFIG_SYS_FLASH_TA		0x1f
+
+#define CONFIG_SYS_FLASH_BANK1_BASE	0x80000000 /* hardwired for CS0 */
+
+#define CONFIG_SYS_FLASH_CFI		1
+#define CONFIG_FLASH_CFI_DRIVER		1
+#define CONFIG_FLASH_CFI_LEGACY		1
+#define CONFIG_SYS_FLASH_LEGACY_2Mx16	1
+#define CONFIG_SYS_FLASH_CFI_WIDTH	FLASH_CFI_16BIT
+#define CONFIG_SYS_FLASH_BANKS_LIST	{ CONFIG_SYS_FLASH_BANK1_BASE }
+#define CONFIG_SYS_MAX_FLASH_BANKS	1
+#define CONFIG_SYS_MAX_FLASH_SECT	1024
 
 /*
- * Store env in memory only
+ * Store env in flash.
+ */
+#define CONFIG_ENV_IS_IN_FLASH
+#else
+/*
+ * Store env in memory only, if no flash.
  */
 #define CONFIG_ENV_IS_NOWHERE
+#define CONFIG_SYS_NO_FLASH
+#endif
+
 #define CONFIG_ENV_SIZE			(4 * 1024)
 #define CONFIG_ENV_ADDR			CONFIG_SYS_FLASH_BANK1_BASE
 #define CONFIG_INFERNO			1

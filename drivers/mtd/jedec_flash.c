@@ -61,6 +61,7 @@
 #define SST39LF800	0x2781
 #define SST39LF160	0x2782
 #define SST39VF1601	0x234b
+#define SST39VF3201	0x235b
 #define SST39LF512	0x00D4
 #define SST39LF010	0x00D5
 #define SST39LF020	0x00D6
@@ -326,6 +327,26 @@ static const struct amd_flash_info jedec_table[] = {
 			ERASEINFO(0x02000, 2),
 			ERASEINFO(0x08000, 1),
 			ERASEINFO(0x10000, 15),
+		}
+	},
+#endif
+#ifdef CONFIG_SYS_FLASH_LEGACY_2Mx16
+	/* Taken from the Linux jedec_probe.c */
+	{
+		.mfr_id		= (u16)SST_MANUFACT,
+		.dev_id		= SST39VF3201,
+		.name		= "SST SST39VF3201",
+		.uaddr		= {
+			[1] = MTD_UADDR_0x5555_0x2AAA /* x16 */
+		},
+		.DevSize	= SIZE_4MiB,
+		.CmdSet		= CFI_CMDSET_AMD_LEGACY,
+		.NumEraseRegions= 4,
+		.regions	= {
+			ERASEINFO(0x01000, 256),
+			ERASEINFO(0x01000, 256),
+			ERASEINFO(0x01000, 256),
+			ERASEINFO(0x01000, 256),
 		}
 	},
 #endif
