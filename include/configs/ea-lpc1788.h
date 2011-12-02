@@ -29,7 +29,7 @@
 /*
  * Disable debug messages
  */
-//#undef DEBUG
+#undef DEBUG
 
 /*
  * This is an ARM Cortex-M3 CPU core
@@ -341,7 +341,7 @@
 #define CONFIG_HOSTNAME			ea-lpc1788
 #define CONFIG_BOOTARGS			"lpc178x_platform=ea-lpc1788 "\
 					"console=ttyS0,115200 panic=10"
-#define CONFIG_BOOTCOMMAND		"run netboot"
+#define CONFIG_BOOTCOMMAND		"run flashboot"
 
 /*
  * This ensures that the board-specific misc_init_r() gets invoked.
@@ -354,10 +354,12 @@
 #define CONFIG_EXTRA_ENV_SETTINGS				\
 	"loadaddr=0xA0000000\0"					\
 	"addip=setenv bootargs ${bootargs} ip=${ipaddr}:${serverip}:${gatewayip}:${netmask}:${hostname}:eth0:off\0"				\
+	"flashaddr=80020000\0"					\
+	"flashboot=run addip;bootm ${flashaddr}\0"		\
 	"ethaddr=C0:B1:3C:88:88:88\0"				\
 	"ipaddr=172.17.4.206\0"					\
 	"serverip=172.17.0.1\0"					\
-	"image=lpc17xx/uImage\0"					\
+	"image=lpc178x/uImage\0"					\
 	"netboot=tftp ${image};run addip;bootm\0"
 
 /*

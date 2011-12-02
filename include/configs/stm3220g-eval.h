@@ -290,7 +290,7 @@
 #define CONFIG_HOSTNAME			stm3220g-eval
 #define CONFIG_BOOTARGS			"stm32_platform=stm3220g-eval "\
 					"console=ttyS2,115200 panic=10"
-#define CONFIG_BOOTCOMMAND		"run netboot"
+#define CONFIG_BOOTCOMMAND		"run flashboot"
 
 #define CONFIG_SYS_CONSOLE_IS_IN_ENV
 
@@ -300,6 +300,8 @@
 #define CONFIG_EXTRA_ENV_SETTINGS				\
 	"loadaddr=0x64000000\0"					\
 	"addip=setenv bootargs ${bootargs} ip=${ipaddr}:${serverip}:${gatewayip}:${netmask}:${hostname}:eth0:off\0"				\
+	"flashaddr=60020000\0"						\
+	"flashboot=run addip;bootm ${flashaddr}\0"		\
 	"ethaddr=C0:B1:3C:88:88:88\0"				\
 	"ipaddr=172.17.4.206\0"					\
 	"serverip=172.17.0.1\0"					\
