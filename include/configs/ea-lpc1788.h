@@ -260,6 +260,11 @@
 #define CONFIG_LPC178X_ETH
 #define CONFIG_LPC178X_ENET_USE_PHY_RMII
 #define CONFIG_LPC178X_ETH_DIV_SEL	7	/* HCLK/28 */
+/*
+ * Used only for the final PHY reset, see `lpc178x_phy_final_reset()`.
+ * For other code, we use automatic PHY discovery.
+ */
+#define CONFIG_LPC178X_ETH_PHY_ADDR	1
 
 /*
  * Ethernet RX buffers are malloced from the internal SRAM (more precisely,

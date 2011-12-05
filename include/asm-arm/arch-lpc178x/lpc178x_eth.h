@@ -19,22 +19,14 @@
  * MA 02111-1307 USA
  */
 
-#include <common.h>
-
-#include <asm/arch/lpc178x.h>
+#ifndef _LPC178X_ETH_H_
+#define _LPC178X_ETH_H_
 
 /*
- * Enable or disable power on a peripheral device (timers, UARTs, USB, etc)
- *
- * This function will be called from `lpc178x_phy_final_reset()`, therefore this
- * should also be in `.ramcode`.
+ * Final PHY reset before performing SYSRESET of SoC
  */
 void __attribute__((section(".ramcode")))
      __attribute__ ((long_call))
-lpc178x_periph_enable(u32 pconp_mask, int enable)
-{
-	if (enable)
-		LPC178X_SCC->pconp |= pconp_mask;
-	else
-		LPC178X_SCC->pconp &= ~pconp_mask;
-}
+lpc178x_phy_final_reset(void);
+
+#endif /* _LPC178X_ETH_H_ */

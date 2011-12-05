@@ -134,8 +134,13 @@ struct lpc178x_scc_regs {
 
 /*
  * Enable or disable power on a peripheral device (timers, UARTs, USB, etc)
+ *
+ * This function will be called from `lpc178x_pre_reset_cpu()`, therefore this
+ * should also be in `.ramcode`.
  */
-extern void lpc178x_periph_enable(u32 pconp_mask, int enable);
+void __attribute__((section(".ramcode")))
+     __attribute__ ((long_call))
+lpc178x_periph_enable(u32 pconp_mask, int enable);
 
 /*
  * Clocks enumeration
@@ -158,5 +163,15 @@ enum clock {
  * @returns             frequency of the clock
  */
 unsigned long clock_get(enum clock clck);
+
+/*
+ * Prepare for software reset
+ *
+ * This function will be called from `reset_cpu()`, therefore this should also
+ * be in `.ramcode`.
+ */
+void __attribute__((section(".ramcode")))
+     __attribute__ ((long_call))
+lpc178x_pre_reset_cpu(void);
 
 #endif /* _MACH_LPC178X_H_ */

@@ -22,6 +22,7 @@
 #include <common.h>
 
 #include <asm/arch/lpc178x.h>
+#include <asm/arch/lpc178x_eth.h>
 #include "clock.h"
 
 /*
@@ -40,4 +41,24 @@ int print_cpuinfo(void)
 		buf[0], buf[1], buf[2]);
 
 	return 0;
+}
+
+/*
+ * Prepare for software reset
+ *
+ * This function will be called from `reset_cpu()`, therefore this should also
+ * be in `.ramcode`.
+ */
+void __attribute__((section(".ramcode")))
+     __attribute__ ((long_call))
+lpc178x_pre_reset_cpu(void)
+{
+#ifdef CONFIG_LPC178X_ETH
+	/*
+	 * If we do not perform a PHY reset immediately before SYSRESET
+	 * (the `cpu_reset()` call), then the Ethernet block will hang
+	 * after this software reset.
+	 */
+	lpc178x_phy_final_reset();
+#endif
 }

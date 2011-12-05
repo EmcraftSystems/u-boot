@@ -112,6 +112,18 @@ void __attribute__((section(".ramcode")))
 		__attribute__ ((long_call))
 		reset_cpu(ulong addr)
 {
+#ifdef CONFIG_SYS_LPC178X
+	/*
+	 * We use the function `lpc178x_pre_reset_cpu()` to reset
+	 * the Ethernet PHY.
+	 *
+	 * LPC178x/7x requires a PHY reset immediately before resetting
+	 * the SoC, otherwise the Ethernet block hangs after software reset
+	 * of the SoC.
+	 */
+	lpc178x_pre_reset_cpu();
+#endif
+
 	/*
 	 * Perform reset but keep priority group unchanged.
 	 */

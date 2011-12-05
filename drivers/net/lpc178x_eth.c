@@ -644,14 +644,65 @@ static int lpc178x_phy_wait_busy(int timeout)
 }
 
 /*
+ * This function will be called from `lpc178x_phy_final_reset()` which resides
+ * in `.ramcode`.
+ * If the compiler makes this funtion `inline`, nothing will be broken, because
+ * `lpc178x_phy_final_reset()` cannot become `inline` (it is not `static`.)
+ */
+static void __attribute__((section(".ramcode")))
+	    __attribute__ ((long_call))
+lpc178x_phy_write_nowait(u32 phy_adr, u16 reg, u16 val)
+{
+	LPC178X_ETH->mcmd = 0;
+	LPC178X_ETH->madr = (phy_adr << LPC178X_ETH_MADR_PA_BITS) |
+		(reg << LPC178X_ETH_MADR_RA_BITS);
+	LPC178X_ETH->mwtd = val;
+}
+
+/*
+ * Final PHY reset before performing SYSRESET of SoC
+ *
+ * If we do not reset the Ethernet PHY immediately before resetting the SoC,
+ * the Ethernet block of the SoC will hang later and will not allow us to use
+ * Ethernet after SoC reset.
+ *
+ * This function will be called from `lpc178x_pre_reset_cpu()` which resides
+ * in `.ramcode`.
+ */
+void __attribute__((section(".ramcode")))
+     __attribute__ ((long_call))
+lpc178x_phy_final_reset(void)
+{
+	/*
+	 * Enable power on the Ethernet block
+	 */
+	lpc178x_periph_enable(LPC178X_SCC_PCONP_PCENET_MSK, 1);
+
+	/*
+	 * Minimal MAC initialization
+	 */
+	LPC178X_ETH->mcfg = (CONFIG_LPC178X_ETH_DIV_SEL << LPC178X_ETH_MCFG_CS_BITS);
+	LPC178X_ETH->mac1 = 0;
+	LPC178X_ETH->mac2 = 0;
+
+	/*
+	 * Reset PHY and wait for write completion
+	 */
+	lpc178x_phy_write_nowait(CONFIG_LPC178X_ETH_PHY_ADDR, PHY_BMCR, PHY_BMCR_RESET);
+	while (LPC178X_ETH->mind & LPC178X_ETH_MIND_BUSY_MSK);
+
+	/*
+	 * Disable power on the Ethernet block
+	 */
+	lpc178x_periph_enable(LPC178X_SCC_PCONP_PCENET_MSK, 0);
+}
+
+/*
  * Write PHY
  */
 static int lpc178x_phy_write(struct lpc178x_eth_dev *mac, u16 reg, u16 val)
 {
-	LPC178X_ETH->mcmd = 0;
-	LPC178X_ETH->madr = (mac->phy_adr << LPC178X_ETH_MADR_PA_BITS) |
-		(reg << LPC178X_ETH_MADR_RA_BITS);
-	LPC178X_ETH->mwtd = val;
+	lpc178x_phy_write_nowait(mac->phy_adr, reg, val);
 
 	return lpc178x_phy_wait_busy(LPC178X_PHY_WRITE_TIMEOUT);
 }
