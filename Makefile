@@ -297,7 +297,7 @@ __LIBS := $(subst $(obj),,$(LIBS)) $(subst $(obj),,$(LIBBOARD))
 #########################################################################
 
 # Always append ALL so that arch config.mk's can add custom ones
-ALL += $(obj)u-boot.srec $(obj)u-boot.bin $(obj)System.map $(U_BOOT_NAND) $(U_BOOT_ONENAND) $(U_BOOT_LPC178X_FCG)
+ALL += $(obj)u-boot.srec $(obj)u-boot.bin $(obj)System.map $(U_BOOT_NAND) $(U_BOOT_ONENAND)
 
 all:		$(ALL)
 
@@ -309,12 +309,10 @@ $(obj)u-boot.srec:	$(obj)u-boot
 
 $(obj)u-boot.bin:	$(obj)u-boot
 		$(OBJCOPY) ${OBJCFLAGS} -O binary $< $@
-
-$(obj)u-boot-lpc.bin:  $(obj)u-boot.bin
+ifeq ($(CONFIG_LPC178X_FCG),y)
 		$(obj)tools/lpc178x_fcg $(obj)u-boot.bin $(obj)u-boot-lpc.bin
-
-$(obj)u-boot-lpc.hex:  $(obj)u-boot-lpc.bin
-		$(OBJCOPY) ${OBJCFLAGS} -O ihex $< $@ -I binary
+		mv $(obj)u-boot-lpc.bin $(obj)u-boot.bin
+endif
 
 $(obj)u-boot.upgrade:	$(obj)u-boot.bin
 		split -b 32768 -a 1 -d u-boot.bin u-boot.bin-
