@@ -2702,6 +2702,7 @@ extern unsigned int __machine_arch_type;
 #define MACH_TYPE_A2F                  3344
 #define MACH_TYPE_STM32                3750
 #define MACH_TYPE_LPC178X              3855
+#define MACH_TYPE_KINETIS              3896
 
 #ifdef CONFIG_ARCH_EBSA110
 # ifdef machine_arch_type
@@ -34969,6 +34970,19 @@ extern unsigned int __machine_arch_type;
 # define machine_is_stm32f2()	(machine_arch_type == MACH_TYPE_STM32)
 #else
 # define machine_is_stm32f2()	(0)
+#endif
+
+#ifdef CONFIG_MACH_KINETIS
+# ifdef machine_arch_type
+#  undef machine_arch_type
+#  define machine_arch_type	__machine_arch_type
+# else
+#  define machine_arch_type	MACH_TYPE_KINETIS
+# endif
+# define machine_is_kinetis() \
+	(machine_arch_type == MACH_TYPE_KINETIS)
+#else
+# define machine_is_kinetis()	(0)
 #endif
 
 /*

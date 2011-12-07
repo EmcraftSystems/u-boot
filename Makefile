@@ -3214,6 +3214,9 @@ stm3220g-eval_config : unconfig
 ea-lpc1788_config : unconfig
 	@$(MKCONFIG) $(@:_config=) arm arm_cortexm3 ea-lpc1788 nxp lpc178x
 
+twr-k60n512_config : unconfig
+	@$(MKCONFIG) $(@:_config=) arm arm_cortexm3 twr-k60n512 freescale kinetis
+
 #########################################################################
 ## XScale Systems
 #########################################################################

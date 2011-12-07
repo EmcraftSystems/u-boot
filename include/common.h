@@ -122,6 +122,9 @@ typedef volatile unsigned char	vu_char;
 #ifdef CONFIG_SYS_LPC178X
 #include <asm/arch-lpc178x/lpc178x.h>
 #endif
+#ifdef CONFIG_SYS_KINETIS
+#include <asm/arch-kinetis/kinetis.h>
+#endif
 
 #include <part.h>
 #include <flash.h>
@@ -472,7 +475,7 @@ void	upmconfig     (unsigned int, unsigned int *, unsigned int);
 ulong	get_tbclk     (void);
 void
 #if defined(CONFIG_SYS_A2F) || defined(CONFIG_SYS_STM32) || \
-    defined(CONFIG_SYS_LPC178X)
+    defined(CONFIG_SYS_LPC178X) || defined(CONFIG_SYS_KINETIS)
 	__attribute__((section(".ramcode")))
 	__attribute__ ((long_call))
 #endif

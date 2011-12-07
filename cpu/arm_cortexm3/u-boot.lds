@@ -44,6 +44,15 @@ SECTIONS
 		*(.vectors)
 	} >NVM
 
+	/*
+	 * This section is only necessary for Freescale Kinetis. For other MCUs,
+	 * this section will be empty and the linker will drop it.
+	 */
+	.kinetis_flash_conf 0x00000400 :
+	{
+		KEEP(*(.kinetis_flash_conf))
+	} >NVM
+
 	.text :
 	{
 		*(.text)
