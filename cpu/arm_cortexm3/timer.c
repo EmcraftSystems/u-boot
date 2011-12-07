@@ -77,16 +77,22 @@ void __udelay(ulong usec)
 
 	clc = usec * (clock_get(CLOCK_SYSTICK) / 1000000);
 
-	/* get current timestamp */
+	/*
+	 * Get current timestamp
+	 */
 	tmp = systick->val;
 
+	/*
+	 * Loop till event
+	 *
+	 * The SYSTICK timer count downwards.
+	 */
 	if (tmp < clc) {
-		/* loop till event */
 		while (systick->val < tmp ||
 			   systick->val > (CM3_SYSTICK_LOAD_RELOAD_MSK - 1 -
 				clc + tmp)) ;	/* nop */
 	} else {
-		while (systick->val > (tmp - clc)) ;
+		while (systick->val > (tmp - clc) && systick->val <= tmp) ;
 	}
 }
 
