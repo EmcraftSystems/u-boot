@@ -67,7 +67,32 @@
 /*
  * Clock configuration (see cpu/arm_cortexm3/kinetis/clock.c for details)
  */
-/* TBD */
+/* Select MCG configuration type */
+#define CONFIG_KINETIS_K60_100MHZ
+/*
+ * Clock rate at the EXTAL input
+ *
+ * See also the description of the J6 jumper on the TWR-K60N512 board.
+ * The PHY clock drives EXTAL.
+ */
+#define KINETIS_EXTAL_RATE	50000000
+/*
+ * The EXTAL rate divided by the divisor value (2**10 = 1024) specified by this
+ * constant should be as close to the 32..40 kHz range as possible.
+ */
+#define KINETIS_MCG_FRDIV_POW	10
+/* Core/system clock divider: 100/1 = 100 MHz */
+#define KINETIS_CCLK_DIV	1
+/* Peripheral clock divider: 100/2 = 50 MHz */
+#define KINETIS_PCLK_DIV	2
+/* FlexBus clock divider: 100/2 = 50 MHz */
+#define KINETIS_FLEXBUS_CLK_DIV	2
+/* Flash clock divider: 100/4 = 25 MHz */
+#define KINETIS_FLASH_CLK_DIV	4
+/* PLL input divider: 50/25 = 2 MHz */
+#define KINETIS_PLL_PRDIV	25
+/* PLL multiplier: 2*50 = 100 MHz */
+#define KINETIS_PLL_VDIV	50
 
 /*
  * Number of clock ticks in 1 sec
