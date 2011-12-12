@@ -25,6 +25,24 @@
 #ifndef _MACH_KINETIS_H_
 #define _MACH_KINETIS_H_
 
+#include <asm/byteorder.h>
+
+/*
+ * This Kinetis port assumes that the CPU works in little-endian mode.
+ * Switching to big-endian will require different bit offsets in peripheral
+ * devices' registers. Also, some bit groups may lay on byte edges, so issue
+ * with big-endian cannot be fixed only by defining bit offsets differently
+ * for the big-endian mode.
+ */
+#ifndef __LITTLE_ENDIAN
+#error This Kinetis port assumes that the CPU works in little-endian mode
+#endif
+
+/*
+ * Peripheral memory map
+ */
+#define KINETIS_AIPS0PERIPH_BASE	0x40000000
+
 /*
  * Clocks enumeration
  */
