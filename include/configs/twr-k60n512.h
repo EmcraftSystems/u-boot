@@ -44,7 +44,9 @@
 /*
  * Enable GPIO driver
  */
-/* TBD */
+#define CONFIG_KINETIS_GPIO
+/* Number of GPIO ports (A..E on K60) */
+#define KINETIS_GPIO_PORTS	5
 
 /*
  * Display CPU and Board information
@@ -164,8 +166,21 @@
  * Serial console configuration
  */
 #define CONFIG_KINETIS_UART_CONSOLE
-/* UART5 is connected to the OSJTAG USB-to-serial Bridge */
-#define CONFIG_KINETIS_UART_PORT	5
+/*
+ * UART3 is connected to the RS-232 port on the TWR-SER board
+ * UART3 pin configuration: Rx: PORT_C.16, Tx = PORT_C.17
+ */
+/*
+ * UART5 is connected to the OSJTAG USB-to-serial Bridge
+ * UART5 pin configuration: Rx: PORT_E.9, Tx = PORT_E.8
+ */
+#define CONFIG_KINETIS_UART_PORT	3	/* UART3 */
+#define CONFIG_KINETIS_UART_RX_IO_PORT	2	/* PORT C */
+#define CONFIG_KINETIS_UART_RX_IO_PIN	16	/* pin 16 */
+#define CONFIG_KINETIS_UART_RX_IO_FUNC	3	/* UART3_RX */
+#define CONFIG_KINETIS_UART_TX_IO_PORT	2	/* PORT C */
+#define CONFIG_KINETIS_UART_TX_IO_PIN	17	/* pin 17 */
+#define CONFIG_KINETIS_UART_TX_IO_FUNC	3	/* UART3_TX */
 
 #define CONFIG_BAUDRATE			115200
 #define CONFIG_SYS_BAUDRATE_TABLE	{ 9600, 19200, 38400, 57600, 115200 }

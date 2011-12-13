@@ -31,6 +31,7 @@ COBJS-$(CONFIG_MX31_GPIO)	+= mx31_gpio.o
 COBJS-$(CONFIG_PCA953X)		+= pca953x.o
 COBJS-$(CONFIG_STM32F2_GPIO)	+= stm32f2_gpio.o
 COBJS-$(CONFIG_LPC178X_GPIO)	+= lpc178x_gpio.o
+COBJS-$(CONFIG_KINETIS_GPIO)	+= kinetis_gpio.o
 
 COBJS	:= $(COBJS-y)
 SRCS	:= $(COBJS:.o=.c)

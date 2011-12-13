@@ -20,6 +20,7 @@
  */
 
 #include <common.h>
+#include <asm/errno.h>
 
 #include "clock.h"
 
@@ -250,6 +251,14 @@
 #define KINETIS_SIM_CLKDIV1_OUTDIV4_BITS	16
 
 /*
+ * Limits for the `kinetis_periph_enable()` function:
+ *     1. The number of SIM_SCGC[] registers
+ *     2. The number of bits in those registers
+ */
+#define KINETIS_SIM_CG_NUMREGS	7
+#define KINETIS_SIM_CG_NUMBITS	32
+
+/*
  * System Integration Module (SIM) register map
  *
  * This map actually covers two hardware modules:
@@ -267,13 +276,7 @@ struct kinetis_sim_regs {
 	u32 sopt7;	/* System Options Register 7 */
 	u32 rsv2[2];
 	u32 sdid;	/* System Device Identification Register */
-	u32 scgc1;	/* System Clock Gating Control Register 1 */
-	u32 scgc2;	/* System Clock Gating Control Register 2 */
-	u32 scgc3;	/* System Clock Gating Control Register 3 */
-	u32 scgc4;	/* System Clock Gating Control Register 4 */
-	u32 scgc5;	/* System Clock Gating Control Register 5 */
-	u32 scgc6;	/* System Clock Gating Control Register 6 */
-	u32 scgc7;	/* System Clock Gating Control Register 7 */
+	u32 scgc[7];	/* System Clock Gating Control Registers 1...7 */
 	u32 clkdiv1;	/* System Clock Divider Register 1 */
 	u32 clkdiv2;	/* System Clock Divider Register 2 */
 	u32 fcfg1;	/* Flash Configuration Register 1 */
@@ -497,6 +500,16 @@ void clock_init(void)
 	 * On Kinetis, the SYSTICK rate is always equal to the CPU clock rate.
 	 */
 	clock_val[CLOCK_SYSTICK] = KINETIS_CPU_RATE;
+
+	/*
+	 * Set the core/system clock rate
+	 */
+	clock_val[CLOCK_CCLK] = KINETIS_CPU_RATE;
+
+	/*
+	 * Set the bus clock rate (used for many peripherals)
+	 */
+	clock_val[CLOCK_PCLK] = KINETIS_PCLK_RATE;
 }
 
 /*
@@ -508,4 +521,35 @@ void clock_init(void)
 unsigned long clock_get(enum clock clck)
 {
 	return clock_val[clck];
+}
+
+/*
+ * Enable or disable the clock on a peripheral device (timers, UARTs, USB, etc)
+ */
+int kinetis_periph_enable(kinetis_clock_gate_t gate, int enable)
+{
+	volatile u32 *scgc;
+	u32 mask;
+	int rv;
+
+	/*
+	 * Verify the function arguments
+	 */
+	if (KINETIS_CG_REG(gate) >= KINETIS_SIM_CG_NUMREGS ||
+	    KINETIS_CG_IDX(gate) >= KINETIS_SIM_CG_NUMBITS) {
+		rv = -EINVAL;
+		goto out;
+	}
+
+	scgc = &KINETIS_SIM->scgc[KINETIS_CG_REG(gate)];
+	mask = 1 << KINETIS_CG_IDX(gate);
+
+	if (enable)
+		*scgc |= mask;
+	else
+		*scgc &= ~mask;
+
+	rv = 0;
+out:
+	return rv;
 }
