@@ -30,7 +30,7 @@
  * should also be in `.ramcode`.
  */
 void __attribute__((section(".ramcode")))
-     __attribute__ ((long_call))
+     __attribute__((long_call))
 lpc178x_periph_enable(u32 pconp_mask, int enable)
 {
 	if (enable)

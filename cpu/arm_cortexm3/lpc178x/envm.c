@@ -385,7 +385,7 @@ out:
  * will be used to self-upgrade U-boot in internal Flash.
  */
 u32 __attribute__((section(".ramcode")))
-    __attribute__ ((long_call))
+    __attribute__((long_call))
 envm_write(u32 offset, void *buf, u32 size)
 {
 	u32 rv = 0;
