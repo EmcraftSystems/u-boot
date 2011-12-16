@@ -49,6 +49,20 @@
 #define CONFIG_LPC178X_PLL0_ENABLE
 
 /*
+ * Set CONFIG_LPC178X_PLL1_ENABLE to enable PLL1. If PLL1 is enabled,
+ * the values of CONFIG_LPC178X_PLL1_M and CONFIG_LPC178X_PLL1_PSEL must also
+ * be set to configure the PLL1 rate based on the selected input clock.
+ * See the LCP178x/7x User's Manual for information on setting these
+ * values correctly. SYSCLK is used as the PLL1 input clock.
+ *
+ * We only enable the PLL1 if the USB clock configuration is enabled, because
+ * only the USB clock uses the PLL1 output.
+ */
+#ifdef CONFIG_LPC178X_USB_DIV
+#define CONFIG_LPC178X_PLL1_ENABLE
+#endif /* CONFIG_LPC178X_USB_DIV */
+
+/*
  * Use the output of PLL0 for CPU clock.
  */
 #define CONFIG_LPC178X_PLL0_FOR_CPU
@@ -104,15 +118,34 @@ static u32 clock_val[CLOCK_END];
 #define LPC178X_SCC_EMCCLKSEL_HALFCPU_MSK	(1 << 0)
 
 /*
+ * USB Clock Selection register
+ */
+/* Selects the divide value for creating the USB clock */
+#define LPC178X_SCC_USBCLKSEL_USBDIV_BITS	0
+/* The mask for all bits of USBCLKSEL[USBDIV] */
+#define LPC178X_SCC_USBCLKSEL_USBDIV_MSK \
+	(((1 << 5) - 1) << LPC178X_SCC_USBCLKSEL_USBDIV_BITS)
+/* Selects the input clock for the USB clock divider */
+#define LPC178X_SCC_USBCLKSEL_USBSEL_BITS	8
+/* The mask for all bits of USBCLKSEL[USBSEL] */
+#define LPC178X_SCC_USBCLKSEL_USBSEL_MSK \
+	(3 << LPC178X_SCC_USBCLKSEL_USBSEL_BITS)
+/* The output of the Alt PLL is used as the input to the USB clock divider */
+#define LPC178X_SCC_USBCLKSEL_USBSEL_PLL1_MSK \
+	(2 << LPC178X_SCC_USBCLKSEL_USBSEL_BITS)
+
+/*
  * Calculate clock rates
  */
 /*
  * Set LPC178X_PLL0_P to the PLL divider value.
+ * The same for PLL1.
  *
  * P (PPL divider value) = 2 in the power of PSEL
  * P can be 1, 2, 4 or 8.
  */
 #define LPC178X_PLL0_P		(1 << CONFIG_LPC178X_PLL0_PSEL)
+#define LPC178X_PLL1_P		(1 << CONFIG_LPC178X_PLL1_PSEL)
 
 /*
  * Set LPC178X_OSC_RATE to the rate of the oscillator actually used.
@@ -130,6 +163,15 @@ static u32 clock_val[CLOCK_END];
 #define LPC178X_PLL0_CLK_OUT	(LPC178X_OSC_RATE * CONFIG_LPC178X_PLL0_M)
 #else
 #define LPC178X_PLL0_CLK_OUT	0
+#endif
+
+/*
+ * Set LPC178X_PLL1_CLK_OUT to the output rate of PLL1.
+ */
+#ifdef CONFIG_LPC178X_PLL1_ENABLE
+#define LPC178X_PLL1_CLK_OUT	(LPC178X_OSC_RATE * CONFIG_LPC178X_PLL1_M)
+#else
+#define LPC178X_PLL1_CLK_OUT	0
 #endif
 
 /*
@@ -217,6 +259,18 @@ static u32 clock_val[CLOCK_END];
 #error PLL0 FCCO rate is too high
 #endif
 #endif /* CONFIG_LPC178X_PLL0_ENABLE */
+
+/*
+ * Verify that PLL1 FCCO fits the range of 156 MHz to 320 MHz
+ */
+#ifdef CONFIG_LPC178X_PLL1_ENABLE
+#if (LPC178X_PLL1_CLK_OUT * 2 * LPC178X_PLL1_P) < 156000000
+#error PLL1 FCCO rate is too low
+#endif
+#if (LPC178X_PLL1_CLK_OUT * 2 * LPC178X_PLL1_P) > 320000000
+#error PLL1 FCCO rate is too high
+#endif
+#endif /* CONFIG_LPC178X_PLL1_ENABLE */
 
 /*
  * Feed sequence values for pll_latch()
@@ -324,6 +378,21 @@ static inline void pll_latch(volatile struct lpc178x_pll_regs *pll_regs)
 }
 
 /*
+ * PLLn setup
+ */
+#define PLL_CONFIG(idx) do { \
+	LPC178X_SCC->pll##idx.cfg =			\
+		((CONFIG_LPC178X_PLL## idx ##_M - 1) <<	\
+		LPC178X_SCC_PLLCFG_MSEL_BITS) |		\
+		(CONFIG_LPC178X_PLL## idx ##_PSEL <<	\
+		LPC178X_SCC_PLLCFG_PSEL_BITS);		\
+	pll_latch(&LPC178X_SCC->pll##idx);		\
+	/* Wait for lock */				\
+	while (!(LPC178X_SCC->pll##idx.stat &		\
+		LPC178X_SCC_PLLSTAT_PLOCK_MSK));	\
+} while (0)
+
+/*
  * Set-up the main oscillator, PLL0 and CPU clock (if necessary)
  */
 static void clock_setup(void)
@@ -347,22 +416,15 @@ static void clock_setup(void)
 #endif /* !CONFIG_LPC178X_SYS_CLK_IRC */
 
 #ifdef CONFIG_LPC178X_PLL0_ENABLE
-	/*
-	 * PLL0 setup.
-	 *
-	 * Only MSEL and PSEL bit groups used in PLL0CFG,
-	 * therefore not using |=
-	 */
-	LPC178X_SCC->pll0.cfg =
-		((CONFIG_LPC178X_PLL0_M - 1) << LPC178X_SCC_PLLCFG_MSEL_BITS) |
-		(CONFIG_LPC178X_PLL0_PSEL << LPC178X_SCC_PLLCFG_PSEL_BITS);
-	pll_latch(&LPC178X_SCC->pll0);
-
-	/* Wait for lock */
-	while (!(LPC178X_SCC->pll0.stat & LPC178X_SCC_PLLSTAT_PLOCK_MSK));
+	PLL_CONFIG(0);
 #endif /* CONFIG_LPC178X_PLL0_ENABLE */
 
-	/* TBD: enable PLL1 (necessary only for USB?) */
+#ifdef CONFIG_LPC178X_PLL1_ENABLE
+	/*
+	 * PLL1 is necessary for USB
+	 */
+	PLL_CONFIG(1);
+#endif /* CONFIG_LPC178X_PLL1_ENABLE */
 
 	/*
 	 * CPU clock
@@ -391,6 +453,15 @@ static void clock_setup(void)
 	LPC178X_SCC->emcclksel = 0;
 #endif /* CONFIG_LPC178X_EMC_HALFCPU */
 #endif /* CONFIG_NR_DRAM_BANKS */
+
+#ifdef CONFIG_LPC178X_USB_DIV
+	/*
+	 * USB clock
+	 */
+	LPC178X_SCC->usbclksel =
+		(CONFIG_LPC178X_USB_DIV << LPC178X_SCC_USBCLKSEL_USBDIV_BITS) |
+		LPC178X_SCC_USBCLKSEL_USBSEL_PLL1_MSK;
+#endif /* CONFIG_LPC178X_USB_DIV */
 }
 
 /*

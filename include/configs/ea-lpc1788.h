@@ -98,7 +98,7 @@
  * PLL0_CLK_OUT must be between 9.75MHz and 160MHz
  */
 /*
- * PLL Multiplier value (1..32)
+ * PLL0 Multiplier value (1..32)
  */
 /* TODO: change M to 10 in order to reach 120 MHz CPU clock */
 #define CONFIG_LPC178X_PLL0_M		9	/* 12 MHz * 9 = 108 MHz */
@@ -110,12 +110,40 @@
 #define CONFIG_LPC178X_PLL0_PSEL	0	/* P = 1 */
 
 /*
+ * PLL1 Multiplier value (1..32)
+ */
+#define CONFIG_LPC178X_PLL1_M		8	/* 12 MHz * 8 = 96 MHz */
+/*
+ * PSEL (a 0..3 code for PLL Divider value)
+ * P (PPL divider value) = 2 in the power of PSEL
+ * PSEL = 0..3 make P = 1, 2, 4 or 8.
+ */
+#define CONFIG_LPC178X_PLL1_PSEL	0	/* P = 1 */
+
+/*
  * CCLKDIV value. Selects the divide value for creating the CPU clock (CCLK)
  * from the selected clock source.
  * CONFIG_LPC178X_CPU_DIV=1 means that the input clock is divided by 1
  * to produce the CPU clock.
  */
 #define CONFIG_LPC178X_CPU_DIV		1
+
+/*
+ * USB clock divider value
+ *
+ * The PLL1 is confugured to produce a 96 MHz clock: 12*8 = 96 MHz.
+ * For the USB controller, we need a 48 Mhz clock, therefore we have to divide
+ * the PLL1 clock by 2.
+ *
+ * The LPC178x/7x User Manual claims that this divider value should be 4 or 6,
+ * but that statement is wrong.
+ *
+ * If you do not want to configure the USB clock, you should not set
+ * the `CONFIG_LPC178X_USB_DIV` option.
+ */
+#define CONFIG_LPC178X_USB_DIV		2
+/* Disable USB clock configuration */
+#undef CONFIG_LPC178X_USB_DIV
 
 /*
  * Peripheral clock selector. This divider, between 1 and 31, is used to
