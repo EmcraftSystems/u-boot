@@ -345,7 +345,7 @@
 #define CONFIG_ZERO_BOOTDELAY_CHECK
 #define CONFIG_HOSTNAME			ea-lpc1788
 #define CONFIG_BOOTARGS			"lpc178x_platform=ea-lpc1788 "\
-					"console=ttyS0,115200 panic=10"
+					"console=ttyS0,115200 panic=10 mem=16M"
 #define CONFIG_BOOTCOMMAND		"run flashboot"
 
 /*
@@ -358,14 +358,7 @@
  */
 #define CONFIG_EXTRA_ENV_SETTINGS				\
 	"loadaddr=0xA0000000\0"					\
-	"addip=setenv bootargs ${bootargs} "			\
-		"ip=${ipaddr}:${serverip}:${gatewayip}:"	\
-			"${netmask}:${hostname}:eth0:off "	\
-	/* Loadable kernel modules do not work generally in  */	\
-	/* configurations where there is more than 16 MBytes */	\
-	/* of RAM available. The following is the workaround */	\
-	/* for this defect.                                  */	\
-		"mem=16M\0"					\
+	"addip=setenv bootargs ${bootargs} ip=${ipaddr}:${serverip}:${gatewayip}:${netmask}:${hostname}:eth0:off\0"				\
 	"flashaddr=80020000\0"					\
 	"flashboot=run addip;bootm ${flashaddr}\0"		\
 	"ethaddr=C0:B1:3C:88:88:88\0"				\
