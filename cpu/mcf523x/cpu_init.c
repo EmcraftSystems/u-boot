@@ -32,7 +32,7 @@
 #if defined(CONFIG_CMD_NET)
 #include <config.h>
 #include <net.h>
-#include <asm/fec.h>
+#include <../drivers/net/fec.h>
 #endif
 
 /*

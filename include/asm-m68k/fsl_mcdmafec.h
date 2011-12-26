@@ -27,7 +27,7 @@
 #define fsl_mcdmafec_h
 
 /* Re-use of the definitions */
-#include <asm/fec.h>
+#include <../drivers/net/fec.h>
 
 typedef struct fecdma {
 	u32 rsvd0;		/* 0x000 */

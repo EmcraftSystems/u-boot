@@ -32,8 +32,11 @@
 #include <netdev.h>
 #include <miiphy.h>
 
-#include <asm/fec.h>
+#include "fec.h"
+
+#ifdef CONFIG_M68K
 #include <asm/immap.h>
+#endif
 
 #undef	ET_DEBUG
 #undef	MII_DEBUG
@@ -122,7 +125,9 @@ void setFecDuplexSpeed(volatile fec_t * fecp, bd_t * bd, int dup_spd)
 #ifdef MII_DEBUG
 		printf("100Mbps\n");
 #endif
+#ifdef CONFIG_M68K
 		bd->bi_ethspeed = 100;
+#endif
 	} else {
 #ifdef CONFIG_MCF5445x
 		fecp->rcr |= 0x200;	/* enabled 10T base */
@@ -130,7 +135,9 @@ void setFecDuplexSpeed(volatile fec_t * fecp, bd_t * bd, int dup_spd)
 #ifdef MII_DEBUG
 		printf("10Mbps\n");
 #endif
+#ifdef CONFIG_M68K
 		bd->bi_ethspeed = 10;
+#endif
 	}
 }
 
@@ -147,7 +154,7 @@ int fec_send(struct eth_device *dev, volatile void *packet, int length)
 	 * Wait for ready
 	 */
 	j = 0;
-	while ((info->txbd[info->txIdx].cbd_sc & BD_ENET_TX_READY) &&
+	while ((info->txbd[info->txIdx].cbd_sc & htons(BD_ENET_TX_READY)) &&
 	       (j < MCFFEC_TOUT_LOOP)) {
 		udelay(1);
 		j++;
@@ -156,9 +163,9 @@ int fec_send(struct eth_device *dev, volatile void *packet, int length)
 		printf("TX not ready\n");
 	}
 
-	info->txbd[info->txIdx].cbd_bufaddr = (uint) packet;
-	info->txbd[info->txIdx].cbd_datlen = length;
-	info->txbd[info->txIdx].cbd_sc |= BD_ENET_TX_RDY_LST;
+	info->txbd[info->txIdx].cbd_bufaddr = htonl((uint) packet);
+	info->txbd[info->txIdx].cbd_datlen = htons(length);
+	info->txbd[info->txIdx].cbd_sc |= htons(BD_ENET_TX_RDY_LST);
 
 	/* Activate transmit Buffer Descriptor polling */
 	fecp->tdar = 0x01000000;	/* Descriptor polling active    */
@@ -180,7 +187,7 @@ int fec_send(struct eth_device *dev, volatile void *packet, int length)
 #endif
 
 	j = 0;
-	while ((info->txbd[info->txIdx].cbd_sc & BD_ENET_TX_READY) &&
+	while ((info->txbd[info->txIdx].cbd_sc & htons(BD_ENET_TX_READY)) &&
 	       (j < MCFFEC_TOUT_LOOP)) {
 		udelay(1);
 		j++;
@@ -192,12 +199,12 @@ int fec_send(struct eth_device *dev, volatile void *packet, int length)
 #ifdef ET_DEBUG
 	printf("%s[%d] %s: cycles: %d    status: %x  retry cnt: %d\n",
 	       __FILE__, __LINE__, __FUNCTION__, j,
-	       info->txbd[info->txIdx].cbd_sc,
-	       (info->txbd[info->txIdx].cbd_sc & 0x003C) >> 2);
+	       htons(info->txbd[info->txIdx].cbd_sc),
+	       (htons(info->txbd[info->txIdx].cbd_sc) & 0x003C) >> 2);
 #endif
 
 	/* return only status bits */
-	rc = (info->txbd[info->txIdx].cbd_sc & BD_ENET_TX_STATS);
+	rc = (info->txbd[info->txIdx].cbd_sc & htons(BD_ENET_TX_STATS));
 	info->txIdx = (info->txIdx + 1) % TX_BUF_CNT;
 
 	return rc;
@@ -216,21 +223,21 @@ int fec_recv(struct eth_device *dev)
 		icache_invalid();
 #endif
 		/* section 16.9.23.2 */
-		if (info->rxbd[info->rxIdx].cbd_sc & BD_ENET_RX_EMPTY) {
+		if (info->rxbd[info->rxIdx].cbd_sc & htons(BD_ENET_RX_EMPTY)) {
 			length = -1;
 			break;	/* nothing received - leave for() loop */
 		}
 
-		length = info->rxbd[info->rxIdx].cbd_datlen;
+		length = ntohs(info->rxbd[info->rxIdx].cbd_datlen);
 
-		if (info->rxbd[info->rxIdx].cbd_sc & 0x003f) {
+		if (info->rxbd[info->rxIdx].cbd_sc & htons(0x003f)) {
 			printf("%s[%d] err: %x\n",
 			       __FUNCTION__, __LINE__,
-			       info->rxbd[info->rxIdx].cbd_sc);
+			       ntohs(info->rxbd[info->rxIdx].cbd_sc));
 #ifdef ET_DEBUG
 			printf("%s[%d] err: %x\n",
 			       __FUNCTION__, __LINE__,
-			       info->rxbd[info->rxIdx].cbd_sc);
+			       ntohs(info->rxbd[info->rxIdx].cbd_sc));
 #endif
 		} else {
 
@@ -242,14 +249,14 @@ int fec_recv(struct eth_device *dev)
 		}
 
 		/* Give the buffer back to the FEC. */
-		info->rxbd[info->rxIdx].cbd_datlen = 0;
+		info->rxbd[info->rxIdx].cbd_datlen = htons(0);
 
 		/* wrap around buffer index when necessary */
 		if (info->rxIdx == LAST_PKTBUFSRX) {
-			info->rxbd[PKTBUFSRX - 1].cbd_sc = BD_ENET_RX_W_E;
+			info->rxbd[PKTBUFSRX - 1].cbd_sc = htons(BD_ENET_RX_W_E);
 			info->rxIdx = 0;
 		} else {
-			info->rxbd[info->rxIdx].cbd_sc = BD_ENET_RX_EMPTY;
+			info->rxbd[info->rxIdx].cbd_sc = htons(BD_ENET_RX_EMPTY);
 			info->rxIdx++;
 		}
 
@@ -492,11 +499,11 @@ int fec_init(struct eth_device *dev, bd_t * bd)
 	 *     Empty, Wrap
 	 */
 	for (i = 0; i < PKTBUFSRX; i++) {
-		info->rxbd[i].cbd_sc = BD_ENET_RX_EMPTY;
-		info->rxbd[i].cbd_datlen = 0;	/* Reset */
-		info->rxbd[i].cbd_bufaddr = (uint) NetRxPackets[i];
+		info->rxbd[i].cbd_sc = htons(BD_ENET_RX_EMPTY);
+		info->rxbd[i].cbd_datlen = htons(0);	/* Reset */
+		info->rxbd[i].cbd_bufaddr = htonl((uint) NetRxPackets[i]);
 	}
-	info->rxbd[PKTBUFSRX - 1].cbd_sc |= BD_ENET_RX_WRAP;
+	info->rxbd[PKTBUFSRX - 1].cbd_sc |= htons(BD_ENET_RX_WRAP);
 
 	/*
 	 * Setup Ethernet Transmitter Buffer Descriptors (13.14.24.19)
@@ -504,11 +511,11 @@ int fec_init(struct eth_device *dev, bd_t * bd)
 	 *    Last, Tx CRC
 	 */
 	for (i = 0; i < TX_BUF_CNT; i++) {
-		info->txbd[i].cbd_sc = BD_ENET_TX_LAST | BD_ENET_TX_TC;
-		info->txbd[i].cbd_datlen = 0;	/* Reset */
-		info->txbd[i].cbd_bufaddr = (uint) (&info->txbuf[0]);
+		info->txbd[i].cbd_sc = htons(BD_ENET_TX_LAST | BD_ENET_TX_TC);
+		info->txbd[i].cbd_datlen = htons(0);	/* Reset */
+		info->txbd[i].cbd_bufaddr = htonl((uint) (&info->txbuf[0]));
 	}
-	info->txbd[TX_BUF_CNT - 1].cbd_sc |= BD_ENET_TX_WRAP;
+	info->txbd[TX_BUF_CNT - 1].cbd_sc |= htons(BD_ENET_TX_WRAP);
 
 	/* Set receive and transmit descriptor base */
 	fecp->erdsr = (unsigned int)(&info->rxbd[0]);
@@ -620,7 +627,9 @@ int mcffec_initialize(bd_t * bis)
 	fec_info[i - 1].next = &fec_info[0];
 
 	/* default speed */
+#ifdef CONFIG_M68K
 	bis->bi_ethspeed = 10;
+#endif
 
 	return 0;
 }

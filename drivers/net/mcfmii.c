@@ -29,9 +29,12 @@
 #ifdef CONFIG_MCF547x_8x
 #include <asm/fsl_mcdmafec.h>
 #else
-#include <asm/fec.h>
+#include "fec.h"
 #endif
+
+#ifdef CONFIG_M68K
 #include <asm/immap.h>
+#endif
 
 DECLARE_GLOBAL_DATA_PTR;
 
