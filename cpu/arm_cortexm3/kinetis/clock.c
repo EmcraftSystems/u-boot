@@ -510,6 +510,11 @@ void clock_init(void)
 	 * Set the bus clock rate (used for many peripherals)
 	 */
 	clock_val[CLOCK_PCLK] = KINETIS_PCLK_RATE;
+
+	/*
+	 * The MAC internal module clock is OSC0ERCLK
+	 */
+	clock_val[CLOCK_MACCLK] = KINETIS_EXTAL_RATE;
 }
 
 /*

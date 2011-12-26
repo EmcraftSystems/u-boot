@@ -67,6 +67,11 @@
 #define CONFIG_ARCH_CPU_INIT
 
 /*
+ * This ensures that the SoC-specific cortex_m3_soc_init() gets invoked.
+ */
+#define CONFIG_ARMCORTEXM3_SOC_INIT
+
+/*
  * Clock configuration (see cpu/arm_cortexm3/kinetis/clock.c for details)
  */
 /* Select MCG configuration type */
@@ -188,7 +193,36 @@
 /*
  * Ethernet configuration
  */
-/* TBD */
+#define CONFIG_MCFFEC
+/* Only the RMII mode is possible on the TWR-K60N512 board */
+#undef CONFIG_MCFFEC_MII
+#define CONFIG_NET_MULTI
+#define CONFIG_MII
+#define CONFIG_MII_INIT
+/*
+ * The value of CONFIG_SYS_FEC0_PINMUX does not matter.
+ * This configuration option is required by the `mcffec.c` driver.
+ */
+#define CONFIG_SYS_FEC0_PINMUX		0
+#define CONFIG_SYS_FEC0_IOBASE		0x400C0000
+#define CONFIG_SYS_FEC0_MIIBASE		CONFIG_SYS_FEC0_IOBASE
+/*
+ * Ethernet buffer descriptor tables should be aligned on 512-byte boundaries
+ */
+#define CONFIG_SYS_CACHELINE_SIZE	512
+#define MCFFEC_TOUT_LOOP		1000000
+#define CONFIG_SYS_DISCOVER_PHY
+#define CONFIG_SYS_RX_ETH_BUFFER	8
+/*
+ * Options for the MDC clock
+ */
+/* Internal MAC clock rate */
+#define CONFIG_MCFFEC_MAC_CLK		clock_get(CLOCK_MACCLK)
+/*
+ * We limit the MDC rate to 800 kHz, because the rate of 2.5 MHz leads to data
+ * corruption when reading the PHY registers.
+ */
+#define CONFIG_MCFFEC_MII_SPEED_LIMIT	800000
 
 /*
  * Console I/O buffer size
@@ -236,7 +270,7 @@
 #undef CONFIG_CMD_IMLS
 #undef CONFIG_CMD_LOADS
 #undef CONFIG_CMD_MISC
-#undef CONFIG_CMD_NET
+#define CONFIG_CMD_NET
 #undef CONFIG_CMD_NFS
 #undef CONFIG_CMD_SOURCE
 #undef CONFIG_CMD_XIMG
@@ -274,8 +308,8 @@
 	"addip=setenv bootargs ${bootargs} "			\
 		"ip=${ipaddr}:${serverip}:${gatewayip}:"	\
 			"${netmask}:${hostname}:eth0:off\0"	\
-	"ethaddr=C0:B1:3C:88:88:88\0"				\
-	"ipaddr=172.17.4.206\0"					\
+	"ethaddr=C0:B1:3C:77:88:99\0"				\
+	"ipaddr=172.17.6.35\0"					\
 	"serverip=172.17.0.1\0"					\
 	"image=k60/uImage\0"					\
 	"netboot=tftp ${image};run addip;bootm\0"

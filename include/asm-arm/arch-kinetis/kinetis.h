@@ -86,6 +86,8 @@ typedef u32 kinetis_clock_gate_t;
 #define KINETIS_CG_PORTC	KINETIS_MKCG(4, 11)	/* SIM_SCGC5[11] */
 #define KINETIS_CG_PORTD	KINETIS_MKCG(4, 12)	/* SIM_SCGC5[12] */
 #define KINETIS_CG_PORTE	KINETIS_MKCG(4, 13)	/* SIM_SCGC5[13] */
+/* ENET */
+#define KINETIS_CG_ENET		KINETIS_MKCG(1, 0)	/* SIM_SCGC2[0] */
 
 /*
  * Enable or disable the clock on a peripheral device (timers, UARTs, USB, etc)
@@ -99,6 +101,7 @@ enum clock {
 	CLOCK_SYSTICK,		/* Systimer clock frequency expressed in Hz   */
 	CLOCK_CCLK,		/* Core clock frequency expressed in Hz       */
 	CLOCK_PCLK,		/* Bus clock frequency expressed in Hz        */
+	CLOCK_MACCLK,		/* MAC module clock frequency expressed in Hz */
 	CLOCK_END		/* for internal usage			      */
 };
 

@@ -119,3 +119,23 @@ out:
 	return rv;
 }
 
+/*
+ * Configure a set of GPIO pins using the given configuration table.
+ * Returns 0 on success.
+ */
+int kinetis_gpio_config_table(
+	const struct kinetis_gpio_pin_config *table, unsigned int len)
+{
+	unsigned int i;
+	int rv;
+
+	for (i = 0; i < len; i ++) {
+		rv = kinetis_gpio_config(&table[i].dsc, table[i].regval);
+		if (rv != 0)
+			goto out;
+	}
+
+	rv = 0;
+out:
+	return rv;
+}
