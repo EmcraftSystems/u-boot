@@ -305,6 +305,7 @@ typedef struct fec {
 
 /* Bit definitions and macros for FEC_RCR */
 #define FEC_RCR_MAX_FL(x)		(((x)&0x7FF)<<16)
+#define FEC_RCR_RMII_MODE		(0x00000100)
 #define FEC_RCR_FCE			(0x00000020)
 #define FEC_RCR_BC_REJ			(0x00000010)
 #define FEC_RCR_PROM			(0x00000008)

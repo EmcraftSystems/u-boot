@@ -106,15 +106,18 @@ void fec_reset(struct eth_device *dev);
 
 void setFecDuplexSpeed(volatile fec_t * fecp, bd_t * bd, int dup_spd)
 {
+	/* Set maximum frame length */
+	fecp->rcr = FEC_RCR_MAX_FL(PKT_MAXBUF_SIZE) | FEC_RCR_MII_MODE;
+#ifndef CONFIG_MCFFEC_MII
+	fecp->rcr |= FEC_RCR_RMII_MODE;
+#endif
+
 	if ((dup_spd >> 16) == FULL) {
-		/* Set maximum frame length */
-		fecp->rcr = FEC_RCR_MAX_FL(PKT_MAXBUF_SIZE) | FEC_RCR_MII_MODE |
-		    FEC_RCR_PROM | 0x100;
+		/* Full duplex mode */
 		fecp->tcr = FEC_TCR_FDEN;
 	} else {
 		/* Half duplex mode */
-		fecp->rcr = FEC_RCR_MAX_FL(PKT_MAXBUF_SIZE) |
-		    FEC_RCR_MII_MODE | FEC_RCR_DRT;
+		fecp->rcr |= FEC_RCR_DRT;
 		fecp->tcr &= ~FEC_TCR_FDEN;
 	}
 

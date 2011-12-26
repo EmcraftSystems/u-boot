@@ -60,6 +60,12 @@ DECLARE_GLOBAL_DATA_PTR;
 #	define CONFIG_SYS_UNSPEC_STRID		0
 #endif
 
+/*
+ * The MSCR[MII_SPEED] bit field consists of 6 bits, therefore the maximum
+ * possible value for this field is 63.
+ */
+#define MCFFEC_MII_SPEED_MAX	63
+
 #ifdef CONFIG_MCF547x_8x
 typedef struct fec_info_dma FEC_INFO_T;
 #define FEC_T fecdma_t
@@ -178,7 +184,7 @@ int mii_discover_phy(struct eth_device *dev)
 #ifdef ET_DEBUG
 			printf("PHY type 0x%x pass %d type\n", phytype, pass);
 #endif
-			if (phytype != 0xffff) {
+			if (phytype != 0xffff && phytype != 0) {
 				phyaddr = phyno;
 				phytype <<= 16;
 				phytype |=
@@ -249,7 +255,22 @@ void __mii_init(void)
 	fecp->eir = 0xffffffff;
 
 	/* Set MII speed */
+#ifdef CONFIG_M68K
 	miispd = (gd->bus_clk / 1000000) / 5;
+#else
+	/*
+	 * The MSCR[MII_SPEED] bit field is minus 1 encoded.
+	 *
+	 * We round the value in MSCR[MII_SPEED] up, so that the MDC frequency
+	 * never exceeds CONFIG_MCFFEC_MII_SPEED_LIMIT.
+	 */
+	miispd =
+		(CONFIG_MCFFEC_MAC_CLK - 1) /
+		(2 * CONFIG_MCFFEC_MII_SPEED_LIMIT);
+#endif /* CONFIG_M68K */
+	if (miispd > MCFFEC_MII_SPEED_MAX)
+		miispd = MCFFEC_MII_SPEED_MAX;
+
 	fecp->mscr = miispd << 1;
 
 	info->phy_addr = mii_discover_phy(dev);
