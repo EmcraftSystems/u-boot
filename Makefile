@@ -3217,6 +3217,9 @@ ea-lpc1788_config : unconfig
 twr-k60n512_config : unconfig
 	@$(MKCONFIG) $(@:_config=) arm arm_cortexm3 twr-k60n512 freescale kinetis
 
+twr-k70f120m_config : unconfig
+	@$(MKCONFIG) $(@:_config=) arm arm_cortexm3 twr-k70f120m freescale kinetis
+
 #########################################################################
 ## XScale Systems
 #########################################################################

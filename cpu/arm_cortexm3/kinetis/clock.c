@@ -93,6 +93,23 @@
 
 #undef KINETIS_MCG_PLLREFSEL	/* No support for multiple oscillators */
 
+#elif defined(CONFIG_KINETIS_K70_120MHZ)
+#define KINETIS_PLL_PRDIV_MAX	8
+#define KINETIS_PLL_VDIV_MIN	16
+#define KINETIS_PLL_VDIV_MAX	47
+
+#define KINETIS_PLL_REF_MIN	8 * 1000 * 1000		/* 8 MHz */
+#define KINETIS_PLL_REF_MAX	16 * 1000 * 1000	/* 16 MHz */
+
+#define KINETIS_PLL_VCO_DIV	2	/* There is a /2 divider after VCO */
+
+#define KINETIS_CPU_RATE_MAX		(120 * 1000 * 1000)	/* 120 MHz */
+#define KINETIS_PCLK_RATE_MAX		(60 * 1000 * 1000)	/* 60 MHz */
+#define KINETIS_FLEXBUS_RATE_MAX	(50 * 1000 * 1000)	/* 50 MHz */
+#define KINETIS_FLASH_RATE_MAX		(25 * 1000 * 1000)	/* 25 MHz */
+
+#define KINETIS_MCG_PLLREFSEL	0	/* PLL0 input: EXTAL0 through OSC0 */
+
 #else
 #error Unsupported Freescale Kinetis MCU series
 #endif
@@ -209,6 +226,9 @@
 #define KINETIS_MCG_C5_PRDIV_BITS	0
 /* PLL Stop Enable */
 #define KINETIS_MCG_C5_PLLSTEN_MSK	(1 << 5)
+/* PLL External Reference Select (for K70@120MHz) */
+#define KINETIS_MCG_C5_PLLREFSEL_BIT	7
+#define KINETIS_MCG_C5_PLLREFSEL_MSK	(1 << KINETIS_MCG_C5_PLLREFSEL_BIT)
 /*
  * MCG Control 6 Register
  */
@@ -359,10 +379,12 @@ static void clock_fei_to_fbe(void)
 		(KINETIS_MCG_FRDIV << KINETIS_MCG_C1_FRDIV_BITS) |
 		KINETIS_MCG_C1_CLKS_EXT_REF_MSK;
 
+#ifndef CONFIG_KINETIS_OSCINIT_NOWAIT
 	/*
 	 * Wait for the input from the external crystal to initialize
 	 */
 	while (!(KINETIS_MCG->status & KINETIS_MCG_S_OSCINIT_MSK));
+#endif /* !CONFIG_KINETIS_OSCINIT_NOWAIT */
 
 	/*
 	 * Wait for reference clock to switch to external reference
@@ -389,6 +411,17 @@ static void clock_fbe_to_pbe(void)
 	KINETIS_MCG->c5 =
 		((KINETIS_PLL_PRDIV - 1) << KINETIS_MCG_C5_PRDIV_BITS) |
 		KINETIS_MCG_C5_PLLSTEN_MSK;
+
+	/*
+	 * If the Multipurpose Clock Generator (MCG) supports multiple
+	 * oscillators (e.g. on K70 @ 120 MHz), select the necessary
+	 * oscillator as the external reference clock for the PLL0.
+	 */
+#ifdef KINETIS_MCG_PLLREFSEL
+	KINETIS_MCG->c5 =
+		(KINETIS_MCG->c5 & ~KINETIS_MCG_C5_PLLREFSEL_MSK) |
+		(KINETIS_MCG_PLLREFSEL << KINETIS_MCG_C5_PLLREFSEL_BIT);
+#endif
 
 	/*
 	 * Set the PLL multiplication factor

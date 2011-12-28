@@ -147,17 +147,40 @@ __attribute__((section(".kinetis_flash_conf"), used)) = {
 /*
  * Size in bytes of the flash programming acceleration RAM
  */
+#if defined(CONFIG_ENVM_TYPE_K60)
 #define FLASH_PROG_ACCEL_SIZE	(4 * 1024)
+#elif defined(CONFIG_ENVM_TYPE_K70)
+#define FLASH_PROG_ACCEL_SIZE	(16 * 1024)
+#else
+#error No CONFIG_ENVM_TYPE_XXX option defined
+#endif /* CONFIG_ENVM_TYPE_XXX */
 /*
  * Size of the bottom half of the flash programming acceleration RAM
  * that may be used for flash programming.
  */
 #define FLASH_PROG_ACCEL_HALF	(FLASH_PROG_ACCEL_SIZE / 2)
 /*
- * Size of a sector in the MCU internal flash is 2 Kbytes
- * on the program flash only MCUs.
+ * Size of a sector in the MCU internal flash is 4 Kbytes (K70) or
+ * 2 Kbytes (K60) on the program flash only MCUs.
  */
+#if defined(CONFIG_ENVM_TYPE_K60)
 #define FLASH_SECTOR_SIZE	(2 * 1024)
+#elif defined(CONFIG_ENVM_TYPE_K70)
+#define FLASH_SECTOR_SIZE	(4 * 1024)
+#else
+#error No CONFIG_ENVM_TYPE_XXX option defined
+#endif /* CONFIG_ENVM_TYPE_XXX */
+/*
+ * The measurement unit for the section size used by the Program Section
+ * command.
+ */
+#if defined(CONFIG_ENVM_TYPE_K60)
+#define KINETIS_ENVM_SIZE_UNIT_BITS	3	/* 8 bytes */
+#elif defined(CONFIG_ENVM_TYPE_K70)
+#define KINETIS_ENVM_SIZE_UNIT_BITS	4	/* 16 bytes */
+#else
+#error No CONFIG_ENVM_TYPE_XXX option defined
+#endif /* CONFIG_ENVM_TYPE_XXX */
 /*
  * Offset of the byte in flash that loads into the FSEC register on reset
  */
@@ -346,14 +369,17 @@ int __attribute__((section(".ramcode")))
 kinetis_ftfl_program_section(u32 dest_addr, u32 size)
 {
 	/*
-	 * ">> 3": We divide `size` by 8 to convert the size in bytes into
-	 * the size in phrases (64 bits of data).
+	 * ">> 3" (K60): We divide `size` by 8 to convert the size in bytes
+	 * into the size in phrases (64 bits of data).
+	 *
+	 * ">> 4" (K70): We divide `size` by 16 to convert the size in bytes
+	 * into the size in double-phrases (128 bits of data).
 	 *
 	 * "<< 16": Then we move the two bytes inside the `data0` word,
 	 * so that they go into the FCCOB[5:4] registers.
 	 */
 	return kinetis_ftfl_command(FTFL_CMD_PROGRAM_SECTION,
-		dest_addr, size << (16 - 3), 0);
+		dest_addr, size << (16 - KINETIS_ENVM_SIZE_UNIT_BITS), 0);
 }
 
 /*

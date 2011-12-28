@@ -20,7 +20,7 @@
  */
 
 /*
- * Configuration settings for the Freescale TWR-K60N512 board.
+ * Configuration settings for the Freescale TWR-K70F120M board.
  */
 
 #ifndef __CONFIG_H
@@ -45,8 +45,8 @@
  * Enable GPIO driver
  */
 #define CONFIG_KINETIS_GPIO
-/* Number of GPIO ports (A..E on K60) */
-#define KINETIS_GPIO_PORTS	5
+/* Number of GPIO ports (A..F on K70) */
+#define KINETIS_GPIO_PORTS	6
 
 /*
  * Display CPU and Board information
@@ -59,7 +59,7 @@
 /*
  * Monitor prompt
  */
-#define CONFIG_SYS_PROMPT		"TWR-K60N512> "
+#define CONFIG_SYS_PROMPT		"TWR-K70F120M> "
 
 /*
  * We want to call the CPU specific initialization
@@ -75,12 +75,14 @@
  * Clock configuration (see cpu/arm_cortexm3/kinetis/clock.c for details)
  */
 /* Select MCG configuration type */
-#define CONFIG_KINETIS_K60_100MHZ
+#define CONFIG_KINETIS_K70_120MHZ
+/* The OSCINIT0 bit does not set on K70 for a yet unknown reason */
+#define CONFIG_KINETIS_OSCINIT_NOWAIT
 /*
- * Clock rate at the EXTAL input
+ * Clock rate at the EXTAL0 input
  *
- * See also the description of the J6 jumper on the TWR-K60N512 board.
- * The PHY clock drives EXTAL.
+ * See also the description of the J19 jumper on the TWR-K70F120M board.
+ * The PHY clock drives EXTAL0.
  */
 #define KINETIS_EXTAL_RATE	50000000
 /*
@@ -88,19 +90,18 @@
  * constant should be as close to the 32..40 kHz range as possible.
  */
 #define KINETIS_MCG_FRDIV_POW	10
-/* Core/system clock divider: 100/1 = 100 MHz */
+/* Core/system clock divider: 120/1 = 120 MHz */
 #define KINETIS_CCLK_DIV	1
-/* Peripheral clock divider: 100/2 = 50 MHz */
+/* Peripheral clock divider: 120/2 = 60 MHz */
 #define KINETIS_PCLK_DIV	2
-/* FlexBus clock divider: 100/2 = 50 MHz */
-#define KINETIS_FLEXBUS_CLK_DIV	2
-/* Flash clock divider: 100/4 = 25 MHz */
-#define KINETIS_FLASH_CLK_DIV	4
-/* PLL input divider: 50/25 = 2 MHz */
-#define KINETIS_PLL_PRDIV	25
-/* PLL multiplier: 2*50 = 100 MHz */
-#define KINETIS_PLL_VDIV	50
-
+/* FlexBus clock divider: 120/3 = 40 MHz */
+#define KINETIS_FLEXBUS_CLK_DIV	3
+/* Flash clock divider: 120/5 = 24 MHz */
+#define KINETIS_FLASH_CLK_DIV	5
+/* PLL input divider: 50/5 = 10 MHz */
+#define KINETIS_PLL_PRDIV	5
+/* PLL multiplier: 10*24/2 = 120 MHz */
+#define KINETIS_PLL_VDIV	24
 /*
  * Number of clock ticks in 1 sec
  */
@@ -126,7 +127,7 @@
  * Memory layout configuration
  */
 #define CONFIG_MEM_NVM_BASE		0x00000000
-#define CONFIG_MEM_NVM_LEN		(512 * 1024)
+#define CONFIG_MEM_NVM_LEN		(1024 * 1024)
 /*
  * 128 kB of SRAM centered at 0x20000000
  * SRAM_L: 0x1FFF0000 - 0x1FFFFFFF (64 kB)
@@ -144,19 +145,17 @@
 #define CONFIG_SYS_MALLOC_LEN		CONFIG_MEM_MALLOC_LEN
 
 /*
- * Configuration of the external DRAM memory
- *
- * There is no DDR controller on the K60N512 MCU.
+ * Configuration of the external DDR2 SDRAM memory
  */
 #define CONFIG_NR_DRAM_BANKS		1
 #define CONFIG_SYS_RAM_CS		0
-#define CONFIG_SYS_RAM_BASE		0x60000000
-#define CONFIG_SYS_RAM_SIZE		(32 * 1024 * 1024)
+#define CONFIG_SYS_RAM_BASE		0x80000000
+#define CONFIG_SYS_RAM_SIZE		(128 * 1024 * 1024)
 
 /*
  * Program flash configuration
  */
-#define CONFIG_ENVM_TYPE_K60
+#define CONFIG_ENVM_TYPE_K70
 
 /*
  * Configuration of the external Flash memory
@@ -177,20 +176,16 @@
  */
 #define CONFIG_KINETIS_UART_CONSOLE
 /*
- * UART3 is connected to the RS-232 port on the TWR-SER board
- * UART3 pin configuration: Rx: PORT_C.16, Tx = PORT_C.17
+ * UART2 is connected to the RS-232 port on the TWR-SER board
+ * UART2 pin configuration: Rx: PORT_E.17, Tx = PORT_E.16
  */
-/*
- * UART5 is connected to the OSJTAG USB-to-serial Bridge
- * UART5 pin configuration: Rx: PORT_E.9, Tx = PORT_E.8
- */
-#define CONFIG_KINETIS_UART_PORT	3	/* UART3 */
-#define CONFIG_KINETIS_UART_RX_IO_PORT	2	/* PORT C */
-#define CONFIG_KINETIS_UART_RX_IO_PIN	16	/* pin 16 */
-#define CONFIG_KINETIS_UART_RX_IO_FUNC	3	/* UART3_RX */
-#define CONFIG_KINETIS_UART_TX_IO_PORT	2	/* PORT C */
-#define CONFIG_KINETIS_UART_TX_IO_PIN	17	/* pin 17 */
-#define CONFIG_KINETIS_UART_TX_IO_FUNC	3	/* UART3_TX */
+#define CONFIG_KINETIS_UART_PORT	2	/* UART2 */
+#define CONFIG_KINETIS_UART_RX_IO_PORT	4	/* PORT E */
+#define CONFIG_KINETIS_UART_RX_IO_PIN	17	/* pin 17 */
+#define CONFIG_KINETIS_UART_RX_IO_FUNC	3	/* UART2_RX */
+#define CONFIG_KINETIS_UART_TX_IO_PORT	4	/* PORT E */
+#define CONFIG_KINETIS_UART_TX_IO_PIN	16	/* pin 16 */
+#define CONFIG_KINETIS_UART_TX_IO_FUNC	3	/* UART2_TX */
 
 #define CONFIG_BAUDRATE			115200
 #define CONFIG_SYS_BAUDRATE_TABLE	{ 9600, 19200, 38400, 57600, 115200 }
@@ -199,7 +194,7 @@
  * Ethernet configuration
  */
 #define CONFIG_MCFFEC
-/* Only the RMII mode is possible on the TWR-K60N512 board */
+/* Only the RMII mode is possible on the TWR-K70F120M board */
 #undef CONFIG_MCFFEC_MII
 #define CONFIG_NET_MULTI
 #define CONFIG_MII
@@ -225,7 +220,8 @@
 #define CONFIG_MCFFEC_MAC_CLK		clock_get(CLOCK_MACCLK)
 /*
  * We limit the MDC rate to 800 kHz, because the rate of 2.5 MHz leads to data
- * corruption when reading the PHY registers.
+ * corruption when reading the PHY registers (we experienced data corruptions
+ * on TWR-K60N512.)
  */
 #define CONFIG_MCFFEC_MII_SPEED_LIMIT	800000
 
@@ -295,9 +291,9 @@
  */
 #define CONFIG_BOOTDELAY		3
 #define CONFIG_ZERO_BOOTDELAY_CHECK
-#define CONFIG_HOSTNAME			twr-k60n512
-#define CONFIG_BOOTARGS			"kinetis_platform=twr-k60n512 "\
-					"console=ttyS0,115200 panic=10"
+#define CONFIG_HOSTNAME			twr-k70f120m
+#define CONFIG_BOOTARGS			"kinetis_platform=twr-k70f120m "\
+					"console=ttyS0,115200 panic=10 mem=16M"
 #define CONFIG_BOOTCOMMAND		"run flashboot"
 
 /*
@@ -309,14 +305,14 @@
  * Short-cuts to some useful commands (macros)
  */
 #define CONFIG_EXTRA_ENV_SETTINGS				\
-	"loadaddr=0x60000000\0"					\
+	"loadaddr=0x80000000\0"					\
 	"addip=setenv bootargs ${bootargs} "			\
 		"ip=${ipaddr}:${serverip}:${gatewayip}:"	\
 			"${netmask}:${hostname}:eth0:off\0"	\
-	"ethaddr=C0:B1:3C:77:88:99\0"				\
-	"ipaddr=172.17.6.35\0"					\
+	"ethaddr=C0:B1:3C:77:88:AA\0"				\
+	"ipaddr=172.17.6.36\0"					\
 	"serverip=172.17.0.1\0"					\
-	"image=k60/uImage\0"					\
+	"image=k70/uImage\0"					\
 	"netboot=tftp ${image};run addip;bootm\0"		\
 	"update=tftp ${image};"					\
 	"prot off ${flashaddr} +${filesize};"			\
