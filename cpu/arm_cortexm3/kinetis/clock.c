@@ -90,6 +90,7 @@
 #define KINETIS_PCLK_RATE_MAX		(50 * 1000 * 1000)	/* 50 MHz */
 #define KINETIS_FLEXBUS_RATE_MAX	(50 * 1000 * 1000)	/* 50 MHz */
 #define KINETIS_FLASH_RATE_MAX		(25 * 1000 * 1000)	/* 25 MHz */
+#define KINETIS_DDR_RATE_MAX		0	/* DDR not supported */
 
 #undef KINETIS_MCG_PLLREFSEL	/* No support for multiple oscillators */
 
@@ -107,6 +108,7 @@
 #define KINETIS_PCLK_RATE_MAX		(60 * 1000 * 1000)	/* 60 MHz */
 #define KINETIS_FLEXBUS_RATE_MAX	(50 * 1000 * 1000)	/* 50 MHz */
 #define KINETIS_FLASH_RATE_MAX		(25 * 1000 * 1000)	/* 25 MHz */
+#define KINETIS_DDR_RATE_MAX		(150 * 1000 * 1000)	/* 150 MHz */
 
 #define KINETIS_MCG_PLLREFSEL	0	/* PLL0 input: EXTAL0 through OSC0 */
 
@@ -148,6 +150,42 @@
 	(KINETIS_MCG_PLL_IN_RATE / KINETIS_PLL_PRDIV * KINETIS_PLL_VDIV / \
 	KINETIS_PLL_VCO_DIV)
 
+#if !defined(CONFIG_KINETIS_K60_100MHZ)
+/*
+ * Verify the PRDIV divider value for PLL1
+ */
+#if !defined(KINETIS_PLL1_PRDIV)
+#error KINETIS_PLL1_PRDIV is not defined
+#elif KINETIS_PLL1_PRDIV < 1 || KINETIS_PLL1_PRDIV > KINETIS_PLL_PRDIV_MAX
+#error KINETIS_PLL1_PRDIV should be between 1 and KINETIS_PLL_PRDIV_MAX
+#endif
+
+/*
+ * Verify the VDIV multiplier value for PLL1
+ */
+#if !defined(KINETIS_PLL1_VDIV)
+#error KINETIS_PLL1_VDIV is not defined
+#elif KINETIS_PLL1_VDIV < KINETIS_PLL_VDIV_MIN || \
+      KINETIS_PLL1_VDIV > KINETIS_PLL_VDIV_MAX
+#error KINETIS_PLL1_VDIV should be set to an integer in the allowed range
+#endif
+
+/*
+ * Verify the PLL reference clock rate for PLL1
+ */
+#if ((KINETIS_MCG_PLL_IN_RATE / KINETIS_PLL1_PRDIV) < KINETIS_PLL_REF_MIN) || \
+    ((KINETIS_MCG_PLL_IN_RATE / KINETIS_PLL1_PRDIV) > KINETIS_PLL_REF_MAX)
+#error The PLL1 reference clock should be in the defined range
+#endif
+
+/*
+ * PLL1 output rate
+ */
+#define KINETIS_PLL1OUT_RATE \
+	(KINETIS_MCG_PLL_IN_RATE / KINETIS_PLL1_PRDIV * KINETIS_PLL1_VDIV / \
+	KINETIS_PLL_VCO_DIV)
+#endif /* !defined(CONFIG_KINETIS_K60_100MHZ) */
+
 /*
  * Core/system clock rate
  */
@@ -179,6 +217,16 @@
 #if KINETIS_FLASH_RATE > KINETIS_FLASH_RATE_MAX
 #error KINETIS_FLASH_RATE exceeds the limit for this MCU
 #endif
+
+#ifdef CONFIG_KINETIS_DDR
+/*
+ * DDR clock rate
+ */
+#define KINETIS_DDR_RATE	KINETIS_PLL1OUT_RATE
+#if KINETIS_DDR_RATE > KINETIS_DDR_RATE_MAX
+#error KINETIS_DDR_RATE exceeds the limit for this MCU
+#endif
+#endif /* CONFIG_KINETIS_DDR */
 
 /*
  * Oscillator (OSC) registers
@@ -237,6 +285,20 @@
 /* PLL Select */
 #define KINETIS_MCG_C6_PLLS_MSK		(1 << 6)
 /*
+ * MCG Control 11 Register
+ */
+/* PLL1 External Reference Divider */
+#define KINETIS_MCG_C11_PRDIV_BITS	0
+/* PLL1 Stop Enable */
+#define KINETIS_MCG_C11_PLLSTEN1_MSK	(1 << 5)
+/* PLL1 Clock Enable */
+#define KINETIS_MCG_C11_PLLCLKEN1_MSK	(1 << 6)
+/*
+ * MCG Control 12 Register
+ */
+/* VCO1 Divider */
+#define KINETIS_MCG_C12_VDIV1_BITS	0
+/*
  * MCG Status Register
  */
 /* OSC Initialization */
@@ -254,6 +316,11 @@
 #define KINETIS_MCG_S_PLLST_MSK		(1 << 5)
 /* Indicates whether the PLL has acquired lock */
 #define KINETIS_MCG_S_LOCK_MSK		(1 << 6)
+/*
+ * MCG Status 2 Register
+ */
+/* This bit indicates whether PLL1 has acquired lock */
+#define KINETIS_MCG_S2_LOCK1_MSK	(1 << 6)
 
 /*
  * SIM registers
@@ -269,50 +336,6 @@
 #define KINETIS_SIM_CLKDIV1_OUTDIV3_BITS	20
 /* Clock 4 output divider value (for the flash clock) */
 #define KINETIS_SIM_CLKDIV1_OUTDIV4_BITS	16
-
-/*
- * Limits for the `kinetis_periph_enable()` function:
- *     1. The number of SIM_SCGC[] registers
- *     2. The number of bits in those registers
- */
-#define KINETIS_SIM_CG_NUMREGS	7
-#define KINETIS_SIM_CG_NUMBITS	32
-
-/*
- * System Integration Module (SIM) register map
- *
- * This map actually covers two hardware modules:
- *     1. SIM low-power logic, at 0x40047000
- *     2. System integration module (SIM), at 0x40048000
- */
-struct kinetis_sim_regs {
-	u32 sopt1;	/* System Options Register 1 */
-	u32 rsv0[1024];
-	u32 sopt2;	/* System Options Register 2 */
-	u32 rsv1;
-	u32 sopt4;	/* System Options Register 4 */
-	u32 sopt5;	/* System Options Register 5 */
-	u32 sopt6;	/* System Options Register 6 */
-	u32 sopt7;	/* System Options Register 7 */
-	u32 rsv2[2];
-	u32 sdid;	/* System Device Identification Register */
-	u32 scgc[7];	/* System Clock Gating Control Registers 1...7 */
-	u32 clkdiv1;	/* System Clock Divider Register 1 */
-	u32 clkdiv2;	/* System Clock Divider Register 2 */
-	u32 fcfg1;	/* Flash Configuration Register 1 */
-	u32 fcfg2;	/* Flash Configuration Register 2 */
-	u32 uidh;	/* Unique Identification Register High */
-	u32 uidmh;	/* Unique Identification Register Mid-High */
-	u32 uidml;	/* Unique Identification Register Mid Low */
-	u32 uidl;	/* Unique Identification Register Low */
-};
-
-/*
- * SIM registers base
- */
-#define KINETIS_SIM_BASE		(KINETIS_AIPS0PERIPH_BASE + 0x00047000)
-#define KINETIS_SIM			((volatile struct kinetis_sim_regs *) \
-					KINETIS_SIM_BASE)
 
 /*
  * Multipurpose Clock Generator (MCG) register map
@@ -332,6 +355,13 @@ struct kinetis_mcg_regs {
 	u8 rsv1;
 	u8 atcvh;	/* MCG Auto Trim Compare Value High Register */
 	u8 atcvl;	/* MCG Auto Trim Compare Value Low Register */
+	u8 c7;		/* MCG Control 7 Register */
+	u8 c8;		/* MCG Control 8 Register */
+	u8 rsv2;
+	u8 c10;		/* MCG Control 10 Register */
+	u8 c11;		/* MCG Control 11 Register */
+	u8 c12;		/* MCG Control 12 Register */
+	u8 status2;	/* MCG Status 2 Register */
 };
 
 /*
@@ -466,6 +496,39 @@ static void clock_pbe_to_pee(void)
 		KINETIS_MCG_S_CLKST_PLL);
 }
 
+#ifdef CONFIG_KINETIS_DDR
+/*
+ * Configure the DDR clock for the DDR asynchronous mode
+ */
+static void clock_setup_ddr_async(void)
+{
+	/*
+	 * Configure the PLL1 input divider.
+	 * Also, enable the PLL1 clock during Normal Stop.
+	 * The input for the PLL1 is OSC0 (50 MHz from the PHY clock).
+	 */
+	KINETIS_MCG->c11 =
+		((KINETIS_PLL1_PRDIV - 1) << KINETIS_MCG_C11_PRDIV_BITS) |
+		KINETIS_MCG_C11_PLLSTEN1_MSK;
+
+	/*
+	 * Set the PLL multiplication factor
+	 */
+	KINETIS_MCG->c12 = (KINETIS_PLL1_VDIV - KINETIS_PLL_VDIV_MIN) <<
+		KINETIS_MCG_C12_VDIV1_BITS;
+
+	/*
+	 * Enable the PLL1
+	 */
+	KINETIS_MCG->c11 |= KINETIS_MCG_C11_PLLCLKEN1_MSK;
+
+	/*
+	 * Wait for the PLL1 to acquire lock
+	 */
+	while (!(KINETIS_MCG->status2 & KINETIS_MCG_S2_LOCK1_MSK));
+}
+#endif /* CONFIG_KINETIS_DDR */
+
 /*
  * Set-up clocks
  */
@@ -515,6 +578,13 @@ static void clock_setup(void)
 	 */
 	clock_pbe_to_pee();
 
+#ifdef CONFIG_KINETIS_DDR
+	/*
+	 * Configure the DDR clock for the DDR asynchronous mode
+	 */
+	clock_setup_ddr_async();
+#endif /* CONFIG_KINETIS_DDR */
+
 	/*
 	 * TBD: Configure the USB clock via KINETIS_SIM->sopt2::PLLFLLSEL
 	 */
@@ -548,6 +618,13 @@ void clock_init(void)
 	 * The MAC internal module clock is OSC0ERCLK
 	 */
 	clock_val[CLOCK_MACCLK] = KINETIS_EXTAL_RATE;
+
+#ifdef CONFIG_KINETIS_DDR
+	/*
+	 * Set the DDR clock rate
+	 */
+	clock_val[CLOCK_DDRCLK] = KINETIS_DDR_RATE;
+#endif /* CONFIG_KINETIS_DDR */
 }
 
 /*

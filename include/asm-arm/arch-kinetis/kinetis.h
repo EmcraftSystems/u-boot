@@ -88,6 +88,55 @@ typedef u32 kinetis_clock_gate_t;
 #define KINETIS_CG_PORTE	KINETIS_MKCG(4, 13)	/* SIM_SCGC5[13] */
 /* ENET */
 #define KINETIS_CG_ENET		KINETIS_MKCG(1, 0)	/* SIM_SCGC2[0] */
+/* DDR */
+#define KINETIS_CG_DDR		KINETIS_MKCG(2, 14)	/* SIM_SCGC3[14] */
+
+/*
+ * Limits for the `kinetis_periph_enable()` function:
+ *     1. The number of SIM_SCGC[] registers
+ *     2. The number of bits in those registers
+ */
+#define KINETIS_SIM_CG_NUMREGS	7
+#define KINETIS_SIM_CG_NUMBITS	32
+
+/*
+ * System Integration Module (SIM) register map
+ *
+ * This map actually covers two hardware modules:
+ *     1. SIM low-power logic, at 0x40047000
+ *     2. System integration module (SIM), at 0x40048000
+ */
+struct kinetis_sim_regs {
+	u32 sopt1;	/* System Options Register 1 */
+	u32 rsv0[1024];
+	u32 sopt2;	/* System Options Register 2 */
+	u32 rsv1;
+	u32 sopt4;	/* System Options Register 4 */
+	u32 sopt5;	/* System Options Register 5 */
+	u32 sopt6;	/* System Options Register 6 */
+	u32 sopt7;	/* System Options Register 7 */
+	u32 rsv2[2];
+	u32 sdid;	/* System Device Identification Register */
+	u32 scgc[KINETIS_SIM_CG_NUMREGS];	/* Clock Gating Regs 1...7 */
+	u32 clkdiv1;	/* System Clock Divider Register 1 */
+	u32 clkdiv2;	/* System Clock Divider Register 2 */
+	u32 fcfg1;	/* Flash Configuration Register 1 */
+	u32 fcfg2;	/* Flash Configuration Register 2 */
+	u32 uidh;	/* Unique Identification Register High */
+	u32 uidmh;	/* Unique Identification Register Mid-High */
+	u32 uidml;	/* Unique Identification Register Mid Low */
+	u32 uidl;	/* Unique Identification Register Low */
+	u32 clkdiv3;	/* System Clock Divider Register 3 */
+	u32 clkdiv4;	/* System Clock Divider Register 4 */
+	u32 mcr;	/* Misc Control Register */
+};
+
+/*
+ * SIM registers base
+ */
+#define KINETIS_SIM_BASE		(KINETIS_AIPS0PERIPH_BASE + 0x00047000)
+#define KINETIS_SIM			((volatile struct kinetis_sim_regs *) \
+					KINETIS_SIM_BASE)
 
 /*
  * Enable or disable the clock on a peripheral device (timers, UARTs, USB, etc)
@@ -102,6 +151,9 @@ enum clock {
 	CLOCK_CCLK,		/* Core clock frequency expressed in Hz       */
 	CLOCK_PCLK,		/* Bus clock frequency expressed in Hz        */
 	CLOCK_MACCLK,		/* MAC module clock frequency expressed in Hz */
+#ifdef CONFIG_KINETIS_DDR
+	CLOCK_DDRCLK,		/* DDR clock frequency expressed in Hz        */
+#endif /* CONFIG_KINETIS_DDR */
 	CLOCK_END		/* for internal usage			      */
 };
 

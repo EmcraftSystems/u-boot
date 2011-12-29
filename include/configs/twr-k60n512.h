@@ -148,6 +148,7 @@
  *
  * There is no DDR controller on the K60N512 MCU.
  */
+#undef CONFIG_KINETIS_DDR
 #define CONFIG_NR_DRAM_BANKS		1
 #define CONFIG_SYS_RAM_CS		0
 #define CONFIG_SYS_RAM_BASE		0x60000000
