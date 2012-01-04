@@ -1,5 +1,5 @@
 /*
- * (C) Copyright 2011
+ * (C) Copyright 2011, 2012
  *
  * Alexander Potashev, Emcraft Systems, aspotashev@emcraft.com
  *
@@ -29,7 +29,16 @@
  */
 int print_cpuinfo(void)
 {
+	char buf[4][32];
+
 	printf("CPU  : %s\n", "Freescale Kinetis series (Cortex-M4)");
+
+	strmhz(buf[0], clock_get(CLOCK_SYSTICK));
+	strmhz(buf[1], clock_get(CLOCK_CCLK));
+	strmhz(buf[2], clock_get(CLOCK_PCLK));
+	strmhz(buf[3], clock_get(CLOCK_MACCLK));
+	printf("Freqs: SYSTICK=%sMHz,CCLK=%sMHz,PCLK=%sMHz,MACCLK=%sMHz\n",
+		buf[0], buf[1], buf[2], buf[3]);
 
 	return 0;
 }
