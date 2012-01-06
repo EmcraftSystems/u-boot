@@ -393,7 +393,11 @@
 	"ipaddr=172.17.4.206\0"					\
 	"serverip=172.17.0.1\0"					\
 	"image=lpc178x/uImage\0"				\
-	"netboot=tftp ${image};run addip;bootm\0"
+	"netboot=tftp ${image};run addip;bootm\0"		\
+	"update=tftp ${image};"					\
+	"prot off ${flashaddr} +${filesize};"			\
+	"era ${flashaddr} +${filesize};"			\
+	"cp.b ${loadaddr} ${flashaddr} ${filesize}\0"
 
 /*
  * Linux kernel boot parameters configuration
