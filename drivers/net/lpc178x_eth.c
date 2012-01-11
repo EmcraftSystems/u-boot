@@ -413,7 +413,6 @@ out:
 /*
  * Initialize PHY: autodetect PHY address
  *
- * This code is the same as in the STM32 Ethernet driver.
  */
 static int lpc178x_phy_init(struct lpc178x_eth_dev *mac)
 {
