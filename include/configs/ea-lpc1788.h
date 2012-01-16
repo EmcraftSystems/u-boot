@@ -142,8 +142,8 @@
  * the `CONFIG_LPC178X_USB_DIV` option.
  */
 #define CONFIG_LPC178X_USB_DIV		2
-/* Disable USB clock configuration */
-#undef CONFIG_LPC178X_USB_DIV
+/* The following line disables the USB clock configuration */
+/* #undef CONFIG_LPC178X_USB_DIV */
 
 /*
  * Peripheral clock selector. This divider, between 1 and 31, is used to
