@@ -76,7 +76,7 @@ int board_init(void)
  */
 int checkboard(void)
 {
-	printf("Board: STM3220G-EVAL board %s\n",
+	printf("Board: STM3220G-EVAL board + STM-MEM add-on,%s\n",
 		CONFIG_SYS_BOARD_REV_STR);
 
 	return 0;
