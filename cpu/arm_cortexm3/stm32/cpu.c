@@ -1,5 +1,5 @@
 /*
- * (C) Copyright 2011
+ * (C) Copyright 2011,2012
  *
  * Yuri Tikhonov, Emcraft Systems, yur@emcraft.com
  *
@@ -31,7 +31,11 @@ int print_cpuinfo(void)
 {
 	char	buf[4][32];
 
-	printf("CPU  : %s\n", "STM32 F2 series (Cortex-M3)");
+#if defined(CONFIG_SYS_ARMCORTEXM4)
+	printf("CPU  : %s\n", "STM32F4 (Cortex-M4)");
+#else
+	printf("CPU  : %s\n", "STM32F2 (Cortex-M3)");
+#endif
 
 	strmhz(buf[0], clock_get(CLOCK_SYSCLK));
 	strmhz(buf[1], clock_get(CLOCK_HCLK));
