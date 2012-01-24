@@ -30,6 +30,8 @@
 /* Pull Enable (pull-down by default) */
 #define KINETIS_GPIO_CONFIG_PE_BIT	1
 #define KINETIS_GPIO_CONFIG_PE_MSK	(1 << KINETIS_GPIO_CONFIG_PE_BIT)
+/* Drive Strength Enable (high drive strength) */
+#define KINETIS_GPIO_CONFIG_DSE_MSK	(1 << 6)
 
 /*
  * These macros should be used to compute the value for the second argument of
@@ -42,6 +44,9 @@
 /* Also enable the pull-down register */
 #define KINETIS_GPIO_CONFIG_PULLDOWN(mux) \
 	(KINETIS_GPIO_CONFIG_MUX(mux) | KINETIS_GPIO_CONFIG_PE_MSK)
+/* Also enable high drive strength */
+#define KINETIS_GPIO_CONFIG_DSE(mux) \
+	(KINETIS_GPIO_CONFIG_MUX(mux) | KINETIS_GPIO_CONFIG_DSE_MSK)
 /*
  * TBD: similar macros with more options
  */

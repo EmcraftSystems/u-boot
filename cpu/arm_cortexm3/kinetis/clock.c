@@ -1,5 +1,5 @@
 /*
- * (C) Copyright 2011
+ * (C) Copyright 2011, 2012
  *
  * Alexander Potashev, Emcraft Systems, aspotashev@emcraft.com
  *
@@ -336,6 +336,21 @@
 #define KINETIS_SIM_CLKDIV1_OUTDIV3_BITS	20
 /* Clock 4 output divider value (for the flash clock) */
 #define KINETIS_SIM_CLKDIV1_OUTDIV4_BITS	16
+/*
+ * System Clock Divider Register 4
+ */
+/* NFC clock divider divisor */
+#define KINETIS_SIM_CLKDIV4_NFCDIV_BITS		27
+#define KINETIS_SIM_CLKDIV4_NFCDIV_BITWIDTH	5
+#define KINETIS_SIM_CLKDIV4_NFCDIV_MSK \
+	(((1 << KINETIS_SIM_CLKDIV4_NFCDIV_BITWIDTH) - 1) << \
+	KINETIS_SIM_CLKDIV4_NFCDIV_BITS)
+/* NFC clock divider fraction */
+#define KINETIS_SIM_CLKDIV4_NFCFRAC_BITS	24
+#define KINETIS_SIM_CLKDIV4_NFCFRAC_BITWIDTH	3
+#define KINETIS_SIM_CLKDIV4_NFCFRAC_MSK \
+	(((1 << KINETIS_SIM_CLKDIV4_NFCFRAC_BITWIDTH) - 1) << \
+	KINETIS_SIM_CLKDIV4_NFCFRAC_BITS)
 
 /*
  * Multipurpose Clock Generator (MCG) register map
@@ -562,6 +577,15 @@ static void clock_setup(void)
 			KINETIS_SIM_CLKDIV1_OUTDIV3_BITS) |
 		((KINETIS_FLASH_CLK_DIV - 1) <<
 			KINETIS_SIM_CLKDIV1_OUTDIV4_BITS);
+
+	/*
+	 * Configure clock divider for the NAND Flash Controller
+	 */
+	KINETIS_SIM->clkdiv4 =
+		(KINETIS_SIM->clkdiv4 & ~(KINETIS_SIM_CLKDIV4_NFCDIV_MSK |
+			KINETIS_SIM_CLKDIV4_NFCFRAC_MSK)) |
+		((KINETIS_NFCCLK_DIV - 1) << KINETIS_SIM_CLKDIV4_NFCDIV_BITS) |
+		((KINETIS_NFCCLK_FRAC - 1) << KINETIS_SIM_CLKDIV4_NFCFRAC_BITS);
 
 	/*
 	 * TBD: Configure clock dividers for USB and I2S here

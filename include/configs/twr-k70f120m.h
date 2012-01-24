@@ -98,6 +98,10 @@
 #define KINETIS_FLEXBUS_CLK_DIV	3
 /* Flash clock divider: 120/5 = 24 MHz */
 #define KINETIS_FLASH_CLK_DIV	5
+/* NFC clock divider: PLL0/5 = 120/5 = 24 MHz */
+#define KINETIS_NFCCLK_DIV	5
+/* NFC clock fraction: do no multiply */
+#define KINETIS_NFCCLK_FRAC	1
 /* PLL input divider: 50/5 = 10 MHz */
 #define KINETIS_PLL_PRDIV	5
 /* PLL multiplier: 10*24/2 = 120 MHz */
@@ -147,8 +151,8 @@
  * SRAM_U: 0x20000000 - 0x2000FFFF (64 kB)
  */
 #define CONFIG_MEM_RAM_BASE		0x1FFF0000
-#define CONFIG_MEM_RAM_LEN		(22 * 1024)
-#define CONFIG_MEM_RAM_BUF_LEN		(84 * 1024)
+#define CONFIG_MEM_RAM_LEN		(32 * 1024)
+#define CONFIG_MEM_RAM_BUF_LEN		(74 * 1024)
 #define CONFIG_MEM_MALLOC_LEN		(18 * 1024)
 #define CONFIG_MEM_STACK_LEN		(4 * 1024)
 /*
@@ -171,16 +175,23 @@
 /*
  * Configuration of the external Flash memory
  */
+/* No NOR flash present */
 #define CONFIG_SYS_NO_FLASH
+/* NAND Flash configuration */
+#define CONFIG_NAND_FSL_NFC
+#define CONFIG_SYS_NAND_BASE		0x400A8000
+#define CONFIG_SYS_MAX_NAND_DEVICE	1
+#define NAND_MAX_CHIPS			CONFIG_SYS_MAX_NAND_DEVICE
+#define CONFIG_SYS_NAND_SELECT_DEVICE
+#define CONFIG_SYS_64BIT_VSPRINTF	/* needed for nand_util.c */
 
 /*
- * Store env in memory only
+ * Store environment in the NAND Flash
  */
-#define CONFIG_ENV_IS_NOWHERE
-#define CONFIG_ENV_SIZE			(4 * 1024)
-#define CONFIG_ENV_ADDR			CONFIG_SYS_FLASH_BANK1_BASE
-#define CONFIG_INFERNO			1
-#define CONFIG_ENV_OVERWRITE		1
+#define CONFIG_ENV_IS_IN_NAND
+#define CONFIG_ENV_OFFSET	0
+#define CONFIG_ENV_SIZE		0x20000
+#define CONFIG_ENV_SECT_SIZE	0x20000
 
 /*
  * Serial console configuration
@@ -286,6 +297,7 @@
 #undef CONFIG_CMD_NFS
 #undef CONFIG_CMD_SOURCE
 #undef CONFIG_CMD_XIMG
+#define CONFIG_CMD_NAND
 
 /*
  * To save memory disable long help
