@@ -128,6 +128,15 @@
 #undef CONFIG_USE_IRQ
 
 /*
+ * Configuration of the external DDR2 SDRAM memory
+ */
+#define CONFIG_KINETIS_DDR
+#define CONFIG_NR_DRAM_BANKS		1
+#define CONFIG_SYS_RAM_CS		0
+#define CONFIG_SYS_RAM_BASE		0x80000000
+#define CONFIG_SYS_RAM_SIZE		(128 * 1024 * 1024)
+
+/*
  * Memory layout configuration
  */
 #define CONFIG_MEM_NVM_BASE		0x00000000
@@ -142,20 +151,17 @@
 #define CONFIG_MEM_RAM_BUF_LEN		(84 * 1024)
 #define CONFIG_MEM_MALLOC_LEN		(18 * 1024)
 #define CONFIG_MEM_STACK_LEN		(4 * 1024)
-
 /*
- * malloc() pool size
+ * Use 512 KB at the end of the external memory for the malloc() pool
+ */
+#define CONFIG_SYS_MALLOC_EXT_LEN	(512 * 1024)
+#define CONFIG_SYS_MALLOC_EXT_BASE \
+	(CONFIG_SYS_RAM_BASE + CONFIG_SYS_RAM_SIZE - CONFIG_SYS_MALLOC_EXT_LEN)
+/*
+ * The generic code still needs CONFIG_SYS_MALLOC_LEN to calculate the base
+ * address of the global data (`gd`) structure.
  */
 #define CONFIG_SYS_MALLOC_LEN		CONFIG_MEM_MALLOC_LEN
-
-/*
- * Configuration of the external DDR2 SDRAM memory
- */
-#define CONFIG_KINETIS_DDR
-#define CONFIG_NR_DRAM_BANKS		1
-#define CONFIG_SYS_RAM_CS		0
-#define CONFIG_SYS_RAM_BASE		0x80000000
-#define CONFIG_SYS_RAM_SIZE		(128 * 1024 * 1024)
 
 /*
  * Program flash configuration
