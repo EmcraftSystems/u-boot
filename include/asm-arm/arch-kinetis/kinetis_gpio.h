@@ -28,8 +28,8 @@
 /* Pin Mux Control (selects pin function) */
 #define KINETIS_GPIO_CONFIG_MUX_BITS	8
 /* Pull Enable (pull-down by default) */
-#define LPC178X_GPIO_CONFIG_PE_BIT	1
-#define LPC178X_GPIO_CONFIG_PE_MSK	(1 << LPC178X_GPIO_CONFIG_PE_BIT)
+#define KINETIS_GPIO_CONFIG_PE_BIT	1
+#define KINETIS_GPIO_CONFIG_PE_MSK	(1 << KINETIS_GPIO_CONFIG_PE_BIT)
 
 /*
  * These macros should be used to compute the value for the second argument of
@@ -39,8 +39,9 @@
 /* The simplest macro that only allow to configure the MUX bits */
 #define KINETIS_GPIO_CONFIG_MUX(mux) \
 	(mux << KINETIS_GPIO_CONFIG_MUX_BITS)
+/* Also enable the pull-down register */
 #define KINETIS_GPIO_CONFIG_PULLDOWN(mux) \
-	((mux << KINETIS_GPIO_CONFIG_MUX_BITS) | LPC178X_GPIO_CONFIG_PE_MSK)
+	(KINETIS_GPIO_CONFIG_MUX(mux) | KINETIS_GPIO_CONFIG_PE_MSK)
 /*
  * TBD: similar macros with more options
  */
