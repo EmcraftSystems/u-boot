@@ -325,10 +325,16 @@
 	"serverip=172.17.0.1\0"					\
 	"image=k70/uImage\0"					\
 	"netboot=tftp ${image};run addip;bootm\0"		\
+	"flashaddr=00020000\0"					\
+	"flashboot=nboot ${loadaddr} 0 ${flashaddr};"		\
+		"run addip;bootm\0"				\
+	/* We hardcode the maximum size of the kernel image, */ \
+	/* because the `nand write` command only accepts a   */ \
+	/* write length when it is page aligned, so we       */ \
+	/* cannot just pass ${filesize} to this command.     */ \
 	"update=tftp ${image};"					\
-	"prot off ${flashaddr} +${filesize};"			\
-	"era ${flashaddr} +${filesize};"			\
-	"cp.b ${loadaddr} ${flashaddr} ${filesize}\0"
+		"nand erase ${flashaddr} 2e0000;"		\
+		"nand write ${loadaddr} ${flashaddr} 2e0000\0"
 
 /*
  * Linux kernel boot parameters configuration
