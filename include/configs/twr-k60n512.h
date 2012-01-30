@@ -216,7 +216,7 @@
  * Ethernet buffer descriptor tables should be aligned on 512-byte boundaries
  */
 #define CONFIG_SYS_CACHELINE_SIZE	512
-#define MCFFEC_TOUT_LOOP		1000000
+#define MCFFEC_TOUT_LOOP		50000
 #define CONFIG_SYS_DISCOVER_PHY
 #define CONFIG_SYS_RX_ETH_BUFFER	8
 /*
