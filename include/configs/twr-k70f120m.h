@@ -108,8 +108,10 @@
 #define KINETIS_PLL_VDIV	24
 /* PLL1 input divider: 50/5 = 10 MHz */
 #define KINETIS_PLL1_PRDIV	5
-/* PLL1 multiplier: 10*30/2 = 150 MHz */
-#define KINETIS_PLL1_VDIV	30
+/* PLL1 multiplier: 10*24/2 = 120 MHz */
+#define KINETIS_PLL1_VDIV	24
+/* Use PLL1 for MCGOUT (required for synchronous mode of the DDR controller) */
+#define KINETIS_MCGOUT_PLL1
 /*
  * Number of clock ticks in 1 sec
  */
@@ -135,6 +137,7 @@
  * Configuration of the external DDR2 SDRAM memory
  */
 #define CONFIG_KINETIS_DDR
+#define CONFIG_KINETIS_DDR_SYNC		/* DDR synchronous mode */
 #define CONFIG_NR_DRAM_BANKS		1
 #define CONFIG_SYS_RAM_CS		0
 #define CONFIG_SYS_RAM_BASE		0x80000000

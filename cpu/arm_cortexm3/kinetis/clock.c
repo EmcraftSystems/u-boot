@@ -94,6 +94,10 @@
 
 #undef KINETIS_MCG_PLLREFSEL	/* No support for multiple oscillators */
 
+#ifdef KINETIS_MCGOUT_PLL1
+#error There is no PLL1 on the Kinetis K60@100MHz MCUs
+#endif
+
 #elif defined(CONFIG_KINETIS_K70_120MHZ)
 #define KINETIS_PLL_PRDIV_MAX	8
 #define KINETIS_PLL_VDIV_MIN	16
@@ -110,7 +114,7 @@
 #define KINETIS_FLASH_RATE_MAX		(25 * 1000 * 1000)	/* 25 MHz */
 #define KINETIS_DDR_RATE_MAX		(150 * 1000 * 1000)	/* 150 MHz */
 
-#define KINETIS_MCG_PLLREFSEL	0	/* PLL0 input: EXTAL0 through OSC0 */
+#define KINETIS_MCG_PLLREFSEL	0	/* PLL0/1 input: EXTAL0 through OSC0 */
 
 #else
 #error Unsupported Freescale Kinetis MCU series
@@ -146,9 +150,15 @@
 /*
  * MCGOUTCLK rate
  */
+#ifdef KINETIS_MCGOUT_PLL1
+#define KINETIS_MCGOUT_RATE \
+	(KINETIS_MCG_PLL_IN_RATE / KINETIS_PLL1_PRDIV * KINETIS_PLL1_VDIV / \
+	KINETIS_PLL_VCO_DIV)
+#else
 #define KINETIS_MCGOUT_RATE \
 	(KINETIS_MCG_PLL_IN_RATE / KINETIS_PLL_PRDIV * KINETIS_PLL_VDIV / \
 	KINETIS_PLL_VCO_DIV)
+#endif /* KINETIS_MCGOUT_PLL1 */
 
 #if !defined(CONFIG_KINETIS_K60_100MHZ)
 /*
@@ -274,6 +284,8 @@
 #define KINETIS_MCG_C5_PRDIV_BITS	0
 /* PLL Stop Enable */
 #define KINETIS_MCG_C5_PLLSTEN_MSK	(1 << 5)
+/* PLL0 Clock Enable */
+#define KINETIS_MCG_C5_PLLCLKEN_MSK	(1 << 6)
 /* PLL External Reference Select (for K70@120MHz) */
 #define KINETIS_MCG_C5_PLLREFSEL_BIT	7
 #define KINETIS_MCG_C5_PLLREFSEL_MSK	(1 << KINETIS_MCG_C5_PLLREFSEL_BIT)
@@ -289,10 +301,15 @@
  */
 /* PLL1 External Reference Divider */
 #define KINETIS_MCG_C11_PRDIV_BITS	0
+/* PLL Clock Select: PLL0 or PLL1 */
+#define KINETIS_MCG_C11_PLLCS_MSK	(1 << 4)
 /* PLL1 Stop Enable */
 #define KINETIS_MCG_C11_PLLSTEN1_MSK	(1 << 5)
 /* PLL1 Clock Enable */
 #define KINETIS_MCG_C11_PLLCLKEN1_MSK	(1 << 6)
+/* PLL1 External Reference Select (for K70@120MHz) */
+#define KINETIS_MCG_C11_PLLREFSEL1_BIT	7
+#define KINETIS_MCG_C11_PLLREFSEL1_MSK	(1 << KINETIS_MCG_C11_PLLREFSEL1_BIT)
 /*
  * MCG Control 12 Register
  */
@@ -326,6 +343,27 @@
  * SIM registers
  */
 /*
+ * System Options Register 2
+ */
+/*
+ * Selects the clock divider source for NFC flash clock
+ */
+#define KINETIS_SIM_SOPT2_NFCSRC_BITS	30
+#define KINETIS_SIM_SOPT2_NFCSRC_MSK	(3 << KINETIS_SIM_SOPT2_NFCSRC_BITS)
+/* MCGPLL0CLK */
+#define KINETIS_SIM_SOPT2_NFCSRC_PLL0	(1 << KINETIS_SIM_SOPT2_NFCSRC_BITS)
+/* MCGPLL1CLK */
+#define KINETIS_SIM_SOPT2_NFCSRC_PLL1	(2 << KINETIS_SIM_SOPT2_NFCSRC_BITS)
+/*
+ * NFC Flash clock select
+ */
+#define KINETIS_SIM_SOPT2_NFC_CLKSEL_MSK	(1 << 15)
+/* Clock divider NFC clock */
+#define KINETIS_SIM_SOPT2_NFC_CLKSEL_NFCDIV	0
+/* EXTAL1 clock */
+#define KINETIS_SIM_SOPT2_NFC_CLKSEL_EXTAL1	KINETIS_SIM_SOPT2_NFC_CLKSEL_MSK
+
+/*
  * System Clock Divider Register 1
  */
 /* Clock 1 output divider value (for the core/system clock) */
@@ -336,6 +374,7 @@
 #define KINETIS_SIM_CLKDIV1_OUTDIV3_BITS	20
 /* Clock 4 output divider value (for the flash clock) */
 #define KINETIS_SIM_CLKDIV1_OUTDIV4_BITS	16
+
 /*
  * System Clock Divider Register 4
  */
@@ -351,6 +390,27 @@
 #define KINETIS_SIM_CLKDIV4_NFCFRAC_MSK \
 	(((1 << KINETIS_SIM_CLKDIV4_NFCFRAC_BITWIDTH) - 1) << \
 	KINETIS_SIM_CLKDIV4_NFCFRAC_BITS)
+
+/*
+ * Set configuration options based on usage of PLL0 or PLL1 for the CPU clock
+ */
+#ifdef KINETIS_MCGOUT_PLL1
+#define KINETIS_SIM_SOPT2_NFCSRC	KINETIS_SIM_SOPT2_NFCSRC_PLL1
+#else
+#define KINETIS_SIM_SOPT2_NFCSRC	KINETIS_SIM_SOPT2_NFCSRC_PLL0
+#endif /* KINETIS_MCGOUT_PLL1 */
+
+/*
+ * Check the requirements for the synchronous mode of the DDR controller
+ */
+#ifdef CONFIG_KINETIS_DDR_SYNC
+#ifndef KINETIS_MCGOUT_PLL1
+#error DDR synchronous mode requires that the system clock is sourced from PLL1
+#endif /* !KINETIS_MCGOUT_PLL1 */
+#ifndef CONFIG_KINETIS_DDR
+#error CONFIG_KINETIS_DDR_SYNC requires CONFIG_KINETIS_DDR
+#endif /* !CONFIG_KINETIS_DDR */
+#endif /* CONFIG_KINETIS_DDR_SYNC */
 
 /*
  * Multipurpose Clock Generator (MCG) register map
@@ -443,15 +503,11 @@ static void clock_fei_to_fbe(void)
 		KINETIS_MCG_S_CLKST_EXT_REF);
 }
 
-/*
- * Transition from the FBE (FLL Bypassed External) to
- * the PBE (PLL Bypassed External) mode.
- */
-static void clock_fbe_to_pbe(void)
+static void clock_setup_pll0(void)
 {
 	/*
-	 * Configure the PLL input divider.
-	 * Also, enable the PLL clock during Normal Stop.
+	 * Configure the PLL0 input divider.
+	 * Also, enable the PLL0 clock during Normal Stop.
 	 */
 	KINETIS_MCG->c5 =
 		((KINETIS_PLL_PRDIV - 1) << KINETIS_MCG_C5_PRDIV_BITS) |
@@ -475,6 +531,76 @@ static void clock_fbe_to_pbe(void)
 		KINETIS_MCG_C6_VDIV_BITS;
 
 	/*
+	 * Enable the PLL0
+	 */
+	KINETIS_MCG->c5 |= KINETIS_MCG_C5_PLLCLKEN_MSK;
+
+	/*
+	 * Wait for the PLL0 to acquire lock
+	 */
+	while (!(KINETIS_MCG->status & KINETIS_MCG_S_LOCK_MSK));
+}
+
+static void clock_setup_pll1(void)
+{
+	/*
+	 * Configure the PLL1 input divider.
+	 * Also, enable the PLL1 clock during Normal Stop.
+	 */
+	KINETIS_MCG->c11 =
+		((KINETIS_PLL1_PRDIV - 1) << KINETIS_MCG_C11_PRDIV_BITS) |
+		KINETIS_MCG_C11_PLLSTEN1_MSK;
+
+	/*
+	 * If the Multipurpose Clock Generator (MCG) supports multiple
+	 * oscillators (e.g. on K70 @ 120 MHz), select the necessary
+	 * oscillator as the external reference clock for the PLL1.
+	 */
+#ifdef KINETIS_MCG_PLLREFSEL
+	KINETIS_MCG->c11 =
+		(KINETIS_MCG->c11 & ~KINETIS_MCG_C11_PLLREFSEL1_MSK) |
+		(KINETIS_MCG_PLLREFSEL << KINETIS_MCG_C11_PLLREFSEL1_BIT);
+#endif
+
+	/*
+	 * Set the PLL1 multiplication factor
+	 */
+	KINETIS_MCG->c12 = (KINETIS_PLL1_VDIV - KINETIS_PLL_VDIV_MIN) <<
+		KINETIS_MCG_C12_VDIV1_BITS;
+
+	/*
+	 * Enable the PLL1
+	 */
+	KINETIS_MCG->c11 |= KINETIS_MCG_C11_PLLCLKEN1_MSK;
+
+	/*
+	 * Wait for the PLL1 to acquire lock
+	 */
+	while (!(KINETIS_MCG->status2 & KINETIS_MCG_S2_LOCK1_MSK));
+}
+
+/*
+ * Transition from the FBE (FLL Bypassed External) to
+ * the PBE (PLL Bypassed External) mode.
+ */
+static void clock_fbe_to_pbe(void)
+{
+	/*
+	 * Configure the PLL that we will use for the MCGOUTCLK
+	 */
+#ifdef KINETIS_MCGOUT_PLL1
+	clock_setup_pll1();
+
+	/* Select PLL1 output as the MCG source clock */
+	KINETIS_MCG->c11 |= KINETIS_MCG_C11_PLLCS_MSK;
+#else
+	clock_setup_pll0();
+
+	/* Select PLL0 output as the MCG source clock */
+	KINETIS_MCG->c11 &= ~KINETIS_MCG_C11_PLLCS_MSK;
+#endif /* KINETIS_MCGOUT_PLL1 */
+
+	/*
 	 * Switch to the PBE mode
 	 */
 	KINETIS_MCG->c6 |= KINETIS_MCG_C6_PLLS_MSK;
@@ -483,11 +609,6 @@ static void clock_fbe_to_pbe(void)
 	 * Wait for the source for the PLLS clock to switch to PLL
 	 */
 	while (!(KINETIS_MCG->status & KINETIS_MCG_S_PLLST_MSK));
-
-	/*
-	 * Wait for the PLL to acquire lock
-	 */
-	while (!(KINETIS_MCG->status & KINETIS_MCG_S_LOCK_MSK));
 }
 
 /*
@@ -511,38 +632,15 @@ static void clock_pbe_to_pee(void)
 		KINETIS_MCG_S_CLKST_PLL);
 }
 
-#ifdef CONFIG_KINETIS_DDR
+#if defined(CONFIG_KINETIS_DDR) && !defined(CONFIG_KINETIS_DDR_SYNC)
 /*
  * Configure the DDR clock for the DDR asynchronous mode
  */
 static void clock_setup_ddr_async(void)
 {
-	/*
-	 * Configure the PLL1 input divider.
-	 * Also, enable the PLL1 clock during Normal Stop.
-	 * The input for the PLL1 is OSC0 (50 MHz from the PHY clock).
-	 */
-	KINETIS_MCG->c11 =
-		((KINETIS_PLL1_PRDIV - 1) << KINETIS_MCG_C11_PRDIV_BITS) |
-		KINETIS_MCG_C11_PLLSTEN1_MSK;
-
-	/*
-	 * Set the PLL multiplication factor
-	 */
-	KINETIS_MCG->c12 = (KINETIS_PLL1_VDIV - KINETIS_PLL_VDIV_MIN) <<
-		KINETIS_MCG_C12_VDIV1_BITS;
-
-	/*
-	 * Enable the PLL1
-	 */
-	KINETIS_MCG->c11 |= KINETIS_MCG_C11_PLLCLKEN1_MSK;
-
-	/*
-	 * Wait for the PLL1 to acquire lock
-	 */
-	while (!(KINETIS_MCG->status2 & KINETIS_MCG_S2_LOCK1_MSK));
+	clock_setup_pll1();
 }
-#endif /* CONFIG_KINETIS_DDR */
+#endif /* CONFIG_KINETIS_DDR && !CONFIG_KINETIS_DDR_SYNC */
 
 /*
  * Set-up clocks
@@ -586,6 +684,14 @@ static void clock_setup(void)
 			KINETIS_SIM_CLKDIV4_NFCFRAC_MSK)) |
 		((KINETIS_NFCCLK_DIV - 1) << KINETIS_SIM_CLKDIV4_NFCDIV_BITS) |
 		((KINETIS_NFCCLK_FRAC - 1) << KINETIS_SIM_CLKDIV4_NFCFRAC_BITS);
+	/*
+	 * Select the NAND Flash Controller clock source
+	 */
+	KINETIS_SIM->sopt2 =
+		(KINETIS_SIM->sopt2 & ~(KINETIS_SIM_SOPT2_NFCSRC_MSK |
+			KINETIS_SIM_SOPT2_NFC_CLKSEL_MSK)) |
+		KINETIS_SIM_SOPT2_NFCSRC |
+		KINETIS_SIM_SOPT2_NFC_CLKSEL_NFCDIV;
 
 	/*
 	 * TBD: Configure clock dividers for USB and I2S here
@@ -602,12 +708,15 @@ static void clock_setup(void)
 	 */
 	clock_pbe_to_pee();
 
-#ifdef CONFIG_KINETIS_DDR
+#if defined(CONFIG_KINETIS_DDR) && !defined(CONFIG_KINETIS_DDR_SYNC)
 	/*
 	 * Configure the DDR clock for the DDR asynchronous mode
+	 *
+	 * If we use the DDR synchronous mode, then the PLL1 is already
+	 * configured.
 	 */
 	clock_setup_ddr_async();
-#endif /* CONFIG_KINETIS_DDR */
+#endif /* CONFIG_KINETIS_DDR && !CONFIG_KINETIS_DDR_SYNC */
 
 	/*
 	 * TBD: Configure the USB clock via KINETIS_SIM->sopt2::PLLFLLSEL
