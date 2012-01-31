@@ -503,6 +503,7 @@ static void clock_fei_to_fbe(void)
 		KINETIS_MCG_S_CLKST_EXT_REF);
 }
 
+#ifndef KINETIS_MCGOUT_PLL1
 static void clock_setup_pll0(void)
 {
 	/*
@@ -540,7 +541,10 @@ static void clock_setup_pll0(void)
 	 */
 	while (!(KINETIS_MCG->status & KINETIS_MCG_S_LOCK_MSK));
 }
+#endif /* !KINETIS_MCGOUT_PLL1 */
 
+#if defined(KINETIS_MCGOUT_PLL1) || \
+    (defined(CONFIG_KINETIS_DDR) && !defined(CONFIG_KINETIS_DDR_SYNC))
 static void clock_setup_pll1(void)
 {
 	/*
@@ -578,6 +582,7 @@ static void clock_setup_pll1(void)
 	 */
 	while (!(KINETIS_MCG->status2 & KINETIS_MCG_S2_LOCK1_MSK));
 }
+#endif /* KINETIS_MCGOUT_PLL1 || (KINETIS_DDR && !KINETIS_DDR_SYNC) */
 
 /*
  * Transition from the FBE (FLL Bypassed External) to
