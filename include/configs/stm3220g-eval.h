@@ -289,7 +289,7 @@
 #define CONFIG_ZERO_BOOTDELAY_CHECK
 #define CONFIG_HOSTNAME			stm3220g-eval
 #define CONFIG_BOOTARGS			"stm32_platform=stm3220g-eval "\
-					"console=ttyS2,115200 panic=10 mem=16M"
+					"console=ttyS2,115200 panic=10"
 #define CONFIG_BOOTCOMMAND		"run flashboot"
 
 #define CONFIG_SYS_CONSOLE_IS_IN_ENV

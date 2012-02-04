@@ -319,7 +319,7 @@
 #define CONFIG_ZERO_BOOTDELAY_CHECK
 #define CONFIG_HOSTNAME			twr-k70f120m
 #define CONFIG_BOOTARGS			"kinetis_platform=twr-k70f120m "\
-					"console=ttyS2,115200 panic=10 mem=16M"
+					"console=ttyS2,115200 panic=10"
 #define CONFIG_BOOTCOMMAND		"run flashboot"
 
 /*

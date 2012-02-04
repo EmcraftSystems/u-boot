@@ -373,7 +373,7 @@
 #define CONFIG_ZERO_BOOTDELAY_CHECK
 #define CONFIG_HOSTNAME			ea-lpc1788
 #define CONFIG_BOOTARGS			"lpc178x_platform=ea-lpc1788 "\
-					"console=ttyS0,115200 panic=10 mem=16M"
+					"console=ttyS0,115200 panic=10"
 #define CONFIG_BOOTCOMMAND		"run flashboot"
 
 /*
