@@ -159,9 +159,9 @@
 #define CONFIG_MEM_MALLOC_LEN		(18 * 1024)
 #define CONFIG_MEM_STACK_LEN		(4 * 1024)
 /*
- * Use 512 KB at the end of the external memory for the malloc() pool
+ * Use 1 MB at the end of the external memory for the malloc() pool
  */
-#define CONFIG_SYS_MALLOC_EXT_LEN	(512 * 1024)
+#define CONFIG_SYS_MALLOC_EXT_LEN	(1024 * 1024)
 #define CONFIG_SYS_MALLOC_EXT_BASE \
 	(CONFIG_SYS_RAM_BASE + CONFIG_SYS_RAM_SIZE - CONFIG_SYS_MALLOC_EXT_LEN)
 /*
@@ -195,6 +195,11 @@
 #define CONFIG_ENV_OFFSET	0
 #define CONFIG_ENV_SIZE		0x20000
 #define CONFIG_ENV_SECT_SIZE	0x20000
+/* Allocate 4 blocks for environment in case three of them are bad blocks */
+#define CONFIG_ENV_RANGE	(CONFIG_ENV_SECT_SIZE * 4)
+/* Allocate another 4 blocks for the redundant copy of environment */
+#define CONFIG_ENV_SIZE_REDUND		CONFIG_ENV_SIZE
+#define CONFIG_ENV_OFFSET_REDUND	(CONFIG_ENV_OFFSET + CONFIG_ENV_RANGE)
 
 /*
  * Serial console configuration
@@ -340,7 +345,7 @@
 	"serverip=172.17.0.1\0"					\
 	"image=k70/uImage\0"					\
 	"netboot=tftp ${image};run addip;bootm\0"		\
-	"flashaddr=00020000\0"					\
+	"flashaddr=00100000\0"					\
 	"flashboot=nboot ${loadaddr} 0 ${flashaddr};"		\
 		"run addip;bootm\0"				\
 	/* We hardcode the maximum size of the kernel image, */ \
@@ -348,8 +353,8 @@
 	/* write length when it is page aligned, so we       */ \
 	/* cannot just pass ${filesize} to this command.     */ \
 	"update=tftp ${image};"					\
-		"nand erase ${flashaddr} 2e0000;"		\
-		"nand write ${loadaddr} ${flashaddr} 2e0000\0"
+		"nand erase ${flashaddr} 1f00000;"		\
+		"nand write ${loadaddr} ${flashaddr} 1f00000\0"
 
 /*
  * Linux kernel boot parameters configuration
