@@ -50,13 +50,13 @@ struct kinetis_port_regs {
 					KINETIS_PORT_BASE(port))
 
 /*
- * Clock gates for the I/O ports: 0..4 <-> A..E
+ * Clock gates for the I/O ports: 0..5 <-> A..F
  *
  * These values can be passed into the `kinetis_periph_enable()` function.
  */
 static const kinetis_clock_gate_t port_clock_gate[] = {
 	KINETIS_CG_PORTA, KINETIS_CG_PORTB, KINETIS_CG_PORTC,
-	KINETIS_CG_PORTD, KINETIS_CG_PORTE
+	KINETIS_CG_PORTD, KINETIS_CG_PORTE, KINETIS_CG_PORTF,
 };
 
 /*
@@ -70,7 +70,7 @@ static inline int kinetis_validate_gpio(const struct kinetis_gpio_dsc *dsc)
 	rv = 0;
 
 	/*
-	 * A[31:0]; B[31:0]; C[31:0]; D[31:0]; E[31:0]
+	 * A[31:0]; B[31:0]; C[31:0]; D[31:0]; E[31:0]; optionally F[31:0]
 	 */
 	if (!dsc || dsc->port >= KINETIS_GPIO_PORTS ||
 	    dsc->pin >= KINETIS_GPIO_PORT_PINS) {

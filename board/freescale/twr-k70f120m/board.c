@@ -445,7 +445,8 @@ static void gpio_init(void)
 	/*
 	 * Configure GPIO pins using the `twr_k70f120m_gpio[]` table
 	 */
-	kinetis_gpio_config_table(twr_k70f120m_gpio, ARRAY_SIZE(twr_k70f120m_gpio));
+	kinetis_gpio_config_table(
+		twr_k70f120m_gpio, ARRAY_SIZE(twr_k70f120m_gpio));
 }
 
 /*
