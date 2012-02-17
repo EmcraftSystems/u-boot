@@ -102,6 +102,10 @@
 #define KINETIS_NFCCLK_DIV	5
 /* NFC clock fraction: do no multiply */
 #define KINETIS_NFCCLK_FRAC	1
+/* LCDC clock divider: PLL/4 = 120/4 = 30 MHz */
+#define KINETIS_LCDCCLK_DIV	4
+/* LCDC clock fraction: do no multiply */
+#define KINETIS_LCDCCLK_FRAC	1
 /* PLL input divider: 50/5 = 10 MHz */
 #define KINETIS_PLL_PRDIV	5
 /* PLL multiplier: 10*24/2 = 120 MHz */
