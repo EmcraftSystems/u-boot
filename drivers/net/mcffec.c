@@ -527,6 +527,16 @@ int fec_init(struct eth_device *dev, bd_t * bd)
 	/* Now enable the transmit and receive processing */
 	fecp->ecr |= FEC_ECR_ETHER_EN;
 
+	/*
+	 * A delay is required between we set RDSR and RDAR. If there is no such
+	 * delay, then the Ethernet module becomes unable to receive packets.
+	 *
+	 * In Freescale MQX and in Linux things just work because there is a lot
+	 * other initialization code between the RDAR and the RDSR register
+	 * are being set, so this other initialization code serves as a delay.
+	 */
+	udelay(10);
+
 	/* And last, try to fill Rx Buffer Descriptors */
 	fecp->rdar = 0x01000000;	/* Descriptor polling active    */
 
