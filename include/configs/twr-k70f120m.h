@@ -138,13 +138,22 @@
 #undef CONFIG_USE_IRQ
 
 /*
+ * Cache configuration
+ */
+#define CONFIG_KINETIS_PC_CACHE_ON
+/* #undef CONFIG_KINETIS_PC_CACHE_ON */
+#define CONFIG_KINETIS_PS_CACHE_ON
+/* #undef CONFIG_KINETIS_PS_CACHE_ON */
+
+/*
  * Configuration of the external DDR2 SDRAM memory
  */
 #define CONFIG_KINETIS_DDR
 #define CONFIG_KINETIS_DDR_SYNC		/* DDR synchronous mode */
 #define CONFIG_NR_DRAM_BANKS		1
 #define CONFIG_SYS_RAM_CS		0
-#define CONFIG_SYS_RAM_BASE		0x80000000
+#define CONFIG_SYS_RAM_BASE		0x70000000
+#define CONFIG_SYS_RAM_ALIAS		0x80000000
 #define CONFIG_SYS_RAM_SIZE		(128 * 1024 * 1024)
 
 /*
@@ -167,7 +176,7 @@
  */
 #define CONFIG_SYS_MALLOC_EXT_LEN	(1024 * 1024)
 #define CONFIG_SYS_MALLOC_EXT_BASE \
-	(CONFIG_SYS_RAM_BASE + CONFIG_SYS_RAM_SIZE - CONFIG_SYS_MALLOC_EXT_LEN)
+	(CONFIG_SYS_RAM_ALIAS + CONFIG_SYS_RAM_SIZE - CONFIG_SYS_MALLOC_EXT_LEN)
 /*
  * The generic code still needs CONFIG_SYS_MALLOC_LEN to calculate the base
  * address of the global data (`gd`) structure.
@@ -340,7 +349,7 @@
  * Short-cuts to some useful commands (macros)
  */
 #define CONFIG_EXTRA_ENV_SETTINGS				\
-	"loadaddr=0x80000000\0"					\
+	"loadaddr=0x08000000\0"					\
 	"addip=setenv bootargs ${bootargs} "			\
 		"ip=${ipaddr}:${serverip}:${gatewayip}:"	\
 			"${netmask}:${hostname}:eth0:off\0"	\
