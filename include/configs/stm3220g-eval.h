@@ -302,7 +302,7 @@
 	"addip=setenv bootargs ${bootargs} ip=${ipaddr}:${serverip}:${gatewayip}:${netmask}:${hostname}:eth0:off\0"				\
 	"flashaddr=60020000\0"					\
 	"flashboot=run addip;bootm ${flashaddr}\0"		\
-	"ethaddr=C0:B1:3C:88:88:88\0"				\
+	"ethaddr=C0:B1:3C:88:88:85\0"				\
 	"ipaddr=172.17.4.206\0"					\
 	"serverip=172.17.0.1\0"					\
 	"image=stm32/uImage\0"					\
