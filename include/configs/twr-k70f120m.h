@@ -213,6 +213,7 @@
 /* Allocate another 4 blocks for the redundant copy of environment */
 #define CONFIG_ENV_SIZE_REDUND		CONFIG_ENV_SIZE
 #define CONFIG_ENV_OFFSET_REDUND	(CONFIG_ENV_OFFSET + CONFIG_ENV_RANGE)
+#define CONFIG_ENV_OVERWRITE		1
 
 /*
  * Serial console configuration
