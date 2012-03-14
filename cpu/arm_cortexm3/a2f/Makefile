@@ -2,7 +2,7 @@
 # (C) Copyright 2000-2003
 # Wolfgang Denk, DENX Software Engineering, wd@denx.de.
 #
-# (C) Copyright 2010,2011
+# (C) Copyright 2010,2011,2012
 # Port to A2F
 # Vladimir Khusainov, Emcraft Systems, vlad@emcraft.com.
 #
@@ -29,7 +29,7 @@ include $(TOPDIR)/config.mk
 
 LIB	= $(obj)lib$(SOC).a
 
-COBJS	:= clock.o cpu.o envm.o wdt.o
+COBJS	:= clock.o cpu.o envm.o wdt.o cmd_somtest.o
 SOBJS	:=
 
 SRCS	:= $(COBJS:.o=.c)
