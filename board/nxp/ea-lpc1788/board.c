@@ -116,12 +116,12 @@
 #define LPC178X_EMC_CTRL_EN_MSK		(1 << 0)
 
 /* EMC data pins (DQ0..DQ31) */
-#define LPC178X_EMC_DATA_PINS	31
+#define LPC178X_EMC_DATA_PINS	32
 #if !defined(CONFIG_SYS_FLASH_CS)
 /* EMC row/column address pins (A0..A11) */
 #define LPC178X_EMC_ADDR_PINS	12
 #else
-/* ..and NOR Flash pins up to A22 */
+/* ..and NOR Flash pins up to A21 */
 #define LPC178X_EMC_ADDR_PINS	22
 #endif
 
@@ -392,7 +392,7 @@ static void gpio_init(void)
 
 	/* Configure EMC data pins (DQ0..DQ31) */
 	dsc.port = 3;
-	for (dsc.pin = 0; dsc.pin <= LPC178X_EMC_DATA_PINS; dsc.pin++)
+	for (dsc.pin = 0; dsc.pin < LPC178X_EMC_DATA_PINS; dsc.pin++)
 		lpc178x_gpio_config(&dsc, LPC178X_GPIO_EMC_REGVAL);
 
 	/*
@@ -400,7 +400,7 @@ static void gpio_init(void)
 	 * NOR FLash address pins.
 	*/
 	dsc.port = 4;
-	for (dsc.pin = 0; dsc.pin <= LPC178X_EMC_ADDR_PINS; dsc.pin++)
+	for (dsc.pin = 0; dsc.pin < LPC178X_EMC_ADDR_PINS; dsc.pin++)
 		lpc178x_gpio_config(&dsc, LPC178X_GPIO_EMC_REGVAL);
 #endif
 }
