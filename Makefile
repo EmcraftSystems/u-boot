@@ -3200,6 +3200,9 @@ smdkc100_config:	unconfig
 a2f-lnx-evb_config :  unconfig
 	@$(MKCONFIG) $(@:_config=) arm arm_cortexm3 a2f-lnx-evb emcraft a2f
 
+a2f-som_config :  unconfig
+	@$(MKCONFIG) $(@:_config=) arm arm_cortexm3 a2f-som emcraft a2f
+
 a2f-actel-dev-brd_config :  unconfig
 	@$(MKCONFIG) $(@:_config=) arm arm_cortexm3 a2f-actel-dev-brd \
 	actel a2f
