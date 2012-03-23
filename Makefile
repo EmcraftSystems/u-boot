@@ -3226,6 +3226,9 @@ twr-k60n512_config : unconfig
 twr-k70f120m_config : unconfig
 	@$(MKCONFIG) $(@:_config=) arm arm_cortexm3 twr-k70f120m freescale kinetis
 
+lpc-lnx-evb_config :  unconfig
+	@$(MKCONFIG) $(@:_config=) arm arm_cortexm3 lpc-lnx-evb emcraft lpc178x
+
 #########################################################################
 ## XScale Systems
 #########################################################################
