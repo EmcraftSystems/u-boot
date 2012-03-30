@@ -452,7 +452,7 @@ int board_init(void)
  */
 int checkboard(void)
 {
-	printf("Board: LPC-LNX-EVB rev %s\n",
+	printf("Board: LPC-LNX-EVB Rev %s, www.emcraft.com\n",
 		CONFIG_SYS_BOARD_REV_STR);
 
 	return 0;
