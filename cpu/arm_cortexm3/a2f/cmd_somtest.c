@@ -28,10 +28,10 @@ static int somtest_gpio(void)
 	int ret = 0;
 
 	printf("SOM test: gpio: starting ...\n");
-	
+
 	/*
  	 * This is some sample code that shows how to access
- 	 * a hardware register from the U-boot context. 
+	 * a hardware register from the U-boot context.
  	 * ...
  	 * TBD - this code needs to be updated to implement
  	 * a desired GPIO test for the SmartFision SOM.
@@ -40,7 +40,7 @@ static int somtest_gpio(void)
 		/*
 		 * This toggles the LED on A2F-LNX-EVB
 		 * The LED is turned on when i is an odd integer,
-		 * off - when i is an even integer. 
+		 * off - when i is an even integer.
 		 */
 		* (volatile unsigned int *) 0x400502a0 = i % 2;
 
@@ -74,10 +74,10 @@ int do_somtest(cmd_tbl_t *cmdtp, int flag, int argc, char *argv[])
 	 * Parse the command arguments
 	 */
 	if (! strcmp(argv[1], "gpio")) {
-		ret = somtest_gpio();	
+		ret = somtest_gpio();
 		goto Done;
 	}
-	printf("%s: unrecognized command %s\n", 
+	printf("%s: unrecognized command %s\n",
 		(char *) argv[0], (char *) argv[1]);
 
 	Done:
