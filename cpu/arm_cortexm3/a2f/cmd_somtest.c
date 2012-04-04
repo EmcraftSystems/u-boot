@@ -22,36 +22,84 @@
 #include <command.h>
 #include <string.h>
 
-static int somtest_gpio(void)
+#define COREGPIO_BASE0		0x40050200
+#define COREGPIO_BASE1		0x40050400
+#define COREGPIO_BASE2		0x40050500
+
+struct coregpio {
+	int config[32];
+	int intclr;
+	int res0[3];
+	int in;
+	int res1[3];
+	int out;
+};
+
+#define CGPIO0			((volatile struct coregpio *)COREGPIO_BASE0)
+#define CGPIO1			((volatile struct coregpio *)COREGPIO_BASE1)
+#define CGPIO2			((volatile struct coregpio *)COREGPIO_BASE2)
+/* Number of pins to test */
+#define TESTPINS		20
+
+static int test_gpio (volatile struct coregpio *gin,
+		volatile struct coregpio *gout, int testval)
 {
-	int i, j;
-	int ret = 0;
+	int i;
+	int ret = -1;
 
-	printf("SOM test: gpio: starting ...\n");
-
-	/*
- 	 * This is some sample code that shows how to access
-	 * a hardware register from the U-boot context.
- 	 * ...
- 	 * TBD - this code needs to be updated to implement
- 	 * a desired GPIO test for the SmartFision SOM.
- 	 */
-	for (i = 1; i <= 10; i++) {
-		/*
-		 * This toggles the LED on A2F-LNX-EVB
-		 * The LED is turned on when i is an odd integer,
-		 * off - when i is an even integer.
-		 */
-		* (volatile unsigned int *) 0x400502a0 = i % 2;
-
-		/*
- 		 * This sleeps a second
- 		 */
-		for (j = 0; j < 1000; j++) udelay(1000);
+	/* Reset all bits in config registers. This will disable all
+	   pin functionality.
+	*/
+	for (i = 0; i < 32; i++) {
+		gin->config[i] = 0;
+		gout->config[i] = 0;
 	}
 
-	printf("SOM test: gpio: %s\n", !ret ? "PASS" : "FAIL");
+	/* Configure gpio0 as output, gpio1 as input */
+	for (i = 0; i < TESTPINS; i++) {
+		gin->config[i] |= 2; /* Input first */
+		gout->config[i] |= 5;
 
+		if (!(gin->config[i] & 2) || !(gout->config[i] & 5)) {
+			printf("FAIL: Config bits don't set!\n");
+			goto xit;
+		}
+	}
+	printf("  Writing test pattern %#x\n", testval);
+	gout->out = testval;
+	if (gout->out != testval) {
+		printf("FAIL, bad value written: %#x (should be %#x)\n",
+			gout->out, testval);
+		goto xit;
+	}
+	printf("  Reading test pattern\n");
+	if (gin->in != testval) {
+		printf("FAIL, bad value read: %#x (should be %#x)\n",
+			gin->in, testval);
+		goto xit;
+	}
+
+	ret = 0;
+xit:
+	return ret;
+
+}
+
+static int somtest_gpio(void)
+{
+	int ret = -1;
+	int testval1 = 0x55555;
+	int testval2 = 0xAAAAA;
+
+	printf("Loopback test SOM CoreGPIO_0 and 1, both directions...\n");
+
+	if (!test_gpio(CGPIO1, CGPIO0, testval1) &&
+		!test_gpio(CGPIO1, CGPIO0, testval2) &&
+		!test_gpio(CGPIO0, CGPIO1, testval1) &&
+		!test_gpio(CGPIO0, CGPIO1, testval2)) {
+		printf("PASS\n");
+		ret = 0;
+	}
 	return ret;
 }
 
