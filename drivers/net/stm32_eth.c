@@ -73,7 +73,7 @@
 #define STM32_MAC_MIIAR_CR_BIT		2		/* Clock range	      */
 #define STM32_MAC_MIIAR_CR_MSK		0x7
 #define STM32_MAC_MIIAR_CR_DIV42	0x0		/* 60-100 MHz	      */
-#define STM32_MAC_MIIAR_CR_DIV62	0x1		/* 100-120 MHz	      */
+#define STM32_MAC_MIIAR_CR_DIV62	0x1		/* 100-168 MHz	      */
 #define STM32_MAC_MIIAR_CR_DIV16	0x2		/* 20-35 MHz	      */
 #define STM32_MAC_MIIAR_CR_DIV26	0x3		/* 35-60 MHz	      */
 
@@ -164,15 +164,14 @@
 #define STM32_RCC_ENR_ETHMACRXEN	(1 << 27)	/* Ethernet Rx clock  */
 
 /*
- * Different timeouts (in cycles)
- * FIXME: replace this stuff with us/ms timeouts (when implement timer support)
+ * Different timeouts
  */
-#define STM32_PHY_READ_TIMEOUT		0x4FFFF
-#define STM32_PHY_WRITE_TIMEOUT		0x4FFFF
-#define STM32_PHY_AUTONEG_TIMEOUT	0x10000
+#define STM32_PHY_READ_TIMEOUT		2500	/* x 100 usec = 250 ms */
+#define STM32_PHY_WRITE_TIMEOUT		2500	/* x 100 usec = 250 ms */
+#define STM32_PHY_AUTONEG_TIMEOUT	100000	/* x 100 usec = 10 s */
 
-#define STM32_MAC_TX_TIMEOUT		0xFFFFFF
-#define STM32_MAC_INIT_TIMEOUT		0xFFFFFF
+#define STM32_MAC_TX_TIMEOUT		1000000	/* x 1 usec = 1000 ms */
+#define STM32_MAC_INIT_TIMEOUT		20000	/* x 100 usec = 2 s */
 
 /*
  * MAC, MMC, PTP, DMA register map
@@ -487,7 +486,7 @@ static s32 stm_phy_link_setup(struct stm_eth_dev *mac)
 {
 	static s32	link_inited;
 
-	s32		link_up, full_dup, speed, rv, i;
+	s32		link_up, full_dup, speed, rv, timeout;
 	u32		cr_val;
 	u16		val;
 
@@ -524,15 +523,17 @@ static s32 stm_phy_link_setup(struct stm_eth_dev *mac)
 	/*
 	 * Wait until auto-negotioation complete
 	 */
-	for (i = 0, val = 0; i < STM32_PHY_AUTONEG_TIMEOUT; i++) {
-		if (stm_phy_read(mac, PHY_BMSR, &val) != 0)
-			continue;
-		if (val & PHY_BMSR_AUTN_COMP) {
-			printf("completed.\n");
-			break;
-		}
+	timeout = STM32_PHY_AUTONEG_TIMEOUT;
+	while (timeout-- > 0) {
+		if (stm_phy_read(mac, PHY_BMSR, &val) == 0 &&
+		    (val & PHY_BMSR_AUTN_COMP))
+			timeout = 0;
+		else
+			udelay(100);
 	}
-	if (!(val & PHY_BMSR_AUTN_COMP))
+	if (val & PHY_BMSR_AUTN_COMP)
+		printf("completed.\n");
+	else
 		printf("timeout.\n");
 
 	/*
@@ -574,6 +575,29 @@ out:
 }
 
 /*
+ * Helper function used in stm_phy_read() and stm_phy_write()
+ */
+static int stm_phy_wait_busy(int timeout)
+{
+	int rv;
+
+	rv = -ETIMEDOUT;
+	while (timeout-- > 0) {
+		if (STM32_MAC->macmiiar & STM32_MAC_MIIAR_MB) {
+			udelay(100);
+		} else {
+			timeout = 0;
+			rv = 0;
+		}
+	}
+
+	if (rv != 0)
+		printf("%s: timed out\n", __func__);
+
+	return rv;
+}
+
+/*
  * Write PHY
  */
 static s32 stm_phy_write(struct stm_eth_dev *mac, u16 reg, u16 val)
@@ -582,10 +606,7 @@ static s32 stm_phy_write(struct stm_eth_dev *mac, u16 reg, u16 val)
 	u32	tmp;
 	s32	rv;
 
-	tmp = 0;
-	while ((STM32_MAC->macmiiar & STM32_MAC_MIIAR_MB) &&
-	       (tmp++ < STM32_PHY_WRITE_TIMEOUT));
-	if (STM32_MAC->macmiiar & STM32_MAC_MIIAR_MB) {
+	if (stm_phy_wait_busy(STM32_PHY_WRITE_TIMEOUT) != 0) {
 		/*
 		 * MII is busy
 		 */
@@ -618,10 +639,7 @@ static s32 stm_phy_write(struct stm_eth_dev *mac, u16 reg, u16 val)
 	STM32_MAC->macmiidr = val;
 	STM32_MAC->macmiiar = tmp;
 
-	tmp = 0;
-	while ((STM32_MAC->macmiiar & STM32_MAC_MIIAR_MB) &&
-	       (tmp++ < STM32_PHY_WRITE_TIMEOUT));
-	if (STM32_MAC->macmiiar & STM32_MAC_MIIAR_MB) {
+	if (stm_phy_wait_busy(STM32_PHY_WRITE_TIMEOUT) != 0) {
 		/*
 		 * Transaction failed: Write timeout
 		 */
@@ -646,10 +664,7 @@ static s32 stm_phy_read(struct stm_eth_dev *mac, u16 reg, u16 *val)
 	u32	tmp;
 	s32	rv;
 
-	tmp = 0;
-	while ((STM32_MAC->macmiiar & STM32_MAC_MIIAR_MB) &&
-	       (tmp++ < STM32_PHY_READ_TIMEOUT));
-	if (STM32_MAC->macmiiar & STM32_MAC_MIIAR_MB) {
+	if (stm_phy_wait_busy(STM32_PHY_READ_TIMEOUT) != 0) {
 		/*
 		 * MII is busy
 		 */
@@ -681,10 +696,7 @@ static s32 stm_phy_read(struct stm_eth_dev *mac, u16 reg, u16 *val)
 	 */
 	STM32_MAC->macmiiar  = tmp;
 
-	tmp = 0;
-	while ((STM32_MAC->macmiiar & STM32_MAC_MIIAR_MB) &&
-	       (tmp++ < STM32_PHY_READ_TIMEOUT));
-	if (STM32_MAC->macmiiar & STM32_MAC_MIIAR_MB) {
+	if (stm_phy_wait_busy(STM32_PHY_READ_TIMEOUT) != 0) {
 		/*
 		 * Transaction failed: read timeout
 		 */
@@ -817,7 +829,7 @@ out:
 static s32 stm_mac_hw_init(struct stm_eth_dev *mac)
 {
 	u32	tmp, hclk;
-	s32	i, rv;
+	s32	rv, timeout;
 
 	/*
 	 * Init GPIOs
@@ -840,14 +852,19 @@ static s32 stm_mac_hw_init(struct stm_eth_dev *mac)
 	STM32_RCC->ahb1rstr &= ~STM32_RCC_AHB1RSTR_MAC;
 
 	STM32_MAC->dmabmr |= STM32_MAC_DMABMR_SR;
-	i = 0;
-	while (STM32_MAC->dmabmr & STM32_MAC_DMABMR_SR) {
-		if (i++ > STM32_MAC_INIT_TIMEOUT)
-			break;
+
+	timeout = STM32_MAC_INIT_TIMEOUT;
+	rv = -EBUSY;
+	while (timeout-- > 0) {
+		if (STM32_MAC->dmabmr & STM32_MAC_DMABMR_SR) {
+			udelay(100);
+		} else {
+			timeout = 0;
+			rv = 0;
+		}
 	}
-	if (STM32_MAC->dmabmr & STM32_MAC_DMABMR_SR) {
+	if (rv != 0) {
 		printf("%s: failed reset MAC subsystem.\n", __func__);
-		rv = -EBUSY;
 		goto out;
 	}
 
@@ -879,21 +896,16 @@ static s32 stm_mac_hw_init(struct stm_eth_dev *mac)
 		/* CSR Clock range between 60-100 MHz */
 		tmp = STM32_MAC_MIIAR_CR_DIV42 << STM32_MAC_MIIAR_CR_BIT;
 	} else {
-		/* CSR Clock range between 100-120 MHz */
+		/* CSR Clock range between 100-168 MHz */
 		tmp = STM32_MAC_MIIAR_CR_DIV62 << STM32_MAC_MIIAR_CR_BIT;
 	}
 
-	if (STM32_MAC->macmiiar & STM32_MAC_MIIAR_MB) {
-		i = 0;
-		while ((STM32_MAC->macmiiar & STM32_MAC_MIIAR_MB) &&
-		       (i++ < STM32_PHY_READ_TIMEOUT));
-		if (STM32_MAC->macmiiar & STM32_MAC_MIIAR_MB) {
-			/*
-			 * MII is busy
-			 */
-			rv = -EBUSY;
-			goto out;
-		}
+	if (stm_phy_wait_busy(STM32_PHY_READ_TIMEOUT) != 0) {
+		/*
+		 * MII is busy
+		 */
+		rv = -EBUSY;
+		goto out;
 	}
 	STM32_MAC->macmiiar = tmp;
 
@@ -1008,14 +1020,18 @@ static s32 stm_eth_send(struct eth_device *dev, volatile void *pkt, s32 len)
 	/*
 	 * Wait until transmit completes
 	 */
-	for (tout = 0; tout < STM32_MAC_TX_TIMEOUT; tout++) {
+	tout = STM32_MAC_TX_TIMEOUT;
+	rv = -ETIMEDOUT;
+	while (tout-- > 0) {
 		if (mac->tx_bd.stat & STM32_DMA_TBD_DMA_OWN)
-			continue;
-		break;
+			udelay(1);
+		else {
+			tout = 0;
+			rv = 0;
+		}
 	}
-	if (mac->tx_bd.stat & STM32_DMA_TBD_DMA_OWN) {
+	if (rv != 0) {
 		printf("%s: timeout.\n", __func__);
-		rv = -ETIMEDOUT;
 		goto out;
 	}
 
