@@ -398,30 +398,86 @@ static int somtest_gpio910(void)
 	printf("Testing MSSGPIO 0-3, out...\n");
 	if (test_gpio_910(&MSSGPIO->in, &MSSGPIO->out, 0x5, (0<<29|1<<22|0<<30|1<<31)))
 		goto ret;
+	if (CGPIO0->in)
+		printf("FAIL, unexpected value %#x in CGPIO0\n", CGPIO0->in);
+	if (CGPIO1->in)
+		printf("FAIL, unexpected value %#x in CGPIO1\n", CGPIO1->in);
+	if (CGPIO2->in)
+		printf("FAIL, unexpected value %#x in CGPIO2\n", CGPIO2->in);
+
 	if (test_gpio_910(&MSSGPIO->in, &MSSGPIO->out, 0xa, (1<<29|0<<22|1<<30|0<<31)))
 		goto ret;
+	if (CGPIO0->in)
+		printf("FAIL, unexpected value %#x in CGPIO0\n", CGPIO0->in);
+	if (CGPIO1->in)
+		printf("FAIL, unexpected value %#x in CGPIO1\n", CGPIO1->in);
+	if (CGPIO2->in)
+		printf("FAIL, unexpected value %#x in CGPIO2\n", CGPIO2->in);
+
 	test_gpio_910(&MSSGPIO->in, &MSSGPIO->out, 0, 0);
 
 	printf("Testing CGPIO0 28-31, out...\n");
 	if (test_gpio_910(&MSSGPIO->in, &CGPIO0->out, 0x5<<28, (0<<25|1<<27|0<<19|1<<16)))
 		goto ret;
+	if (CGPIO0->in)
+		printf("FAIL, unexpected value %#x in CGPIO0\n", CGPIO0->in);
+	if (CGPIO1->in)
+		printf("FAIL, unexpected value %#x in CGPIO1\n", CGPIO1->in);
+	if (CGPIO2->in)
+		printf("FAIL, unexpected value %#x in CGPIO2\n", CGPIO2->in);
+
 	if (test_gpio_910(&MSSGPIO->in, &CGPIO0->out, 0xa<<28, (1<<25|0<<27|1<<19|0<<16)))
 		goto ret;
+	if (CGPIO0->in)
+		printf("FAIL, unexpected value %#x in CGPIO0\n", CGPIO0->in);
+	if (CGPIO1->in)
+		printf("FAIL, unexpected value %#x in CGPIO1\n", CGPIO1->in);
+	if (CGPIO2->in)
+		printf("FAIL, unexpected value %#x in CGPIO2\n", CGPIO2->in);
+
 	test_gpio_910(&MSSGPIO->in, &CGPIO0->out, 0, 0);
 
 
 	printf("Testing CGPIO1 28-31, out...\n");
 	if (test_gpio_910(&MSSGPIO->in, &CGPIO1->out, 0x5<<28, (0<<24|1<<26|0<<18|1<<17)))
 		goto ret;
+	if (CGPIO0->in)
+		printf("FAIL, unexpected value %#x in CGPIO0\n", CGPIO0->in);
+	if (CGPIO1->in)
+		printf("FAIL, unexpected value %#x in CGPIO1\n", CGPIO1->in);
+	if (CGPIO2->in)
+		printf("FAIL, unexpected value %#x in CGPIO2\n", CGPIO2->in);
+
 	if (test_gpio_910(&MSSGPIO->in, &CGPIO1->out, 0xa<<28, (1<<24|0<<26|1<<18|0<<17)))
 		goto ret;
+	if (CGPIO0->in)
+		printf("FAIL, unexpected value %#x in CGPIO0\n", CGPIO0->in);
+	if (CGPIO1->in)
+		printf("FAIL, unexpected value %#x in CGPIO1\n", CGPIO1->in);
+	if (CGPIO2->in)
+		printf("FAIL, unexpected value %#x in CGPIO2\n", CGPIO2->in);
+
 	test_gpio_910(&MSSGPIO->in, &CGPIO1->out, 0, 0);
 
 	printf("Testing CGPIO2 2-3, out...\n");
 	if (test_gpio_910(&MSSGPIO->in, &CGPIO2->out, 1<<2, (0<<23|1<<28)))
 		goto ret;
+	if (CGPIO0->in)
+		printf("FAIL, unexpected value %#x in CGPIO0\n", CGPIO0->in);
+	if (CGPIO1->in)
+		printf("FAIL, unexpected value %#x in CGPIO1\n", CGPIO1->in);
+	if (CGPIO2->in)
+		printf("FAIL, unexpected value %#x in CGPIO2\n", CGPIO2->in);
+
 	if (test_gpio_910(&MSSGPIO->in, &CGPIO2->out, 2<<2, (1<<23|0<<28)))
 		goto ret;
+	if (CGPIO0->in)
+		printf("FAIL, unexpected value %#x in CGPIO0\n", CGPIO0->in);
+	if (CGPIO1->in)
+		printf("FAIL, unexpected value %#x in CGPIO1\n", CGPIO1->in);
+	if (CGPIO2->in)
+		printf("FAIL, unexpected value %#x in CGPIO2\n", CGPIO2->in);
+
 	test_gpio_910(&MSSGPIO->in, &CGPIO2->out, 0, 0);
 
 	clear_all_gpio();
@@ -438,35 +494,87 @@ static int somtest_gpio910(void)
 	printf("Testing MSSGPIO 0-3, in...\n");
 	if (test_gpio_910(&MSSGPIO->in, &MSSGPIO->out, (0<<29|1<<22|0<<30|1<<31), 0x5))
 		goto ret;
+	if (CGPIO0->in)
+		printf("FAIL, unexpected value %#x in CGPIO0\n", CGPIO0->in);
+	if (CGPIO1->in)
+		printf("FAIL, unexpected value %#x in CGPIO1\n", CGPIO1->in);
+	if (CGPIO2->in)
+		printf("FAIL, unexpected value %#x in CGPIO2\n", CGPIO2->in);
+
 	if (test_gpio_910(&MSSGPIO->in, &MSSGPIO->out, (1<<29|0<<22|1<<30|0<<31), 0xa))
 		goto ret;
-	if (test_gpio_910(&MSSGPIO->in, &MSSGPIO->out, 0, 0))
-		goto ret;
+	if (CGPIO0->in)
+		printf("FAIL, unexpected value %#x in CGPIO0\n", CGPIO0->in);
+	if (CGPIO1->in)
+		printf("FAIL, unexpected value %#x in CGPIO1\n", CGPIO1->in);
+	if (CGPIO2->in)
+		printf("FAIL, unexpected value %#x in CGPIO2\n", CGPIO2->in);
+
+	test_gpio_910(&MSSGPIO->in, &MSSGPIO->out, 0, 0);
 
 	printf("Testing CGPIO0 28-31, in...\n");
 	if (test_gpio_910(&CGPIO0->in, &MSSGPIO->out, (0<<25|1<<27|0<<19|1<<16), 0x5<<28))
 		goto ret;
+	if (MSSGPIO->in)
+		printf("FAIL, unexpected value %#x in MSSGPIO\n", MSSGPIO->in);
+	if (CGPIO1->in)
+		printf("FAIL, unexpected value %#x in CGPIO1\n", CGPIO1->in);
+	if (CGPIO2->in)
+		printf("FAIL, unexpected value %#x in CGPIO2\n", CGPIO2->in);
+
 	if (test_gpio_910(&CGPIO0->in, &MSSGPIO->out, (1<<25|0<<27|1<<19|0<<16), 0xa<<28))
 		goto ret;
-	if (test_gpio_910(&CGPIO0->in, &MSSGPIO->out, 0, 0))
-		goto ret;
+	if (MSSGPIO->in)
+		printf("FAIL, unexpected value %#x in MSSGPIO\n", MSSGPIO->in);
+	if (CGPIO1->in)
+		printf("FAIL, unexpected value %#x in CGPIO1\n", CGPIO1->in);
+	if (CGPIO2->in)
+		printf("FAIL, unexpected value %#x in CGPIO2\n", CGPIO2->in);
+
+	test_gpio_910(&CGPIO0->in, &MSSGPIO->out, 0, 0);
 
 
 	printf("Testing CGPIO1 28-31, in...\n");
 	if (test_gpio_910(&CGPIO1->in, &MSSGPIO->out, (0<<24|1<<26|0<<18|1<<17), 0x5<<28))
 		goto ret;
+	if (MSSGPIO->in)
+		printf("FAIL, unexpected value %#x in MSSGPIO\n", MSSGPIO->in);
+	if (CGPIO0->in)
+		printf("FAIL, unexpected value %#x in CGPIO0\n", CGPIO0->in);
+	if (CGPIO2->in)
+		printf("FAIL, unexpected value %#x in CGPIO2\n", CGPIO2->in);
+
 	if (test_gpio_910(&CGPIO1->in, &MSSGPIO->out, (1<<24|0<<26|1<<18|0<<17), 0xa<<28))
 		goto ret;
-	if (test_gpio_910(&CGPIO1->in, &MSSGPIO->out, 0, 0))
-		goto ret;
+	if (MSSGPIO->in)
+		printf("FAIL, unexpected value %#x in MSSGPIO\n", MSSGPIO->in);
+	if (CGPIO0->in)
+		printf("FAIL, unexpected value %#x in CGPIO0\n", CGPIO0->in);
+	if (CGPIO2->in)
+		printf("FAIL, unexpected value %#x in CGPIO2\n", CGPIO2->in);
+
+	test_gpio_910(&CGPIO1->in, &MSSGPIO->out, 0, 0);
 
 	printf("Testing CGPIO2 2-3, in...\n");
 	if (test_gpio_910(&CGPIO2->in, &MSSGPIO->out, (0<<23|1<<28), 1<<2))
 		goto ret;
+	if (MSSGPIO->in)
+		printf("FAIL, unexpected value %#x in MSSGPIO\n", MSSGPIO->in);
+	if (CGPIO0->in)
+		printf("FAIL, unexpected value %#x in CGPIO0\n", CGPIO0->in);
+	if (CGPIO1->in)
+		printf("FAIL, unexpected value %#x in CGPIO1\n", CGPIO1->in);
+
 	if (test_gpio_910(&CGPIO2->in, &MSSGPIO->out, (1<<23|0<<28), 2<<2))
 		goto ret;
-	if (test_gpio_910(&CGPIO2->in, &MSSGPIO->out, 0, 0))
-		goto ret;
+	if (MSSGPIO->in)
+		printf("FAIL, unexpected value %#x in MSSGPIO\n", MSSGPIO->in);
+	if (CGPIO0->in)
+		printf("FAIL, unexpected value %#x in CGPIO0\n", CGPIO0->in);
+	if (CGPIO1->in)
+		printf("FAIL, unexpected value %#x in CGPIO1\n", CGPIO1->in);
+
+	test_gpio_910(&CGPIO2->in, &MSSGPIO->out, 0, 0);
 
 	printf("Walking 1 test on P9 in, P10 out...\n");
 	if (test_gpio910_walk(P9, P10, ARRAY_SIZE(P9)))
