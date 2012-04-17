@@ -45,9 +45,12 @@ extern char	_mem_ram_buf_base, _mem_ram_buf_size;
  * this function to be inlined into do_cptf(), which is located in flash.
  * This makes the U-Boot crash while performing self-upgrade.
  */
-int __attribute__((section(".ramcode")))
-           __attribute__ ((long_call))
-  envm_write_and_reset(ulong dst, ulong src, ulong size, int do_reset)
+int
+#ifdef CONFIG_ARMCORTEXM3_RAMCODE
+	__attribute__((section(".ramcode")))
+	__attribute__((long_call))
+#endif
+	envm_write_and_reset(ulong dst, ulong src, ulong size, int do_reset)
 {
 	int ret = 0;
 
