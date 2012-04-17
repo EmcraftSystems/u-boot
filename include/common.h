@@ -122,6 +122,9 @@ typedef volatile unsigned char	vu_char;
 #ifdef CONFIG_SYS_LPC178X
 #include <asm/arch-lpc178x/lpc178x.h>
 #endif
+#ifdef CONFIG_SYS_LPC18XX
+#include <asm/arch-lpc18xx/lpc18xx.h>
+#endif
 #ifdef CONFIG_SYS_KINETIS
 #include <asm/arch-kinetis/kinetis.h>
 #endif
