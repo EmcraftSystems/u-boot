@@ -1,12 +1,8 @@
-This is the source tree of U-Boot, a popular boot loader for embedded devices.
- U-Boot was developed by DENX Software Engineering (www.denx.de).
+This is the source tree of U-Boot, a popular boot loader for embedded devices. U-Boot was developed by DENX Software Engineering (www.denx.de).
 
-This particular version of U-Boot is maintained by Emcraft Systems and
-supports several Cortex-M3 and Cortex-M4 based MCUs.
+This particular version of U-Boot is maintained by Emcraft Systems and supports several Cortex-M3 and Cortex-M4 based MCUs.
 
-A complete list of Cortex-M MCUs and boards supported by this version of
-U-Boot is available at http://www.emcraft.com.
+A complete list of Cortex-M MCUs and boards supported by this version of U-Boot is available at http://www.emcraft.com.
 
-If you want to contribute code to this source tree, please email your
-patches to a2f-linux-support@emcraft.com.
+If you want to contribute code to this source tree, please email your patches to a2f-linux-support@emcraft.com.
 
