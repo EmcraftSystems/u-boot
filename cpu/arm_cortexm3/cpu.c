@@ -110,9 +110,12 @@ void hw_watchdog_reset(void)
  * Note that we need for this function to reside in RAM since it
  * can be used to self-upgrade U-boot in eNMV.
  */
-void __attribute__((section(".ramcode")))
-		__attribute__ ((long_call))
-		reset_cpu(ulong addr)
+void
+#ifdef CONFIG_ARMCORTEXM3_RAMCODE
+	__attribute__((section(".ramcode")))
+	__attribute__((long_call))
+#endif
+	reset_cpu(ulong addr)
 {
 #ifdef CONFIG_SYS_LPC178X
 	/*

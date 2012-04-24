@@ -473,9 +473,21 @@ int	checkicache   (void);
 int	checkdcache   (void);
 void	upmconfig     (unsigned int, unsigned int *, unsigned int);
 ulong	get_tbclk     (void);
-void
+
+/*
+ * The following MCUs should use the .ramcode section to allow for self-upgrade
+ *
+ * The LPC18xx/LPC43xx MCUs (CONFIG_SYS_LPC18XX) normally do not use
+ * execution-in-place. But if they do, the CONFIG_ARMCORTEXM3_RAMCODE option
+ * can be defined in the U-Boot board configuration file (include/configs/.h)
+ */
 #if defined(CONFIG_SYS_A2F) || defined(CONFIG_SYS_STM32) || \
     defined(CONFIG_SYS_LPC178X) || defined(CONFIG_SYS_KINETIS)
+#define CONFIG_ARMCORTEXM3_RAMCODE
+#endif
+
+void
+#ifdef CONFIG_ARMCORTEXM3_RAMCODE
 	__attribute__((section(".ramcode")))
 	__attribute__ ((long_call))
 #endif

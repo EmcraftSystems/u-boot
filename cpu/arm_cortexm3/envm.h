@@ -20,6 +20,8 @@
 #ifndef __ENVM_H__
 #define __ENVM_H__
 
+#include <common.h>
+
 /*
  * Initialize the eNVM interface
  */
@@ -31,8 +33,10 @@ void envm_init(void);
  * will be used to self-upgrade U-boot in eNMV.
  */
 unsigned int
+#ifdef CONFIG_ARMCORTEXM3_RAMCODE
 	__attribute__((section(".ramcode")))
-	__attribute__ ((long_call))
+	__attribute__((long_call))
+#endif
 	envm_write(unsigned int offset, void * buf, unsigned int size);
 
 #if defined(CONFIG_SYS_STM32)
