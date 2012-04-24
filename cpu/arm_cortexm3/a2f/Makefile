@@ -29,7 +29,9 @@ include $(TOPDIR)/config.mk
 
 LIB	= $(obj)lib$(SOC).a
 
-COBJS	:= clock.o cpu.o envm.o wdt.o cmd_somtest.o
+COBJS-$(CONFIG_CMD_SOMTEST) += cmd_somtest.o
+COBJS	:= clock.o cpu.o envm.o wdt.o $(COBJS-y)
+
 SOBJS	:=
 
 SRCS	:= $(COBJS:.o=.c)

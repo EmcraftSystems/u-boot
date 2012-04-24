@@ -47,7 +47,7 @@
 #define CONFIG_SYS_BOARD_REV		0x1A
 
 #if (CONFIG_SYS_BOARD_REV!=0x1A)
-#error CONFIG_SYS_BOARD_REV must be 1A 
+#error CONFIG_SYS_BOARD_REV must be 1A
 #endif
 
 /*
@@ -251,6 +251,7 @@
 #undef CONFIG_CMD_NFS
 #undef CONFIG_CMD_SOURCE
 #undef CONFIG_CMD_XIMG
+#undef CONFIG_CMD_SOMTEST
 
 /*
  * To save memory disable long help
