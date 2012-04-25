@@ -153,7 +153,7 @@
 /*
  * Timings for the external Flash
  */
-#define CONFIG_SYS_EMC0CS1CR		0x00011137
+#define CONFIG_SYS_EMC0CS1CR		0x00011147
 
 /*
  * Settings for the CFI Flash driver
@@ -165,6 +165,8 @@
 #define CONFIG_SYS_MAX_FLASH_BANKS	1
 #define CONFIG_SYS_MAX_FLASH_SECT	128
 #define CONFIG_SYS_FLASH_CFI_AMD_RESET	1
+/* Use writebuffer, otherwise the flash is too slow */
+#define CONFIG_SYS_FLASH_USE_BUFFER_WRITE
 
 /*
  * U-boot environment configuration
