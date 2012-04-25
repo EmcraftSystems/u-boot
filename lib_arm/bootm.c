@@ -194,7 +194,9 @@ static void setup_commandline_tag (bd_t *bd, char *commandline)
 
 	strcpy (params->u.cmdline.cmdline, p);
 
-#if defined(CONFIG_SYS_A2F) || defined(CONFIG_SYS_STM32) || defined(CONFIG_SYS_LPC178X) || defined(CONFIG_SYS_KINETIS)
+#if defined(CONFIG_SYS_A2F) || defined(CONFIG_SYS_STM32) || \
+    defined(CONFIG_SYS_LPC178X) || defined(CONFIG_SYS_KINETIS) || \
+    defined(CONFIG_SYS_LPC18XX)
 	/* Add "ethaddr=..." to bootargs, if not set by the user */
 	{
 		char *e;

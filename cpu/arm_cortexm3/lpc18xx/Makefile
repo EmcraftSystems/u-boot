@@ -1,6 +1,10 @@
 #
-# Copyright 2000-2008
+# (C) Copyright 2000-2003
 # Wolfgang Denk, DENX Software Engineering, wd@denx.de.
+#
+# (C) Copyright 2012
+# Port to NXP LPC18xx MCU
+# Alexander Potashev, Emcraft Systems, aspotashev@emcraft.com.
 #
 # See file CREDITS for list of people who contributed to this
 # project.
@@ -12,7 +16,7 @@
 #
 # This program is distributed in the hope that it will be useful,
 # but WITHOUT ANY WARRANTY; without even the implied warranty of
-# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.	See the
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 # GNU General Public License for more details.
 #
 # You should have received a copy of the GNU General Public License
@@ -23,26 +27,23 @@
 
 include $(TOPDIR)/config.mk
 
-LIB 	:= $(obj)libgpio.a
+LIB	= $(obj)lib$(SOC).a
 
-COBJS-$(CONFIG_AT91_GPIO)	+= at91_gpio.o
-COBJS-$(CONFIG_KIRKWOOD_GPIO)	+= kw_gpio.o
-COBJS-$(CONFIG_MX31_GPIO)	+= mx31_gpio.o
-COBJS-$(CONFIG_PCA953X)		+= pca953x.o
-COBJS-$(CONFIG_STM32F2_GPIO)	+= stm32f2_gpio.o
-COBJS-$(CONFIG_LPC178X_GPIO)	+= lpc178x_gpio.o
-COBJS-$(CONFIG_LPC18XX_GPIO)	+= lpc18xx_gpio.o
-COBJS-$(CONFIG_KINETIS_GPIO)	+= kinetis_gpio.o
+COBJS	:= clock.o cpu.o envm.o wdt.o
+SOBJS	:=
 
-COBJS	:= $(COBJS-y)
 SRCS	:= $(COBJS:.o=.c)
 OBJS	:= $(addprefix $(obj),$(COBJS))
+SOBJS	:= $(addprefix $(obj),$(SOBJS))
 
-all:	$(LIB)
-
-$(LIB):	$(obj).depend $(OBJS)
+$(LIB):	$(obj).depend $(OBJS) $(SOBJS)
 	$(AR) $(ARFLAGS) $@ $(OBJS)
 
+clean:
+	rm -f $(SOBJS) $(OBJS)
+
+distclean:
+	rm -f $(LIB) core *.bak $(obj).depend
 
 #########################################################################
 
@@ -51,4 +52,4 @@ include $(SRCTREE)/rules.mk
 
 sinclude $(obj).depend
 
-########################################################################
+#########################################################################

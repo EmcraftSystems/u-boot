@@ -3232,6 +3232,9 @@ lpc-lnx-evb_config :  unconfig
 k70-som_config : unconfig
 	@$(MKCONFIG) $(@:_config=) arm arm_cortexm3 k70-som emcraft kinetis
 
+lpc4350-eval_config : unconfig
+	@$(MKCONFIG) $(@:_config=) arm arm_cortexm3 lpc4350-eval hitex lpc18xx
+
 #########################################################################
 ## XScale Systems
 #########################################################################
