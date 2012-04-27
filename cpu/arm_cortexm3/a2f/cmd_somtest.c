@@ -135,7 +135,8 @@ struct pa_adc {
 #define ADC1			((volatile struct pa_adc *)ADC_BASE1)
 #define ADC2			((volatile struct pa_adc *)ADC_BASE2)
 
-#define mdelay(a)		udelay((a)*1000)
+#define mdelay(n) ({unsigned long msec=(n); while (msec--) udelay(1000);})
+
 #define ADC_STATUS(n)		(*((volatile int *)0x40021000+(n)))
 
 #define SSE_TS_CTRL		0x40020004
@@ -1039,42 +1040,44 @@ static int somtest_adc(void)
 /* After enable, the counter appear to work after ~40 seconds (!?).
  * Submitted a SR to Microsemi.
  */
-static int somtest_rtc(void)
+static int somtest_rtc(char *arg)
 {
-	int cnt;
+	unsigned long long cnt;
 
-	A2F_SYSREG->clr_mss_sr |= 0x1; /* Clear pending RTC int */
-	/* init counter */
-	*(volatile int *)RTC_CTRL_STAT_REG |= XTAL_EN;
-	*(volatile int *)RTC_CTRL_STAT_REG |= RSTB_CNT;
-
-	/* clear counter */
-	*(volatile int *)RTC_COUNTER0_REG = 0;
-	*(volatile int *)RTC_COUNTER1_REG = 0;
-	*(volatile int *)RTC_COUNTER2_REG = 0;
-	*(volatile int *)RTC_COUNTER3_REG = 0;
-	*(volatile int *)RTC_COUNTER4_REG = 0;
-
-	/* start counter */
-	*(volatile int *)RTC_CTRL_STAT_REG |= CNTR_EN;
-	/* delay for 1 sec */
-#if 1
-	mdelay(1000);
-#else
-	{
-		int i = 0x7fffa000;
-		while (i--)
-			;
-	}
-#endif
-	/* Stop counter */
-
-	*(volatile int *)RTC_CTRL_STAT_REG &= ~CNTR_EN;
 	cnt = *(volatile int *)RTC_COUNTER0_REG;
 	cnt |= (*(volatile int *)RTC_COUNTER1_REG) << 8;
+	cnt |= (*(volatile int *)RTC_COUNTER2_REG) << 16;
+	cnt |= (*(volatile int *)RTC_COUNTER3_REG) << 24;
+	cnt |= (unsigned long long)(*(volatile int *)RTC_COUNTER4_REG) << 32;
 
-	printf("RTC counter: %d (should be about 256)\n", cnt);
+	printf("current RTC val is %Ld (%Ld sec), ctrl reg %#x\n", cnt,
+		cnt/256, *(volatile int *)RTC_CTRL_STAT_REG);
 
+	if (!strcmp(arg, "start")) {
+		/* Stop counter */
+		*(volatile int *)RTC_CTRL_STAT_REG &= ~CNTR_EN;
+		A2F_SYSREG->clr_mss_sr |= 0x1; /* Clear pending RTC int */
+		/* init counter */
+		*(volatile int *)RTC_CTRL_STAT_REG |= XTAL_EN;
+		*(volatile int *)RTC_CTRL_STAT_REG |= RSTB_CNT;
+
+		printf("Reset RTC to zero\n");
+		/* clear counter */
+		*(volatile int *)RTC_COUNTER0_REG = 0;
+		*(volatile int *)RTC_COUNTER1_REG = 0;
+		*(volatile int *)RTC_COUNTER2_REG = 0;
+		*(volatile int *)RTC_COUNTER3_REG = 0;
+		*(volatile int *)RTC_COUNTER4_REG = 0;
+
+		/* start counter */
+		*(volatile int *)RTC_CTRL_STAT_REG |= CNTR_EN;
+		/* delay for 1 sec */
+	} else {
+		if (!strcmp(arg, "stop")) {
+			/* Stop counter */
+			*(volatile int *)RTC_CTRL_STAT_REG &= ~CNTR_EN;
+		}
+	}
 	return 0;
 }
 
@@ -1151,7 +1154,7 @@ int do_somtest(cmd_tbl_t *cmdtp, int flag, int argc, char *argv[])
 	}
 
 	if (! strcmp(argv[1], "rtc")) {
-		ret = somtest_rtc();
+		ret = somtest_rtc(argv[2]);
 		goto Done;
 	}
 
