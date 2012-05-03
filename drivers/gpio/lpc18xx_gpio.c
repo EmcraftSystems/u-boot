@@ -35,6 +35,14 @@ DECLARE_GLOBAL_DATA_PTR;
 #define LPC18XX_IOMUX_GROUP_PINS	32
 
 /*
+ * Pins CLK0..CLK3 with imaginary numbers 0x18.0-0x18.3
+ */
+/* Index of the the imaginary group of pins */
+#define LPC18XX_IOMUX_CLK_GROUP		24
+/* Number of CLK0..CLK3 pins */
+#define LPC18XX_IOMUX_CLK_PINS		4
+
+/*
  * System Control Unit (SCU) registers base
  */
 #define LPC18XX_SCU_BASE	(LPC18XX_APB0PERIPH_BASE + 0x00006000)
@@ -59,8 +67,11 @@ static inline int lpc18xx_validate_pin(const struct lpc18xx_iomux_dsc *dsc)
 
 	rv = 0;
 
-	if (!dsc || dsc->group >= LPC18XX_IOMUX_GROUPS ||
-	    dsc->pin >= LPC18XX_IOMUX_GROUP_PINS) {
+	if (!dsc ||
+		((dsc->group >= LPC18XX_IOMUX_GROUPS ||
+			dsc->pin >= LPC18XX_IOMUX_GROUP_PINS) &&
+		(dsc->group != LPC18XX_IOMUX_CLK_GROUP ||
+			dsc->pin >= LPC18XX_IOMUX_CLK_PINS))) {
 		if (gd->have_console) {
 			printf("IOMUX: incorrect params %d.%d.\n",
 				dsc ? dsc->group : -1,

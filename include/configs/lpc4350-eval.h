@@ -131,6 +131,10 @@
 #define CONFIG_SYS_RAM_CS		0	/* 0 .. 3 */
 #define CONFIG_SYS_RAM_BASE		0x28000000
 #define CONFIG_SYS_RAM_SIZE		(8 * 1024 * 1024)
+/*
+ * Use the CPU_CLOCK/2 for EMC
+ */
+#define CONFIG_LPC18XX_EMC_HALFCPU
 
 /*
  * Store env in memory only, if no flash.
