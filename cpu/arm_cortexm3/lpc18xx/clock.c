@@ -22,6 +22,7 @@
 #include <common.h>
 #include <asm/errno.h>
 
+#include <asm/arch/lpc18xx_creg.h>
 #include "clock.h"
 
 /*
@@ -109,6 +110,10 @@ struct lpc18xx_cgu_regs {
 /* CLK_SEL: Clock source selection */
 #define LPC18XX_CGU_CLKSEL_BITS		24
 #define LPC18XX_CGU_CLKSEL_MSK		(0x1f << LPC18XX_CGU_CLKSEL_BITS)
+/* ENET_RX_CLK */
+#define LPC18XX_CGU_CLKSEL_ENET_RX	(0x02 << LPC18XX_CGU_CLKSEL_BITS)
+/* ENET_TX_CLK */
+#define LPC18XX_CGU_CLKSEL_ENET_TX	(0x03 << LPC18XX_CGU_CLKSEL_BITS)
 /* Crystal oscillator */
 #define LPC18XX_CGU_CLKSEL_XTAL		(0x06 << LPC18XX_CGU_CLKSEL_BITS)
 /* PLL1 */
@@ -143,6 +148,42 @@ struct lpc18xx_cgu_regs {
  */
 /* PLL1 lock indicator */
 #define LPC18XX_CGU_PLL1STAT_LOCK	(1 << 0)
+
+/*
+ * RGU (Reset Generation Unit) register map
+ */
+struct lpc18xx_rgu_regs {
+	u32 rsv0[64];
+
+	u32 ctrl0;		/* Reset control register 0 */
+	u32 ctrl1;		/* Reset control register 1 */
+	u32 rsv1[2];
+
+	u32 status0;		/* Reset status register 0 */
+	u32 status1;		/* Reset status register 1 */
+	u32 status2;		/* Reset status register 2 */
+	u32 status3;		/* Reset status register 3 */
+	u32 rsv2[12];
+
+	u32 active_status0;	/* Reset active status register 0 */
+	u32 active_status1;	/* Reset active status register 1 */
+	u32 rsv3[170];
+
+	u32 ext_stat[64];	/* Reset external status registers */
+};
+
+/*
+ * RGU registers base
+ */
+#define LPC18XX_RGU_BASE		0x40053000
+#define LPC18XX_RGU			((volatile struct lpc18xx_rgu_regs *) \
+					LPC18XX_RGU_BASE)
+
+/*
+ * RESET_CTRL0 register
+ */
+/* ETHERNET_RST */
+#define LPC18XX_RGU_CTRL0_ETHERNET	(1 << 22)
 
 /*
  * Clock values
@@ -302,6 +343,55 @@ static void clock_setup(void)
 }
 
 /*
+ * Set-up the Ethernet clock and reset the Ethernet MAC
+ */
+void eth_clock_setup(void)
+{
+	int timeout;
+	int rv;
+
+	/*
+	 * This clock configuration is valid only for MII
+	 */
+	LPC18XX_CGU->phy_rx_clk =
+		LPC18XX_CGU_CLKSEL_ENET_RX | LPC18XX_CGU_AUTOBLOCK_MSK;
+	LPC18XX_CGU->phy_tx_clk =
+		LPC18XX_CGU_CLKSEL_ENET_TX | LPC18XX_CGU_AUTOBLOCK_MSK;
+
+	/*
+	 * Choose the MII Ethernet mode
+	 */
+	LPC18XX_CREG->creg6 =
+		(LPC18XX_CREG->creg6 & ~LPC18XX_CREG_CREG6_ETHMODE_MSK) |
+		LPC18XX_CREG_CREG6_ETHMODE_MII;
+
+	/*
+	 * Reset the Ethernet module of the MCU
+	 */
+	LPC18XX_RGU->ctrl0 = LPC18XX_RGU_CTRL0_ETHERNET;
+
+	/*
+	 * Wait for the Ethernet module to exit the reset state
+	 */
+	timeout = 10;
+	rv = -ETIMEDOUT;
+	while (timeout-- > 0) {
+		if (!(LPC18XX_RGU->active_status0 &
+		    LPC18XX_RGU_CTRL0_ETHERNET)) {
+			udelay(1000);
+		} else {
+			timeout = 0;
+			rv = 0;
+		}
+	}
+
+	if (rv < 0) {
+		printf("%s: Reset of the Ethernet module timed out.\n",
+			__func__);
+	}
+}
+
+/*
  * Initialize the reference clocks.
  */
 void clock_init(void)
@@ -310,6 +400,11 @@ void clock_init(void)
 	 * Set-up clocks
 	 */
 	clock_setup();
+
+	/*
+	 * Set-up Ethernet clocks
+	 */
+	eth_clock_setup();
 
 	/*
 	 * Set SysTick timer rate to the CPU core clock

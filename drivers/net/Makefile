@@ -78,6 +78,7 @@ COBJS-$(CONFIG_XILINX_EMACLITE) += xilinx_emaclite.o
 COBJS-$(CONFIG_CORE10100) += core10100.o
 COBJS-$(CONFIG_STM32_ETH) += stm32_eth.o
 COBJS-$(CONFIG_LPC178X_ETH) += lpc178x_eth.o
+COBJS-$(CONFIG_LPC18XX_ETH) += lpc18xx_eth.o
 
 COBJS	:= $(COBJS-y)
 SRCS	:= $(COBJS:.o=.c)
