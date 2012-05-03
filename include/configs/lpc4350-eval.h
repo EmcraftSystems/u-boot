@@ -79,8 +79,7 @@
 #define CONFIG_LPC18XX_EXTOSC_RATE		12000000
 
 /*
- * PLL1 Multiplier value (1..32).
- * The PLL1 source clock is the external crystal oscillator.
+ * PLL1 multiplier value (1..256)
  */
 #define CONFIG_LPC18XX_PLL1_M		17	/* 12 MHz * 17 = 204 MHz */
 

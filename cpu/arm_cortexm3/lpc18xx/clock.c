@@ -20,6 +20,7 @@
  */
 
 #include <common.h>
+#include <asm/errno.h>
 
 #include "clock.h"
 
@@ -207,7 +208,7 @@ static void clock_setup(void)
 	/*
 	 * Wait for the external oscillator to stabilize
 	 */
-	cycle_delay(5000);
+	cycle_delay(1000000);
 
 	/*
 	 * Switch the M4 core clock to the 12MHz external oscillator
@@ -216,44 +217,80 @@ static void clock_setup(void)
 		(LPC18XX_CGU->m4_clk & ~LPC18XX_CGU_CLKSEL_MSK) |
 		LPC18XX_CGU_CLKSEL_XTAL | LPC18XX_CGU_AUTOBLOCK_MSK;
 
+	LPC18XX_CGU->pll1_ctrl =
+		(LPC18XX_CGU->pll1_ctrl & ~LPC18XX_CGU_CLKSEL_MSK) |
+		LPC18XX_CGU_CLKSEL_XTAL | LPC18XX_CGU_AUTOBLOCK_MSK;
+
 	/*
-	 * Reset PLL1 configuration
+	 * Configure PLL1 for a 108MHz output, because we cannot set
+	 * the maximum frequency right away.
 	 */
 	LPC18XX_CGU->pll1_ctrl =
 		(LPC18XX_CGU->pll1_ctrl &
-			~LPC18XX_CGU_CLKSEL_MSK &
-			~LPC18XX_CGU_PLL1CTRL_PSEL_MSK &
-			~LPC18XX_CGU_PLL1CTRL_NSEL_MSK &
-			~LPC18XX_CGU_PLL1CTRL_MSEL_MSK &
-			~LPC18XX_CGU_PLL1CTRL_BYPASS_MSK) |
-		LPC18XX_CGU_CLKSEL_XTAL;
-
-	/*
-	 * Intermediate PLL1 configuration, do not reach the desired output rate
-	 * at this point.
-	 */
-	LPC18XX_CGU->pll1_ctrl |=
-		LPC18XX_CGU_PLL1CTRL_FBSEL_MSK |
+		~(LPC18XX_CGU_PLL1CTRL_FBSEL_MSK |
+		LPC18XX_CGU_PLL1CTRL_BYPASS_MSK |
 		LPC18XX_CGU_PLL1CTRL_DIRECT_MSK |
-		(0 << LPC18XX_CGU_PLL1CTRL_NSEL_BITS) |
+		LPC18XX_CGU_PLL1CTRL_PSEL_MSK |
+		LPC18XX_CGU_PLL1CTRL_NSEL_MSK |
+		LPC18XX_CGU_PLL1CTRL_MSEL_MSK)) |
 		((LPC18XX_PLL1_M_INTERMEDIATE - 1) <<
-			LPC18XX_CGU_PLL1CTRL_MSEL_BITS);
+			LPC18XX_CGU_PLL1CTRL_MSEL_BITS) |
+		(0 << LPC18XX_CGU_PLL1CTRL_NSEL_BITS) |
+		(1 << LPC18XX_CGU_PLL1CTRL_PSEL_BITS) |
+		LPC18XX_CGU_PLL1CTRL_DIRECT_MSK |
+		LPC18XX_CGU_PLL1CTRL_FBSEL_MSK;
 
 	/*
-	 * Enable PLL1 if it was disabled
+	 * Make sure the PLL1 is enabled
 	 */
 	LPC18XX_CGU->pll1_ctrl &= ~LPC18XX_CGU_PLL1CTRL_PD_MSK;
 
 	/*
-	 * Wait for the PLL1 lock detector
+	 * Wait for PLL1 to acquire lock
 	 */
 	while (!(LPC18XX_CGU->pll1_stat & LPC18XX_CGU_PLL1STAT_LOCK));
 
 	/*
-	 * Use PLL1 as clock source for BASE_M4_CL and BASE_UARTx_CLK
+	 * Switch the MCU M4 core to PLL1
 	 */
-	LPC18XX_CGU->m4_clk    = LPC18XX_CGU_CLKSEL_PLL1 |
-		LPC18XX_CGU_AUTOBLOCK_MSK;
+	LPC18XX_CGU->m4_clk =
+		(LPC18XX_CGU->m4_clk & ~LPC18XX_CGU_CLKSEL_MSK) |
+		LPC18XX_CGU_CLKSEL_PLL1 | LPC18XX_CGU_AUTOBLOCK_MSK;
+
+	/* Wait 1ms */
+	cycle_delay(60000);
+
+	/*
+	 * Clear the PLL1 control register before switching to the maximum
+	 * output frequency. The MCU hangs otherwise.
+	 */
+	LPC18XX_CGU->pll1_ctrl &=
+		~(LPC18XX_CGU_PLL1CTRL_FBSEL_MSK |
+		LPC18XX_CGU_PLL1CTRL_BYPASS_MSK |
+		LPC18XX_CGU_PLL1CTRL_DIRECT_MSK |
+		LPC18XX_CGU_PLL1CTRL_PSEL_MSK |
+		LPC18XX_CGU_PLL1CTRL_NSEL_MSK |
+		LPC18XX_CGU_PLL1CTRL_MSEL_MSK);
+
+	/*
+	 * Configure PLL1 for the requested output frequency
+	 */
+	LPC18XX_CGU->pll1_ctrl |=
+		((CONFIG_LPC18XX_PLL1_M - 1) <<
+			LPC18XX_CGU_PLL1CTRL_MSEL_BITS) |
+		(0 << LPC18XX_CGU_PLL1CTRL_NSEL_BITS) |
+		(0 << LPC18XX_CGU_PLL1CTRL_PSEL_BITS) |
+		LPC18XX_CGU_PLL1CTRL_DIRECT_MSK |
+		LPC18XX_CGU_PLL1CTRL_FBSEL_MSK;
+
+	/*
+	 * Wait for PLL1 to stabilize
+	 */
+	cycle_delay(1000000);
+
+	/*
+	 * Set-up clocks for UARTs
+	 */
 	LPC18XX_CGU->uart0_clk = LPC18XX_CGU_CLKSEL_PLL1 |
 		LPC18XX_CGU_AUTOBLOCK_MSK;
 	LPC18XX_CGU->uart1_clk = LPC18XX_CGU_CLKSEL_PLL1 |
@@ -262,14 +299,6 @@ static void clock_setup(void)
 		LPC18XX_CGU_AUTOBLOCK_MSK;
 	LPC18XX_CGU->uart3_clk = LPC18XX_CGU_CLKSEL_PLL1 |
 		LPC18XX_CGU_AUTOBLOCK_MSK;
-
-	/*
-	 * Raise PLL1 multiplier to the requested value
-	 */
-	LPC18XX_CGU->pll1_ctrl =
-		(LPC18XX_CGU->pll1_ctrl & ~LPC18XX_CGU_PLL1CTRL_MSEL_MSK) |
-		((CONFIG_LPC18XX_PLL1_M - 1) <<
-			LPC18XX_CGU_PLL1CTRL_MSEL_BITS);
 }
 
 /*
@@ -277,6 +306,9 @@ static void clock_setup(void)
  */
 void clock_init(void)
 {
+	/*
+	 * Set-up clocks
+	 */
 	clock_setup();
 
 	/*
