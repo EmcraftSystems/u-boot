@@ -141,13 +141,46 @@
 #define CONFIG_LPC18XX_EMC_HALFCPU
 
 /*
+ * Configuration of the external Flash memory
+ */
+/* Define this to enable NOR Flash support */
+#define CONFIG_SYS_FLASH_CS		0
+
+#if defined(CONFIG_SYS_FLASH_CS)
+#define CONFIG_SYS_FLASH_CFG		0x81 /* 16 bit, Byte Lane enabled */
+#define CONFIG_SYS_FLASH_WE		(1 - 1)		/* Minimum is enough */
+#define CONFIG_SYS_FLASH_OE		0		/* Minimum is enough */
+#define CONFIG_SYS_FLASH_RD		(15 - 1)	/* 70ns at 204MHz */
+#define CONFIG_SYS_FLASH_PAGE		(15 - 1)	/* 70ns at 204MHz */
+#define CONFIG_SYS_FLASH_WR		0x1f		/* Maximum */
+#define CONFIG_SYS_FLASH_TA		0x0f		/* Maximum */
+
+#define CONFIG_SYS_FLASH_BANK1_BASE	0x1C000000 /* CS0 */
+
+#define CONFIG_SYS_FLASH_CFI		1
+#define CONFIG_FLASH_CFI_DRIVER		1
+#define CONFIG_FLASH_CFI_LEGACY		1
+#define CONFIG_SYS_FLASH_LEGACY_2Mx16	1
+#define CONFIG_SYS_FLASH_CFI_WIDTH	FLASH_CFI_16BIT
+#define CONFIG_SYS_FLASH_BANKS_LIST	{ CONFIG_SYS_FLASH_BANK1_BASE }
+#define CONFIG_SYS_MAX_FLASH_BANKS	1
+#define CONFIG_SYS_MAX_FLASH_SECT	1024
+
+/*
+ * Store env in flash.
+ */
+#define CONFIG_ENV_IS_IN_FLASH
+#else
+/*
  * Store env in memory only, if no flash.
  */
 #define CONFIG_ENV_IS_NOWHERE
 #define CONFIG_SYS_NO_FLASH
+#endif
 
 #define CONFIG_ENV_SIZE			(4 * 1024)
-#define CONFIG_ENV_ADDR			CONFIG_SYS_FLASH_BANK1_BASE
+#define CONFIG_ENV_ADDR \
+	(CONFIG_SYS_FLASH_BANK1_BASE + 128 * 1024)
 #define CONFIG_INFERNO			1
 #define CONFIG_ENV_OVERWRITE		1
 
@@ -288,7 +321,7 @@
 #define CONFIG_EXTRA_ENV_SETTINGS				\
 	"loadaddr=0x28000000\0"					\
 	"addip=setenv bootargs ${bootargs} ip=${ipaddr}:${serverip}:${gatewayip}:${netmask}:${hostname}:eth0:off\0"				\
-	"flashaddr=1C020000\0"					\
+	"flashaddr=1C040000\0"					\
 	"flashboot=run addip;bootm ${flashaddr}\0"		\
 	"ethaddr=C0:B1:3C:88:88:90\0"				\
 	"ipaddr=172.17.4.215\0"					\

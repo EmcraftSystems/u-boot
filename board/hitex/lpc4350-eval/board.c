@@ -404,6 +404,36 @@ static const struct lpc18xx_pin_config hitex_lpc4350_iomux[] = {
 	/* P2.9 = A0 - SDRAM */
 	{{0x2, 9}, LPC18XX_IOMUX_EMC_CONFIG(3)},
 #endif /* CONFIG_NR_DRAM_BANKS */
+
+#if defined(CONFIG_SYS_FLASH_CS)
+	/*
+	 * Configuration for EMC pins used only for NOR flash
+	 */
+	/* P1.3 = OE# - NOR */
+	{{0x1, 3}, LPC18XX_IOMUX_EMC_CONFIG(3)},
+	/* P1.4 = BLS0# - NOR */
+	{{0x1, 4}, LPC18XX_IOMUX_EMC_CONFIG(3)},
+	/* P6.6 = BLS1# - NOR */
+	{{0x6, 6}, LPC18XX_IOMUX_EMC_CONFIG(1)},
+	/* P1.5 = CS0# - NOR */
+	{{0x1, 5}, LPC18XX_IOMUX_EMC_CONFIG(3)},
+	/* P2.1 = A12 - NOR */
+	{{0x2, 1}, LPC18XX_IOMUX_EMC_CONFIG(2)},
+	/* P6.7 = A15 - NOR */
+	{{0x6, 7}, LPC18XX_IOMUX_EMC_CONFIG(1)},
+	/* PD.15 = A17 - NOR */
+	{{0xD, 15}, LPC18XX_IOMUX_EMC_CONFIG(2)},
+	/* PD.16 = A16 - NOR */
+	{{0xD, 16}, LPC18XX_IOMUX_EMC_CONFIG(2)},
+	/* PE.0 = A18 - NOR */
+	{{0xE, 0}, LPC18XX_IOMUX_EMC_CONFIG(3)},
+	/* PE.1 = A19 - NOR */
+	{{0xE, 1}, LPC18XX_IOMUX_EMC_CONFIG(3)},
+	/* PE.2 = A20 - NOR */
+	{{0xE, 2}, LPC18XX_IOMUX_EMC_CONFIG(3)},
+	/* PE.3 = A21 - NOR */
+	{{0xE, 3}, LPC18XX_IOMUX_EMC_CONFIG(3)},
+#endif /* CONFIG_SYS_FLASH_CS */
 };
 
 /*
@@ -423,6 +453,8 @@ static void iomux_init(void)
  */
 int board_init(void)
 {
+	volatile struct lpc_emc_st_regs *st;
+
 	/*
 	 * Set SDRAM clock output delay to ~3.5ns (0x7777),
 	 * the SDRAM chip does not work otherwise.
@@ -442,6 +474,17 @@ int board_init(void)
 	 */
 	iomux_init();
 
+#ifdef CONFIG_SYS_FLASH_CS
+	/* Set timing for flash */
+	st = &LPC_EMC->st[CONFIG_SYS_FLASH_CS];
+	st->cfg = CONFIG_SYS_FLASH_CFG;
+	st->we = CONFIG_SYS_FLASH_WE;
+	st->oe = CONFIG_SYS_FLASH_OE;
+	st->rd = CONFIG_SYS_FLASH_RD;
+	st->page  = CONFIG_SYS_FLASH_PAGE;
+	st->wr = CONFIG_SYS_FLASH_WR;
+	st->ta = CONFIG_SYS_FLASH_TA;
+#endif
 	return 0;
 }
 
@@ -577,5 +620,18 @@ int dram_init(void)
 int board_eth_init(bd_t *bis)
 {
 	return lpc18xx_eth_driver_init(bis);
+}
+#endif
+
+#ifdef CONFIG_FLASH_CFI_LEGACY
+ulong board_flash_get_legacy (ulong base, int banknum, flash_info_t *info)
+{
+	if (banknum == 0) {	/* non-CFI flash */
+		info->portwidth = FLASH_CFI_16BIT;
+		info->chipwidth = FLASH_CFI_BY16;
+		info->interface = FLASH_CFI_X16;
+		return 1;
+	} else
+		return 0;
 }
 #endif
