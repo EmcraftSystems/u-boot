@@ -87,7 +87,11 @@ static inline int lpc18xx_validate_pin(const struct lpc18xx_iomux_dsc *dsc)
  * Configure the specified MCU pin.
  * Returns 0 on success, -EINVAL otherwise.
  */
-int lpc18xx_pin_config(const struct lpc18xx_iomux_dsc *dsc, u32 regval)
+int
+#ifdef CONFIG_LPC18XX_NORFLASH_BOOTSTRAP_WORKAROUND
+	__attribute__((section(".lpc18xx_image_top_text")))
+#endif
+	lpc18xx_pin_config(const struct lpc18xx_iomux_dsc *dsc, u32 regval)
 {
 	int rv;
 
@@ -102,8 +106,12 @@ int lpc18xx_pin_config(const struct lpc18xx_iomux_dsc *dsc, u32 regval)
  * Configure a set of MCU pins using the given configuration table.
  * Returns 0 on success.
  */
-int lpc18xx_pin_config_table(
-	const struct lpc18xx_pin_config *table, unsigned int len)
+int
+#ifdef CONFIG_LPC18XX_NORFLASH_BOOTSTRAP_WORKAROUND
+	__attribute__((section(".lpc18xx_image_top_text")))
+#endif
+	lpc18xx_pin_config_table(
+		const struct lpc18xx_pin_config *table, unsigned int len)
 {
 	unsigned int i;
 	int rv;

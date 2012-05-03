@@ -239,12 +239,6 @@ struct lpc_emc_regs {
 DECLARE_GLOBAL_DATA_PTR;
 
 /*
- * Pin settings for EMC pins
- */
-#define LPC18XX_IOMUX_EMC_CONFIG(func) \
-	(LPC18XX_IOMUX_CONFIG(func, 0, 1, 1, 1, 1))
-
-/*
  * Pin configuration table for Hitex LPC4350 Eval.
  *
  * This table does not list all MCU pins that will be configured. See also
@@ -447,6 +441,208 @@ static void iomux_init(void)
 	lpc18xx_pin_config_table(
 		hitex_lpc4350_iomux, ARRAY_SIZE(hitex_lpc4350_iomux));
 }
+
+#ifdef CONFIG_LPC18XX_NORFLASH_BOOTSTRAP_WORKAROUND
+
+extern char _mem_nvm_base;
+extern char _mem_nvm_size;
+
+/*
+ * OTP (One-Time Programmable) memory area map
+ */
+struct lpc18xx_otp_area {
+	u32 part_id;		/* Part ID */
+	u32 rsv0;
+	u32 uniq_id;		/* Unique ID */
+	u32 rsv1;
+	u32 key0[4];		/* AES key 0 */
+	u32 key1[4];		/* AES key 1 */
+	u32 ctrl;		/* Customer control data */
+	u32 usb_id;		/* USB ID */
+	u32 user1;		/* General purpose OTP memory */
+	u32 user2;		/* General purpose OTP memory */
+};
+
+/*
+ * OTP memory base
+ */
+#define LPC18XX_OTP_BASE		0x40045000
+#define LPC18XX_OTP			((volatile struct lpc18xx_otp_area *) \
+					LPC18XX_OTP_BASE)
+
+/*
+ * Customer control data
+ */
+/* Boot source selection in OTP */
+#define LPC18XX_OTP_CTRL_BOOTSRC_BITS	25
+#define LPC18XX_OTP_CTRL_BOOTSRC_MSK	(0xF << LPC18XX_OTP_CTRL_BOOTSRC_BITS)
+
+/*
+ * GPIO (GPIO ports) register map
+ */
+struct lpc18xx_gpio_regs {
+	u8 pbyte[256];		/* GPIO port byte pin registers */
+	u32 rsv0[960];
+	u32 pword[256];		/* GPIO port word pin registers */
+	u32 rsv1[768];
+	u32 dir[8];		/* GPIO port direction registers */
+	u32 rsv2[24];
+	u32 mask[8];		/* GPIO port mask registers */
+	u32 rsv3[24];
+	u32 pin[8];		/* GPIO port pin registers */
+	u32 rsv4[24];
+	u32 mpin[8];		/* GPIO masked port pin registers */
+	u32 rsv5[24];
+	u32 set[8];		/* GPIO port set registers */
+	u32 rsv6[24];
+	u32 clr[8];		/* GPIO port clear registers */
+	u32 rsv7[24];
+	u32 not[8];		/* GPIO port toggle registers */
+};
+
+/*
+ * GPIO registers base
+ */
+#define LPC18XX_GPIO_BASE		0x400F4000
+#define LPC18XX_GPIO			((volatile struct lpc18xx_gpio_regs *) \
+					LPC18XX_GPIO_BASE)
+#define LPC18XX_GPIO_B(port,pin)	(LPC18XX_GPIO->pbyte[32*(port) + (pin)])
+
+/*
+ * Configuration of boot pins as GPIO inputs
+ */
+static const struct lpc18xx_pin_config
+	__attribute__((section(".lpc18xx_image_top_data")))
+	hitex_lpc4350_iomux_boot_pins[] = {
+	/* P1.1 = GPIO0[8] - BOOT1 */
+	{{0x1, 1}, LPC18XX_IOMUX_GPIO_IN(0)},
+	/* P1.2 = GPIO0[9] - BOOT2 */
+	{{0x1, 2}, LPC18XX_IOMUX_GPIO_IN(0)},
+	/* P2.8 = GPIO5[7] - BOOT3 */
+	{{0x2, 8}, LPC18XX_IOMUX_GPIO_IN(4)},
+	/* P2.9 = GPIO1[10] - BOOT4 */
+	{{0x2, 9}, LPC18XX_IOMUX_GPIO_IN(0)},
+};
+
+/*
+ * List of values returned by lpc18xx_get_boot_source()
+ */
+#define LPC18XX_BOOTSRC_USART0		0
+#define LPC18XX_BOOTSRC_SPIFI		1
+#define LPC18XX_BOOTSRC_EMC_8BIT	2
+#define LPC18XX_BOOTSRC_EMC_16BIT	3
+#define LPC18XX_BOOTSRC_EMC_32BIT	4
+#define LPC18XX_BOOTSRC_USB0		5
+#define LPC18XX_BOOTSRC_USB1		6
+#define LPC18XX_BOOTSRC_SPI		7
+#define LPC18XX_BOOTSRC_USART3		8
+
+/*
+ * Return identifier of the boot source used (from OTP or status of boot pins)
+ */
+static int __attribute__((section(".lpc18xx_image_top_text")))
+	lpc18xx_get_boot_source(void)
+{
+	int rv;
+
+	/*
+	 * Try to find boot source selector in OTP
+	 */
+	rv = (LPC18XX_OTP->ctrl & LPC18XX_OTP_CTRL_BOOTSRC_MSK) >>
+		LPC18XX_OTP_CTRL_BOOTSRC_BITS;
+	if (rv > 0) {
+		rv--;
+		goto out;
+	}
+
+	/*
+	 * Check status of boot pins
+	 *
+	 * The pins need to be configured for GPIOs before reading their
+	 * statuses. The directions of GPIOs are set to inputs by default, no
+	 * need to reconfigure directions therefore.
+	 */
+	lpc18xx_pin_config_table(
+		hitex_lpc4350_iomux_boot_pins,
+		ARRAY_SIZE(hitex_lpc4350_iomux_boot_pins));
+	rv = (LPC18XX_GPIO_B(0, 8) << 0) |
+	     (LPC18XX_GPIO_B(0, 9) << 1) |
+	     (LPC18XX_GPIO_B(5, 7) << 2) |
+	     (LPC18XX_GPIO_B(1, 10) << 3);
+
+out:
+	return rv;
+}
+
+/*
+ * Configure enough pins to access the first 128KBytes of the 16-bit NOR flash
+ */
+static const struct lpc18xx_pin_config
+	__attribute__((section(".lpc18xx_image_top_data")))
+	hitex_lpc4350_iomux_boot_norflash[] = {
+	/*
+	 * Reconfigure the boot pins, because we turned them into GPIO inputs
+	 */
+	/* P1.1 = A6 - SDRAM,NOR */
+	{{0x1, 1}, LPC18XX_IOMUX_EMC_CONFIG(2)},
+	/* P1.2 = A7 - SDRAM,NOR */
+	{{0x1, 2}, LPC18XX_IOMUX_EMC_CONFIG(2)},
+	/* P2.8 = A8 - SDRAM,NOR */
+	{{0x2, 8}, LPC18XX_IOMUX_EMC_CONFIG(3)},
+	/* P2.9 = A0 - SDRAM */
+	{{0x2, 9}, LPC18XX_IOMUX_EMC_CONFIG(3)},
+
+	/*
+	 * Configure the EMC pins required to access the first 128KBytes
+	 * of NOR flash. The Boot ROM of LPC4350 forgets to configure these
+	 * pins.
+	 */
+	/* P6.8 = A14 */
+	{{0x6, 8}, LPC18XX_IOMUX_EMC_CONFIG(1)},
+	/* P6.7 = A15 */
+	{{0x6, 7}, LPC18XX_IOMUX_EMC_CONFIG(1)},
+	/* PD.16 = A16 */
+	{{0xD, 16}, LPC18XX_IOMUX_EMC_CONFIG(2)},
+};
+
+static void __attribute__((section(".lpc18xx_image_top_text")))
+	norflash_bootstrap_iomux_init(void)
+{
+	lpc18xx_pin_config_table(
+		hitex_lpc4350_iomux_boot_norflash,
+		ARRAY_SIZE(hitex_lpc4350_iomux_boot_norflash));
+}
+
+/*
+ * This function will be called very early on U-Boot initialization to reload
+ * the whole U-Boot image from NOR flash if we use bootloading from NOR flash.
+ */
+void __attribute__((section(".lpc18xx_image_top_text")))
+	lpc18xx_bootstrap_from_norflash(void)
+{
+	char *src, *dest, *src_end;
+
+	/*
+	 * Check if we boot from NOR flash
+	 */
+	if (lpc18xx_get_boot_source() == LPC18XX_BOOTSRC_EMC_16BIT) {
+		/*
+		 * Configure remaining pins required for NOR flash
+		 */
+		norflash_bootstrap_iomux_init();
+
+		/*
+		 * Copy U-Boot image from NOR flash to internal SRAM
+		 */
+		dest = &_mem_nvm_base;
+		src = (void *)(CONFIG_SYS_FLASH_BANK1_BASE +
+			CONFIG_LPC18XX_NORFLASH_IMAGE_OFFSET);
+		src_end = src + (u32)&_mem_nvm_size;
+		for (; src < src_end; src++, dest++)
+			*dest = *src;
+	}
+}
+#endif /* CONFIG_LPC18XX_NORFLASH_BOOTSTRAP_WORKAROUND */
 
 /*
  * Early hardware init.

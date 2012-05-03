@@ -53,6 +53,16 @@ SECTIONS
 		KEEP(*(.kinetis_flash_conf))
 	} >NVM
 
+	/*
+	 * Store contents of these two sections in the beginning of the U-Boot
+	 * image to ensure they are loaded by the Boot ROM of the LPC4350 MCU.
+	 */
+	.lpc18xx_image_top :
+	{
+		*(.lpc18xx_image_top_text)
+		*(.lpc18xx_image_top_data)
+	} >NVM
+
 	.text :
 	{
 		*(.text)

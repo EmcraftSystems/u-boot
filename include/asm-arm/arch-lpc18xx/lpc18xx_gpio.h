@@ -22,6 +22,8 @@
 #ifndef _LPC18XX_IOMUX_H_
 #define _LPC18XX_IOMUX_H_
 
+#include <asm/types.h>
+
 /*
  * Bits and bit groups inside the SCU_SFS registers
  */
@@ -56,6 +58,17 @@
 /*
  * TBD: similar macros for other pin types
  */
+
+/*
+ * Pin settings for EMC pins
+ */
+#define LPC18XX_IOMUX_EMC_CONFIG(func) \
+	(LPC18XX_IOMUX_CONFIG(func, 0, 1, 1, 1, 1))
+/*
+ * Pin settings for GPIO input pins
+ */
+#define LPC18XX_IOMUX_GPIO_IN(func) \
+	(LPC18XX_IOMUX_CONFIG(func, 0, 1, 0, 1, 0))
 
 /*
  * IOMUX pin descriptor

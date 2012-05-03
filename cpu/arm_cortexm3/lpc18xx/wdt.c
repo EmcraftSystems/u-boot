@@ -38,7 +38,11 @@ void wdt_strobe(void)
 /*
  * Disable the WDT.
  */
-void wdt_disable(void)
+void
+#ifdef CONFIG_LPC18XX_NORFLASH_BOOTSTRAP_WORKAROUND
+	__attribute__((section(".lpc18xx_image_top_text")))
+#endif
+	wdt_disable(void)
 {
 	/*
 	 * TBD
@@ -50,7 +54,11 @@ void wdt_disable(void)
 /*
  * Enable the WDT.
  */
-void wdt_enable(void)
+void
+#ifdef CONFIG_LPC18XX_NORFLASH_BOOTSTRAP_WORKAROUND
+	__attribute__((section(".lpc18xx_image_top_text")))
+#endif
+	wdt_enable(void)
 {
 	/*
 	 * TBD

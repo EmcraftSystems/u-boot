@@ -17,8 +17,13 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston,
  * MA 02111-1307 USA
  */
+#include <config.h>
 #include <string.h>
 #include "wdt.h"
+
+#ifdef CONFIG_LPC18XX_NORFLASH_BOOTSTRAP_WORKAROUND
+#include <asm/arch/lpc18xx_gpio.h>
+#endif
 
  /*
  * FIXME: move to the appropriate header
@@ -45,6 +50,10 @@ void _start(void);
 void default_isr(void);
 
 extern void start_armboot(void);
+
+#ifdef CONFIG_LPC18XX_NORFLASH_BOOTSTRAP_WORKAROUND
+extern void lpc18xx_norflash_bootstrap_iomux_init(void);
+#endif
 
 /*
  * Control IRQs
@@ -81,10 +90,23 @@ unsigned int vectors[] __attribute__((section(".vectors"))) = {
 	[2 ... 165]	= (unsigned int)&default_isr
 };
 
+#ifdef CONFIG_LPC18XX_NORFLASH_BOOTSTRAP_WORKAROUND
+/*
+ * This function will be called very early on U-Boot initialization to reload
+ * the whole U-Boot image from NOR flash if we use bootloading from NOR flash.
+ */
+void __attribute__((section(".lpc18xx_image_top_text")))
+	lpc18xx_bootstrap_from_norflash(void);
+#endif /* CONFIG_LPC18XX_NORFLASH_BOOTSTRAP_WORKAROUND */
+
  /*
   * Reset entry point
   */
-void _start(void)
+void
+#ifdef CONFIG_LPC18XX_NORFLASH_BOOTSTRAP_WORKAROUND
+	__attribute__((section(".lpc18xx_image_top_text")))
+#endif
+	_start(void)
 {
 	/*
 	 * Depending on the config parameter, enable or disable the WDT.
@@ -99,6 +121,15 @@ void _start(void)
 	 * Make sure interrupts are disabled.
 	 */
 	__disable_irq();
+
+#ifdef CONFIG_LPC18XX_NORFLASH_BOOTSTRAP_WORKAROUND
+	/*
+	 * Reload the whole U-Boot image from NOR flash.
+	 * The Boot ROM on LPC4350 parts cannot load more than 32KBytes
+	 * from NOR flash when booting.
+	 */
+	lpc18xx_bootstrap_from_norflash();
+#endif /* CONFIG_LPC18XX_NORFLASH_BOOTSTRAP_WORKAROUND */
 
 	/*
 	 * Copy data and initialize BSS
@@ -133,7 +164,12 @@ void _start(void)
 /*
  * Default exception handler
  */
-void __attribute__((naked, noreturn)) default_isr(void);
+void __attribute__((naked, noreturn))
+#ifdef CONFIG_LPC18XX_NORFLASH_BOOTSTRAP_WORKAROUND
+	__attribute__((section(".lpc18xx_image_top_text")))
+#endif
+	default_isr(void);
+
 void default_isr(void)
 {
 	/*
