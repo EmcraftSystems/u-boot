@@ -43,6 +43,12 @@
 #define CONFIG_SYS_LPC18XX
 
 /*
+ * Add header to the U-Boot image to pass necessary information
+ * to the Boot ROM bootloader.
+ */
+#define CONFIG_LPC18XX_BOOTHEADER
+
+/*
  * Enable GPIO driver
  */
 #define CONFIG_LPC18XX_GPIO

@@ -313,6 +313,10 @@ ifeq ($(CONFIG_LPC178X_FCG),y)
 		$(obj)tools/lpc178x_fcg $(obj)u-boot.bin $(obj)u-boot-lpc.bin
 		mv $(obj)u-boot-lpc.bin $(obj)u-boot.bin
 endif
+ifeq ($(CONFIG_LPC18XX_BOOTHEADER),y)
+		$(obj)tools/lpc18xx_bootheader $(obj)u-boot.bin $(obj)u-boot-bootheader.bin
+		mv $(obj)u-boot-bootheader.bin $(obj)u-boot.bin
+endif
 
 $(obj)u-boot.upgrade:	$(obj)u-boot.bin
 		split -b 32768 -a 1 -d u-boot.bin u-boot.bin-
@@ -3798,7 +3802,8 @@ clean:
 	       $(obj)tools/gen_eth_addr    $(obj)tools/img2srec		  \
 	       $(obj)tools/mkimage	   $(obj)tools/mpc86x_clk	  \
 	       $(obj)tools/ncb		   $(obj)tools/ubsha1		  \
-	       $(obj)tools/lpc178x_fcg
+	       $(obj)tools/lpc178x_fcg					  \
+	       $(obj)tools/lpc18xx_bootheader
 	@rm -f $(obj)board/cray/L1/{bootscript.c,bootscript.image}	  \
 	       $(obj)board/netstar/{eeprom,crcek,crcit,*.srec,*.bin}	  \
 	       $(obj)board/trab/trab_fkt   $(obj)board/voiceblue/eeprom   \
