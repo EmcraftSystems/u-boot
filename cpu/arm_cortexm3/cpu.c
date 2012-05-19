@@ -131,6 +131,12 @@ void
 	lpc178x_pre_reset_cpu();
 #endif
 
+#ifdef CONFIG_SYS_LPC18XX
+	/*
+	 * Use watchdog reset on LPC18xx/43xx
+	 */
+	lpc18xx_reset_cpu();
+#else
 	/*
 	 * Perform reset but keep priority group unchanged.
 	 */
@@ -138,7 +144,7 @@ void
 			  (CM3_SCB_REGS->aircr &
 			  (CM3_AIRCR_PRIGROUP_MSK << CM3_AIRCR_PRIGROUP_SHIFT))
 			  | CM3_AIRCR_SYSRESET;
-
+#endif
 }
 
 /*
