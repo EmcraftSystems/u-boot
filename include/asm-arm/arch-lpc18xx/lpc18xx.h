@@ -65,4 +65,9 @@ enum clock {
  */
 unsigned long clock_get(enum clock clck);
 
+/*
+ * Trigger watchdog reset on LPC18xx/43xx
+ */
+void lpc18xx_reset_cpu(void);
+
 #endif /* _MACH_LPC18XX_H_ */
