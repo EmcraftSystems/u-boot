@@ -113,7 +113,7 @@
  * Memory layout configuration
  */
 /*
- * No internal flash on the NXP LPC1850 MCU. Setting CONFIG_MEM_NVM_LEN to the
+ * No internal flash on the NXP LPC4350 MCU. Setting CONFIG_MEM_NVM_LEN to the
  * size of the contiguous region of internal SRAM at address 0x10000000.
  */
 #define CONFIG_MEM_NVM_BASE		0x00000000

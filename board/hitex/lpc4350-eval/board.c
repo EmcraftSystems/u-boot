@@ -48,7 +48,7 @@
 #define SDRAM_RDCFG_RD		1
 /* Precharge command period (tRP) */
 #define SDRAM_T_RP		2	/* 18ns */
-/* Active to precharge command perion (tRAS) */
+/* Active to precharge command period (tRAS) */
 #define SDRAM_T_RAS		5	/* 42ns */
 /* Self-refresh exit time (tSREX) */
 #define SDRAM_T_SREX		7	/* We set this to the same as tXSR */
@@ -58,7 +58,7 @@
 #define SDRAM_T_DAL		5	/* 5 cycles */
 /* Write recovery time (tWR) */
 #define SDRAM_T_WR		2	/* 2 cycles */
-/* Active to active command perion (tRC) */
+/* Active to active command period (tRC) */
 #define SDRAM_T_RC		7	/* 60ns */
 /* Auto-refresh period and auto-refresh to active command period (tRFC) */
 #define SDRAM_T_RFC		7	/* 60ns */
