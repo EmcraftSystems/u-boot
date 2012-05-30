@@ -270,7 +270,7 @@
  */
 #define CONFIG_BOOTDELAY		3
 #define CONFIG_ZERO_BOOTDELAY_CHECK
-#define CONFIG_HOSTNAME			a2f-lnx-evb
+#define CONFIG_HOSTNAME			a2f-som
 #if (CONFIG_SYS_SOM_VARIANT==0xA2F500)
 # define CONFIG_BOOTARGS		"a2f_platform=a2f500-som "\
 					"console=ttyS0,115200 panic=10"
