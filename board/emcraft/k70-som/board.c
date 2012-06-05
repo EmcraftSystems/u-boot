@@ -533,6 +533,12 @@ int misc_init_r(void)
 
 /*
  * Other SDRAM configuration options
+ *
+ * By setting the following values of timing parameters we expect to support
+ * both of the following LPDDR parts, either of them may be installed on a
+ * K70-SOM module:
+ *   MT46H32M16LFBF-5
+ *   MT46H32M16LFBF-6
  */
 #define KINETIS_DDR_INITAREF		2
 #define KINETIS_DDR_TINIT		50
@@ -540,13 +546,13 @@ int misc_init_r(void)
 #define KINETIS_DDR_WRLAT		1
 #define KINETIS_DDR_LATGATE	        6
 #define KINETIS_DDR_LATLIN		6
-#define KINETIS_DDR_TRASMIN	        5
-#define KINETIS_DDR_TRC			7
+#define KINETIS_DDR_TRASMIN	        6
+#define KINETIS_DDR_TRC			8
 #define KINETIS_DDR_TRRD		2
 #define KINETIS_DDR_TBINT		1
 #define KINETIS_DDR_TMRD		2
 #define KINETIS_DDR_TRTP		2
-#define KINETIS_DDR_TRP			2
+#define KINETIS_DDR_TRP			3
 #define KINETIS_DDR_TWTR		2
 #define KINETIS_DDR_TRASMAX		8400	/* 70 us */
 #define KINETIS_DDR_TMOD		0
@@ -554,7 +560,7 @@ int misc_init_r(void)
 #define KINETIS_DDR_CLKPW		1
 #define KINETIS_DDR_TDAL		4
 #define KINETIS_DDR_TWR			2
-#define KINETIS_DDR_TRASDI		2
+#define KINETIS_DDR_TRASDI		3
 #define KINETIS_DDR_TDLL		0
 #define KINETIS_DDR_TRPAB		2
 #define KINETIS_DDR_TCPD		24000
