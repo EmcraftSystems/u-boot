@@ -691,7 +691,7 @@ static void clock_setup(void)
 	/*
 	 * Set the OSC module to buffer a clock from EXTAL onto the OSC_CLK_OUT
 	 *
-	 * The OSCERCLK clock is used as the Ethernet RMII clock,
+	 * The OSC0ERCLK clock is used as the Ethernet RMII clock,
 	 * it must be 50 MHz.
 	 */
 	KINETIS_OSC->cr =
