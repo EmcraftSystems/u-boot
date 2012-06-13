@@ -280,10 +280,6 @@ NAND_SPL = nand_spl
 U_BOOT_NAND = $(obj)u-boot-nand.bin
 endif
 
-ifeq ($(CONFIG_LPC178X_FCG),y)
-U_BOOT_LPC178X_FCG = $(obj)u-boot-lpc.hex
-endif
-
 ifeq ($(CONFIG_ONENAND_U_BOOT),y)
 ONENAND_IPL = onenand_ipl
 U_BOOT_ONENAND = $(obj)u-boot-onenand.bin
@@ -301,8 +297,13 @@ ALL += $(obj)u-boot.srec $(obj)u-boot.bin $(obj)System.map $(U_BOOT_NAND) $(U_BO
 
 all:		$(ALL)
 
+ifeq ($(CONFIG_LPC178X_FCG),y)
+$(obj)u-boot.hex:	$(obj)u-boot.bin
+		$(OBJCOPY) ${OBJCFLAGS} -O ihex -I binary $< $@
+else
 $(obj)u-boot.hex:	$(obj)u-boot
 		$(OBJCOPY) ${OBJCFLAGS} -O ihex $< $@
+endif
 
 $(obj)u-boot.srec:	$(obj)u-boot
 		$(OBJCOPY) -O srec $< $@
