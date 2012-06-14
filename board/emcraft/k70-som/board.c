@@ -546,6 +546,8 @@ int misc_init_r(void)
  *   MT46H32M16LFBF-5
  *   MT46H32M16LFBF-6
  */
+#if defined(CONFIG_KINETIS_120MHZ)
+/* DDR clock rate is 120MHz */
 #define KINETIS_DDR_INITAREF		2
 #define KINETIS_DDR_TINIT		50
 #define KINETIS_DDR_TCCD		2
@@ -579,9 +581,58 @@ int misc_init_r(void)
 #define KINETIS_DDR_CKSRX		3
 #define KINETIS_DDR_CKSRE		3
 
-#define KINETIS_DDR_APREBIT		10
-#define KINETIS_DDR_COLSIZ		1
-#define KINETIS_DDR_ADDPINS		3
+#define KINETIS_DDR_CMDAGE		255
+#define KINETIS_DDR_AGECNT		255
+#define KINETIS_DDR_R2WSAME		2
+#define KINETIS_DDR_R2RSAME		3
+#define KINETIS_DDR_RDDTENBAS		1
+#define KINETIS_DDR_PHYRDLAT		6
+#define KINETIS_DDR_PYWRLTBS		1
+#define KINETIS_DDR_CTRLUPDMX		968
+#define KINETIS_DDR_PHYUPDTY1		968
+#define KINETIS_DDR_PHYUPDTY0		968
+#define KINETIS_DDR_PHYUPDTY3		968
+#define KINETIS_DDR_PHYUPDTY2		968
+#define KINETIS_DDR_WRLATADJ		2
+#define KINETIS_DDR_RDLATADJ		3
+#define KINETIS_DDR_PHYUPDRESP		968
+#define KINETIS_DDR_CLKENDLY		1
+#define KINETIS_DDR_CMDDLY		2
+
+#elif defined(CONFIG_KINETIS_150MHZ)
+/* DDR clock rate is 150MHz */
+#define KINETIS_DDR_INITAREF		2
+#define KINETIS_DDR_TINIT		50
+#define KINETIS_DDR_TCCD		2
+#define KINETIS_DDR_WRLAT		1
+#define KINETIS_DDR_LATGATE	        6
+#define KINETIS_DDR_LATLIN		6
+#define KINETIS_DDR_TRASMIN	        7
+#define KINETIS_DDR_TRC			10
+#define KINETIS_DDR_TRRD		2
+#define KINETIS_DDR_TBINT		1
+#define KINETIS_DDR_TMRD		2
+#define KINETIS_DDR_TRTP		2
+#define KINETIS_DDR_TRP			3
+#define KINETIS_DDR_TWTR		2
+#define KINETIS_DDR_TRASMAX		10500	/* 70 us */
+#define KINETIS_DDR_TMOD		0
+#define KINETIS_DDR_TCKESR		1
+#define KINETIS_DDR_CLKPW		1
+#define KINETIS_DDR_TDAL		6
+#define KINETIS_DDR_TWR			3
+#define KINETIS_DDR_TRASDI		3
+#define KINETIS_DDR_TDLL		0
+#define KINETIS_DDR_TRPAB		3
+#define KINETIS_DDR_TCPD		30000
+#define KINETIS_DDR_TFAW		0
+#define KINETIS_DDR_TREF		1170	/* 7.8 us */
+#define KINETIS_DDR_TRFC		15
+#define KINETIS_DDR_TXSR		19
+#define KINETIS_DDR_TPDEX		2
+#define KINETIS_DDR_TXSNR		19
+#define KINETIS_DDR_CKSRX		3
+#define KINETIS_DDR_CKSRE		3
 
 #define KINETIS_DDR_CMDAGE		255
 #define KINETIS_DDR_AGECNT		255
@@ -600,6 +651,15 @@ int misc_init_r(void)
 #define KINETIS_DDR_PHYUPDRESP		968
 #define KINETIS_DDR_CLKENDLY		1
 #define KINETIS_DDR_CMDDLY		2
+
+#endif /* 120MHz / 150MHz */
+
+/*
+ * Parameters that defined address mapping
+ */
+#define KINETIS_DDR_APREBIT		10
+#define KINETIS_DDR_COLSIZ		1
+#define KINETIS_DDR_ADDPINS		3
 
 /*
  * LPDDR memory chip configuration options

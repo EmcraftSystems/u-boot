@@ -43,9 +43,10 @@
 #define CONFIG_SYS_KINETIS
 
 /*
- * Choose Kinetis MCU family
+ * Choose Kinetis MCU family and maximum core frequency
  */
 #define CONFIG_KINETIS_K70
+#define CONFIG_KINETIS_120MHZ
 
 /*
  * Enable GPIO driver
@@ -122,12 +123,17 @@
  * constant should be as close to the 32..40 kHz range as possible.
  */
 #define KINETIS_MCG_FRDIV_POW	10
-/* Core/system clock divider: 120/1 = 120 MHz */
+/* Core/system clock divider: 120/1 = 120MHz or 150/1 = 150MHz */
 #define KINETIS_CCLK_DIV	1
-/* Peripheral clock divider: 120/2 = 60 MHz */
+/* Peripheral clock divider: 120/2 = 60MHz or 150/2 = 75MHz */
 #define KINETIS_PCLK_DIV	2
-/* FlexBus clock divider: 120/3 = 40 MHz */
+/* FlexBus clock divider: 120/3 = 40MHz or 150/3 = 50MHz */
 #define KINETIS_FLEXBUS_CLK_DIV	3
+
+#if defined(CONFIG_KINETIS_120MHZ)
+/*
+ * 120MHz MCU
+ */
 /* Flash clock divider: 120/5 = 24 MHz */
 #define KINETIS_FLASH_CLK_DIV	5
 /* NFC clock divider: PLL0/7 = 120/7 = 17.14 MHz */
@@ -150,6 +156,36 @@
 #define KINETIS_PLL1_PRDIV	5
 /* PLL1 multiplier: 10*24/2 = 120 MHz */
 #define KINETIS_PLL1_VDIV	24
+
+#elif defined(CONFIG_KINETIS_150MHZ)
+/*
+ * 150MHz MCU
+ */
+/* Flash clock divider: 150/6 = 25 MHz */
+#define KINETIS_FLASH_CLK_DIV	6
+/* NFC clock divider: PLL0/8 = 150/8 = 18.75 MHz */
+#define KINETIS_NFCCLK_DIV	8
+/* NFC clock fraction: do no multiply */
+#define KINETIS_NFCCLK_FRAC	1
+
+#ifdef KINETIS_HAS_LCD
+/* LCDC clock divider: PLL/5 = 150/5 = 30 MHz */
+#define KINETIS_LCDCCLK_DIV	5
+/* LCDC clock fraction: do no multiply */
+#define KINETIS_LCDCCLK_FRAC	1
+#endif /* KINETIS_HAS_LCD */
+
+/* PLL input divider: 50/5 = 10 MHz */
+#define KINETIS_PLL_PRDIV	5
+/* PLL multiplier: 10*30/2 = 150 MHz */
+#define KINETIS_PLL_VDIV	30
+/* PLL1 input divider: 50/5 = 10 MHz */
+#define KINETIS_PLL1_PRDIV	5
+/* PLL1 multiplier: 10*30/2 = 150 MHz */
+#define KINETIS_PLL1_VDIV	30
+
+#endif
+
 /* Use PLL1 for MCGOUT (required for synchronous mode of the DDR controller) */
 #define KINETIS_MCGOUT_PLL1
 /*

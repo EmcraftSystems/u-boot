@@ -99,6 +99,7 @@
 #endif
 
 #elif defined(CONFIG_KINETIS_K70_120MHZ)
+/* MCUs with maximum core rate 120MHz or 150MHz */
 #define KINETIS_PLL_PRDIV_MAX	8
 #define KINETIS_PLL_VDIV_MIN	16
 #define KINETIS_PLL_VDIV_MAX	47
@@ -108,11 +109,20 @@
 
 #define KINETIS_PLL_VCO_DIV	2	/* There is a /2 divider after VCO */
 
+#if defined(CONFIG_KINETIS_120MHZ)
+/* 120MHz */
 #define KINETIS_CPU_RATE_MAX		(120 * 1000 * 1000)	/* 120 MHz */
 #define KINETIS_PCLK_RATE_MAX		(60 * 1000 * 1000)	/* 60 MHz */
+#define KINETIS_DDR_RATE_MAX		(125 * 1000 * 1000)	/* 125 MHz */
+#elif defined(CONFIG_KINETIS_150MHZ)
+/* 150MHz */
+#define KINETIS_CPU_RATE_MAX		(150 * 1000 * 1000)	/* 150 MHz */
+#define KINETIS_PCLK_RATE_MAX		(75 * 1000 * 1000)	/* 75 MHz */
+#define KINETIS_DDR_RATE_MAX		(150 * 1000 * 1000)	/* 150 MHz */
+#endif
+
 #define KINETIS_FLEXBUS_RATE_MAX	(50 * 1000 * 1000)	/* 50 MHz */
 #define KINETIS_FLASH_RATE_MAX		(25 * 1000 * 1000)	/* 25 MHz */
-#define KINETIS_DDR_RATE_MAX		(150 * 1000 * 1000)	/* 150 MHz */
 
 #define KINETIS_MCG_PLLREFSEL	0	/* PLL0/1 input: EXTAL0 through OSC0 */
 
