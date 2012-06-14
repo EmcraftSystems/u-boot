@@ -128,8 +128,8 @@
 #define KINETIS_FLEXBUS_CLK_DIV	3
 /* Flash clock divider: 120/5 = 24 MHz */
 #define KINETIS_FLASH_CLK_DIV	5
-/* NFC clock divider: PLL0/5 = 120/5 = 24 MHz */
-#define KINETIS_NFCCLK_DIV	5
+/* NFC clock divider: PLL0/7 = 120/7 = 17.14 MHz */
+#define KINETIS_NFCCLK_DIV	7
 /* NFC clock fraction: do no multiply */
 #define KINETIS_NFCCLK_FRAC	1
 /* LCDC clock divider: PLL/4 = 120/4 = 30 MHz */
