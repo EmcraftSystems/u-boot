@@ -43,6 +43,11 @@
 #define CONFIG_SYS_KINETIS
 
 /*
+ * Choose Kinetis MCU family
+ */
+#define CONFIG_KINETIS_K70
+
+/*
  * Enable GPIO driver
  */
 #define CONFIG_KINETIS_GPIO
@@ -69,9 +74,21 @@
 #endif
 
 /*
- * Monitor prompt
+ * Monitor prompt and hostname
  */
+#if defined(CONFIG_KINETIS_K70)
+/* Kinetis K70 */
 #define CONFIG_SYS_PROMPT		"K70-SOM> "
+#define CONFIG_HOSTNAME			k70-som
+#define CONFIG_KINETIS_PLATFORM		"k70-som"
+#elif defined(CONFIG_KINETIS_K61)
+/* Kinetis K61 */
+#define CONFIG_SYS_PROMPT		"K61-SOM> "
+#define CONFIG_HOSTNAME			k61-som
+#define CONFIG_KINETIS_PLATFORM		"k61-som"
+#else
+#error No Kinetis MCU family specified
+#endif
 
 /*
  * We want to call the CPU specific initialization
@@ -350,8 +367,8 @@
  */
 #define CONFIG_BOOTDELAY		3
 #define CONFIG_ZERO_BOOTDELAY_CHECK
-#define CONFIG_HOSTNAME			k70-som
-#define CONFIG_BOOTARGS			"kinetis_platform=k70-som "\
+#define CONFIG_BOOTARGS			"kinetis_platform=" \
+					CONFIG_KINETIS_PLATFORM " " \
 					"console=ttyS2,115200 panic=10"
 #define CONFIG_BOOTCOMMAND		"run flashboot"
 

@@ -449,12 +449,18 @@ int board_init(void)
 	return 0;
 }
 
+#if defined(CONFIG_KINETIS_K70)
+#define CONFIG_SYS_BOARD_NAME	"K70-SOM"
+#elif defined(CONFIG_KINETIS_K61)
+#define CONFIG_SYS_BOARD_NAME	"K61-SOM"
+#endif
+
 /*
  * Dump pertinent info to the console.
  */
 int checkboard(void)
 {
-	printf("Board: K70-SOM Rev %s, www.emcraft.com\n",
+	printf("Board: " CONFIG_SYS_BOARD_NAME " Rev %s, www.emcraft.com\n",
 		CONFIG_SYS_BOARD_REV_STR);
 
 	return 0;
