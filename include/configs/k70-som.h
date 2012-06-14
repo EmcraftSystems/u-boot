@@ -81,11 +81,13 @@
 #define CONFIG_SYS_PROMPT		"K70-SOM> "
 #define CONFIG_HOSTNAME			k70-som
 #define CONFIG_KINETIS_PLATFORM		"k70-som"
+#define KINETIS_HAS_LCD
 #elif defined(CONFIG_KINETIS_K61)
 /* Kinetis K61 */
 #define CONFIG_SYS_PROMPT		"K61-SOM> "
 #define CONFIG_HOSTNAME			k61-som
 #define CONFIG_KINETIS_PLATFORM		"k61-som"
+#undef KINETIS_HAS_LCD
 #else
 #error No Kinetis MCU family specified
 #endif
@@ -132,10 +134,14 @@
 #define KINETIS_NFCCLK_DIV	7
 /* NFC clock fraction: do no multiply */
 #define KINETIS_NFCCLK_FRAC	1
+
+#ifdef KINETIS_HAS_LCD
 /* LCDC clock divider: PLL/4 = 120/4 = 30 MHz */
 #define KINETIS_LCDCCLK_DIV	4
 /* LCDC clock fraction: do no multiply */
 #define KINETIS_LCDCCLK_FRAC	1
+#endif /* KINETIS_HAS_LCD */
+
 /* PLL input divider: 50/5 = 10 MHz */
 #define KINETIS_PLL_PRDIV	5
 /* PLL multiplier: 10*24/2 = 120 MHz */
