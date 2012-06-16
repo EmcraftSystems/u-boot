@@ -119,6 +119,8 @@
 #define KINETIS_CPU_RATE_MAX		(150 * 1000 * 1000)	/* 150 MHz */
 #define KINETIS_PCLK_RATE_MAX		(75 * 1000 * 1000)	/* 75 MHz */
 #define KINETIS_DDR_RATE_MAX		(150 * 1000 * 1000)	/* 150 MHz */
+#else
+#error Unsupported Freescale Kinetis MCU core frequency
 #endif
 
 #define KINETIS_FLEXBUS_RATE_MAX	(50 * 1000 * 1000)	/* 50 MHz */

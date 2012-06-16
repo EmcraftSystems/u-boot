@@ -42,6 +42,11 @@
 #define CONFIG_SYS_KINETIS
 
 /*
+ * Choose Kinetis MCU maximum core frequency
+ */
+#define CONFIG_KINETIS_120MHZ
+
+/*
  * Enable GPIO driver
  */
 #define CONFIG_KINETIS_GPIO
