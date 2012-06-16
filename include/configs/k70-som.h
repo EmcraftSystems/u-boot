@@ -108,8 +108,6 @@
  */
 /* Select MCG configuration type */
 #define CONFIG_KINETIS_K70_120MHZ
-/* The OSCINIT0 bit does not set on K70 for a yet unknown reason */
-#define CONFIG_KINETIS_OSCINIT_NOWAIT
 /*
  * Clock rate at the EXTAL0 input
  *
@@ -117,9 +115,14 @@
  * possible because the PHY's REF_CLK output clock signal is connected
  * to the EXTAL0 pin of the MCU.
  */
-#define KINETIS_EXTAL_RATE	50000000
+#define KINETIS_OSC0_RATE	50000000
+/* Frequency of the oscillator at XTAL1/EXTAL1 */
+#define KINETIS_OSC1_RATE	12000000
+/* Use crystal oscillator connected to OSC1 as main MCG input */
+#define KINETIS_MCG_PLLREFSEL	1	/* OSC1 */
+#define KINETIS_MCG_EXT_CRYSTAL
 /*
- * The EXTAL rate divided by the divisor value (2**10 = 1024) specified by this
+ * The EXTAL0 rate divided by the divisor value (2**10 = 1024) specified by this
  * constant should be as close to the 32..40 kHz range as possible.
  */
 #define KINETIS_MCG_FRDIV_POW	10
@@ -148,14 +151,14 @@
 #define KINETIS_LCDCCLK_FRAC	1
 #endif /* KINETIS_HAS_LCD */
 
-/* PLL input divider: 50/5 = 10 MHz */
-#define KINETIS_PLL_PRDIV	5
-/* PLL multiplier: 10*24/2 = 120 MHz */
-#define KINETIS_PLL_VDIV	24
-/* PLL1 input divider: 50/5 = 10 MHz */
-#define KINETIS_PLL1_PRDIV	5
-/* PLL1 multiplier: 10*24/2 = 120 MHz */
-#define KINETIS_PLL1_VDIV	24
+/* PLL input divider: 12/1 = 12 MHz */
+#define KINETIS_PLL_PRDIV	1
+/* PLL multiplier: 12*20/2 = 120 MHz */
+#define KINETIS_PLL_VDIV	20
+/* PLL1 input divider: 12/1 = 12 MHz */
+#define KINETIS_PLL1_PRDIV	1
+/* PLL1 multiplier: 12*20/2 = 120 MHz */
+#define KINETIS_PLL1_VDIV	20
 
 #elif defined(CONFIG_KINETIS_150MHZ)
 /*
@@ -175,14 +178,14 @@
 #define KINETIS_LCDCCLK_FRAC	1
 #endif /* KINETIS_HAS_LCD */
 
-/* PLL input divider: 50/5 = 10 MHz */
-#define KINETIS_PLL_PRDIV	5
-/* PLL multiplier: 10*30/2 = 150 MHz */
-#define KINETIS_PLL_VDIV	30
-/* PLL1 input divider: 50/5 = 10 MHz */
-#define KINETIS_PLL1_PRDIV	5
-/* PLL1 multiplier: 10*30/2 = 150 MHz */
-#define KINETIS_PLL1_VDIV	30
+/* PLL input divider: 12/1 = 12 MHz */
+#define KINETIS_PLL_PRDIV	1
+/* PLL multiplier: 12*25/2 = 150 MHz */
+#define KINETIS_PLL_VDIV	25
+/* PLL1 input divider: 12/1 = 12 MHz */
+#define KINETIS_PLL1_PRDIV	1
+/* PLL1 multiplier: 12*25/2 = 150 MHz */
+#define KINETIS_PLL1_VDIV	25
 
 #endif
 

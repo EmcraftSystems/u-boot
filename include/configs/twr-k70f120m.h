@@ -81,15 +81,15 @@
  */
 /* Select MCG configuration type */
 #define CONFIG_KINETIS_K70_120MHZ
-/* The OSCINIT0 bit does not set on K70 for a yet unknown reason */
-#define CONFIG_KINETIS_OSCINIT_NOWAIT
 /*
  * Clock rate at the EXTAL0 input
  *
  * See also the description of the J19 jumper on the TWR-K70F120M board.
  * The PHY clock drives EXTAL0.
  */
-#define KINETIS_EXTAL_RATE	50000000
+#define KINETIS_OSC0_RATE	50000000
+/* Use external reference clock from Ethernet PHY as main MCG input */
+#define KINETIS_MCG_PLLREFSEL	0	/* OSC0 */
 /*
  * The EXTAL rate divided by the divisor value (2**10 = 1024) specified by this
  * constant should be as close to the 32..40 kHz range as possible.

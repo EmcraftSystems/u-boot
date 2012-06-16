@@ -82,7 +82,9 @@
  * See also the description of the J6 jumper on the TWR-K60N512 board.
  * The PHY clock drives EXTAL.
  */
-#define KINETIS_EXTAL_RATE	50000000
+#define KINETIS_OSC0_RATE	50000000
+/* Use external reference clock from Ethernet PHY as main MCG input */
+#define KINETIS_MCG_PLLREFSEL	0	/* OSC0 */
 /*
  * The EXTAL rate divided by the divisor value (2**10 = 1024) specified by this
  * constant should be as close to the 32..40 kHz range as possible.

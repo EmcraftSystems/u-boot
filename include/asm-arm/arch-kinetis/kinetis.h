@@ -93,6 +93,8 @@ typedef u32 kinetis_clock_gate_t;
 #define KINETIS_CG_DDR		KINETIS_MKCG(2, 14)	/* SIM_SCGC3[14] */
 /* NAND Flash Controller */
 #define KINETIS_CG_NFC		KINETIS_MKCG(2, 8)	/* SIM_SCGC3[8] */
+/* OSC1 */
+#define KINETIS_CG_OSC1		KINETIS_MKCG(0, 5)	/* SIM_SCGC1[5] */
 
 /*
  * Limits for the `kinetis_periph_enable()` function:

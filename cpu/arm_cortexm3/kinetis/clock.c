@@ -25,9 +25,85 @@
 #include "clock.h"
 
 /*
+ * Set the limits for the PLL divider and multiplier values for the MCU:
+ *     KINETIS_PLL_PRDIV_MAX
+ *     KINETIS_PLL_VDIV_MIN
+ *     KINETIS_PLL_VDIV_MAX
+ *
+ * Also set the range for the PLL reference clock (see datasheets for MCUs):
+ *     KINETIS_PLL_REF_MIN
+ *     KINETIS_PLL_REF_MAX
+ *
+ * Divider value between the VCO output and the PLL output:
+ *     KINETIS_PLL_VCO_DIV
+ *
+ * Clock frequency limits:
+ */
+#if defined(CONFIG_KINETIS_K60_100MHZ)
+#define KINETIS_PLL_PRDIV_MAX	25
+#define KINETIS_PLL_VDIV_MIN	24
+#define KINETIS_PLL_VDIV_MAX	55
+
+#define KINETIS_PLL_REF_MIN	(2 * 1000 * 1000)	/* 2 MHz */
+#define KINETIS_PLL_REF_MAX	(4 * 1000 * 1000)	/* 4 MHz */
+
+#define KINETIS_PLL_VCO_DIV	1	/* No /2 divider after VCO */
+
+#define KINETIS_CPU_RATE_MAX		(100 * 1000 * 1000)	/* 100 MHz */
+#define KINETIS_PCLK_RATE_MAX		(50 * 1000 * 1000)	/* 50 MHz */
+#define KINETIS_FLEXBUS_RATE_MAX	(50 * 1000 * 1000)	/* 50 MHz */
+#define KINETIS_FLASH_RATE_MAX		(25 * 1000 * 1000)	/* 25 MHz */
+#define KINETIS_DDR_RATE_MAX		0	/* DDR not supported */
+
+#undef KINETIS_MCG_OSC_MULTI		/* No support for multiple oscillators */
+
+#ifdef KINETIS_MCGOUT_PLL1
+#error There is no PLL1 on the Kinetis K60@100MHz MCUs
+#endif
+
+#elif defined(CONFIG_KINETIS_K70_120MHZ)
+/* MCUs with maximum core rate 120MHz or 150MHz */
+#define KINETIS_PLL_PRDIV_MAX	8
+#define KINETIS_PLL_VDIV_MIN	16
+#define KINETIS_PLL_VDIV_MAX	47
+
+#define KINETIS_PLL_REF_MIN	(8 * 1000 * 1000)	/* 8 MHz */
+#define KINETIS_PLL_REF_MAX	(16 * 1000 * 1000)	/* 16 MHz */
+
+#define KINETIS_PLL_VCO_DIV	2	/* There is a /2 divider after VCO */
+
+#if defined(CONFIG_KINETIS_120MHZ)
+/* 120MHz */
+#define KINETIS_CPU_RATE_MAX		(120 * 1000 * 1000)	/* 120 MHz */
+#define KINETIS_PCLK_RATE_MAX		(60 * 1000 * 1000)	/* 60 MHz */
+#define KINETIS_DDR_RATE_MAX		(125 * 1000 * 1000)	/* 125 MHz */
+#elif defined(CONFIG_KINETIS_150MHZ)
+/* 150MHz */
+#define KINETIS_CPU_RATE_MAX		(150 * 1000 * 1000)	/* 150 MHz */
+#define KINETIS_PCLK_RATE_MAX		(75 * 1000 * 1000)	/* 75 MHz */
+#define KINETIS_DDR_RATE_MAX		(150 * 1000 * 1000)	/* 150 MHz */
+#else
+#error Unsupported Freescale Kinetis MCU core frequency
+#endif
+
+#define KINETIS_FLEXBUS_RATE_MAX	(50 * 1000 * 1000)	/* 50 MHz */
+#define KINETIS_FLASH_RATE_MAX		(25 * 1000 * 1000)	/* 25 MHz */
+
+/* PLL0 and PLL1 input: Oscillator on XTAL1/EXTAL1 controller by OSC1 module */
+#define KINETIS_MCG_OSC_MULTI		/* MCU has two oscillators */
+
+#else
+#error Unsupported Freescale Kinetis MCU series
+#endif
+
+/*
  * Clock rate on the input of the MCG (Multipurpose Clock Generator)
  */
-#define KINETIS_MCG_PLL_IN_RATE		KINETIS_EXTAL_RATE
+#if KINETIS_MCG_PLLREFSEL == 0
+#define KINETIS_MCG_PLL_IN_RATE		KINETIS_OSC0_RATE
+#else
+#define KINETIS_MCG_PLL_IN_RATE		KINETIS_OSC1_RATE
+#endif
 
 /*
  * Set KINETIS_MCG_FREQ_RANGE according to the frequency range of the crystal
@@ -59,77 +135,6 @@
 #else
 #error KINETIS_MCG_FRDIV_POW should be between 5 and 10
 #endif /* KINETIS_MCG_FRDIV_POW in 5 ... 10 */
-#endif
-
-/*
- * Set the limits for the PLL divider and multiplier values for the MCU:
- *     KINETIS_PLL_PRDIV_MAX
- *     KINETIS_PLL_VDIV_MIN
- *     KINETIS_PLL_VDIV_MAX
- *
- * Also set the range for the PLL reference clock (see datasheets for MCUs):
- *     KINETIS_PLL_REF_MIN
- *     KINETIS_PLL_REF_MAX
- *
- * Divider value between the VCO output and the PLL output:
- *     KINETIS_PLL_VCO_DIV
- *
- * Clock frequency limits:
- */
-#if defined(CONFIG_KINETIS_K60_100MHZ)
-#define KINETIS_PLL_PRDIV_MAX	25
-#define KINETIS_PLL_VDIV_MIN	24
-#define KINETIS_PLL_VDIV_MAX	55
-
-#define KINETIS_PLL_REF_MIN	(2 * 1000 * 1000)	/* 2 MHz */
-#define KINETIS_PLL_REF_MAX	(4 * 1000 * 1000)	/* 4 MHz */
-
-#define KINETIS_PLL_VCO_DIV	1	/* No /2 divider after VCO */
-
-#define KINETIS_CPU_RATE_MAX		(100 * 1000 * 1000)	/* 100 MHz */
-#define KINETIS_PCLK_RATE_MAX		(50 * 1000 * 1000)	/* 50 MHz */
-#define KINETIS_FLEXBUS_RATE_MAX	(50 * 1000 * 1000)	/* 50 MHz */
-#define KINETIS_FLASH_RATE_MAX		(25 * 1000 * 1000)	/* 25 MHz */
-#define KINETIS_DDR_RATE_MAX		0	/* DDR not supported */
-
-#undef KINETIS_MCG_PLLREFSEL	/* No support for multiple oscillators */
-
-#ifdef KINETIS_MCGOUT_PLL1
-#error There is no PLL1 on the Kinetis K60@100MHz MCUs
-#endif
-
-#elif defined(CONFIG_KINETIS_K70_120MHZ)
-/* MCUs with maximum core rate 120MHz or 150MHz */
-#define KINETIS_PLL_PRDIV_MAX	8
-#define KINETIS_PLL_VDIV_MIN	16
-#define KINETIS_PLL_VDIV_MAX	47
-
-#define KINETIS_PLL_REF_MIN	8 * 1000 * 1000		/* 8 MHz */
-#define KINETIS_PLL_REF_MAX	16 * 1000 * 1000	/* 16 MHz */
-
-#define KINETIS_PLL_VCO_DIV	2	/* There is a /2 divider after VCO */
-
-#if defined(CONFIG_KINETIS_120MHZ)
-/* 120MHz */
-#define KINETIS_CPU_RATE_MAX		(120 * 1000 * 1000)	/* 120 MHz */
-#define KINETIS_PCLK_RATE_MAX		(60 * 1000 * 1000)	/* 60 MHz */
-#define KINETIS_DDR_RATE_MAX		(125 * 1000 * 1000)	/* 125 MHz */
-#elif defined(CONFIG_KINETIS_150MHZ)
-/* 150MHz */
-#define KINETIS_CPU_RATE_MAX		(150 * 1000 * 1000)	/* 150 MHz */
-#define KINETIS_PCLK_RATE_MAX		(75 * 1000 * 1000)	/* 75 MHz */
-#define KINETIS_DDR_RATE_MAX		(150 * 1000 * 1000)	/* 150 MHz */
-#else
-#error Unsupported Freescale Kinetis MCU core frequency
-#endif
-
-#define KINETIS_FLEXBUS_RATE_MAX	(50 * 1000 * 1000)	/* 50 MHz */
-#define KINETIS_FLASH_RATE_MAX		(25 * 1000 * 1000)	/* 25 MHz */
-
-#define KINETIS_MCG_PLLREFSEL	0	/* PLL0/1 input: EXTAL0 through OSC0 */
-
-#else
-#error Unsupported Freescale Kinetis MCU series
 #endif
 
 /*
@@ -280,13 +285,13 @@
  * MCG Control 2 Register
  */
 /* Frequency Range Select bits */
-#define KINETIS_MCG_C2_RANGE_BITS	4
+#define KINETIS_MCG_C2_RANGE0_BITS	4
 /*
- * External Reference Select
+ * External Reference Select for OSC0
  *    0 = External reference clock requested.
  *    1 = Oscillator requested.
  */
-#define KINETIS_MCG_C2_EREFS_MSK	(1 << 2)
+#define KINETIS_MCG_C2_EREFS0_MSK	(1 << 2)
 /* Configure crystal oscillator for high-gain operation */
 #define KINETIS_MCG_C2_HGO_MSK		(1 << 3)
 /*
@@ -309,6 +314,17 @@
 /* PLL Select */
 #define KINETIS_MCG_C6_PLLS_MSK		(1 << 6)
 /*
+ * MCG Control 10 Register
+ */
+/* Frequency Range1 Select */
+#define KINETIS_MCG_C10_RANGE1_BITS	4
+/*
+ * External Reference Select for OSC1
+ *    0 = External reference clock requested.
+ *    1 = Oscillator requested.
+ */
+#define KINETIS_MCG_C10_EREFS1_MSK	(1 << 2)
+/*
  * MCG Control 11 Register
  */
 /* PLL1 External Reference Divider */
@@ -330,8 +346,8 @@
 /*
  * MCG Status Register
  */
-/* OSC Initialization */
-#define KINETIS_MCG_S_OSCINIT_MSK	(1 << 1)
+/* Oscillator 0 initialization */
+#define KINETIS_MCG_S_OSCINIT0_MSK	(1 << 1)
 /* Clock Mode Status */
 #define KINETIS_MCG_S_CLKST_BITS	2
 #define KINETIS_MCG_S_CLKST_MSK		(3 << KINETIS_MCG_S_CLKST_BITS)
@@ -350,6 +366,8 @@
  */
 /* This bit indicates whether PLL1 has acquired lock */
 #define KINETIS_MCG_S2_LOCK1_MSK	(1 << 6)
+/* Oscillator 1 initialization */
+#define KINETIS_MCG_S2_OSCINIT1_MSK	(1 << 1)
 
 /*
  * SIM registers
@@ -461,20 +479,6 @@
 #endif /* CONFIG_KINETIS_DDR_SYNC */
 
 /*
- * Oscillator (OSC) register map
- */
-struct kinetis_osc_regs {
-	u8 cr;		/* OSC Control Register */
-};
-
-/*
- * OSC registers base
- */
-#define KINETIS_OSC_BASE		(KINETIS_AIPS0PERIPH_BASE + 0x00065000)
-#define KINETIS_OSC			((volatile struct kinetis_osc_regs *) \
-					KINETIS_OSC_BASE)
-
-/*
  * Clock values
  */
 static u32 clock_val[CLOCK_END];
@@ -488,7 +492,22 @@ static void clock_fei_to_fbe(void)
 	/*
 	 * Select frequency range on the input of MCG
 	 */
-	KINETIS_MCG->c2 = (KINETIS_MCG_FREQ_RANGE << KINETIS_MCG_C2_RANGE_BITS);
+#if KINETIS_MCG_PLLREFSEL == 0
+	KINETIS_MCG->c2 = KINETIS_MCG_FREQ_RANGE << KINETIS_MCG_C2_RANGE0_BITS;
+#else
+	KINETIS_MCG->c10 = KINETIS_MCG_FREQ_RANGE << KINETIS_MCG_C10_RANGE1_BITS;
+#endif /* KINETIS_MCG_PLLREFSEL */
+
+	/*
+	 * Select if an oscillator is connected to the main input of MCG
+	 */
+#ifdef KINETIS_MCG_EXT_CRYSTAL
+#if KINETIS_MCG_PLLREFSEL == 0
+	KINETIS_MCG->c2 |= KINETIS_MCG_C2_EREFS0_MSK;
+#else
+	KINETIS_MCG->c10 |= KINETIS_MCG_C10_EREFS1_MSK;
+#endif /* KINETIS_MCG_PLLREFSEL */
+#endif /* KINETIS_MCG_EXT_CRYSTAL */
 
 	/*
 	 * Set the FLL External Reference Divider.
@@ -498,12 +517,16 @@ static void clock_fei_to_fbe(void)
 		(KINETIS_MCG_FRDIV << KINETIS_MCG_C1_FRDIV_BITS) |
 		KINETIS_MCG_C1_CLKS_EXT_REF_MSK;
 
-#ifndef CONFIG_KINETIS_OSCINIT_NOWAIT
+#ifdef KINETIS_MCG_EXT_CRYSTAL
 	/*
 	 * Wait for the input from the external crystal to initialize
 	 */
-	while (!(KINETIS_MCG->status & KINETIS_MCG_S_OSCINIT_MSK));
-#endif /* !CONFIG_KINETIS_OSCINIT_NOWAIT */
+#if KINETIS_MCG_PLLREFSEL == 0
+	while (!(KINETIS_MCG->status & KINETIS_MCG_S_OSCINIT0_MSK));
+#else
+	while (!(KINETIS_MCG->status2 & KINETIS_MCG_S2_OSCINIT1_MSK));
+#endif /* KINETIS_MCG_PLLREFSEL */
+#endif /* KINETIS_MCG_EXT_CRYSTAL */
 
 	/*
 	 * Wait for reference clock to switch to external reference
@@ -533,7 +556,7 @@ static void clock_setup_pll0(void)
 	 * oscillators (e.g. on K70 @ 120 MHz), select the necessary
 	 * oscillator as the external reference clock for the PLL0.
 	 */
-#ifdef KINETIS_MCG_PLLREFSEL
+#ifdef KINETIS_MCG_OSC_MULTI
 	KINETIS_MCG->c5 =
 		(KINETIS_MCG->c5 & ~KINETIS_MCG_C5_PLLREFSEL_MSK) |
 		(KINETIS_MCG_PLLREFSEL << KINETIS_MCG_C5_PLLREFSEL_BIT);
@@ -574,7 +597,7 @@ static void clock_setup_pll1(void)
 	 * oscillators (e.g. on K70 @ 120 MHz), select the necessary
 	 * oscillator as the external reference clock for the PLL1.
 	 */
-#ifdef KINETIS_MCG_PLLREFSEL
+#ifdef KINETIS_MCG_OSC_MULTI
 	KINETIS_MCG->c11 =
 		(KINETIS_MCG->c11 & ~KINETIS_MCG_C11_PLLREFSEL1_MSK) |
 		(KINETIS_MCG_PLLREFSEL << KINETIS_MCG_C11_PLLREFSEL1_BIT);
@@ -662,18 +685,58 @@ static void clock_setup_ddr_async(void)
 #endif /* CONFIG_KINETIS_DDR && !CONFIG_KINETIS_DDR_SYNC */
 
 /*
+ * Oscillator (OSC) register map
+ */
+struct kinetis_osc_regs {
+	u8 cr;		/* OSC Control Register */
+};
+
+/*
+ * OSC registers base
+ */
+#define KINETIS_OSC0_BASE		(KINETIS_AIPS0PERIPH_BASE + 0x00065000)
+#define KINETIS_OSC1_BASE		(KINETIS_AIPS0PERIPH_BASE + 0x000E5000)
+
+static u32 kinetis_osc_base[] = {
+	KINETIS_OSC0_BASE, KINETIS_OSC1_BASE,
+};
+
+/*
+ * Enable OSCx module to control oscillator or external reference clock
+ */
+static void osc_enable(int osc)
+{
+	volatile struct kinetis_osc_regs *regs =
+		(volatile struct kinetis_osc_regs *)kinetis_osc_base[osc];
+
+	/*
+	 * Enable clock on OSC1 module. OSC0 is always enabled.
+	 */
+	if (osc == 1)
+		kinetis_periph_enable(KINETIS_CG_OSC1, 1);
+
+	regs->cr = KINETIS_OSC_CR_EREFSTEN_MSK | KINETIS_OSC_CR_ERCLKEN_MSK;
+}
+
+/*
  * Set-up clocks
  */
 static void clock_setup(void)
 {
 	/*
-	 * Set the OSC module to buffer a clock from EXTAL onto the OSC_CLK_OUT
+	 * Set the OSC module to buffer the clock from EXTAL0 onto the OSC0ERCLK
 	 *
 	 * The OSC0ERCLK clock is used as the Ethernet RMII clock,
 	 * it must be 50 MHz.
 	 */
-	KINETIS_OSC->cr =
-		KINETIS_OSC_CR_EREFSTEN_MSK | KINETIS_OSC_CR_ERCLKEN_MSK;
+	osc_enable(0);
+
+#if KINETIS_MCG_PLLREFSEL == 1
+	/*
+	 * Enable OSC1, if needed
+	 */
+	osc_enable(1);
+#endif
 
 	/*
 	 * Switch to the FBE (FLL Bypassed External) mode
@@ -790,7 +853,7 @@ void clock_init(void)
 	/*
 	 * The MAC internal module clock is OSC0ERCLK
 	 */
-	clock_val[CLOCK_MACCLK] = KINETIS_EXTAL_RATE;
+	clock_val[CLOCK_MACCLK] = KINETIS_OSC0_RATE;
 
 #ifdef CONFIG_KINETIS_DDR
 	/*
