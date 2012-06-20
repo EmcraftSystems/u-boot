@@ -123,7 +123,7 @@
  * Set KINETIS_MCG_FRDIV to the code for writing into the FRDIV bit field
  * of the MCG_C1 register.
  */
-#if KINETIS_MCG_FREQ_RANGE == 0
+#if KINETIS_MCG_FREQ_RANGE == 0 || defined(KINETIS_FLLREF_RTC)
 #if KINETIS_MCG_FRDIV_POW >= 0 && KINETIS_MCG_FRDIV_POW <= 7
 #define KINETIS_MCG_FRDIV	KINETIS_MCG_FRDIV_POW
 #else
@@ -314,6 +314,11 @@
 /* PLL Select */
 #define KINETIS_MCG_C6_PLLS_MSK		(1 << 6)
 /*
+ * MCG Control 7 Register
+ */
+/* MCG OSC Clock Select */
+#define KINETIS_MCG_C7_OSCSEL_MSK	(1 << 0)
+/*
  * MCG Control 10 Register
  */
 /* Frequency Range1 Select */
@@ -479,6 +484,48 @@
 #endif /* CONFIG_KINETIS_DDR_SYNC */
 
 /*
+ * RTC Control Register
+ */
+/* Oscillator 4pF load configure */
+#define KINETIS_RTC_CR_SC4P_MSK		(1 << 12)
+/* Oscillator 16pF load configure */
+#define KINETIS_RTC_CR_SC16P_MSK	(1 << 10)
+/* Oscillator Enable */
+#define KINETIS_RTC_CR_OSCE_MSK		(1 << 8)
+
+/*
+ * Real Time Clock (RTC) register map
+ */
+struct kinetis_rtc_regs {
+	u32 tsr;	/* RTC Time Seconds Register */
+	u32 tpr;	/* RTC Time Prescaler Register */
+	u32 tar;	/* RTC Time Alarm Register */
+	u32 tcr;	/* RTC Time Compensation Register */
+	u32 cr;		/* RTC Control Register */
+	u32 sr;		/* RTC Status Register */
+	u32 lr;		/* RTC Lock Register */
+	u32 ier;	/* RTC Interrupt Enable Register */
+	u32 ttsr;	/* RTC Tamper Time Seconds Register */
+	u32 mer;	/* RTC Monotonic Enable Register */
+	u32 mclr;	/* RTC Monotonic Counter Low Register */
+	u32 mchr;	/* RTC Monotonic Counter High Register */
+	u32 ter;	/* RTC Tamper Enable Register */
+	u32 tdr;	/* RTC Tamper Detect Register */
+	u32 ttr;	/* RTC Tamper Trim Register */
+	u32 tir;	/* RTC Tamper Interrupt Register */
+	u32 rsv0[496];
+	u32 war;	/* RTC Write Access Register */
+	u32 rar;	/* RTC Read Access Register */
+};
+
+/*
+ * RTC registers base
+ */
+#define KINETIS_RTC_BASE		(KINETIS_AIPS0PERIPH_BASE + 0x0003D000)
+#define KINETIS_RTC			((volatile struct kinetis_rtc_regs *) \
+					KINETIS_RTC_BASE)
+
+/*
  * Clock values
  */
 static u32 clock_val[CLOCK_END];
@@ -508,6 +555,30 @@ static void clock_fei_to_fbe(void)
 	KINETIS_MCG->c10 |= KINETIS_MCG_C10_EREFS1_MSK;
 #endif /* KINETIS_MCG_PLLREFSEL */
 #endif /* KINETIS_MCG_EXT_CRYSTAL */
+
+	/*
+	 * Use RTC clock for FLL reference clock, if needed.
+	 */
+#ifdef KINETIS_FLLREF_RTC
+	/*
+	 * Enable the RTC module of the MCU
+	 */
+	kinetis_periph_enable(KINETIS_CG_RTC, 1);
+
+	/*
+	 * Enable RTC
+	 *
+	 * RTC oscillator load capacity should be 20pF (=16+4) for K70-SOM.
+	 */
+	KINETIS_RTC->cr |=
+		KINETIS_RTC_CR_SC16P_MSK | KINETIS_RTC_CR_SC4P_MSK |
+		KINETIS_RTC_CR_OSCE_MSK;
+
+	/*
+	 * Select 32 kHz RTC as the FLL external reference clock
+	 */
+	KINETIS_MCG->c7 |= KINETIS_MCG_C7_OSCSEL_MSK;
+#endif /* KINETIS_FLLREF_RTC */
 
 	/*
 	 * Set the FLL External Reference Divider.

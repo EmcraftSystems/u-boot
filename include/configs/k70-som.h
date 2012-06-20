@@ -122,10 +122,16 @@
 #define KINETIS_MCG_PLLREFSEL	1	/* OSC1 */
 #define KINETIS_MCG_EXT_CRYSTAL
 /*
- * The EXTAL0 rate divided by the divisor value (2**10 = 1024) specified by this
- * constant should be as close to the 32..40 kHz range as possible.
+ * Use RTC oscillator for FLL reference clock, because on K70-SOM/DNI-ETH
+ * we do not have reference clock from Ethernet PHY on EXTAL0.
  */
-#define KINETIS_MCG_FRDIV_POW	10
+#define KINETIS_FLLREF_RTC
+/*
+ * The EXTAL32 rate (32 kHz) divided by the divisor value (2**0 = 1)
+ * specified by this constant should be as close to the 32..40 kHz
+ * range as possible.
+ */
+#define KINETIS_MCG_FRDIV_POW	0
 /* Core/system clock divider: 120/1 = 120MHz or 150/1 = 150MHz */
 #define KINETIS_CCLK_DIV	1
 /* Peripheral clock divider: 120/2 = 60MHz or 150/2 = 75MHz */
