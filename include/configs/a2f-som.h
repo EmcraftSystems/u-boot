@@ -105,7 +105,6 @@
 #else
 # define CONFIG_MEM_NVM_LEN		(256 * 1024)
 #endif
-#define CONFIG_MEM_NVM_UBOOT_OFF	0x0
 
 #define CONFIG_MEM_RAM_BASE		0x20000000
 #define CONFIG_MEM_RAM_LEN		(16 * 1024)
