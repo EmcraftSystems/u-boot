@@ -61,6 +61,7 @@
 #define SPI_CONTROL_SPH			(1 << 25)
 #define SPI_CONTROL_SPS			(1 << 26)
 #define SPI_CONTROL_BIGFIFO		(1 << 29)
+#define SPI_CONTROL_CLKMODE		(1 << 28)
 #define SPI_CONTROL_RESET		(1 << 31)
 
 /*
@@ -244,15 +245,15 @@ static inline int spi_a2f_hw_clk_set(struct a2f_spi_slave *s, unsigned int spd)
  	 * Calculate the clock rate that works for this slave
  	 */
 	h = s->hb;
-	for (i = 1; i <= 8; i ++) {
-		if (h / (1 << i) <= spd)
+	for (i = 0; i <= 255; i++) {
+		if (h / ((i + 1) << 1) <= spd)
 			break;
 	}
 
 	/*
  	 * Can't provide a rate that is slow enough for the slave
  	 */
-	if (i == 9) {
+	if (i > 255) {
 		ret = -1;
 		goto done;
 	}
@@ -260,11 +261,11 @@ static inline int spi_a2f_hw_clk_set(struct a2f_spi_slave *s, unsigned int spd)
 	/*
  	 * Set the clock rate
  	 */
-	MSS_SPI(s)->clk_gen = i - 1;
+	MSS_SPI(s)->clk_gen = i;
 
 done:
 	d_printk(3, "bus=%d,cnt_hz=%d,slv_hz=%d,rsl_hz=%d,clk_gen=%d,ret=%d\n",
-		s->slave.bus, h, spd, h / (1 << i),
+		s->slave.bus, h, spd, h / ((i + 1) << 1),
 		MSS_SPI(s)->clk_gen, ret);
 
 	return ret;
@@ -493,7 +494,8 @@ int spi_claim_bus(struct spi_slave *slv)
 	 * Similarly on A2F500, we have an option to extend FIFO to
 	 * 32 8-bit FIFO frames.
  	 */
-	MSS_SPI(s)->control |= SPI_CONTROL_SPS | SPI_CONTROL_BIGFIFO;
+	MSS_SPI(s)->control |= SPI_CONTROL_SPS | SPI_CONTROL_BIGFIFO |
+			       SPI_CONTROL_CLKMODE;
 
 	/*
  	 * Enable the SPI contoller
