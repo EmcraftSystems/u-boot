@@ -199,7 +199,7 @@
 #define CONFIG_NET_MULTI
 #define CONFIG_M2S_ETH
 
-#define CONFIG_SYS_RX_ETH_BUFFER	4
+#define CONFIG_SYS_RX_ETH_BUFFER	2
 
 /*
  * Use standard MII PHY API

@@ -35,7 +35,6 @@
 #undef DEBUG
 
 #include <common.h>
-#include <malloc.h>
 #include <net.h>
 #include <miiphy.h>
 #include <asm/errno.h>
@@ -291,6 +290,11 @@ static int			m2s_bd_cur_tx, m2s_bd_cur_rx;
 static volatile struct m2s_eth_dma_bd	m2s_bd_tx[M2S_TX_BD_NUM];
 static volatile struct m2s_eth_dma_bd	m2s_bd_rx[M2S_RX_BD_NUM];
 
+/*
+ * Rx buffers
+ */
+static u8			m2s_buf_rx[M2S_RX_BD_NUM][M2S_FRM_MAX_LEN];
+
 /******************************************************************************
  * Functions exported from the module
  ******************************************************************************/
@@ -374,13 +378,7 @@ static int m2s_eth_init(struct eth_device *dev, bd_t *bd_unused)
 	for (i = 0; i < M2S_RX_BD_NUM; i++) {
 		bd = &m2s_bd_rx[i];
 
-		bd->frame = malloc(M2S_FRM_MAX_LEN);
-		if (!bd->frame) {
-			printf("%s: no mem for BD%d frame\n", __func__, i);
-			rv = -ENOMEM;
-			goto out;
-		}
-
+		bd->frame = m2s_buf_rx[i];
 		bd->cfg_size  = M2S_BD_EMPTY;
 		bd->next = (void *)&m2s_bd_rx[(i + 1) % M2S_RX_BD_NUM];
 	}
@@ -568,7 +566,6 @@ static void m2s_eth_halt(struct eth_device *dev)
 	for (i = 0; i < M2S_RX_BD_NUM; i++) {
 		if (!m2s_bd_rx[i].frame)
 			continue;
-		free((void *)m2s_bd_rx[i].frame);
 		m2s_bd_rx[i].frame = NULL;
 	}
 }
