@@ -116,6 +116,9 @@ typedef volatile unsigned char	vu_char;
 #ifdef CONFIG_SYS_A2F
 #include <asm/arch-a2f/a2f.h>
 #endif
+#ifdef CONFIG_SYS_M2S
+#include <asm/arch-m2s/m2s.h>
+#endif
 #ifdef CONFIG_SYS_STM32
 #include <asm/arch-stm32/stm32.h>
 #endif
@@ -485,7 +488,8 @@ ulong	get_tbclk     (void);
  * can be defined in the U-Boot board configuration file (include/configs/.h)
  */
 #if defined(CONFIG_SYS_A2F) || defined(CONFIG_SYS_STM32) || \
-    defined(CONFIG_SYS_LPC178X) || defined(CONFIG_SYS_KINETIS)
+    defined(CONFIG_SYS_LPC178X) || defined(CONFIG_SYS_KINETIS) || \
+    defined(CONFIG_SYS_M2S)
 #define CONFIG_ARMCORTEXM3_RAMCODE
 #endif
 

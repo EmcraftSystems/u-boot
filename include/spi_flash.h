@@ -53,13 +53,47 @@ void spi_flash_free(struct spi_flash *flash);
 static inline int spi_flash_read(struct spi_flash *flash, u32 offset,
 		size_t len, void *buf)
 {
+#if defined(CONFIG_SPI_MAX_XF_LEN)
+	u32	adr = offset, pos = 0, sz;
+	int	rv;
+
+	do {
+		sz = len < CONFIG_SPI_MAX_XF_LEN ? len : CONFIG_SPI_MAX_XF_LEN;
+		rv = flash->read(flash, adr, sz, &((u8 *)buf)[pos]);
+		if (rv != 0)
+			break;
+		len -= sz;
+		pos += sz;
+		adr += sz;
+	} while (len);
+
+	return rv;
+#else
 	return flash->read(flash, offset, len, buf);
+#endif
 }
 
 static inline int spi_flash_write(struct spi_flash *flash, u32 offset,
 		size_t len, const void *buf)
 {
+#if defined(CONFIG_SPI_MAX_XF_LEN)
+	u32	adr = offset, pos = 0, sz;
+	int	rv;
+
+	do {
+		sz = len < CONFIG_SPI_MAX_XF_LEN ? len : CONFIG_SPI_MAX_XF_LEN;
+		rv = flash->write(flash, adr, sz, &((const u8 *)buf)[pos]);
+		if (rv != 0)
+			break;
+		len -= sz;
+		pos += sz;
+		adr += sz;
+	} while (len);
+
+	return rv;
+#else
 	return flash->write(flash, offset, len, buf);
+#endif
 }
 
 static inline int spi_flash_erase(struct spi_flash *flash, u32 offset,

@@ -3245,6 +3245,12 @@ lpc4350-eval_config : unconfig
 lpc1850-eval_config : unconfig
 	@$(MKCONFIG) $(@:_config=) arm arm_cortexm3 lpc1850-eval hitex lpc18xx
 
+m2s-som_config :  unconfig
+	@$(MKCONFIG) $(@:_config=) arm arm_cortexm3 m2s-som emcraft m2s
+
+m2s-som-copy2_config :  unconfig
+	@$(MKCONFIG) $(@:_config=) arm arm_cortexm3 m2s-som emcraft m2s
+
 #########################################################################
 ## XScale Systems
 #########################################################################

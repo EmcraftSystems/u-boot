@@ -2704,6 +2704,7 @@ extern unsigned int __machine_arch_type;
 #define MACH_TYPE_LPC178X              3855
 #define MACH_TYPE_KINETIS              3896
 #define MACH_TYPE_LPC18XX              4152
+#define MACH_TYPE_M2S                  9999
 
 #ifdef CONFIG_ARCH_EBSA110
 # ifdef machine_arch_type
@@ -34997,6 +34998,19 @@ extern unsigned int __machine_arch_type;
 	(machine_arch_type == MACH_TYPE_LPC18XX)
 #else
 # define machine_is_lpc18xx()	(0)
+#endif
+
+#ifdef CONFIG_MACH_M2S
+# ifdef machine_arch_type
+#  undef machine_arch_type
+#  define machine_arch_type	__machine_arch_type
+# else
+#  define machine_arch_type	MACH_TYPE_M2S
+# endif
+# define machine_is_m2s() \
+	(machine_arch_type == MACH_TYPE_M2S)
+#else
+# define machine_is_m2s()	(0)
 #endif
 
 /*

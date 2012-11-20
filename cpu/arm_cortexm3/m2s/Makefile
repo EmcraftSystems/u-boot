@@ -1,6 +1,10 @@
 #
-# (C) Copyright 2000-2007
+# (C) Copyright 2000-2003
 # Wolfgang Denk, DENX Software Engineering, wd@denx.de.
+#
+# (C) Copyright 2012
+# Port to M2S (Actel SmartFusion2)
+# Alexander Potashev, Emcraft Systems, aspotashev@emcraft.com.
 #
 # See file CREDITS for list of people who contributed to this
 # project.
@@ -12,7 +16,7 @@
 #
 # This program is distributed in the hope that it will be useful,
 # but WITHOUT ANY WARRANTY; without even the implied warranty of
-# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.	See the
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 # GNU General Public License for more details.
 #
 # You should have received a copy of the GNU General Public License
@@ -23,28 +27,24 @@
 
 include $(TOPDIR)/config.mk
 
-LIB	:= $(obj)libspi.a
+LIB	= $(obj)lib$(SOC).a
 
-COBJS-$(CONFIG_ATMEL_DATAFLASH_SPI) += atmel_dataflash_spi.o
-COBJS-$(CONFIG_ATMEL_SPI) += atmel_spi.o
-COBJS-$(CONFIG_A2F_SPI) += a2f_spi.o
-COBJS-$(CONFIG_BFIN_SPI) += bfin_spi.o
-COBJS-$(CONFIG_CF_SPI) += cf_spi.o
-COBJS-$(CONFIG_DAVINCI_SPI) += davinci_spi.o
-COBJS-$(CONFIG_KIRKWOOD_SPI) += kirkwood_spi.o
-COBJS-$(CONFIG_MPC52XX_SPI) += mpc52xx_spi.o
-COBJS-$(CONFIG_MPC8XXX_SPI) += mpc8xxx_spi.o
-COBJS-$(CONFIG_MXC_SPI) += mxc_spi.o
-COBJS-$(CONFIG_SOFT_SPI) += soft_spi.o
+COBJS-$(CONFIG_CMD_SOMTEST) += cmd_somtest.o
+COBJS-$(CONFIG_CMD_A2F_SPI_TEST) += cmd_spitest.o
+COBJS-$(CONFIG_ARMCORTEXM3_SOC_INIT) += soc.o
+COBJS	:= clock.o cpu.o envm.o wdt.o $(COBJS-y)
 
-COBJS	:= $(COBJS-y)
-SRCS	:= $(COBJS:.o=.c)
+SRCS	:= $(COBJS:.o=.c) $(SOBJS:.o=.s)
 OBJS	:= $(addprefix $(obj),$(COBJS))
 
-all:	$(LIB)
-
-$(LIB):	$(obj).depend $(OBJS)
+$(LIB):	$(obj).depend $(OBJS) $(SOBJS)
 	$(AR) $(ARFLAGS) $@ $(OBJS)
+
+clean:
+	rm -f $(SOBJS) $(OBJS)
+
+distclean:
+	rm -f $(LIB) core *.bak $(obj).depend
 
 #########################################################################
 

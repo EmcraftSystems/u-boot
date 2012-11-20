@@ -40,6 +40,7 @@
 #define CMD_S25FLXX_RDSR	0x05	/* Read Status Register */
 #define CMD_S25FLXX_WRSR	0x01	/* Write Status Register */
 #define CMD_S25FLXX_PP		0x02	/* Page Program */
+#define CMD_S25FLXX_PE		0x20	/* Parameter 4-kB Sector Erase */
 #define CMD_S25FLXX_SE		0xd8	/* Sector Erase */
 #define CMD_S25FLXX_BE		0xc7	/* Bulk Erase */
 #define CMD_S25FLXX_DP		0xb9	/* Deep Power-down */
@@ -49,24 +50,40 @@
 #define SPSN_ID_S25FL016A	0x0214
 #define SPSN_ID_S25FL032A	0x0215
 #define SPSN_ID_S25FL064A	0x0216
-#define SPSN_ID_S25FL128P	0x2018
+#define SPSN_ID_S25FL128	0x2018
 #define SPSN_EXT_ID_S25FL128P_256KB	0x0300
 #define SPSN_EXT_ID_S25FL128P_64KB	0x0301
+#define SPSN_EXT_ID_S25FL128S_64KB	0x4D01
 
 #define SPANSION_SR_WIP		(1 << 0)	/* Write-in-Progress */
 
+/*
+ * Allow hybrid geometries with up to the following number of sectors
+ * with different sizes
+ */
+#define DIF_SEC_SIZE_NUM	2
+
 struct spansion_spi_flash_params {
+	/*
+	 * User defined configuration
+	 */
 	u16 idcode1;
 	u16 idcode2;
 	u16 page_size;
-	u16 pages_per_sector;
-	u16 nr_sectors;
+	u16 pages_per_sector[DIF_SEC_SIZE_NUM];
+	u16 nr_sectors[DIF_SEC_SIZE_NUM];
 	const char *name;
+
+	/*
+	 * Calculated at initialization
+	 */
+	u32 end[DIF_SEC_SIZE_NUM];
+	u8  cmd_pe;
 };
 
 struct spansion_spi_flash {
 	struct spi_flash flash;
-	const struct spansion_spi_flash_params *params;
+	struct spansion_spi_flash_params *params;
 };
 
 static inline struct spansion_spi_flash *to_spansion_spi_flash(struct spi_flash
@@ -75,56 +92,85 @@ static inline struct spansion_spi_flash *to_spansion_spi_flash(struct spi_flash
 	return container_of(flash, struct spansion_spi_flash, flash);
 }
 
-static const struct spansion_spi_flash_params spansion_spi_flash_table[] = {
+static struct spansion_spi_flash_params spansion_spi_flash_table[] = {
 	{
 		.idcode1 = SPSN_ID_S25FL008A,
 		.idcode2 = 0,
 		.page_size = 256,
-		.pages_per_sector = 256,
-		.nr_sectors = 16,
+		.pages_per_sector[0] = 256,
+		.nr_sectors[0] = 16,
 		.name = "S25FL008A",
 	},
 	{
 		.idcode1 = SPSN_ID_S25FL016A,
 		.idcode2 = 0,
 		.page_size = 256,
-		.pages_per_sector = 256,
-		.nr_sectors = 32,
+		.pages_per_sector[0] = 256,
+		.nr_sectors[0] = 32,
 		.name = "S25FL016A",
 	},
 	{
 		.idcode1 = SPSN_ID_S25FL032A,
 		.idcode2 = 0,
 		.page_size = 256,
-		.pages_per_sector = 256,
-		.nr_sectors = 64,
+		.pages_per_sector[0] = 256,
+		.nr_sectors[0] = 64,
 		.name = "S25FL032A",
 	},
 	{
 		.idcode1 = SPSN_ID_S25FL064A,
 		.idcode2 = 0,
 		.page_size = 256,
-		.pages_per_sector = 256,
-		.nr_sectors = 128,
+		.pages_per_sector[0] = 256,
+		.nr_sectors[0] = 128,
 		.name = "S25FL064A",
 	},
 	{
-		.idcode1 = SPSN_ID_S25FL128P,
+		.idcode1 = SPSN_ID_S25FL128,
 		.idcode2 = SPSN_EXT_ID_S25FL128P_64KB,
 		.page_size = 256,
-		.pages_per_sector = 256,
-		.nr_sectors = 256,
+		.pages_per_sector[0] = 256,
+		.nr_sectors[0] = 256,
 		.name = "S25FL128P_64K",
 	},
 	{
-		.idcode1 = SPSN_ID_S25FL128P,
+		.idcode1 = SPSN_ID_S25FL128,
 		.idcode2 = SPSN_EXT_ID_S25FL128P_256KB,
 		.page_size = 256,
-		.pages_per_sector = 1024,
-		.nr_sectors = 64,
+		.pages_per_sector[0] = 1024,
+		.nr_sectors[0] = 64,
 		.name = "S25FL128P_256K",
 	},
+	{
+		.idcode1 = SPSN_ID_S25FL128,
+		.idcode2 = SPSN_EXT_ID_S25FL128S_64KB,
+		.page_size = 256,
+		.pages_per_sector[0] = 16,
+		.nr_sectors[0] = 32,
+		.pages_per_sector[1] = 256,
+		.nr_sectors[1] = 254,
+		.name = "S25FL128S_64K",
+	},
 };
+
+/*
+ * Get size of the sector (in bytes), which covers the address specified
+ */
+static u32 spansion_sec_size(struct spansion_spi_flash *spsn, u32 addr)
+{
+	struct spansion_spi_flash_params	*p = spsn->params;
+	u32					size = 0, i;
+
+	for (i = 0; i < DIF_SEC_SIZE_NUM; i++) {
+		if (!(addr < p->end[i]))
+			continue;
+
+		size = p->page_size * p->pages_per_sector[i];
+		break;
+	}
+
+	return size;
+}
 
 static int spansion_wait_ready(struct spi_flash *flash, unsigned long timeout)
 {
@@ -244,8 +290,7 @@ static int spansion_write(struct spi_flash *flash,
 int spansion_erase(struct spi_flash *flash, u32 offset, size_t len)
 {
 	struct spansion_spi_flash *spsn = to_spansion_spi_flash(flash);
-	unsigned long sector_size;
-	size_t actual;
+	unsigned long sector_size, start, end, pos;
 	int ret;
 	u8 cmd[4];
 
@@ -255,17 +300,23 @@ int spansion_erase(struct spi_flash *flash, u32 offset, size_t len)
 	 * when possible.
 	 */
 
-	sector_size = spsn->params->page_size * spsn->params->pages_per_sector;
+	/*
+	 * Fit [offset; offset + len] into the sector aligned
+	 * boundaries [start; end]
+	 */
+	sector_size = spansion_sec_size(spsn, offset);
+	start = offset & ~(sector_size - 1);
 
-	if (offset % sector_size || len % sector_size) {
-		debug("SF: Erase offset/length not multiple of sector size\n");
-		return -1;
+	sector_size = spansion_sec_size(spsn, offset + len);
+	end = (offset + len + sector_size - 1) & ~(sector_size - 1);
+
+	/*
+	 * Don't check alignments, just warns instead
+	 */
+	if (start != offset || end != (offset + len)) {
+		debug("SF: Warn, auto-align erase area [%x;%x] -> [%lx;%lx]\n",
+			offset, offset + len, start, end);
 	}
-
-	len /= sector_size;
-	cmd[0] = CMD_S25FLXX_SE;
-	cmd[2] = 0x00;
-	cmd[3] = 0x00;
 
 	ret = spi_claim_bus(flash->spi);
 	if (ret) {
@@ -274,8 +325,15 @@ int spansion_erase(struct spi_flash *flash, u32 offset, size_t len)
 	}
 
 	ret = 0;
-	for (actual = 0; actual < len; actual++) {
-		cmd[1] = (offset / sector_size) + actual;
+	pos = start;
+	do {
+		sector_size = spansion_sec_size(spsn, pos);
+
+		cmd[0] = (sector_size == 4096) ? spsn->params->cmd_pe :
+						 CMD_S25FLXX_SE;
+		cmd[1] = pos >> 16;
+		cmd[2] = pos >>  8;
+		cmd[3] = pos >>  0;
 
 		ret = spi_flash_cmd(flash->spi, CMD_S25FLXX_WREN, NULL, 0);
 		if (ret < 0) {
@@ -295,10 +353,14 @@ int spansion_erase(struct spi_flash *flash, u32 offset, size_t len)
 			debug("SF: SPANSION page erase timed out\n");
 			break;
 		}
-	}
 
-	debug("SF: SPANSION: Successfully erased %u bytes @ 0x%x\n",
-	      len * sector_size, offset);
+		pos += sector_size;
+	} while (pos < end);
+
+	if (ret == 0) {
+		debug("SF: SPANSION: Successfully erased %lu bytes @ 0x%lx\n",
+		      pos, start);
+	}
 
 	spi_release_bus(flash->spi);
 	return ret;
@@ -306,9 +368,9 @@ int spansion_erase(struct spi_flash *flash, u32 offset, size_t len)
 
 struct spi_flash *spi_flash_probe_spansion(struct spi_slave *spi, u8 *idcode)
 {
-	const struct spansion_spi_flash_params *params;
+	struct spansion_spi_flash_params *params;
 	struct spansion_spi_flash *spsn;
-	unsigned int i;
+	unsigned int i, size;
 	unsigned short jedec, ext_jedec;
 
 	jedec = idcode[1] << 8 | idcode[2];
@@ -333,6 +395,25 @@ struct spi_flash *spi_flash_probe_spansion(struct spi_slave *spi, u8 *idcode)
 		return NULL;
 	}
 
+	for (i = 0, size = 0; i < DIF_SEC_SIZE_NUM; i++) {
+		size += params->page_size * params->pages_per_sector[i] *
+			params->nr_sectors[i];
+		params->end[i] = size;
+	}
+
+	if (params->idcode1 == SPSN_ID_S25FL128 &&
+	    params->idcode2 == SPSN_EXT_ID_S25FL128S_64KB) {
+		/*
+		 * Use special cmd for 4kB sector erase
+		 */
+		params->cmd_pe = CMD_S25FLXX_PE;
+	} else {
+		/*
+		 * Use common cmd for 4kB sector erase
+		 */
+		params->cmd_pe = CMD_S25FLXX_SE;
+	}
+
 	spsn->params = params;
 	spsn->flash.spi = spi;
 	spsn->flash.name = params->name;
@@ -340,8 +421,7 @@ struct spi_flash *spi_flash_probe_spansion(struct spi_slave *spi, u8 *idcode)
 	spsn->flash.write = spansion_write;
 	spsn->flash.erase = spansion_erase;
 	spsn->flash.read = spansion_read_fast;
-	spsn->flash.size = params->page_size * params->pages_per_sector
-	    * params->nr_sectors;
+	spsn->flash.size = size;
 
 	debug("SF: Detected %s with page size %u, total %u bytes\n",
 	      params->name, params->page_size, spsn->flash.size);
