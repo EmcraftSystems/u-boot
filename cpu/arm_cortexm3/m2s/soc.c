@@ -30,6 +30,10 @@
  */
 static void soc_cache_enable(void)
 {
+	/*
+	 * Enable cache
+	 */
+	M2S_SYSREG->cc_cr = 1 << 0;
 }
 #endif
 
