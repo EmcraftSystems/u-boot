@@ -113,6 +113,13 @@ int dram_init (void)
 	M2S_SYSREG->mddr_cr = (1 << 0);
 
 	/*
+	 * Disable all DDR Bridge buffers
+	 * We suspect some bug in the buffering scheme, so disable
+	 * this for now
+	 */
+	M2S_SYSREG->ddrb_cr = 0;
+
+	/*
 	 * Configure mode, and mapping:
 	 * - LPDDR1 + PHY-16 + ECC_DISABLE
 	 * - BANK:1-0,COL:9-0,ROW:12-0 <-> src[2]..
