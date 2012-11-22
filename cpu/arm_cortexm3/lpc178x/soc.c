@@ -63,9 +63,6 @@ void cortex_m3_soc_init(void)
 	 * execution is not permitted at the addresses above 0xA0000000
 	 * (including SDRAM.)
 	 */
-	cortex_m3_mpu_add_region(0, 0x00000000,
-		CM3_MPU_RASR_AP_RW_RW | CM3_MPU_RASR_SIZE_4GB |
-		CM3_MPU_RASR_EN);
-	cortex_m3_mpu_enable(1);
+	cortex_m3_mpu_full_access();
 }
 #endif
