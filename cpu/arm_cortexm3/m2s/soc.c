@@ -59,4 +59,14 @@ void cortex_m3_soc_init(void)
 	M2S_SYSREG->soft_reset_cr |= (1 << 7);
 	M2S_SYSREG->soft_reset_cr &= ~(1 << 7);
 #endif
+
+	/*
+	 * Configure the memory protection unit (MPU) to allow full access to
+	 * the whole 4GB address space.
+	 *
+	 * This is required, because in the default configuration code
+	 * execution is not permitted at the addresses above 0xA0000000
+	 * (including external DDR memory.)
+	 */
+	cortex_m3_mpu_full_access();
 }
