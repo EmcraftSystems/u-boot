@@ -23,7 +23,7 @@
 #include <string.h>
 #include "envm.h"
 
-extern void a2f_spi_test(unsigned int bus, unsigned int cmd);
+extern void m2s_spi_test(unsigned int bus, unsigned int cmd);
 
  /*
   * Run SPI test
@@ -40,7 +40,7 @@ int do_spitest(cmd_tbl_t *cmdtp, int flag, int argc, char *argv[])
 	if (argc < 3) {
 		printf("%s: bus number and command must be specified\n",
 			(char *) argv[0]);
-		goto Done;
+		goto done;
 	}
 
 	/*
@@ -49,16 +49,16 @@ int do_spitest(cmd_tbl_t *cmdtp, int flag, int argc, char *argv[])
 	bus = simple_strtoul(argv[1], NULL, 16);
 	if (bus != 0 && bus != 1 && bus != 2) {
 		printf("%s: bus number must be 0, 1 or 2\n", (char *) argv[0]);
-		goto Done;
+		goto done;
 	}
 	cmd = simple_strtoul(argv[2], NULL, 16);
 
 	/*
 	 * Call the SPI driver in order to run actual test
 	 */
-	a2f_spi_test(bus, cmd);
+	m2s_spi_test(bus, cmd);
 
-	Done:
+done:
 	return ret;
 }
 

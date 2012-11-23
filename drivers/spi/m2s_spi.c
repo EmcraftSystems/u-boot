@@ -1,5 +1,6 @@
 /*
  * Copyright (C) 2012 Vladimir Khusainov, Emcraft Systems, vlad@emcraft.com
+ * Copyright (C) 2012 Yuri Tikhonov, Emcraft Systems, yur@emcraft.com
  *
  * See file CREDITS for list of people who contributed to this
  * project.
@@ -25,12 +26,12 @@
 #include <clock.h>
 
 /*
- * Debug output control. While debugging, have SPI_A2F_DEBUG defined.
- * In deployment, make sure that SPI_A2F_DEBUG is undefined
+ * Debug output control. While debugging, have SPI_M2S_DEBUG defined.
+ * In deployment, make sure that SPI_M2S_DEBUG is undefined
  * to avoid performance and size overhead of debug messages.
  */
-#if defined(CONFIG_SYS_A2F_SPI_DEBUG)
-#define SPI_A2F_DEBUG
+#if defined(CONFIG_SYS_M2S_SPI_DEBUG)
+#define SPI_M2S_DEBUG
 #endif
 
 /*
@@ -103,9 +104,9 @@
 /*
  * Service to print debug messages
  */
-#if defined(SPI_A2F_DEBUG)
+#if defined(SPI_M2S_DEBUG)
 # define d_printk(level, fmt, args...)					\
-	if (spi_a2f_debug >= level) printf("%s: " fmt, __func__, ## args)
+	if (spi_m2s_debug >= level) printf("%s: " fmt, __func__, ## args)
 #else
 # define d_printk(level, fmt, args...)
 #endif
@@ -113,7 +114,7 @@
 /*
  * Private data structure for an SPI slave
  */
-struct a2f_spi_slave {
+struct m2s_spi_slave {
 	struct spi_slave	slave;		/* Generic slave */
 	void			*regs;		/* Registers base */
 	u32			hz;		/* SPI bus rate */
@@ -128,7 +129,7 @@ struct a2f_spi_slave {
 	u32			dtx_sel;	/* TX DMA peripheral */
 };
 
-/* 
+/*
  * Description of the the SmartFusion SPI hardware interfaces.
  * This is a 1-to-1 mapping of Actel's documenation onto a C structure.
  * Refer to SmartFusion Data Sheet for details.
@@ -165,11 +166,11 @@ struct mss_pdma {
 };
 
 
-#if defined(SPI_A2F_DEBUG)
+#if defined(SPI_M2S_DEBUG)
 /*
  * Driver verbosity level: 0->silent; >0->verbose (1 to 4, growing verbosity)
  */
-static int spi_a2f_debug = 4;
+static int spi_m2s_debug = 4;
 #endif
 
 /*
@@ -182,12 +183,12 @@ static int pdma_used;
  * @param c		generic slave
  * @returns		driver specific slave
  */
-static inline struct a2f_spi_slave *to_a2f_spi(struct spi_slave *slave)
+static inline struct m2s_spi_slave *to_m2s_spi(struct spi_slave *slave)
 {
-	return container_of(slave, struct a2f_spi_slave, slave);
+	return container_of(slave, struct m2s_spi_slave, slave);
 }
 
-#if defined(SPI_A2F_DEBUG)
+#if defined(SPI_M2S_DEBUG)
 /*
  * Dump PDMA registers
  */
@@ -217,14 +218,14 @@ static void pdma_dump(char *comment, u8 drx, u8 dtx)
  * @param cs		chip select: [0..7]->slave, otherwise->deselect all
  * @returns		0->good,!=0->bad
  */
-static inline int spi_a2f_hw_cs_set(struct a2f_spi_slave *s, int cs)
+static inline int spi_m2s_hw_cs_set(struct m2s_spi_slave *s, int cs)
 {
 	unsigned int v = (0 <= cs && cs <= 7) ? (1 << cs) : 0;
 	int ret = 0;
 
 	MSS_SPI(s)->slave_select = v;
 
-	d_printk(3, "bus=%d,cs=%d,slave_select=0x%x,ret=%d\n", 
+	d_printk(3, "bus=%d,cs=%d,slave_select=0x%x,ret=%d\n",
 		 s->slave.bus, cs, MSS_SPI(s)->slave_select, ret);
 	return ret;
 }
@@ -235,15 +236,15 @@ static inline int spi_a2f_hw_cs_set(struct a2f_spi_slave *s, int cs)
  * @param spd		clock rate in Hz
  * @returns		0->good,!=0->bad
  */
-static inline int spi_a2f_hw_clk_set(struct a2f_spi_slave *s, unsigned int spd)
+static inline int spi_m2s_hw_clk_set(struct m2s_spi_slave *s, unsigned int spd)
 {
 	int i;
 	unsigned int h;
 	int ret = 0;
 
 	/*
- 	 * Calculate the clock rate that works for this slave
- 	 */
+	 * Calculate the clock rate that works for this slave
+	 */
 	h = s->hb;
 	for (i = 0; i <= 255; i++) {
 		if (h / ((i + 1) << 1) <= spd)
@@ -251,16 +252,16 @@ static inline int spi_a2f_hw_clk_set(struct a2f_spi_slave *s, unsigned int spd)
 	}
 
 	/*
- 	 * Can't provide a rate that is slow enough for the slave
- 	 */
+	 * Can't provide a rate that is slow enough for the slave
+	 */
 	if (i > 255) {
 		ret = -1;
 		goto done;
 	}
 
 	/*
- 	 * Set the clock rate
- 	 */
+	 * Set the clock rate
+	 */
 	MSS_SPI(s)->clk_gen = i;
 
 done:
@@ -278,24 +279,24 @@ done:
  * @param bt		frame size
  * @returns		0->good,!=0->bad
  */
-static inline int spi_a2f_hw_bt_set(struct a2f_spi_slave *s, int bt)
+static inline int spi_m2s_hw_bt_set(struct m2s_spi_slave *s, int bt)
 {
 	int ret = 0;
 
 	/*
- 	 * Disable the SPI contoller. Writes to data frame size have
- 	 * no effect when the controller is enabled.
- 	 */
+	 * Disable the SPI contoller. Writes to data frame size have
+	 * no effect when the controller is enabled.
+	 */
 	MSS_SPI(s)->control &= ~SPI_CONTROL_ENABLE;
 
 	/*
- 	 * Set the new data frame size.
- 	 */
+	 * Set the new data frame size.
+	 */
 	MSS_SPI(s)->txrxdf_size = bt;
 
 	/*
- 	 * Re-enable the SPI contoller 
- 	 */
+	 * Re-enable the SPI contoller
+	 */
 	MSS_SPI(s)->control |= SPI_CONTROL_ENABLE;
 
 	d_printk(3, "bus=%d,bt=%d,txrxdf_size=%d,ret=%d\n",
@@ -308,23 +309,23 @@ static inline int spi_a2f_hw_bt_set(struct a2f_spi_slave *s, int bt)
  * @param s		slave
  * @param len		transfer size
  */
-static inline void spi_a2f_hw_tfsz_set(struct a2f_spi_slave *s, int len)
+static inline void spi_m2s_hw_tfsz_set(struct m2s_spi_slave *s, int len)
 {
 	/*
- 	 * Disable the SPI contoller. Writes to transfer length have
- 	 * no effect when the controller is enabled.
- 	 */
+	 * Disable the SPI contoller. Writes to transfer length have
+	 * no effect when the controller is enabled.
+	 */
 	MSS_SPI(s)->control &= ~SPI_CONTROL_ENABLE;
 
 	/*
- 	 * Set the new data frame size.
- 	 */
+	 * Set the new data frame size.
+	 */
 	MSS_SPI(s)->control &= ~SPI_CONTROL_CNT_MSK;
 	MSS_SPI(s)->control |= len << SPI_CONTROL_CNT_SHF;
 
 	/*
- 	 * Re-enable the SPI contoller 
- 	 */
+	 * Re-enable the SPI contoller
+	 */
 	MSS_SPI(s)->control |= SPI_CONTROL_ENABLE;
 
 	d_printk(3, "bus=%d,len=%d\n", s->slave.bus, len);
@@ -336,14 +337,14 @@ static inline void spi_a2f_hw_tfsz_set(struct a2f_spi_slave *s, int len)
  * @param mode		mode
  * @returns		0->good;!=0->bad
  */
-static inline int spi_a2f_hw_mode_set(struct a2f_spi_slave *s,
+static inline int spi_m2s_hw_mode_set(struct m2s_spi_slave *s,
 				      unsigned int mode)
 {
 	int ret = 0;
 
 	/*
- 	 * Set the mode
- 	 */
+	 * Set the mode
+	 */
 	if (mode & SPI_CPHA)
 		MSS_SPI(s)->control |= SPI_CONTROL_SPH;
 	else
@@ -374,18 +375,18 @@ void spi_init()
  * @param cs		slave Chip Select
  * @param hz		max freq this slave can run at
  * @param m		slave access mode
- * @returns		driver specific slave 
+ * @returns		driver specific slave
  */
 struct spi_slave *spi_setup_slave(unsigned int b, unsigned int cs,
 				  unsigned int hz, unsigned int m)
 {
-	struct a2f_spi_slave	*s;
+	struct m2s_spi_slave	*s;
 	struct spi_slave	*slv = NULL;
 
 	/*
- 	 * Validate input parameters. Can be anything since this is
- 	 * part of user build-time configuration.
- 	 */
+	 * Validate input parameters. Can be anything since this is
+	 * part of user build-time configuration.
+	 */
 	if (! (0 <= b && b <= 1)) {
 		goto done;
 	}
@@ -394,16 +395,16 @@ struct spi_slave *spi_setup_slave(unsigned int b, unsigned int cs,
 	}
 
 	/*
- 	 * Allocate the driver-specific slave data structure
- 	 */
-	s = malloc(sizeof(struct a2f_spi_slave));
+	 * Allocate the driver-specific slave data structure
+	 */
+	s = malloc(sizeof(struct m2s_spi_slave));
 	if (!s) {
 		goto done;
 	}
 
 	/*
- 	 * Fill in the driver-specific slave data structure
- 	 */
+	 * Fill in the driver-specific slave data structure
+	 */
 	s->slave.bus = b;
 	s->slave.cs = cs;
 	s->mode = m;
@@ -432,7 +433,7 @@ struct spi_slave *spi_setup_slave(unsigned int b, unsigned int cs,
 		s->rst_clr = M2S_SYS_SOFT_RST_CR_SPI1;
 	}
 
-	d_printk(2, "bus=%d,regs=%p,cs=%d,hz=%d,mode=0x%x\n", 
+	d_printk(2, "bus=%d,regs=%p,cs=%d,hz=%d,mode=0x%x\n",
 		b, s->regs, cs, hz, m);
 
 done :
@@ -446,62 +447,57 @@ done :
  */
 void spi_free_slave(struct spi_slave *slv)
 {
-	struct a2f_spi_slave *s = to_a2f_spi(slv);
+	struct m2s_spi_slave *s = to_m2s_spi(slv);
 
 	/*
- 	 * Release the driver-specific slave data structure
- 	 */
+	 * Release the driver-specific slave data structure
+	 */
 	free(s);
 
 	d_printk(2, "slv=%p\n", slv);
 }
 
 /*
- * Set up the SPI controller 
+ * Set up the SPI controller
  * @param slv		SPI slave
  * @returns		0->success; !0->failure
  */
 int spi_claim_bus(struct spi_slave *slv)
 {
 	unsigned int ret = 0;
-	struct a2f_spi_slave *s = to_a2f_spi(slv);
+	struct m2s_spi_slave *s = to_m2s_spi(slv);
 
 	/*
 	 * Reset the MSS SPI controller and then bring it out of reset
- 	 */
+	 */
 	M2S_SYSREG->soft_reset_cr |= s->rst_clr;
 	M2S_SYSREG->soft_reset_cr &= ~s->rst_clr;
 
 	/*
- 	 * Set the master mode
- 	 */
+	 * Set the master mode
+	 */
 	MSS_SPI(s)->control |= SPI_CONTROL_MASTER;
 
 	/*
- 	 * Set the transfer protocol. We are using the Motorola
- 	 * SPI mode, with no user interface to configure it to 
- 	 * some other mode.
- 	 */
+	 * Set the transfer protocol. We are using the Motorola
+	 * SPI mode, with no user interface to configure it to
+	 * some other mode.
+	 */
 	MSS_SPI(s)->control &= ~SPI_CONTROL_PROTO_MSK;
 	MSS_SPI(s)->control |= SPI_CONTROL_PROTO_MOTO;
 
 	/*
-	 * We are running on the A2F500 device, we have an option
-	 * to set-up the controller in such a way that it doesn't remove
+	 * Set-up the controller in such a way that it doesn't remove
 	 * Chip Select until the entire message has been transferred,
 	 * even if at some points TX FIFO becomes empty.
-	 * ...
-	 * Similarly on A2F500, we have an option to extend FIFO to
-	 * 32 8-bit FIFO frames.
- 	 */
+	 */
 	MSS_SPI(s)->control |= SPI_CONTROL_SPS | SPI_CONTROL_BIGFIFO |
 			       SPI_CONTROL_CLKMODE;
 
 	/*
- 	 * Enable the SPI contoller
-	 * On the A2F500 it is critical to clear RESET in
-	 * the control bit. This bit is not defined for A2F200.
- 	 */
+	 * Enable the SPI contoller
+	 * It is critical to clear RESET in the control bit.
+	 */
 	MSS_SPI(s)->control &= ~SPI_CONTROL_RESET;
 	MSS_SPI(s)->control |= SPI_CONTROL_ENABLE;
 
@@ -538,12 +534,12 @@ int spi_claim_bus(struct spi_slave *slv)
 }
 
 /*
- * Shut down the SPI controller 
+ * Shut down the SPI controller
  * @param slv		SPI slave
  */
 void spi_release_bus(struct spi_slave *slv)
 {
-	struct a2f_spi_slave *s = to_a2f_spi(slv);
+	struct m2s_spi_slave *s = to_m2s_spi(slv);
 
 	/*
 	 * Reset DMAs
@@ -554,13 +550,13 @@ void spi_release_bus(struct spi_slave *slv)
 		M2S_SYSREG->soft_reset_cr |= M2S_SYS_SOFT_RST_CR_PDMA;
 
 	/*
- 	 * Disable the SPI contoller
- 	 */
+	 * Disable the SPI contoller
+	 */
 	MSS_SPI(s)->control &= ~SPI_CONTROL_ENABLE;
 
 	/*
- 	 * Put the SPI controller into reset
- 	 */
+	 * Put the SPI controller into reset
+	 */
 	M2S_SYSREG->soft_reset_cr |= s->rst_clr;
 
 	d_printk(2, "slv=%p\n", slv);
@@ -579,21 +575,20 @@ int spi_xfer(struct spi_slave *slv, unsigned int bl,
 	     const void *dout, void *din, unsigned long fl)
 {
 	/*
- 	 * The SPI framework implemented in U-boot doesn't work too well
- 	 * for the SmartFusion SPI hardware. The U-boot implementation makes
- 	 * an assumption that there is always a way to activate / deactive
- 	 * CS under explicit software control. This is not the case for
- 	 * the SmartFusion; CS is controlled by the SPI controller hardware
- 	 * and is active as long as a current transcation is active, which is
- 	 * defined by the total length of the transaction, as programmed into
- 	 * a certain CSR (this is the model that works for the A2F500; it is
- 	 * even more restricive for the A2F200).
- 	 * An implication is that we must calculate the size of the total
- 	 * transaction before we can start any transfer of that transaction.
- 	 * Hence the static variables below that are needed to maintain
- 	 * the state of things across potentially (typically, even) 
- 	 * multiple calls to this function across a single transaction.
- 	 */
+	 * The SPI framework implemented in U-boot doesn't work too well
+	 * for the SmartFusion SPI hardware. The U-boot implementation makes
+	 * an assumption that there is always a way to activate / deactive
+	 * CS under explicit software control. This is not the case for
+	 * the SmartFusion; CS is controlled by the SPI controller hardware
+	 * and is active as long as a current transcation is active, which is
+	 * defined by the total length of the transaction, as programmed into
+	 * a certain CSR.
+	 * An implication is that we must calculate the size of the total
+	 * transaction before we can start any transfer of that transaction.
+	 * Hence the static variables below that are needed to maintain
+	 * the state of things across potentially (typically, even)
+	 * multiple calls to this function across a single transaction.
+	 */
 	static struct {
 		const void	*dout;
 		void		*din;
@@ -605,45 +600,45 @@ int spi_xfer(struct spi_slave *slv, unsigned int bl,
 
 	int i, btx, brx, ret = 0;
 	void *p;
-	struct a2f_spi_slave *s = to_a2f_spi(slv);
+	struct m2s_spi_slave *s = to_m2s_spi(slv);
 	volatile struct mss_pdma_chan *chan;
 
-	/* 
- 	 * If this is a first transfer in a transaction, reset
- 	 * the static variables to the "zero" state.
- 	 */
+	/*
+	 * If this is a first transfer in a transaction, reset
+	 * the static variables to the "zero" state.
+	 */
 	if (fl & SPI_XFER_BEGIN) {
 		xfer_len = 0;
 		xfer_ttl = 0;
 	}
 
 	/*
- 	 * Save the parameters of this transfer and continue
- 	 * to calculate the size of the total transaction.
- 	 */
+	 * Save the parameters of this transfer and continue
+	 * to calculate the size of the total transaction.
+	 */
 	xfer_arr[xfer_len].dout = dout;
 	xfer_arr[xfer_len].din = din;
 	xfer_arr[xfer_len].len = bl / 8;
 	xfer_ttl += xfer_arr[xfer_len].len;
 
 	/*
- 	 * If this is not the last transfer in a transaction,
- 	 * prepare for a next transfer and bail out.
- 	 */
+	 * If this is not the last transfer in a transaction,
+	 * prepare for a next transfer and bail out.
+	 */
 	if (!(fl & SPI_XFER_END)) {
 		xfer_len++;
 		goto done;
 	}
 
 	/*
- 	 * Finally, this is the last transfer in a transaction.
- 	 * Ready to perform the actual transaction.
- 	 * Set for this slave: frame size, clock, slave select, mode
- 	 */
-	if (spi_a2f_hw_bt_set(s, 8) ||
-	    spi_a2f_hw_clk_set(s, s->hz) ||
-	    spi_a2f_hw_cs_set(s, s->slave.cs) ||
-	    spi_a2f_hw_mode_set(s, s->mode)) {
+	 * Finally, this is the last transfer in a transaction.
+	 * Ready to perform the actual transaction.
+	 * Set for this slave: frame size, clock, slave select, mode
+	 */
+	if (spi_m2s_hw_bt_set(s, 8) ||
+	    spi_m2s_hw_clk_set(s, s->hz) ||
+	    spi_m2s_hw_cs_set(s, s->slave.cs) ||
+	    spi_m2s_hw_mode_set(s, s->mode)) {
 		ret = -1;
 		goto done;
 	}
@@ -652,7 +647,7 @@ int spi_xfer(struct spi_slave *slv, unsigned int bl,
 	 * We can't provide persistent TxFIFO data flow even with PDMA, so to
 	 * avoid resetting #SS - set up frame counter
 	 */
-	spi_a2f_hw_tfsz_set(s, xfer_ttl);
+	spi_m2s_hw_tfsz_set(s, xfer_ttl);
 
 	/*
 	 * We don't use double buffering scheme, because we should be able to
@@ -713,13 +708,13 @@ int spi_xfer(struct spi_slave *slv, unsigned int bl,
 		while (!(MSS_PDMA->chan[s->drx].status & (1 << brx)));
 	}
 
-#if defined(SPI_A2F_DEBUG)
+#if defined(SPI_M2S_DEBUG)
 	pdma_dump("xfer done", s->drx, s->dtx);
 	for (i = 0; i <= xfer_len; i++) {
 		d_printk(4, "%d:%x,%x\n", i,
-			xfer_arr[i].dout ? 
-				((unsigned char *) xfer_arr[i].dout)[0] : -1, 
-			xfer_arr[i].din ? 
+			xfer_arr[i].dout ?
+				((unsigned char *) xfer_arr[i].dout)[0] : -1,
+			xfer_arr[i].din ?
 				((unsigned char *) xfer_arr[i].din)[0] : -1);
 	}
 #endif
@@ -728,9 +723,9 @@ done:
 	return ret;
 }
 
-#if defined(CONFIG_CMD_A2F_SPI_TEST)
+#if defined(CONFIG_CMD_M2S_SPI_TEST)
 
-void a2f_spi_test(unsigned int bus, unsigned char cmd)
+void m2s_spi_test(unsigned int bus, unsigned char cmd)
 {
 	struct spi_slave *s;
 	unsigned char rsp[32];
@@ -763,4 +758,4 @@ done_do_nothing:
 	return;
 }
 
-#endif /* CONFIG_CMD_A2F_SPI_TEST */
+#endif /* CONFIG_CMD_M2S_SPI_TEST */

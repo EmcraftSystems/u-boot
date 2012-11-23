@@ -138,7 +138,7 @@
  * Configure the SPI contoler device driver
  * FIFO Size is 64K, but leave 5 bytes for cmd[] + addr[]
  */
-#define CONFIG_A2F_SPI			1
+#define CONFIG_M2S_SPI			1
 #define CONFIG_SPI_MAX_XF_LEN		65530
 
 /*
