@@ -2704,7 +2704,7 @@ extern unsigned int __machine_arch_type;
 #define MACH_TYPE_LPC178X              3855
 #define MACH_TYPE_KINETIS              3896
 #define MACH_TYPE_LPC18XX              4152
-#define MACH_TYPE_M2S                  9999
+#define MACH_TYPE_M2S                  4446
 
 #ifdef CONFIG_ARCH_EBSA110
 # ifdef machine_arch_type
