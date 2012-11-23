@@ -56,8 +56,8 @@
 /*
  * MT46H32M16LFBF-6 params & timings
  */
-#define DDR_BL			16	/* Burst length (value)		*/
-#define DDR_MR_BL		4	/* Burst length (power of 2)	*/
+#define DDR_BL			8	/* Burst length (value)		*/
+#define DDR_MR_BL		3	/* Burst length (power of 2)	*/
 #define DDR_BT			0	/* Burst type int(1)/seq(0)	*/
 
 #define DDR_CL			3	/* CAS (read) latency		*/
@@ -113,11 +113,18 @@ int dram_init (void)
 	M2S_SYSREG->mddr_cr = (1 << 0);
 
 	/*
+	 * No non-bufferable regions
+	 */
+	M2S_SYSREG->ddrb_nb_size_cr = 0;
+
+#if (DDR_BL == 16)
+	/*
 	 * Disable all DDR Bridge buffers
 	 * We suspect some bug in the buffering scheme, so disable
 	 * this for now
 	 */
 	M2S_SYSREG->ddrb_cr = 0;
+#endif
 
 	/*
 	 * Configure mode, and mapping:
