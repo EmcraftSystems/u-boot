@@ -102,8 +102,7 @@
 /*
  * Cache configuration
  */
-#define CONFIG_M2S_CACHE_ON
-/* #undef CONFIG_M2S_CACHE_ON */
+#undef CONFIG_M2S_CACHE_ON
 
 /*
  * Memory layout configuration
