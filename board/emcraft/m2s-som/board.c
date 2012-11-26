@@ -68,7 +68,7 @@
 #define DDR_tCKE		1
 
 #define DDR_tRFC		M2S_CLK_MIN(72)
-#define DDR_tREFI		M2S_CLK32_MAX(15600)
+#define DDR_tREFI		M2S_CLK32_MAX(7800)
 #define DDR_tCKE_pre		M2S_CLK1024_MIN(200000)
 #define DDR_tCKE_post		M2S_CLK1024_MIN(400)
 #define DDR_tRCD		M2S_CLK_MIN(18)
@@ -145,8 +145,7 @@ int dram_init (void)
 	/*
 	 * Setup timings
 	 */
-	ddr->ddrc.DYN_REFRESH_1_CR = (DDR_tRFC << REG_DDRC_T_RFC_MIN) |
-				     (1 << REG_DDRC_SELFREF_EN);
+	ddr->ddrc.DYN_REFRESH_1_CR = DDR_tRFC << REG_DDRC_T_RFC_MIN;
 	ddr->ddrc.DYN_REFRESH_2_CR = (DDR_tREFI << REG_DDRC_T_RFC_NOM_X32);
 	ddr->ddrc.CKE_RSTN_CYCLES_1_CR = DDR_tCKE_pre << REG_DDRC_PRE_CKE_X1024;
 	ddr->ddrc.CKE_RSTN_CYCLES_2_CR = DDR_tCKE_post << REG_DDRC_POST_CKE_X1024;
