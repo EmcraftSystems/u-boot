@@ -148,6 +148,17 @@
 #define CONFIG_SPI_FLASH		1
 #define CONFIG_SPI_FLASH_SPANSION	1
 
+#define CONFIG_SPI_FLASH_BUS		0		/* SPI bus */
+#define CONFIG_SPI_FLASH_CS		0		/* SPI CS */
+#define CONFIG_SPI_FLASH_SPEED		20000000	/* Max speed */
+#define CONFIG_SPI_FLASH_MODE		3		/* SPI mode */
+
+/*
+ * 'sf' commands defaults
+ */
+#define CONFIG_SF_DEFAULT_SPEED		CONFIG_SPI_FLASH_SPEED
+#define CONFIG_SF_DEFAULT_MODE		CONFIG_SPI_FLASH_MODE
+
 /*
  * U-boot environment configuration
  */
@@ -155,10 +166,10 @@
 #define CONFIG_ENV_SECT_SIZE		0x1000
 #define CONFIG_ENV_SIZE			CONFIG_ENV_SECT_SIZE
 #define CONFIG_ENV_OFFSET		0x0
-#define CONFIG_ENV_SPI_BUS		0
-#define CONFIG_ENV_SPI_CS		0
-#define CONFIG_ENV_SPI_MAX_HZ		10000000
-#define CONFIG_ENV_SPI_MODE		3	/* SPI_MODE_3 */
+#define CONFIG_ENV_SPI_BUS		CONFIG_SPI_FLASH_BUS
+#define CONFIG_ENV_SPI_CS		CONFIG_SPI_FLASH_CS
+#define CONFIG_ENV_SPI_MAX_HZ		CONFIG_SPI_FLASH_SPEED
+#define CONFIG_ENV_SPI_MODE		CONFIG_SPI_FLASH_MODE
 
 #define CONFIG_INFERNO			1
 #define CONFIG_ENV_OVERWRITE		1
@@ -277,8 +288,8 @@
 	"loadaddr=" MK_STR(CONFIG_SYS_RAM_BASE) "\0"		\
 	"spiaddr=" MK_STR(CONFIG_ENV_IMG_OFFSET) "\0"		\
 	"spisize=0\0"						\
-	"spiprobe=sf probe " MK_STR(CONFIG_ENV_SPI_BUS) ":" MK_STR(CONFIG_ENV_SPI_CS) \
-		" " MK_STR(CONFIG_ENV_SPI_MAX_HZ) " " MK_STR(CONFIG_ENV_SPI_MODE) "\0" \
+	"spiprobe=sf probe " MK_STR(CONFIG_SPI_FLASH_BUS) ":" MK_STR(CONFIG_SPI_FLASH_CS) \
+		" " MK_STR(CONFIG_SPI_FLASH_SPEED) " " MK_STR(CONFIG_SPI_FLASH_MODE) "\0" \
 	"addip=setenv bootargs ${bootargs} ip=${ipaddr}:${serverip}:${gatewayip}:${netmask}:${hostname}:eth0:off\0" \
 	"flashboot=run addip;run spiprobe; sf read ${loadaddr} ${spiaddr} ${spisize}; bootm ${loadaddr}\0" \
 	"ethaddr=C0:B1:3C:83:83:83\0"				\
