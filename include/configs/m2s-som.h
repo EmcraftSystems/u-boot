@@ -278,7 +278,7 @@
 #define CONFIG_ZERO_BOOTDELAY_CHECK
 #define CONFIG_HOSTNAME			m2s-som
 #define CONFIG_BOOTARGS			"m2s_platform=m2s-som "\
-					"console=ttyS1,115200 panic=10"
+					"console=ttyS0,57600 panic=10"
 #define CONFIG_BOOTCOMMAND		"run flashboot"
 
 /*
