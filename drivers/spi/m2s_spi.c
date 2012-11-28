@@ -423,7 +423,7 @@ struct spi_slave *spi_setup_slave(unsigned int b, unsigned int cs,
 		s->rst_clr = M2S_SYS_SOFT_RST_CR_SPI0;
 	} else {
 		s->regs = (void *)MSS_SPI1_REGS;
-		s->hb = CLOCK_PCLK1;
+		s->hb = clock_get(CLOCK_PCLK1);
 
 		s->drx = 2;
 		s->dtx = 3;
