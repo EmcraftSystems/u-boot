@@ -175,9 +175,11 @@
 #define CONFIG_ENV_OVERWRITE		1
 
 /*
- * Location of kernel image and Co in SPI
+ * Location of kernel image and Co in SPI.
+ * Linux MTD driver has no boot sectors support, so locate kernel
+ * with 64K alignment
  */
-#define CONFIG_ENV_IMG_OFFSET		CONFIG_ENV_SIZE
+#define CONFIG_ENV_IMG_OFFSET		0x10000
 
 /*
  * Serial console configuration: MSS UART1
