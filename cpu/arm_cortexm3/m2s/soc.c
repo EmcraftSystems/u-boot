@@ -65,7 +65,7 @@ void cortex_m3_soc_init(void)
 #endif
 
 #ifdef CONFIG_M2S_SPI
-	/* Initialize iomux for SPI */
+	/* Initialize iomux for SPI0 */
 	*(volatile int *)0x400381F4 = 0x36C;
 #endif
 	/*
