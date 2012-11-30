@@ -35,10 +35,8 @@ int print_cpuinfo(void)
 	strmhz(buf[CLOCK_DDR], clock_get(CLOCK_DDR));
 	strmhz(buf[CLOCK_PCLK0], clock_get(CLOCK_PCLK0));
 	strmhz(buf[CLOCK_PCLK1], clock_get(CLOCK_PCLK1));
-	printf("Freqs: CORTEX-M3=%sMHz,DDR=%sMhz,"
-		"PCLK0=%sMHz,PCLK1=%sMHz\n",
-		buf[CLOCK_SYSTICK], buf[CLOCK_DDR],
-		buf[CLOCK_PCLK0], buf[CLOCK_PCLK1]);
+	printf("Freqs: CORTEX-M3=%sMHz,PCLK0=%sMHz,PCLK1=%sMHz\n",
+		buf[CLOCK_SYSTICK], buf[CLOCK_PCLK0], buf[CLOCK_PCLK1]);
 
 	return 0;
 }

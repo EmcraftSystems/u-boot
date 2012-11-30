@@ -108,7 +108,19 @@
  * Memory layout configuration
  */
 #define CONFIG_MEM_NVM_BASE		0x00000000
-#define CONFIG_MEM_NVM_LEN		(256 * 1024) /* for  M2S050T */
+#define CONFIG_MEM_NVM_LEN		(256 * 1024)
+
+#if 0
+/*
+ * Define the constant below to build U-boot for running
+ * from offset 0x20000 (128KB) in eNVM. When built this way,
+ * use the following commands to test the newly built U-boot:
+ * - tftp u-boot.bin
+ * - cptf 20000 ${loadaddr} ${filesize} 0
+ * - go 20375 (or check address of _start in u-boot.map)
+ */
+#define CONFIG_MEM_NVM_UBOOT_OFF	(128 * 1024)
+#endif
 
 #define CONFIG_MEM_RAM_BASE		0x20000000
 #define CONFIG_MEM_RAM_LEN		(16 * 1024)
@@ -147,15 +159,10 @@
 
 #define CONFIG_SPI_FLASH		1
 #define CONFIG_SPI_FLASH_SPANSION	1
-
-#define CONFIG_SPI_FLASH_BUS		0		/* SPI bus */
-#define CONFIG_SPI_FLASH_CS		0		/* SPI CS */
-#define CONFIG_SPI_FLASH_SPEED		20000000	/* Max speed */
-#define CONFIG_SPI_FLASH_MODE		3		/* SPI mode */
-
-/*
- * 'sf' commands defaults
- */
+#define CONFIG_SPI_FLASH_BUS		0
+#define CONFIG_SPI_FLASH_CS		0
+#define CONFIG_SPI_FLASH_MODE		3
+#define CONFIG_SPI_FLASH_SPEED		(CONFIG_SYS_M2S_SYSREF / 4)
 #define CONFIG_SF_DEFAULT_SPEED		CONFIG_SPI_FLASH_SPEED
 #define CONFIG_SF_DEFAULT_MODE		CONFIG_SPI_FLASH_MODE
 
