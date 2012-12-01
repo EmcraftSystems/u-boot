@@ -44,9 +44,15 @@
 
 /*
  * Choose Kinetis MCU family and maximum core frequency
+ * Default is K70 @120MHz and can be redefined by config.h
  */
+#ifndef CONFIG_KINETIS_K61
 #define CONFIG_KINETIS_K70
+#endif
+
+#ifndef CONFIG_KINETIS_150MHZ
 #define CONFIG_KINETIS_120MHZ
+#endif
 
 /*
  * Enable GPIO driver
