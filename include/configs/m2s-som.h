@@ -295,16 +295,19 @@
  */
 #define CONFIG_EXTRA_ENV_SETTINGS				\
 	"loadaddr=" MK_STR(CONFIG_SYS_RAM_BASE) "\0"		\
-	"spiaddr=" MK_STR(CONFIG_ENV_IMG_OFFSET) "\0"		\
-	"spisize=0\0"						\
-	"spiprobe=sf probe " MK_STR(CONFIG_SPI_FLASH_BUS) ":" MK_STR(CONFIG_SPI_FLASH_CS) \
-		" " MK_STR(CONFIG_SPI_FLASH_SPEED) " " MK_STR(CONFIG_SPI_FLASH_MODE) "\0" \
-	"addip=setenv bootargs ${bootargs} ip=${ipaddr}:${serverip}:${gatewayip}:${netmask}:${hostname}:eth0:off\0" \
-	"flashboot=run addip;run spiprobe; sf read ${loadaddr} ${spiaddr} ${spisize}; bootm ${loadaddr}\0" \
 	"ethaddr=C0:B1:3C:83:83:83\0"				\
 	"ipaddr=172.17.4.219\0"					\
 	"serverip=172.17.0.1\0"					\
-	"image=m2s/uImage\0"					\
+	"image=networking.uImage\0"				\
+	"spiaddr=" MK_STR(CONFIG_ENV_IMG_OFFSET) "\0"		\
+	"spisize=400000\0"					\
+	"spiprobe=sf probe " MK_STR(CONFIG_SPI_FLASH_BUS) "\0"	\
+	"addip=setenv bootargs ${bootargs}" 			\
+	" ip=${ipaddr}:${serverip}:${gatewayip}:"		\
+	"${netmask}:${hostname}:eth0:off\0" 			\
+	"flashboot=run addip;run spiprobe;"			\
+	" sf read ${loadaddr} ${spiaddr} ${spisize};"		\
+	" bootm ${loadaddr}\0"					\
 	"netboot=tftp ${loadaddr} ${image};run addip;bootm\0"	\
 	"update=tftp ${loadaddr} ${image};run spiprobe;"	\
 	" sf erase ${spiaddr} ${filesize};"			\
