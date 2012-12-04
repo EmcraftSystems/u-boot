@@ -58,15 +58,6 @@ void cortex_m3_soc_init(void)
 	 */
 	M2S_SYSREG->soft_reset_cr |= (1 << 7);
 	M2S_SYSREG->soft_reset_cr &= ~(1 << 7);
-
-	/* Initialize iomux for MSS UART0 */
-	*(volatile int *)0x4003827C = 0xc;
-	*(volatile int *)0x40038280 = 0x361;
-#endif
-
-#ifdef CONFIG_M2S_SPI
-	/* Initialize iomux for SPI0 */
-	*(volatile int *)0x400381F4 = 0x36C;
 #endif
 	/*
 	 * Configure the memory protection unit (MPU) to allow full access to
