@@ -291,10 +291,19 @@
 #define CONFIG_BOOTCOMMAND		"run flashboot"
 
 /*
+ * Macro for the "loadaddr". The most optimal load address
+ * for the non-compressed uImage is the kernel link address
+ * (CONFIG_SYS_RAM_BASE + 0x8000) minus sizeof uImage header (0x40),
+ * so the kernel start address would be loaded just to the right
+ * place.
+ */
+#define UIMAGE_LOADADDR			0xA0007FC0
+
+/*
  * Short-cuts to some useful commands (macros)
  */
 #define CONFIG_EXTRA_ENV_SETTINGS				\
-	"loadaddr=" MK_STR(CONFIG_SYS_RAM_BASE) "\0"		\
+	"loadaddr=" MK_STR(UIMAGE_LOADADDR) "\0"		\
 	"ethaddr=C0:B1:3C:83:83:83\0"				\
 	"ipaddr=172.17.4.219\0"					\
 	"serverip=172.17.0.1\0"					\
