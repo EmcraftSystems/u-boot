@@ -29,10 +29,9 @@
 #include <asm/arch/ddr.h>
 
 /*
- * TBD: move to config or convert at run-time?
  * Generate DDR timings depending on the following DDR clock
  */
-#define M2S_DDR_MHZ		160
+#define M2S_DDR_MHZ		(CONFIG_SYS_M2S_SYSREF / (1000 * 1000))
 
 /*
  * Common conversion macros used for DDR cfg

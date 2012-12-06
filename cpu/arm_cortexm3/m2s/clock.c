@@ -32,16 +32,6 @@ static unsigned long clock[CLOCK_END];
  */
 static void clock_mss_init(void)
 {
-	/*
-	 * Check if PERSIST_CC is set. If it is, it means that
-	 * FACC is in reset and its registers hasn't initialized yet.
-	 * The workaround is to de-assert the reset and perform
-	 * the software reset making FACC initialize properly.
-	 */
-	if (M2S_SYSREG->mssddr_facc1_cr & (1<<25)) {
-		M2S_SYSREG->mssddr_facc1_cr &= ~(1<<25);
-		reset_cpu(0);
-	}
 
 	/*
 	 * Analog voltage = 3.3v. Libero appears to ignore this
