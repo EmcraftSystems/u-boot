@@ -198,7 +198,7 @@
 #define CONFIG_SYS_NS16550_CLK		clock_get(CLOCK_PCLK0)
 #define CONFIG_CONS_INDEX		1
 #define CONFIG_SYS_NS16550_COM1		0x40000000
-#define CONFIG_BAUDRATE			57600
+#define CONFIG_BAUDRATE			115200
 #define CONFIG_SYS_BAUDRATE_TABLE	{ 9600, 19200, 38400, 57600, 115200 }
 
 /*
@@ -287,7 +287,7 @@
 #define CONFIG_ZERO_BOOTDELAY_CHECK
 #define CONFIG_HOSTNAME			m2s-som
 #define CONFIG_BOOTARGS			"m2s_platform=m2s-som "\
-					"console=ttyS0,57600 panic=10"
+					"console=ttyS0,115200 panic=10"
 #define CONFIG_BOOTCOMMAND		"run flashboot"
 
 /*
