@@ -76,6 +76,12 @@ struct mssgpio {
 #define IN			0
 #define OUT			1
 
+/* GPIO NN in COREGPIO0 block */
+#define DS3LED_GPIO		0
+#define DS4LED_GPIO		1
+#define S2BUTTON_GPIO		2
+
+
 /*
  * Connection description for the test 4. P9[i] corresponds to the P10[i].
  */
@@ -1085,25 +1091,27 @@ static int somtest_rtc(char *arg)
 static int somtest_led(void)
 {
 	int i;
-	/* Configure GPIO0-23 and 24 as output, 22 as input */
-	config_gpio(&CGPIO0->config[0], OUT, 23, 2);
-	config_gpio(&CGPIO0->config[0], IN, 22, 1);
+
+	config_gpio(&CGPIO0->config[0], OUT, DS3LED_GPIO, 1);
+	config_gpio(&CGPIO0->config[0], OUT, DS4LED_GPIO, 1);
+	config_gpio(&CGPIO0->config[0], IN, S2BUTTON_GPIO, 1);
+
 	printf("Check the DS4 LED, should blink three times...\n");
 	mdelay(1000);
 	for (i = 0; i < 6; i++) {
-		CGPIO0->out ^= (1 << 23);
+		CGPIO0->out ^= (1 << DS3LED_GPIO);
 		mdelay(1000);
 	}
 
 	printf("Check the DS3 LED, should blink three times...\n");
 	mdelay(1000);
 	for (i = 0; i < 6; i++) {
-		CGPIO0->out ^= (1 << 24);
+		CGPIO0->out ^= (1 << DS4LED_GPIO);
 		mdelay(1000);
 	}
 	for (i = 0; i < 6; i++) {
 		printf("Current state of the S2 button is %d, %s the button\n",
-			!!(CGPIO0->in & (1 << 22)), i%2 ? "release" : "hold");
+			!!(CGPIO0->in & (1 << S2BUTTON_GPIO)), i%2 ? "release" : "hold");
 		mdelay(5000);
 	}
 	printf("PASSED\n");
