@@ -118,11 +118,18 @@
  * PERF_PARAM_1_CR bits
  */
 #define REG_DDRC_BURST_RDWR		13
+#define REG_DDRC_PAGECLOSE		0x10
 
 /*
  * PERF_PARAM_2_CR bits
  */
 #define REG_DDRC_BURST_MODE		10
+
+/*
+ * DDRC_PWR_SAVE_1_CR bits
+ */
+#define REG_DDRC_POWERDOWN_TO_X32_SHIFT		1
+#define REG_DDRC_POST_SELFREF_GAP_X32_SHIFT	6
 
 /*
  * DDR Configuration registers

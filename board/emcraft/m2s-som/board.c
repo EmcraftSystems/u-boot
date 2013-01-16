@@ -62,7 +62,7 @@
 #define DDR_CL			3	/* CAS (read) latency		*/
 #define DDR_WL			1	/* Write latency		*/
 #define DDR_tMRD		2
-#define DDR_tWTR		1
+#define DDR_tWTR		2
 #define DDR_tXP			1
 #define DDR_tCKE		1
 
@@ -131,6 +131,9 @@ int dram_init (void)
 	 * - BANK:1-0,COL:9-0,ROW:12-0 <-> src[2]..
 	 */
 	ddr->ddrc.DYN_POWERDOWN_CR = (0 << REG_DDRC_POWERDOWN_EN);
+	ddr->ddrc.PWR_SAVE_1_CR = (4 << REG_DDRC_POST_SELFREF_GAP_X32_SHIFT) |
+		(0xc << REG_DDRC_POWERDOWN_TO_X32_SHIFT);
+
 	ddr->ddrc.MODE_CR = (  1 << REG_DDRC_MOBILE) |
 			    (  1 << REG_DDRC_SDRAM) |
 			    (0x1 << REG_DDRC_DATA_BUS_WIDTH);
