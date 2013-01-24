@@ -3218,6 +3218,9 @@ a2f-hoermann-brd_config :  unconfig
 	@$(MKCONFIG) $(@:_config=) arm arm_cortexm3 a2f-hoermann-brd \
 	hoermann a2f
 
+sf2-dev-kit_config :  unconfig
+	@$(MKCONFIG) $(@:_config=) arm arm_cortexm3 sf2-dev-kit actel m2s
+
 stm3220g-eval_config : unconfig
 	@$(MKCONFIG) $(@:_config=) arm arm_cortexm3 stm3220g-eval stm stm32
 

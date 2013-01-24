@@ -3,6 +3,7 @@
  *
  * Alexander Potashev, Emcraft Systems, aspotashev@emcraft.com
  * Vladimir Khusainov, Emcraft Systems, vlad@emcraft.com
+ * Vladimir Skvortsov, Emcraft Systems, vskvortsov@emcraft.com
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License as
@@ -54,10 +55,16 @@ void cortex_m3_soc_init(void)
 #ifdef CONFIG_SYS_NS16550
 
 	/*
-	 * Reset UART0 and take it out of reset
+	 * Reset UART0/1 and take them out of reset
 	 */
+#ifdef CONFIG_SYS_NS16550_COM1
 	M2S_SYSREG->soft_reset_cr |= (1 << 7);
 	M2S_SYSREG->soft_reset_cr &= ~(1 << 7);
+#endif
+#ifdef CONFIG_SYS_NS16550_COM2
+	M2S_SYSREG->soft_reset_cr |= (1 << 8);
+	M2S_SYSREG->soft_reset_cr &= ~(1 << 8);
+#endif
 #endif
 	/*
 	 * Configure the memory protection unit (MPU) to allow full access to
