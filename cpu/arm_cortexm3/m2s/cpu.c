@@ -29,7 +29,7 @@ int print_cpuinfo(void)
 {
 	char buf[CLOCK_END][32];
 
-	printf("CPU  : %s\n", "SmartFusion2 cSoC (Cortex-M3 Hard IP)");
+	printf("CPU  : %s\n", "SmartFusion2 SoC (Cortex-M3 Hard IP)");
 
 	strmhz(buf[CLOCK_SYSTICK], clock_get(CLOCK_SYSTICK));
 	strmhz(buf[CLOCK_DDR], clock_get(CLOCK_DDR));
