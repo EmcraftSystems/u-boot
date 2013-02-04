@@ -123,8 +123,8 @@
 #define CONFIG_MEM_NVM_UBOOT_OFF	(128 * 1024)
 #endif
 
-#define CONFIG_MEM_RAM_BASE			0x20000000
-#define CONFIG_MEM_RAM_LEN			(16 * 1024)
+#define CONFIG_MEM_RAM_BASE		0x20000000
+#define CONFIG_MEM_RAM_LEN		(16 * 1024)
 #define CONFIG_MEM_RAM_BUF_LEN		(32 * 1024)
 #define CONFIG_MEM_MALLOC_LEN		(12 * 1024)
 #define CONFIG_MEM_STACK_LEN		(4 * 1024)
@@ -138,8 +138,8 @@
  * Configuration of the external memory
  */
 #define CONFIG_NR_DRAM_BANKS		1
-#define CONFIG_SYS_RAM_BASE			0xA0000000
-#define CONFIG_SYS_RAM_SIZE			(16 * 1024 * 1024)
+#define CONFIG_SYS_RAM_BASE		0xA0000000
+#define CONFIG_SYS_RAM_SIZE		(256 * 1024 * 1024)
 
 /*
  * Configuration of the external Flash
@@ -148,22 +148,51 @@
 #define CONFIG_SYS_NO_FLASH
 
 /*
+ * Configure the SPI contoler device driver
+ * FIFO Size is 64K, but leave 5 bytes for cmd[] + addr[]
+ */
+#define CONFIG_M2S_SPI			1
+#define CONFIG_SPI_MAX_XF_LEN		65530
+
+/*
+ * Configure SPI Flash
+ */
+
+#define CONFIG_SPI_FLASH		1
+#define CONFIG_SPI_FLASH_ATMEL		1
+#define CONFIG_SPI_FLASH_BUS		0
+#define CONFIG_SPI_FLASH_CS		0
+#define CONFIG_SPI_FLASH_MODE		3
+#define CONFIG_SPI_FLASH_SPEED		(CONFIG_SYS_M2S_SYSREF / 4)
+#define CONFIG_SF_DEFAULT_SPEED		CONFIG_SPI_FLASH_SPEED
+#define CONFIG_SF_DEFAULT_MODE		CONFIG_SPI_FLASH_MODE
+
+/*
  * U-boot environment configuration
  */
-#define CONFIG_ENV_IS_NOWHERE	1
-#define CONFIG_ENV_SIZE				0x1000
+#define CONFIG_ENV_IS_IN_SPI_FLASH	1
+#define CONFIG_ENV_SECT_SIZE		0x1000
+#define CONFIG_ENV_SIZE			CONFIG_ENV_SECT_SIZE
+#define CONFIG_ENV_OFFSET		0x0
+#define CONFIG_ENV_SPI_BUS		CONFIG_SPI_FLASH_BUS
+#define CONFIG_ENV_SPI_CS		CONFIG_SPI_FLASH_CS
+#define CONFIG_ENV_SPI_MAX_HZ		CONFIG_SPI_FLASH_SPEED
+#define CONFIG_ENV_SPI_MODE		CONFIG_SPI_FLASH_MODE
+
+#define CONFIG_INFERNO			1
+#define CONFIG_ENV_OVERWRITE		1
 
 /*
  * Serial console configuration: MSS UART1
  */
-#define CONFIG_SYS_NS16550			1
+#define CONFIG_SYS_NS16550		1
 #undef CONFIG_NS16550_MIN_FUNCTIONS
 #define CONFIG_SYS_NS16550_SERIAL	1
 #define CONFIG_SYS_NS16550_REG_SIZE	(-4)
 #define CONFIG_SYS_NS16550_CLK		clock_get(CLOCK_PCLK1)
-#define CONFIG_CONS_INDEX			2
+#define CONFIG_CONS_INDEX		2
 #define CONFIG_SYS_NS16550_COM2		0x40010000
-#define CONFIG_BAUDRATE				115200
+#define CONFIG_BAUDRATE			115200
 #define CONFIG_SYS_BAUDRATE_TABLE	{ 9600, 19200, 38400, 57600, 115200 }
 
 /*
@@ -255,22 +284,22 @@
 /*
  * Short-cuts to some useful commands (macros)
  */
-#define CONFIG_EXTRA_ENV_SETTINGS							\
-	"loadaddr=" MK_STR(UIMAGE_LOADADDR) "\0"				\
-	"image=networking.uImage\0"								\
-	"spiaddr=" MK_STR(CONFIG_ENV_IMG_OFFSET) "\0"			\
-	"spisize=400000\0"										\
+#define CONFIG_EXTRA_ENV_SETTINGS				\
+	"loadaddr=" MK_STR(UIMAGE_LOADADDR) "\0"		\
+	"image=networking.uImage\0"				\
+	"spiaddr=" MK_STR(CONFIG_ENV_IMG_OFFSET) "\0"		\
+	"spisize=400000\0"					\
 	"spiprobe=sf probe " MK_STR(CONFIG_SPI_FLASH_BUS) "\0"	\
-	"addip=setenv bootargs ${bootargs}"						\
-	" ip=${ipaddr}:${serverip}:${gatewayip}:"				\
-	"${netmask}:${hostname}:eth0:off\0"						\
-	"flashboot=run addip;run spiprobe;"						\
-	" sf read ${loadaddr} ${spiaddr} ${spisize};"			\
-	" bootm ${loadaddr}\0"									\
+	"addip=setenv bootargs ${bootargs}"			\
+	" ip=${ipaddr}:${serverip}:${gatewayip}:"		\
+	"${netmask}:${hostname}:eth0:off\0"			\
+	"flashboot=run addip;run spiprobe;"			\
+	" sf read ${loadaddr} ${spiaddr} ${spisize};"		\
+	" bootm ${loadaddr}\0"					\
 	"netboot=tftp ${loadaddr} ${image};run addip;bootm\0"	\
-	"update=tftp ${loadaddr} ${image};run spiprobe;"		\
-	" sf erase ${spiaddr} ${filesize};"						\
-	" sf write ${loadaddr} ${spiaddr} ${filesize};"			\
+	"update=tftp ${loadaddr} ${image};run spiprobe;"	\
+	" sf erase ${spiaddr} ${filesize};"			\
+	" sf write ${loadaddr} ${spiaddr} ${filesize};"		\
 	" setenv spisize 0x${filesize}; saveenv\0"
 
 /*
