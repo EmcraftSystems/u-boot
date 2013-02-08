@@ -56,10 +56,10 @@
 /*
  * This is a specific revision of the board
  */
-#define CONFIG_SYS_BOARD_REV		0x1A
+#define CONFIG_SYS_BOARD_REV		0x1
 
-#if (CONFIG_SYS_BOARD_REV!=0x1A)
-#error CONFIG_SYS_BOARD_REV must be 1A
+#if (CONFIG_SYS_BOARD_REV!=0x1)
+#error CONFIG_SYS_BOARD_REV must be 0x1
 #endif
 
 /*
@@ -68,7 +68,7 @@
 #define CONFIG_DISPLAY_CPUINFO		1
 #define CONFIG_DISPLAY_BOARDINFO	1
 
-#define CONFIG_SYS_BOARD_REV_STR	"A"
+#define CONFIG_SYS_BOARD_REV_STR	"1.0"
 
 /*
  * Monitor prompt
@@ -271,6 +271,7 @@
 #define CONFIG_BOOTARGS			"m2s_platform=sf2-dev-kit "\
 					"console=ttyS1,115200 panic=10"
 #define CONFIG_BOOTCOMMAND		"run flashboot"
+#define CONFIG_ENV_IMG_OFFSET		0x10000
 
 /*
  * Macro for the "loadaddr". The most optimal load address
@@ -288,7 +289,7 @@
 	"loadaddr=" MK_STR(UIMAGE_LOADADDR) "\0"		\
 	"image=networking.uImage\0"				\
 	"spiaddr=" MK_STR(CONFIG_ENV_IMG_OFFSET) "\0"		\
-	"spisize=400000\0"					\
+	"spisize=3F0000\0"					\
 	"spiprobe=sf probe " MK_STR(CONFIG_SPI_FLASH_BUS) "\0"	\
 	"addip=setenv bootargs ${bootargs}"			\
 	" ip=${ipaddr}:${serverip}:${gatewayip}:"		\

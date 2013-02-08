@@ -43,7 +43,7 @@ int board_init(void)
 
 int checkboard(void)
 {
-	printf("Board: SF2-DEV-KIT Rev %s, www.emcraft.com\n",
+	printf("Board: SF2-DEV-KIT Rev %s, Microsemi\n",
 		CONFIG_SYS_BOARD_REV_STR);
 	return 0;
 }
