@@ -172,6 +172,31 @@
 #define CONFIG_SYS_MAX_FLASH_BANKS	1
 #define CONFIG_SYS_MAX_FLASH_SECT	1024
 
+
+#define CONFIG_LPC_SPI			1
+
+#define CONFIG_LPC_SPI_PINS {					\
+	{{0x3, 3}, LPC18XX_IOMUX_CONFIG(1, 0, 0, 1, 0, 0)},	\
+	{{0x3, 6}, LPC18XX_IOMUX_CONFIG(1, 0, 0, 1, 1, 1)},	\
+	{{0x3, 7}, LPC18XX_IOMUX_CONFIG(1, 0, 0, 1, 0, 0)},	\
+	{{0x3, 8}, LPC18XX_IOMUX_CONFIG(4, 0, 0, 1, 0, 0)}	\
+}
+#define CONFIG_LPC_CS_GPIO {5, 11}
+
+/*
+ * Configure SPI Flash
+ */
+
+#define CONFIG_SPI_FLASH		1
+#define CONFIG_SPI_FLASH_SPANSION	1
+#define CONFIG_SPI_FLASH_BUS		0
+#define CONFIG_SPI_FLASH_CS		0
+#define CONFIG_SPI_FLASH_MODE		0
+#define CONFIG_SPI_FLASH_SPEED		(clock_get(CLOCK_SPI) / 8)
+#define CONFIG_SF_DEFAULT_SPEED		CONFIG_SPI_FLASH_SPEED
+#define CONFIG_SF_DEFAULT_MODE		CONFIG_SPI_FLASH_MODE
+
+
 /*
  * Store env in flash.
  */
@@ -303,6 +328,9 @@
 #undef CONFIG_CMD_NFS
 #undef CONFIG_CMD_SOURCE
 #undef CONFIG_CMD_XIMG
+#if defined(CONFIG_SPI_FLASH)
+#define CONFIG_CMD_SF
+#endif
 
 /*
  * To save memory disable long help

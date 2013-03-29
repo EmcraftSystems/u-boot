@@ -25,6 +25,9 @@
 
 #include <common.h>
 #include <netdev.h>
+#if defined(CONFIG_LPC_SPI)
+#include <spi.h>
+#endif
 
 #include <asm/arch/lpc18xx_gpio.h>
 #include <asm/arch/lpc18xx_scu.h>
@@ -469,44 +472,12 @@ struct lpc18xx_otp_area {
 #define LPC18XX_OTP_BASE		0x40045000
 #define LPC18XX_OTP			((volatile struct lpc18xx_otp_area *) \
 					LPC18XX_OTP_BASE)
-
 /*
  * Customer control data
  */
 /* Boot source selection in OTP */
 #define LPC18XX_OTP_CTRL_BOOTSRC_BITS	25
 #define LPC18XX_OTP_CTRL_BOOTSRC_MSK	(0xF << LPC18XX_OTP_CTRL_BOOTSRC_BITS)
-
-/*
- * GPIO (GPIO ports) register map
- */
-struct lpc18xx_gpio_regs {
-	u8 pbyte[256];		/* GPIO port byte pin registers */
-	u32 rsv0[960];
-	u32 pword[256];		/* GPIO port word pin registers */
-	u32 rsv1[768];
-	u32 dir[8];		/* GPIO port direction registers */
-	u32 rsv2[24];
-	u32 mask[8];		/* GPIO port mask registers */
-	u32 rsv3[24];
-	u32 pin[8];		/* GPIO port pin registers */
-	u32 rsv4[24];
-	u32 mpin[8];		/* GPIO masked port pin registers */
-	u32 rsv5[24];
-	u32 set[8];		/* GPIO port set registers */
-	u32 rsv6[24];
-	u32 clr[8];		/* GPIO port clear registers */
-	u32 rsv7[24];
-	u32 not[8];		/* GPIO port toggle registers */
-};
-
-/*
- * GPIO registers base
- */
-#define LPC18XX_GPIO_BASE		0x400F4000
-#define LPC18XX_GPIO			((volatile struct lpc18xx_gpio_regs *) \
-					LPC18XX_GPIO_BASE)
-#define LPC18XX_GPIO_B(port,pin)	(LPC18XX_GPIO->pbyte[32*(port) + (pin)])
 
 /*
  * Configuration of boot pins as GPIO inputs
@@ -681,6 +652,11 @@ int board_init(void)
 	st->wr = CONFIG_SYS_FLASH_WR;
 	st->ta = CONFIG_SYS_FLASH_TA;
 #endif
+
+#if defined(CONFIG_LPC_SPI)
+	spi_init();
+#endif
+
 	return 0;
 }
 

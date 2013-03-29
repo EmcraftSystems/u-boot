@@ -50,10 +50,12 @@
 #define SPSN_ID_S25FL016A	0x0214
 #define SPSN_ID_S25FL032A	0x0215
 #define SPSN_ID_S25FL064A	0x0216
+#define SPSN_ID_S25FL064P	0x0216
 #define SPSN_ID_S25FL128	0x2018
 #define SPSN_EXT_ID_S25FL128P_256KB	0x0300
 #define SPSN_EXT_ID_S25FL128P_64KB	0x0301
 #define SPSN_EXT_ID_S25FL128S_64KB	0x4D01
+#define SPSN_EXT_ID_S25FL064P	0x4D00
 
 #define SPANSION_SR_WIP		(1 << 0)	/* Write-in-Progress */
 
@@ -124,6 +126,14 @@ static struct spansion_spi_flash_params spansion_spi_flash_table[] = {
 		.pages_per_sector[0] = 256,
 		.nr_sectors[0] = 128,
 		.name = "S25FL064A",
+	},
+	{
+		.idcode1 = SPSN_ID_S25FL064P,
+		.idcode2 = SPSN_EXT_ID_S25FL064P,
+		.page_size = 256,
+		.pages_per_sector[0] = 256,
+		.nr_sectors[0] = 128,
+		.name = "S25FL064P",
 	},
 	{
 		.idcode1 = SPSN_ID_S25FL128,

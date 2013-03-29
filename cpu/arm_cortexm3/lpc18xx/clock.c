@@ -340,6 +340,14 @@ static void clock_setup(void)
 		LPC18XX_CGU_AUTOBLOCK_MSK;
 	LPC18XX_CGU->uart3_clk = LPC18XX_CGU_CLKSEL_PLL1 |
 		LPC18XX_CGU_AUTOBLOCK_MSK;
+
+#if defined(CONFIG_LPC_SPI)
+	/*
+	 * Set-up clocks for SPI
+	 */
+	LPC18XX_CGU->spifi_clk = LPC18XX_CGU_CLKSEL_PLL1 |
+		LPC18XX_CGU_AUTOBLOCK_MSK;
+#endif
 }
 
 /*
@@ -423,6 +431,13 @@ void clock_init(void)
 	clock_val[CLOCK_UART1] = LPC18XX_PLL1_CLK_OUT;
 	clock_val[CLOCK_UART2] = LPC18XX_PLL1_CLK_OUT;
 	clock_val[CLOCK_UART3] = LPC18XX_PLL1_CLK_OUT;
+
+	/*
+	 * Set SPI base clock rate
+	 */
+#if defined(CONFIG_LPC_SPI)
+	clock_val[CLOCK_SPI] = LPC18XX_PLL1_CLK_OUT;
+#endif
 }
 
 /*

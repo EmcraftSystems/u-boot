@@ -54,6 +54,7 @@ enum clock {
 	CLOCK_UART1,		/* UART1 base clock rate expressed in Hz      */
 	CLOCK_UART2,		/* UART2 base clock rate expressed in Hz      */
 	CLOCK_UART3,		/* UART3 base clock rate expressed in Hz      */
+	CLOCK_SPI,		/* SPI base clock rate expressed in Hz      */
 	CLOCK_END		/* for internal usage			      */
 };
 

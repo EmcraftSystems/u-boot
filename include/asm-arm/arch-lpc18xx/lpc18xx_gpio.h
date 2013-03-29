@@ -96,4 +96,41 @@ int lpc18xx_iomux_config(const struct lpc18xx_iomux_dsc *dsc, u32 regval);
 extern int lpc18xx_pin_config_table(
 	const struct lpc18xx_pin_config *table, unsigned int len);
 
+/*
+ * GPIO (GPIO ports) register map
+ */
+struct lpc18xx_gpio_regs {
+	u8 pbyte[256];		/* GPIO port byte pin registers */
+	u32 rsv0[960];
+	u32 pword[256];		/* GPIO port word pin registers */
+	u32 rsv1[768];
+	u32 dir[8];		/* GPIO port direction registers */
+	u32 rsv2[24];
+	u32 mask[8];		/* GPIO port mask registers */
+	u32 rsv3[24];
+	u32 pin[8];		/* GPIO port pin registers */
+	u32 rsv4[24];
+	u32 mpin[8];		/* GPIO masked port pin registers */
+	u32 rsv5[24];
+	u32 set[8];		/* GPIO port set registers */
+	u32 rsv6[24];
+	u32 clr[8];		/* GPIO port clear registers */
+	u32 rsv7[24];
+	u32 not[8];		/* GPIO port toggle registers */
+};
+
+/*
+ * GPIO registers base
+ */
+#define LPC18XX_GPIO_BASE		0x400F4000
+#define LPC18XX_GPIO			((volatile struct lpc18xx_gpio_regs *) \
+					LPC18XX_GPIO_BASE)
+#define LPC18XX_GPIO_B(port,pin)	(LPC18XX_GPIO->pbyte[32*(port) + (pin)])
+
+
+void lpc_gpio_dir(struct lpc18xx_iomux_dsc pin, u8 dir);
+void lpc_gpio_set(struct lpc18xx_iomux_dsc pin);
+void lpc_gpio_clear(struct lpc18xx_iomux_dsc pin);
+
+
 #endif /* _LPC18XX_IOMUX_H_ */

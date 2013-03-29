@@ -126,3 +126,25 @@ int
 out:
 	return rv;
 }
+
+/*
+ * Set direction for GPIO pin.
+ */
+void lpc_gpio_dir(struct lpc18xx_iomux_dsc pin, u8 dir)
+{
+	if (dir) {
+		LPC18XX_GPIO->dir[pin.group] |= (1 << pin.pin);
+	} else {
+		LPC18XX_GPIO->dir[pin.group] &= ~(1 << pin.pin);
+	}
+}
+
+void lpc_gpio_set(struct lpc18xx_iomux_dsc pin)
+{
+	LPC18XX_GPIO->set[pin.group] = (1 << pin.pin);
+}
+
+void lpc_gpio_clear(struct lpc18xx_iomux_dsc pin)
+{
+	LPC18XX_GPIO->clr[pin.group] = (1 << pin.pin);
+}
