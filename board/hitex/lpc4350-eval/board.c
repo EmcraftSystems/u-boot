@@ -28,6 +28,9 @@
 #if defined(CONFIG_LPC_SPI)
 #include <spi.h>
 #endif
+#if defined(CONFIG_SPIFI)
+#include <spifi.h>
+#endif
 
 #include <asm/arch/lpc18xx_gpio.h>
 #include <asm/arch/lpc18xx_scu.h>
@@ -677,7 +680,11 @@ int checkboard(void)
 #ifdef CONFIG_MISC_INIT_R
 int misc_init_r(void)
 {
-	/* TBD */
+#if defined(CONFIG_SPIFI)
+	if (spifi_initialize()) {
+		return 1;
+	}
+#endif
 	return 0;
 }
 #endif /* CONFIG_MISC_INIT_R */

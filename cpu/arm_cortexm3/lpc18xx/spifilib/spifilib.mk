@@ -1,11 +1,3 @@
-#
-# (C) Copyright 2000-2003
-# Wolfgang Denk, DENX Software Engineering, wd@denx.de.
-#
-# (C) Copyright 2012
-# Port to NXP LPC18xx MCU
-# Alexander Potashev, Emcraft Systems, aspotashev@emcraft.com.
-#
 # See file CREDITS for list of people who contributed to this
 # project.
 #
@@ -25,31 +17,14 @@
 # MA 02111-1307 USA
 #
 
-include $(TOPDIR)/config.mk
+spifilib.bin: spifilib
+	$(OBJCOPY) -O binary $< $@
 
-LIB	= $(obj)lib$(SOC).a
+spifilib: spifilib.o spifi_drv_M3.lib spifilib.lds
+	$(LD) $(LDLAGS) -Map spifilib.map -Tspifilib.lds -nostdlib -o $@ spifilib.o spifi_drv_M3.lib
 
-COBJS	:= clock.o cpu.o envm.o wdt.o spifi.o
-SOBJS	:=
-
-SRCS	:= $(COBJS:.o=.c)
-OBJS	:= $(addprefix $(obj),$(COBJS))
-SOBJS	:= $(addprefix $(obj),$(SOBJS))
-
-$(LIB):	$(obj).depend $(OBJS) $(SOBJS)
-	$(AR) $(ARFLAGS) $@ $(OBJS)
+spifilib.o: spifilib.h spifilib.c
+	$(CC) $(CFLAGS) -fshort-wchar -fshort-enums -c $+
 
 clean:
-	rm -f $(SOBJS) $(OBJS)
-
-distclean:
-	rm -f $(LIB) core *.bak $(obj).depend
-
-#########################################################################
-
-# defines $(obj).depend target
-include $(SRCTREE)/rules.mk
-
-sinclude $(obj).depend
-
-#########################################################################
+	$(RM) spifilib.o spifilib spifilib.bin

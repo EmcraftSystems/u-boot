@@ -33,6 +33,9 @@
 #include <dataflash.h>
 #endif
 #include <watchdog.h>
+#ifdef CONFIG_SPIFI
+#include <spifi.h>
+#endif
 
 #include <u-boot/md5.h>
 #include <sha1.h>
@@ -447,6 +450,20 @@ int do_mem_cp ( cmd_tbl_t *cmdtp, int flag, int argc, char *argv[])
 	if (addr_bfin_on_chip_mem(dest) || addr_bfin_on_chip_mem(addr)) {
 		memcpy((void *)dest, (void *)addr, count * size);
 		return 0;
+	}
+#endif
+
+#ifdef CONFIG_SPIFI
+	if (spifi_addr(dest)) {
+		if (spifi_addr(addr)) {
+			puts ("Cannot copy from SPIFI to SPIFI, aborting.\n\r");
+			return 1;
+		}
+		if (!spifi_addr(dest + count)) {
+			puts ("Cannot copy across SPIFI boundaries, aborting.\n\r");
+			return 1;
+		}
+		return spifi_write(dest, (void *)addr, count);
 	}
 #endif
 

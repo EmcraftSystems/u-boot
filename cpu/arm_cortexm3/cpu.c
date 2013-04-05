@@ -25,6 +25,10 @@
 #include "wdt.h"
 #include "clock.h"
 
+#if defined (CONFIG_SYS_LPC18XX) && defined(CONFIG_SPIFI)
+#include <spifi.h>
+#endif
+
 DECLARE_GLOBAL_DATA_PTR;
 
 #if defined(CONFIG_ARMCORTEXM3_SOC_INIT)
@@ -134,6 +138,10 @@ void
 #endif
 
 #ifdef CONFIG_SYS_LPC18XX
+#if defined(CONFIG_SPIFI)
+	/* LPC4350 errata 3.10 for booting from SPIFI */
+	spifi_cancel_mem_mode();
+#endif
 	/*
 	 * Use watchdog reset on LPC18xx/43xx
 	 */

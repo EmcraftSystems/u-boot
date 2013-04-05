@@ -308,7 +308,13 @@ endif
 $(obj)u-boot.srec:	$(obj)u-boot
 		$(OBJCOPY) -O srec $< $@
 
-$(obj)u-boot.bin:	$(obj)u-boot
+ifeq ($(CONFIG_SYS_LPC18XX)$(CONFIG_SPIFI),yy)
+SPIFILIB_DEP = cpu/arm_cortexm3/lpc18xx/spifilib/spifilib.bin
+$(SPIFILIB_DEP): depend
+		$(MAKE) -C cpu/arm_cortexm3/lpc18xx/spifilib -f spifilib.mk
+endif
+
+$(obj)u-boot.bin:	$(obj)u-boot $(SPIFILIB_DEP)
 		$(OBJCOPY) ${OBJCFLAGS} -O binary $< $@
 ifeq ($(CONFIG_LPC178X_FCG),y)
 		$(obj)tools/lpc178x_fcg $(obj)u-boot.bin $(obj)u-boot-lpc.bin
@@ -317,6 +323,9 @@ endif
 ifeq ($(CONFIG_LPC18XX_BOOTHEADER),y)
 		$(obj)tools/lpc18xx_bootheader $(obj)u-boot.bin $(obj)u-boot-bootheader.bin
 		mv $(obj)u-boot-bootheader.bin $(obj)u-boot.bin
+endif
+ifeq ($(CONFIG_SYS_LPC18XX)$(CONFIG_SPIFI),yy)
+		dd if=cpu/arm_cortexm3/lpc18xx/spifilib/spifilib.bin of=u-boot.bin seek=112 bs=1024
 endif
 
 $(obj)u-boot.upgrade:	$(obj)u-boot.bin

@@ -171,47 +171,19 @@
 #define CONFIG_SYS_FLASH_BANKS_LIST	{ CONFIG_SYS_FLASH_BANK1_BASE }
 #define CONFIG_SYS_MAX_FLASH_BANKS	1
 #define CONFIG_SYS_MAX_FLASH_SECT	1024
-
-
-#define CONFIG_LPC_SPI			1
-
-#define CONFIG_LPC_SPI_PINS {					\
-	{{0x3, 3}, LPC18XX_IOMUX_CONFIG(1, 0, 0, 1, 0, 0)},	\
-	{{0x3, 6}, LPC18XX_IOMUX_CONFIG(1, 0, 0, 1, 1, 1)},	\
-	{{0x3, 7}, LPC18XX_IOMUX_CONFIG(1, 0, 0, 1, 0, 0)},	\
-	{{0x3, 8}, LPC18XX_IOMUX_CONFIG(4, 0, 0, 1, 0, 0)}	\
-}
-#define CONFIG_LPC_CS_GPIO {5, 11}
-
-/*
- * Configure SPI Flash
- */
-
-#define CONFIG_SPI_FLASH		1
-#define CONFIG_SPI_FLASH_SPANSION	1
-#define CONFIG_SPI_FLASH_BUS		0
-#define CONFIG_SPI_FLASH_CS		0
-#define CONFIG_SPI_FLASH_MODE		0
-#define CONFIG_SPI_FLASH_SPEED		(clock_get(CLOCK_SPI) / 8)
-#define CONFIG_SF_DEFAULT_SPEED		CONFIG_SPI_FLASH_SPEED
-#define CONFIG_SF_DEFAULT_MODE		CONFIG_SPI_FLASH_MODE
-
-
-/*
- * Store env in flash.
- */
-#define CONFIG_ENV_IS_IN_FLASH
-#else
-/*
- * Store env in memory only, if no flash.
- */
-#define CONFIG_ENV_IS_NOWHERE
-#define CONFIG_SYS_NO_FLASH
 #endif
 
+/*
+ * Use the memory mapped QSPI Flash
+ */
+#define CONFIG_SPIFI
+#define CONFIG_SPIFI_BASE		0x14000000
+#define CONFIG_SPIFI_SIZE		(16*1024*1024)
+
+#define CONFIG_ENV_IS_IN_SPIFI
 #define CONFIG_ENV_SIZE			(4 * 1024)
 #define CONFIG_ENV_ADDR \
-	(CONFIG_SYS_FLASH_BANK1_BASE + 128 * 1024)
+	(CONFIG_SPIFI_BASE + 128 * 1024)
 #define CONFIG_INFERNO			1
 #define CONFIG_ENV_OVERWRITE		1
 
