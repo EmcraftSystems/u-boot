@@ -23,7 +23,7 @@
 
 int32_t cancel_mem_mode (SPIFIobj *obj);
 
-const spifilib_header_t spilib_hdr __attribute__((section(".rodata.spifilib.header"))) = 
+const spifilib_header_t spilib_hdr __attribute__((section(".rodata.spifilib.header"))) =
 {
 	SPIFILIB_SIG,
 	(spifilib_header_t *)&spilib_hdr,

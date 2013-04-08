@@ -25,7 +25,9 @@
 #include "spifi_rom_api.h"
 
 #define SPIFILIB_SIG	0x591F121B
-#define SPIFILIB_SIZE	16*1024
+#define SPIFILIB_SIZE	(16*1024)
+
+#define SPIFI_BASE_ADDR 0x14000000
 
 typedef int32_t (*spifi_init_t)(SPIFIobj *obj, uint32_t csHigh, uint32_t options, uint32_t mhz);
 typedef int32_t (*spifi_program_t)(SPIFIobj *obj, char *source, SPIFIopers *opers);
@@ -43,6 +45,6 @@ typedef struct spifilib_header_s
 	spifi_cancel_mem_mode_t cancel_mem_mode_func;
 } spifilib_header_t;
 
-const spifilib_header_t *spifilib_flash_hdr = (spifilib_header_t *)(0x14000000 + 112 * 1024);
+const spifilib_header_t *spifilib_flash_hdr = (spifilib_header_t *)(SPIFI_BASE_ADDR + 112 * 1024);
 
 #endif

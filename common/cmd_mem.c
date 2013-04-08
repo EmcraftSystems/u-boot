@@ -454,12 +454,12 @@ int do_mem_cp ( cmd_tbl_t *cmdtp, int flag, int argc, char *argv[])
 #endif
 
 #ifdef CONFIG_SPIFI
-	if (spifi_addr(dest)) {
-		if (spifi_addr(addr)) {
+	if (spifi_addr(dest) || spifi_addr(dest + count)) {
+		if (spifi_addr(addr) || spifi_addr(addr + count)) {
 			puts ("Cannot copy from SPIFI to SPIFI, aborting.\n\r");
 			return 1;
 		}
-		if (!spifi_addr(dest + count)) {
+		if (!spifi_addr(dest) || !spifi_addr(dest + count)) {
 			puts ("Cannot copy across SPIFI boundaries, aborting.\n\r");
 			return 1;
 		}

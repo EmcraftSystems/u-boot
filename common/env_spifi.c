@@ -1,6 +1,6 @@
 /* LowLevel function for SPIFI environment support
  *
- * (C) Copyright 2012
+ * (C) Copyright 2013
  *
  * Dmitry Konyshev, Emcraft Systems, probables@emcraft.com
  *
@@ -24,6 +24,10 @@
 #include <command.h>
 #include <environment.h>
 #include <linux/stddef.h>
+
+#if defined(CONFIG_SPIFI)
+#include <spifi.h>
+#endif
 
 DECLARE_GLOBAL_DATA_PTR;
 

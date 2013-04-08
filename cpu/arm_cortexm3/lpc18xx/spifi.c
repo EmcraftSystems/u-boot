@@ -22,8 +22,6 @@
 #include <common.h>
 #include "spifilib/spifilib.h"
 
-#if defined(CONFIG_SPIFI)
-
 static SPIFIobj spifi_obj;
 const spifilib_header_t *spifilib_ram_hdr = NULL;
 
@@ -76,4 +74,3 @@ void spifi_cancel_mem_mode(void)
 	spifilib_ram_hdr->cancel_mem_mode_func(&spifi_obj);
 }
 
-#endif
