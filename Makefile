@@ -3230,6 +3230,9 @@ a2f-hoermann-brd_config :  unconfig
 sf2-dev-kit_config :  unconfig
 	@$(MKCONFIG) $(@:_config=) arm arm_cortexm3 sf2-dev-kit actel m2s
 
+stm-som_config : unconfig
+	@$(MKCONFIG) $(@:_config=) arm arm_cortexm3 stm-som emcraft stm32
+
 stm3220g-eval_config : unconfig
 	@$(MKCONFIG) $(@:_config=) arm arm_cortexm3 stm3220g-eval stm stm32
 
