@@ -332,12 +332,16 @@ static struct stm32f2_gpio_dsc mac_gpio[] = {
 	{STM32F2_GPIO_PORT_A, 2},
 	{STM32F2_GPIO_PORT_A, 7},
 
+#ifndef CONFIG_STM32_ETH_RMII
 	{STM32F2_GPIO_PORT_B, 5},
 	{STM32F2_GPIO_PORT_B, 8},
+#endif
 
 	{STM32F2_GPIO_PORT_C, 1},
+#ifndef CONFIG_STM32_ETH_RMII
 	{STM32F2_GPIO_PORT_C, 2},
 	{STM32F2_GPIO_PORT_C, 3},
+#endif
 	{STM32F2_GPIO_PORT_C, 4},
 	{STM32F2_GPIO_PORT_C, 5},
 
@@ -345,12 +349,14 @@ static struct stm32f2_gpio_dsc mac_gpio[] = {
 	{STM32F2_GPIO_PORT_G, 13},
 	{STM32F2_GPIO_PORT_G, 14},
 
+#ifndef CONFIG_STM32_ETH_RMII
 	{STM32F2_GPIO_PORT_H, 2},
 	{STM32F2_GPIO_PORT_H, 3},
 	{STM32F2_GPIO_PORT_H, 6},
 	{STM32F2_GPIO_PORT_H, 7},
 
 	{STM32F2_GPIO_PORT_I, 10}
+#endif
 };
 
 /*
@@ -804,7 +810,11 @@ static s32 stm_mac_gpio_init(struct stm_eth_dev *mac)
 	 */
 	val = STM32_SYSCFG->pmc;
 	val &= STM32_SYSCFG_PMC_SEL_MSK << STM32_SYSCFG_PMC_SEL_BIT;
+#ifndef CONFIG_STM32_ETH_RMII
 	val |= STM32_SYSCFG_PMC_SEL_MII << STM32_SYSCFG_PMC_SEL_BIT;
+#else
+	val |= STM32_SYSCFG_PMC_SEL_RMII << STM32_SYSCFG_PMC_SEL_BIT;
+#endif
 	STM32_SYSCFG->pmc = val;
 
 	/*

@@ -75,8 +75,8 @@
  */
 #define CONFIG_STM32_SYS_CLK_PLL
 #define CONFIG_STM32_PLL_SRC_HSE
-#define CONFIG_STM32_HSE_HZ		25000000	/* 25 MHz */
-#define CONFIG_STM32_PLL_M		25
+#define CONFIG_STM32_HSE_HZ		12000000	/* 12 MHz */
+#define CONFIG_STM32_PLL_M		12
 #define CONFIG_STM32_PLL_N		336
 #define CONFIG_STM32_PLL_P		2
 #define CONFIG_STM32_PLL_Q		7
@@ -121,9 +121,9 @@
  */
 #define CONFIG_NR_DRAM_BANKS		1
 #define CONFIG_SYS_RAM_SIZE		(16 * 1024 * 1024)
-#define CONFIG_SYS_RAM_CS		2
+#define CONFIG_SYS_RAM_CS		1
 
-#undef CONFIG_SYS_RAM_BURST
+#define CONFIG_SYS_RAM_BURST
 #define CONFIG_SYS_FSMC_PSRAM_BCR	0x00005059
 #define CONFIG_SYS_FSMC_PSRAM_BTR	0x10000904
 #define CONFIG_SYS_FSMC_PSRAM_BWTR	0x10000804
@@ -134,7 +134,7 @@
 /*
  * Configuration of the external Flash memory
  */
-#define CONFIG_SYS_FLASH_CS		1
+#define CONFIG_SYS_FLASH_CS		2
 
 #define CONFIG_SYS_FSMC_FLASH_BCR	0x00005015
 #define CONFIG_SYS_FSMC_FLASH_BTR	0x00021206
@@ -151,9 +151,10 @@
 #define CONFIG_SYS_MAX_FLASH_SECT	128
 #define CONFIG_SYS_FLASH_CFI_AMD_RESET	1
 #define CONFIG_SYS_FLASH_PROTECTION	1
+#define CONFIG_SYS_FLASH_USE_BUFFER_WRITE
 
 /*
- * Store env in memory only
+ * Store env in Flash memory
  */
 #define CONFIG_ENV_IS_IN_FLASH
 #define CONFIG_ENV_SIZE			(4 * 1024)
@@ -179,6 +180,7 @@
  */
 #define CONFIG_NET_MULTI
 #define CONFIG_STM32_ETH
+#define CONFIG_STM32_ETH_RMII
 
 /*
  * Ethernet RX buffers are malloced from the internal SRAM (more precisely,
@@ -256,7 +258,7 @@
 #define CONFIG_BOOTDELAY		3
 #define CONFIG_ZERO_BOOTDELAY_CHECK
 #define CONFIG_HOSTNAME			stm-som
-#define CONFIG_BOOTARGS			"stm32_platform=stm-som"\
+#define CONFIG_BOOTARGS			"stm32_platform=stm-som "\
 					"console=ttyS2,115200 panic=10"
 #define CONFIG_BOOTCOMMAND		"run flashboot"
 
@@ -266,9 +268,9 @@
  * Short-cuts to some useful commands (macros)
  */
 #define CONFIG_EXTRA_ENV_SETTINGS				\
-	"loadaddr=0x64000000\0"					\
+	"loadaddr=0x60000000\0"					\
 	"addip=setenv bootargs ${bootargs} ip=${ipaddr}:${serverip}:${gatewayip}:${netmask}:${hostname}:eth0:off\0"				\
-	"flashaddr=60020000\0"					\
+	"flashaddr=64020000\0"					\
 	"flashboot=run addip;bootm ${flashaddr}\0"		\
 	"ethaddr=C0:B1:3C:88:88:85\0"				\
 	"ipaddr=172.17.4.206\0"					\

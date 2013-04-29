@@ -206,7 +206,7 @@
 /*
  * Timeouts (in cycles)
  */
-#define STM32_HSE_STARTUP_TIMEOUT	0x0500
+#define STM32_HSE_STARTUP_TIMEOUT	0x05000
 
 /*
  * Clock values
