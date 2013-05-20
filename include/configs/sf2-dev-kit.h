@@ -302,6 +302,9 @@
  */
 #define CONFIG_EXTRA_ENV_SETTINGS				\
 	"loadaddr=" MK_STR(UIMAGE_LOADADDR) "\0"		\
+	"ethaddr=C0:B1:3C:88:88:88\0"				\
+	"ipaddr=172.17.4.221\0"					\
+	"serverip=172.17.0.1\0"					\
 	"image=networking.uImage\0"				\
 	"spiaddr=" MK_STR(CONFIG_ENV_IMG_OFFSET) "\0"		\
 	"spisize=3F0000\0"					\
