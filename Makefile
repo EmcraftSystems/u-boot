@@ -315,8 +315,8 @@ ifeq ($(CONFIG_LPC178X_FCG),y)
 		mv $(obj)u-boot-lpc.bin $(obj)u-boot.bin
 endif
 ifeq ($(CONFIG_LPC18XX_BOOTHEADER),y)
-		$(obj)tools/lpc18xx_bootheader $(obj)u-boot.bin $(obj)u-boot-bootheader.bin
-		mv $(obj)u-boot-bootheader.bin $(obj)u-boot.bin
+		$(obj)tools/lpc18xx_bootheader $(obj)u-boot.bin $(obj)u-boot-bootheader.bin # add header
+		mv $(obj)u-boot-bootheader.bin $(obj)u-boot.bin # replace u-boot.bin 
 endif
 
 $(obj)u-boot.upgrade:	$(obj)u-boot.bin
@@ -3261,6 +3261,11 @@ lpc4350-eval_config : unconfig
 
 lpc1850-eval_config : unconfig
 	@$(MKCONFIG) $(@:_config=) arm arm_cortexm3 lpc1850-eval hitex lpc18xx
+
+
+lpc4350-db1_config : unconfig
+	@$(MKCONFIG) $(@:_config=) arm arm_cortexm3 lpc4350-db1 diolan lpc18xx
+
 
 m2s-som_config :  unconfig
 	@$(MKCONFIG) $(@:_config=) arm arm_cortexm3 m2s-som emcraft m2s

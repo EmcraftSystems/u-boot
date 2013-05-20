@@ -32,11 +32,11 @@ MEMORY
 			LENGTH = NVM_LEN
 	RAM (rw):	ORIGIN = CONFIG_MEM_RAM_BASE, \
 			LENGTH = CONFIG_MEM_RAM_LEN
-	RAM_BUF (r):	ORIGIN = ORIGIN(RAM) + LENGTH(RAM), \
+	RAM_BUF (r):	ORIGIN = CONFIG_MEM_RAM_BASE + LENGTH(RAM), \
 			LENGTH = CONFIG_MEM_RAM_BUF_LEN
-	MALLOC (r):	ORIGIN = ORIGIN(RAM_BUF) + LENGTH(RAM_BUF), \
+	MALLOC (r):	ORIGIN = CONFIG_MEM_RAM_BASE + LENGTH(RAM) + LENGTH(RAM_BUF), \
 			LENGTH = CONFIG_MEM_MALLOC_LEN
-	STACK (r):	ORIGIN = ORIGIN(MALLOC) + LENGTH(MALLOC), \
+	STACK (r):	ORIGIN = CONFIG_MEM_RAM_BASE + LENGTH(RAM) + LENGTH(RAM_BUF) + LENGTH(MALLOC), \
 			LENGTH = CONFIG_MEM_STACK_LEN
 }
 
@@ -104,10 +104,15 @@ SECTIONS
 		*(.stack)
 	} >STACK
 
+	/* This section has to be removed for debugging 
+	* If done, copying the whole image of U-Boot (see start.c) has to be modified
+	* make an objdump on u-boot image to see how sections are organized
+	*/
 	/DISCARD/ :
 	{
 		*(*)
 	}
+	
 }
 
 /*
