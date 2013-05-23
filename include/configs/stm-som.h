@@ -1,5 +1,5 @@
 /*
- * (C) Copyright 2011, 2012, 2013
+ * (C) Copyright 2011-2013
  *
  * Yuri Tikhonov, Emcraft Systems, yur@emcraft.com
  * Alexander Potashev, Emcraft Systems, aspotashev@emcraft.com
@@ -40,9 +40,11 @@
 #define CONFIG_SYS_ARMCORTEXM4
 
 /*
- * This is the STM32-F4 device
+ * This is the STM32-F4 device.
+ * This is an extended STM32F4 device
  */
 #define CONFIG_SYS_STM32
+#define CONFIG_SYS_STM32F43X
 
 /*
  * Enable GPIO driver

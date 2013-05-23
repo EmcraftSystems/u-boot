@@ -29,14 +29,24 @@
  * Flash data area definitions
  */
 #define STM32_FLASH_BASE		0x08000000
-#define STM32_FLASH_SIZE	        ((4 * 16 + 64 + 7 * 128) * 1024)
+#if defined(CONFIG_SYS_STM32F43X)
+#define STM32_FLASH_SIZE	        (1024 * 1024 * 2)
+#else
+#define STM32_FLASH_SIZE	        (1024 * 1024 * 1)
+#endif
 /*
- * This array defines the layout of the Embedded Flash on the STM32F2x chips
+ * This array defines the layout of the Embedded Flash on the STM32 chips
  */
 static u32 flash_bsize[] = {
 	[0 ... 3]	=  16 * 1024,
 	[4]		=  64 * 1024,
 	[5 ... 11]	= 128 * 1024
+#if defined(CONFIG_SYS_STM32F43X)
+	,
+	[12 ... 15]	=  16 * 1024,
+	[16]		=  64 * 1024,
+	[17 ... 23]	= 128 * 1024
+#endif
 	};
 
 /*
@@ -75,6 +85,7 @@ struct stm32_flash_regs {
 #define STM32_FLASH_CR_PSIZE_32x	(2 << STM32_FLASH_CR_PSIZE_SHIFT)
 #define STM32_FLASH_CR_SECT_SHIFT	3
 #define STM32_FLASH_CR_SECT_MSK		0xf
+#define STM32_FLASH_CR_BLCK(v)		((v) << 7)
 #define STM32_FLASH_CR_MER		(1 << 2)
 #define STM32_FLASH_CR_SER		(1 << 1)
 #define STM32_FLASH_CR_PG		(1 << 0)
@@ -159,7 +170,10 @@ static s32 __attribute__((section(".ramcode")))
 stm32_flash_erase(u32 offset, u32 size)
 {
 	s32 ret;
-	s32 n, num;
+	s32 n, k, num;
+#if defined(CONFIG_SYS_STM32F43X)
+	s32 v;
+#endif
 	u32 erasesize;
 
 	if ((n = stm32_flash_get_block((u8 *)offset)) < 0) {
@@ -189,7 +203,17 @@ stm32_flash_erase(u32 offset, u32 size)
 	while (n < num) {
 		STM32_FLASH_REGS->cr &= ~(STM32_FLASH_CR_SECT_MSK <<
 					STM32_FLASH_CR_SECT_SHIFT);
-		STM32_FLASH_REGS->cr |= ((n << STM32_FLASH_CR_SECT_SHIFT) |
+		k = n;
+#if defined(CONFIG_SYS_STM32F43X)
+		v = k >= 12;
+		if (v) {
+			k -= 12;
+		}
+#endif
+		STM32_FLASH_REGS->cr |= ((k << STM32_FLASH_CR_SECT_SHIFT) |
+#if defined(CONFIG_SYS_STM32F43X)
+					STM32_FLASH_CR_BLCK(v) |
+#endif
 					STM32_FLASH_CR_SER);
 		STM32_FLASH_REGS->cr |= STM32_FLASH_CR_START;
 		/*
@@ -290,7 +314,8 @@ envm_write(u32 offset, void * buf, u32 size)
 	/* Basic sanity check. More checking in the "get_block" routine */
 	if ((offset < STM32_FLASH_BASE) ||
 		((offset + size) > (STM32_FLASH_BASE + STM32_FLASH_SIZE))) {
-		printf("%s: Address %#x is not in flash or size %d is too big\n",
+		printf("%s: Address %#x is not in flash"
+			" or size %d is too big\n",
 			__func__, offset, size);
 		goto xit;
 	}
