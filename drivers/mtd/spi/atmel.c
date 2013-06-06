@@ -588,6 +588,7 @@ int dataflash_erase_at25(struct spi_flash *flash, u32 offset, size_t len)
 	size_t actual;
 	int ret;
 	u8 cmd[4];
+	unsigned long start, end;
 
 	/*
 	 * TODO: This function currently uses 4K block erase only. We can
@@ -601,9 +602,15 @@ int dataflash_erase_at25(struct spi_flash *flash, u32 offset, size_t len)
 		return -1;
 	}
 
-	if (offset % block_size || len % block_size) {
-		debug("SF: Erase offset/length not multiple of page size\n");
-		return -1;
+	start = offset & ~(block_size - 1);
+	end = (offset + len + block_size - 1) & ~(block_size - 1);
+
+	/*
+	 * Don't check alignments, just warns instead
+	 */
+	if (start != offset || end != (offset + len)) {
+		debug("SF: Warn, auto-align erase area [%x;%x] -> [%lx;%lx]\n",
+			offset, offset + len, start, end);
 	}
 
 	cmd[0] = CMD_AT25_ERASE_BLOCK_4K;
@@ -615,9 +622,9 @@ int dataflash_erase_at25(struct spi_flash *flash, u32 offset, size_t len)
 		return ret;
 	}
 
-	for (actual = 0; actual < len; actual += block_size) {
-		cmd[1] = offset >> 16;
-		cmd[2] = offset >> 8;
+	for (actual = start; actual < end; actual += block_size) {
+		cmd[1] = actual >> 16;
+		cmd[2] = actual >> 8;
 
 		ret = spi_flash_cmd(flash->spi, CMD_AT25_WREN, NULL, 0);
 		if (ret < 0) {
@@ -636,12 +643,10 @@ int dataflash_erase_at25(struct spi_flash *flash, u32 offset, size_t len)
 			debug("SF: AT25 page erase timed out\n");
 			goto out;
 		}
-
-		offset += block_size;
 	}
 
 	debug("SF: AT25: Successfully erased %zu bytes @ 0x%x\n",
-			len, offset);
+			end - start, start);
 	ret = 0;
 
 out:
