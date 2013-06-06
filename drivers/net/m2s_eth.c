@@ -91,17 +91,45 @@
  * CFG1 register fields
  */
 #define M2S_MAC_CFG1_RST	(1 << 31)	/* PE-MCXMAC full reset	      */
+#define M2S_MAC_CFG1_RXCTL_RST	(1 << 19)
+#define M2S_MAC_CFG1_TXCTL_RST	(1 << 18)
+#define M2S_MAC_CFG1_RX_RST	(1 << 17)
+#define M2S_MAC_CFG1_TX_RST	(1 << 16)
 #define M2S_MAC_CFG1_RX_ENA	(1 << 2)	/* MAC receive enable	      */
 #define M2S_MAC_CFG1_TX_ENA	(1 << 0)	/* MAC transmit enable	      */
 
 /*
  * CFG2 register fields
  */
-#define M2S_MAC_CFG2_MODE_BIT	8		/* MAC interface mode	      */
-#define M2S_MAC_CFG2_MODE_MSK	0x3
-#define M2S_MAC_CFG2_MODE_MII	0x1		/* Nibble mode		      */
-#define M2S_MAC_CFG2_PAD_CRC	(1 << 2)	/* PAD&CRC appending enable   */
-#define M2S_MAC_CFG2_FULL_DUP	(1 << 0)	/* PE-MCXMAC Full duplex      */
+#define M2S_MAC_CFG2_PREAM_LEN_BIT	12
+#define M2S_MAC_CFG2_PREAM_LEN_MSK	0xf
+#define M2S_MAC_CFG2_MODE_BIT		8	/* MAC interface mode	      */
+#define M2S_MAC_CFG2_MODE_MSK		0x3
+#define M2S_MAC_CFG2_MODE_BYTE		0x2	/* Byte mode		      */
+#define M2S_MAC_CFG2_MODE_MII		0x1	/* Nibble mode		      */
+#define M2S_MAC_CFG2_HUGE_FRAME_EN	(1 << 5)
+#define M2S_MAC_CFG2_LEN_CHECK		(1 << 4)
+#define M2S_MAC_CFG2_PAD_CRC		(1 << 2) /* PAD&CRC appending enable   */
+#define M2S_MAC_CFG2_CRC_EN		(1 << 1)
+#define M2S_MAC_CFG2_FULL_DUP		(1 << 0) /* PE-MCXMAC Full duplex      */
+
+/*
+ * IPG/IFG register
+ */
+#define M2S_MAC_IFG_BTBIPG_BIT		0
+#define M2S_MAC_IFG_MINIFGENF_BIT	8
+#define M2S_MAC_IFG_NONBTBIPG_BIT	16
+
+/*
+ * half-duplex register
+ */
+#define M2S_MAC_HALF_DUPLEX_ABEB_TUNC_BIT		20
+#define M2S_MAC_HALF_DUPLEX_ABEB_ENABLE			(1 << 19)
+#define M2S_MAC_HALF_DUPLEX_BACKPRES_NOBACKOFF		(1 << 18)
+#define M2S_MAC_HALF_DUPLEX_NO_BACKOFF			(1 << 17)
+#define M2S_MAC_HALF_DUPLEX_EXCS_DEFER			(1 << 16)
+#define M2S_MAC_HALF_DUPLEX_RETX_MAX_BIT		12
+#define M2S_MAC_HALF_DUPLEX_SLOTTIME_BIT		0
 
 /*
  * MII_COMMAND register fields
@@ -124,6 +152,12 @@
  * DMA_RX_CTRL/DMA_TX_CTRL register fields
  */
 #define M2S_MAC_DMA_CTRL_ENA	(1 << 0)	/* Enable Tx/Rx DMA xfers     */
+
+/*
+ * Interface Control register fields
+ */
+#define M2S_MAC_INTF_RESET		(1 << 31) /* Reset interface module */
+#define M2S_MAC_INTF_SPEED_100		(1 << 4)  /* MII PHY speed 100Mbit */
 
 /*
  * FIFO_CFG0 register fields
@@ -164,12 +198,15 @@
 /*
  * MAC Configuration Register in Sysreg block fields
  */
-#define M2S_SYS_MAC_CR_PM_BIT 	2		/* PHY mode		      */
+#define M2S_SYS_MAC_CR_PM_BIT	2		/* PHY mode		      */
 #define M2S_SYS_MAC_CR_PM_MSK	0x7
+#define M2S_SYS_MAC_CR_PM_TBI	0x2		/* Use TBI mode		      */
 #define M2S_SYS_MAC_CR_PM_MII	0x3		/* Use MII mode		      */
 #define M2S_SYS_MAC_CR_LS_BIT	0		/* Line speed		      */
 #define M2S_SYS_MAC_CR_LS_MSK	0x3
+#define M2S_SYS_MAC_CR_LS_10	0x0		/* 10 Mbps		      */
 #define M2S_SYS_MAC_CR_LS_100	0x1		/* 100 Mbps		      */
+#define M2S_SYS_MAC_CR_LS_1000	0x2		/* 1000 Mbps		      */
 
 /*
  * Software Reset Control Register fields
@@ -255,8 +292,10 @@ static void m2s_eth_halt(struct eth_device *dev);
 static  int m2s_mii_read(char *devname, u8 addr, u8 reg, u16 *val);
 static  int m2s_mii_write(char *devname, u8 addr, u8 reg, u16 val);
 
+#ifndef CONFIG_M2S_ETH_MODE_SGMII
 static  int m2s_phy_probe(void);
 static  int m2s_phy_link_setup(void);
+#endif
 
 static void m2s_mac_dump_regs(char *who);
 
@@ -277,7 +316,10 @@ static struct eth_device	m2s_eth_dev = {
 /*
  * PHY address
  */
+#ifndef CONFIG_M2S_ETH_MODE_SGMII
 static u8			m2s_phy_addr = 0xFF;
+#endif
+static u8			m2s_mii_speed = M2S_SYS_MAC_CR_LS_100;
 
 /*
  * Current indexes within m2s_bd_Xx[] (idx of BT to process next)
@@ -294,6 +336,238 @@ static volatile struct m2s_eth_dma_bd	m2s_bd_rx[M2S_RX_BD_NUM];
  * Rx buffers
  */
 static u8			m2s_buf_rx[M2S_RX_BD_NUM][M2S_FRM_MAX_LEN];
+
+#define M88E1340_PHY_ADDR 0
+#define SF2_MSGMII_PHY_ADDR 0x1e
+
+/* M88E1340 PHY registers */
+
+/* Advertisement control register. */
+#define MII_ADVERTISE           0x04        /* Advertisement control reg   */
+
+#define ADVERTISE_SLCT          0x001f      /* Selector bits               */
+#define ADVERTISE_CSMA          0x0001      /* Only selector supported     */
+#define ADVERTISE_10HALF        0x0020      /* Try for 10mbps half-duplex  */
+#define ADVERTISE_1000XFULL     0x0020      /* Try for 1000BASE-X full-duplex */
+#define ADVERTISE_10FULL        0x0040      /* Try for 10mbps full-duplex  */
+#define ADVERTISE_1000XHALF     0x0040      /* Try for 1000BASE-X half-duplex */
+#define ADVERTISE_100HALF       0x0080      /* Try for 100mbps half-duplex */
+#define ADVERTISE_1000XPAUSE    0x0080      /* Try for 1000BASE-X pause    */
+#define ADVERTISE_100FULL       0x0100      /* Try for 100mbps full-duplex */
+#define ADVERTISE_1000XPSE_ASYM 0x0100      /* Try for 1000BASE-X asym pause */
+#define ADVERTISE_100BASE4      0x0200      /* Try for 100mbps 4k packets  */
+#define ADVERTISE_PAUSE_CAP     0x0400      /* Try for pause               */
+#define ADVERTISE_PAUSE_ASYM    0x0800      /* Try for asymetric pause     */
+#define ADVERTISE_RESV          0x1000      /* Unused...                   */
+#define ADVERTISE_RFAULT        0x2000      /* Say we can detect faults    */
+#define ADVERTISE_LPACK         0x4000      /* Ack link partners response  */
+#define ADVERTISE_NPAGE         0x8000      /* Next page bit               */
+
+/* 1000BASE-T Control register */
+#define MII_CTRL1000            0x09        /* 1000BASE-T control          */
+
+#define ADVERTISE_1000FULL      0x0200      /* Advertise 1000BASE-T full duplex */
+#define ADVERTISE_1000HALF      0x0100      /* Advertise 1000BASE-T half duplex */
+
+#define M88E1340_EXT_ADDR_PAGE_CR       0x16
+#define PAGE_0                          0x00
+
+#define M88E1340_PHY_STATUS		0x11
+#define M88E1340_PHY_STATUS_1000	0x8000
+#define M88E1340_PHY_STATUS_100	        0x4000
+#define M88E1340_PHY_STATUS_SPD_MASK	0xc000
+#define M88E1340_PHY_STATUS_FULLDUPLEX	0x2000
+#define M88E1340_PHY_STATUS_RESOLVED	0x0800
+#define M88E1340_PHY_STATUS_LINK	0x0400
+
+#ifdef CONFIG_M2S_ETH_MODE_SGMII
+
+static int msgmii_phy_init(void)
+{
+	u16 val;
+	int rv;
+
+	/* Reset M-SGMII. */
+	rv = miiphy_write(M2S_MII_NAME, SF2_MSGMII_PHY_ADDR, 0x00, 0x9000u);
+	if (rv != 0) {
+		return -1;
+	}
+	/* Register 0x04 of M-SGMII must be always be set to 0x0001. */
+	rv = miiphy_write(M2S_MII_NAME, SF2_MSGMII_PHY_ADDR, 0x04, 0x0001);
+	if (rv != 0) {
+		return -1;
+	}
+	/*
+	 * Enable auto-negotiation inside SmartFusion2 SGMII block.
+	 */
+	rv = miiphy_read(M2S_MII_NAME, SF2_MSGMII_PHY_ADDR, 0, &val);
+	if (rv != 0) {
+		return -1;
+	}
+	val |= 0x1000;
+	rv = miiphy_write(M2S_MII_NAME, SF2_MSGMII_PHY_ADDR, 0x0, val);
+	if (rv != 0) {
+		return -1;
+	}
+
+	return 0;
+}
+
+static int m881340_phy_set_link_speed(void)
+{
+	u16 val;
+	int rv;
+        /* Set auto-negotiation advertisement. */
+	/* Set 10Mbps and 100Mbps advertisement. */
+	rv = miiphy_read(M2S_MII_NAME, M88E1340_PHY_ADDR, MII_ADVERTISE, &val);
+	if (rv != 0) {
+		goto out;
+	}
+	val |= (ADVERTISE_10HALF | ADVERTISE_10FULL
+		| ADVERTISE_100HALF | ADVERTISE_100FULL);
+	rv = miiphy_write(M2S_MII_NAME, M88E1340_PHY_ADDR, MII_ADVERTISE, val);
+	if (rv != 0) {
+		goto out;
+	}
+
+	/* Set 1000Mbps advertisement. */
+	rv = miiphy_read(M2S_MII_NAME, M88E1340_PHY_ADDR, MII_CTRL1000, &val);
+	if (rv != 0) {
+		goto out;
+	}
+
+	val |= (ADVERTISE_1000FULL | ADVERTISE_1000HALF);
+	rv = miiphy_write(M2S_MII_NAME, M88E1340_PHY_ADDR, MII_CTRL1000, val);
+	if (rv != 0) {
+		goto out;
+	}
+ out:
+	if (rv) {
+		printf("%s %d %s return %d\n", __FILE__, __LINE__,
+				__func__, rv);
+	}
+	return rv;
+}
+
+static int msgmii_phy_autonegotiate(void)
+{
+	int rv;
+	u16 val;
+	int timeout;
+
+	/* Enable auto-negotiation. */
+	rv = miiphy_write(M2S_MII_NAME, M88E1340_PHY_ADDR,
+			M88E1340_EXT_ADDR_PAGE_CR, PAGE_0);
+	if (rv != 0) {
+		goto out;
+	}
+	val = 0x9340 | PHY_BMCR_100_MBPS;
+	rv = miiphy_write(M2S_MII_NAME, M88E1340_PHY_ADDR, PHY_BMCR, val);
+	if (rv != 0) {
+		goto out;
+	}
+
+	/* Wait for copper auto-negotiation to complete. */
+	timeout = M2S_AUTONEG_TOUT/1000;
+	while (timeout--) {
+		rv = miiphy_read(M2S_MII_NAME, M88E1340_PHY_ADDR,
+				PHY_BMSR, &val);
+		if (rv != 0) {
+			printf("mii err %d.\n", rv);
+			goto out;
+		}
+		if (!(val & PHY_BMSR_AUTN_COMP)) {
+			int i;
+			for (i = 0; i < 1000; i++)
+				udelay(1000);
+			continue;
+		}
+		rv = miiphy_read(M2S_MII_NAME, M88E1340_PHY_ADDR,
+				M88E1340_PHY_STATUS, &val);
+		if (rv != 0) {
+			printf("mii err %d.\n", rv);
+			goto out;
+		}
+		if ((val & M88E1340_PHY_STATUS_SPD_MASK) ==
+				M88E1340_PHY_STATUS_100) {
+			m2s_mii_speed = M2S_SYS_MAC_CR_LS_100;
+		} else if ((val & M88E1340_PHY_STATUS_SPD_MASK) ==
+				M88E1340_PHY_STATUS_1000) {
+			m2s_mii_speed = M2S_SYS_MAC_CR_LS_1000;
+		} else {
+			m2s_mii_speed = M2S_SYS_MAC_CR_LS_10;
+		}
+		break;
+	}
+
+	if (timeout <= 0) {
+		printf("%s %d %s marvel autoneg failed by timeout %02x\n",
+				__FILE__, __LINE__, __func__, val);
+		return -1;
+	}
+
+	rv = miiphy_read(M2S_MII_NAME, SF2_MSGMII_PHY_ADDR, PHY_BMSR, &val);
+	if (rv != 0) {
+		goto out;
+	}
+
+	if (val & PHY_BMSR_AUTN_COMP) {
+		/* no need to start auto-negotiation if it is already done */
+		goto out;
+	}
+
+	rv = miiphy_read(M2S_MII_NAME, SF2_MSGMII_PHY_ADDR, PHY_BMCR, &val);
+	if (rv != 0) {
+		goto out;
+	}
+
+	rv = miiphy_write(M2S_MII_NAME, SF2_MSGMII_PHY_ADDR, PHY_BMCR,
+			val | PHY_BMCR_AUTON | PHY_BMCR_RST_NEG);
+	if (rv != 0) {
+		goto out;
+	}
+
+	/*
+	 * Wait until auto-negotiation completes
+	 */
+	timeout = M2S_AUTONEG_TOUT/10;
+	while (timeout--) {
+		rv = miiphy_read(M2S_MII_NAME, SF2_MSGMII_PHY_ADDR,
+				PHY_BMSR, &val);
+
+		if (rv != 0) {
+			printf("mii err %d.\n", rv);
+			goto out;
+		}
+		if (!(val & PHY_BMSR_AUTN_COMP)) {
+			if (timeout % 100 != 0) {
+				udelay(10000);
+				continue;
+			}
+
+			/* restart auto-negotiation if it is not complete
+			   in a second */
+			rv = miiphy_write(M2S_MII_NAME, SF2_MSGMII_PHY_ADDR,
+					PHY_BMCR,
+					PHY_BMCR_AUTON | PHY_BMCR_RST_NEG);
+			if (rv != 0) {
+				goto out;
+			}
+
+			continue;
+		}
+		break;
+	}
+	if (timeout <= 0)
+		printf("MSGMII PHY auto-negotiaiton timed out!\n");
+    
+ out:
+	return rv;
+
+
+}
+
+#endif
 
 /******************************************************************************
  * Functions exported from the module
@@ -334,7 +608,7 @@ out:
 static int m2s_eth_init(struct eth_device *dev, bd_t *bd_unused)
 {
 	volatile struct m2s_eth_dma_bd	*bd;
-	int				i, rv, timeout;
+	int				i, rv = 0, timeout;
 
 	/*
 	 * Release the Ethernet MAC from reset
@@ -343,23 +617,55 @@ static int m2s_eth_init(struct eth_device *dev, bd_t *bd_unused)
 
 	/*
 	 * Set-up CR
-	 * FIXME: set line-speed according to val get from PHY?
 	 */
 	M2S_SYSREG->mac_cr &= ~(M2S_SYS_MAC_CR_PM_MSK << M2S_SYS_MAC_CR_PM_BIT);
 	M2S_SYSREG->mac_cr &= ~(M2S_SYS_MAC_CR_LS_MSK << M2S_SYS_MAC_CR_LS_BIT);
+#ifndef CONFIG_M2S_ETH_MODE_SGMII
 	M2S_SYSREG->mac_cr |= M2S_SYS_MAC_CR_PM_MII << M2S_SYS_MAC_CR_PM_BIT;
-	M2S_SYSREG->mac_cr |= M2S_SYS_MAC_CR_LS_100 << M2S_SYS_MAC_CR_LS_BIT;
+#else
+	/* Interface type: TBI */
+	M2S_SYSREG->mac_cr = M2S_SYS_MAC_CR_PM_TBI << M2S_SYS_MAC_CR_PM_BIT;
+#endif
+
+	M2S_MAC_CFG->mii_config = 7;
 
 	/*
 	 * Reset all PE-MCXMAC modules, and configure
 	 */
 	M2S_MAC_CFG->cfg1 |= M2S_MAC_CFG1_RST;
 	M2S_MAC_CFG->cfg1 &= ~M2S_MAC_CFG1_RST;
+	/* Clear all reset bits */
+	/* Clear MCXMAC TX reset */
+	M2S_MAC_CFG->cfg1 &= ~M2S_MAC_CFG1_TX_RST;
+	/* Clear MCXMAC RX reset */
+	M2S_MAC_CFG->cfg1 &= ~M2S_MAC_CFG1_RX_RST;
+	/* Clear MCXMAC TX reset */
+	M2S_MAC_CFG->cfg1 &= ~M2S_MAC_CFG1_TXCTL_RST;
+	/* Clear MCXMAC RX reset */
+	M2S_MAC_CFG->cfg1 &= ~M2S_MAC_CFG1_RXCTL_RST;
+	/* Clear MCXMAC interface reset */
+	M2S_MAC_CFG->if_ctrl &= ~M2S_MAC_INTF_RESET;
+	/* Clear FIFO watermark reset */
+	/* Clear FIFO Rx system reset */
+	/* Clear FIFO Rx fab reset */
+	/* Clear FIFO Tx system reset */
+	/* Clear FIFO Tx system reset */
+	M2S_MAC_CFG->fifo_cfg[0] &= ~M2S_MAC_FIFO_CFG0_ALL_RST;
+
+	M2S_MAC_CFG->cfg1 = 0;
 
 	M2S_MAC_CFG->cfg2 &= ~(M2S_MAC_CFG2_MODE_MSK << M2S_MAC_CFG2_MODE_BIT);
+#ifndef CONFIG_M2S_ETH_MODE_SGMII
 	M2S_MAC_CFG->cfg2 |= (M2S_MAC_CFG2_MODE_MII << M2S_MAC_CFG2_MODE_BIT) |
 			     M2S_MAC_CFG2_FULL_DUP | M2S_MAC_CFG2_PAD_CRC;
-
+#else
+	M2S_MAC_CFG->cfg2 =
+		M2S_MAC_CFG2_FULL_DUP | M2S_MAC_CFG2_CRC_EN
+		| M2S_MAC_CFG2_PAD_CRC
+		| M2S_MAC_CFG2_LEN_CHECK
+		| (M2S_MAC_CFG2_MODE_BYTE << M2S_MAC_CFG2_MODE_BIT)
+		| (0x7 << M2S_MAC_CFG2_PREAM_LEN_BIT);
+#endif
 	M2S_MAC_CFG->max_frame_length = M2S_FRM_MAX_LEN;
 
 	M2S_MAC_CFG->station_addr[0] = (dev->enetaddr[0] << 24) |
@@ -403,11 +709,6 @@ static int m2s_eth_init(struct eth_device *dev, bd_t *bd_unused)
 	M2S_MAC_DMA->rx_ctrl = M2S_MAC_DMA_CTRL_ENA;
 
 	/*
-	 * Enable MAC Rx and Tx
-	 */
-	M2S_MAC_CFG->cfg1 = M2S_MAC_CFG1_RX_ENA | M2S_MAC_CFG1_TX_ENA;
-
-	/*
 	 * Reset and enable FIFOs
 	 */
 	M2S_MAC_CFG->fifo_cfg[0] |= M2S_MAC_FIFO_CFG0_ALL_RST;
@@ -427,13 +728,37 @@ static int m2s_eth_init(struct eth_device *dev, bd_t *bd_unused)
 		goto out;
 	}
 
+#ifdef CONFIG_M2S_ETH_MODE_SGMII
+	if (msgmii_phy_init() < 0)
+		goto out;
+	if (m881340_phy_set_link_speed() < 0)
+		goto out;
+	if (msgmii_phy_autonegotiate() < 0)
+		goto out;
+#else
 	/*
 	 * Probe for PHY, and get LINK status
 	 */
 	rv = m2s_phy_probe();
 	if (rv != 0)
 		goto out;
-	m2s_phy_link_setup();
+	if (rv != 0)
+		goto out;
+#endif
+
+	if (m2s_mii_speed == M2S_SYS_MAC_CR_LS_100) {
+		M2S_MAC_CFG->if_ctrl |= M2S_MAC_INTF_SPEED_100;
+	} else {
+		M2S_MAC_CFG->if_ctrl &= ~M2S_MAC_INTF_SPEED_100;
+	}
+	M2S_SYSREG->mac_cr = (M2S_SYSREG->mac_cr & ~M2S_SYS_MAC_CR_LS_MSK) |
+		m2s_mii_speed;
+	M2S_MAC_CFG->cfg2 |= M2S_MAC_CFG2_FULL_DUP;
+
+	/*
+	 * Enable MAC Rx and Tx
+	 */
+	M2S_MAC_CFG->cfg1 = M2S_MAC_CFG1_RX_ENA | M2S_MAC_CFG1_TX_ENA;
 
 	rv = 0;
 out:
@@ -581,7 +906,7 @@ static int m2s_mii_read(char *devname, u8 adr, u8 reg, u16 *val)
 {
 	int	timeout, rv;
 
-	if (adr == 0 || adr > 31 || reg > 31 || !val) {
+	if (adr > 31 || reg > 31 || !val) {
 		printf("%s: bad params %x/%x/%p\n", __func__, adr, reg, val);
 		rv = -EINVAL;
 		goto out;
@@ -617,7 +942,7 @@ static int m2s_mii_write(char *devname, u8 adr, u8 reg, u16 val)
 {
 	int	timeout, rv;
 
-	if (adr == 0 || adr > 31 || reg > 31) {
+	if (adr > 31 || reg > 31) {
 		printf("%s: bad params %x/%x\n", __func__, adr, reg);
 		rv = -EINVAL;
 		goto out;
@@ -640,6 +965,8 @@ static int m2s_mii_write(char *devname, u8 adr, u8 reg, u16 val)
 out:
 	return rv;
 }
+
+#ifndef CONFIG_M2S_ETH_MODE_SGMII
 
 /******************************************************************************
  * PHY routines
@@ -740,6 +1067,8 @@ link_up:
 out:
 	return rv;
 }
+
+#endif
 
 /******************************************************************************
  * Debug stuff

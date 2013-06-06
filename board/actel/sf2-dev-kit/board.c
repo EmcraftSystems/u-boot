@@ -36,8 +36,29 @@ void dummy_func(void)
 	return;
 }
 
+extern void configure_zl30362(void);
+
+#define SERDES0_LANE3_REGS	0x40029c00
+#define TX_PST_RATIO		0x28
+
 int board_init(void)
 {
+	/* some magic from the Libero design generated source code
+	   to get the PHY working in the SGMII mode */
+	*(volatile uint32_t*)(SERDES0_LANE3_REGS + TX_PST_RATIO) = 0x0;
+	/* configure the ZL30362 Clock Network Synchronizer
+	   (required for Ethernet to function in U-boot and Linux) */
+	configure_zl30362();
+	CORE_SF2_CFG->config_done = 1u; /* Signal to CoreSF2Reset that peripheral
+					   configuration registers have
+					   been written.*/
+#if 0 /* FIXME: init_done is never signalled after a soft reset
+	 if the DDR has been initialized before the reset. */
+	while(!CORE_SF2_CFG->init_done)
+	{
+		;   /* Wait for INIT_DONE from CoreSF2Reset. */
+	}
+#endif
 	return 0;
 }
 

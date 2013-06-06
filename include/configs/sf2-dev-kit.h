@@ -142,6 +142,21 @@
 #define CONFIG_SYS_RAM_SIZE		(256 * 1024 * 1024)
 
 /*
+ * Ethernet driver configuration
+ */
+#define CONFIG_NET_MULTI
+#define CONFIG_M2S_ETH
+#define CONFIG_M2S_ETH_MODE_SGMII
+
+#define CONFIG_SYS_RX_ETH_BUFFER	2
+
+/*
+ * Use standard MII PHY API
+ */
+#define CONFIG_MII
+#define CONFIG_SYS_FAULT_ECHO_LINK_DOWN
+
+/*
  * Configuration of the external Flash
  * No NOR Flash
  */
@@ -241,8 +256,8 @@
 #undef CONFIG_CMD_IMLS
 #define CONFIG_CMD_LOADS
 #undef CONFIG_CMD_MISC
-/* #define CONFIG_CMD_NET */
-#undef CONFIG_CMD_NET
+#define CONFIG_CMD_NET
+#define CONFIG_CMD_PING
 #undef CONFIG_CMD_NETBOOT
 #undef CONFIG_CMD_NFS
 #undef CONFIG_CMD_SOURCE

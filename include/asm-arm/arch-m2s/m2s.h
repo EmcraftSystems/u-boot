@@ -79,6 +79,15 @@ struct m2s_sysreg {
 #define M2S_SYSREG			((volatile struct m2s_sysreg *)\
 					(M2S_SYSREG_BASE))
 
+struct m2s_coresf2config {
+    unsigned int   config_done;
+    unsigned int   init_done;
+    unsigned int   clr_init_done;
+};
+
+#define CORE_SF2_CFG_BASE		0x40022000u
+#define CORE_SF2_CFG			\
+	((volatile struct m2s_coresf2config *)CORE_SF2_CFG_BASE)
 
 /*
  * Reference clocks enumeration
