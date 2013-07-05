@@ -55,10 +55,18 @@
 /*
  * This is a specific revision of the board
  */
-#define CONFIG_SYS_BOARD_REV		0x1A
+#if !defined(CONFIG_SYS_BOARD_REV)
+#define CONFIG_SYS_BOARD_REV		0x2A
+#endif
 
-#if (CONFIG_SYS_BOARD_REV!=0x1A)
-#error CONFIG_SYS_BOARD_REV must be 1A
+#if (CONFIG_SYS_BOARD_REV!=0x1A) && (CONFIG_SYS_BOARD_REV!=0x2A)
+#error CONFIG_SYS_BOARD_REV must be 1A or 2A
+#endif
+
+#if (CONFIG_SYS_BOARD_REV==0x1A)
+# define CONFIG_SYS_BOARD_REV_STR	"1A"
+#else
+# define CONFIG_SYS_BOARD_REV_STR	"2A"
 #endif
 
 /*
@@ -66,8 +74,6 @@
  */
 #define CONFIG_DISPLAY_CPUINFO		1
 #define CONFIG_DISPLAY_BOARDINFO	1
-
-#define CONFIG_SYS_BOARD_REV_STR	"A"
 
 /*
  * Monitor prompt

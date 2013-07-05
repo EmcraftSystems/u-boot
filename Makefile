@@ -3274,8 +3274,16 @@ lpc4350-eval_config : unconfig
 lpc1850-eval_config : unconfig
 	@$(MKCONFIG) $(@:_config=) arm arm_cortexm3 lpc1850-eval hitex lpc18xx
 
+m2s-som-1a_config \
 m2s-som_config :  unconfig
-	@$(MKCONFIG) $(@:_config=) arm arm_cortexm3 m2s-som emcraft m2s
+	@mkdir -p $(obj)include
+	@ >$(obj)include/config.h
+	@[ -z "$(findstring -1a,$@)" ] || \
+		{ echo "#define CONFIG_SYS_BOARD_REV  0x1A" >>$(obj)include/config.h ; \
+		  echo "...for rev 1A" ; \
+		}
+	@$(MKCONFIG) -a m2s-som arm arm_cortexm3 m2s-som emcraft m2s
+
 
 m2s-fg484-som_config :  unconfig
 	@$(MKCONFIG) $(@:_config=) arm arm_cortexm3 m2s-fg484-som emcraft m2s
