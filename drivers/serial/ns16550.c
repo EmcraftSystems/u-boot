@@ -69,8 +69,10 @@ char NS16550_getc (NS16550_t com_port)
 {
 	while ((com_port->lsr & UART_LSR_DR) == 0) {
 #ifdef CONFIG_USB_TTY
+#ifndef CONFIG_LPC18XX_USB
 		extern void usbtty_poll(void);
 		usbtty_poll();
+#endif
 #endif
 		WATCHDOG_RESET();
 	}

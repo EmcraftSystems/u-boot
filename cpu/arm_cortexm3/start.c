@@ -40,6 +40,8 @@ extern char _data_lma_start;
 extern char _data_start;
 extern char _data_end;
 
+extern unsigned int __section_table_start, __section_table_end;
+
 extern char _mem_stack_base, _mem_stack_end;
 unsigned long _armboot_start;
 
@@ -48,6 +50,9 @@ extern char _bss_end;
 
 void _start(void);
 void default_isr(void);
+#ifdef CONFIG_LPC18XX_USB
+void USB0_IRQHandler(void);
+#endif
 
 extern void start_armboot(void);
 
@@ -87,7 +92,13 @@ unsigned int vectors[] __attribute__((section(".vectors"))) = {
 	/*
 	 * Other exceptions
 	 */
+#ifdef CONFIG_LPC18XX_USB
+	[2 ... 23]	= (unsigned int)&default_isr,
+	[24] = (unsigned int)&USB0_IRQHandler,
+	[25 ... 165]	= (unsigned int)&default_isr
+#else
 	[2 ... 165]	= (unsigned int)&default_isr
+#endif
 };
 
 #ifdef CONFIG_LPC18XX_NORFLASH_BOOTSTRAP_WORKAROUND
@@ -108,6 +119,13 @@ void
 #endif
 	_start(void)
 {
+
+	/*
+	 * Make sure interrupts are disabled.
+	 */
+	__disable_irq();
+
+
 	/*
 	 * Depending on the config parameter, enable or disable the WDT.
 	 */
@@ -119,10 +137,7 @@ void
 	wdt_enable();
 #endif
 
-	/*
-	 * Make sure interrupts are disabled.
-	 */
-	__disable_irq();
+
 
 #ifdef CONFIG_LPC18XX_NORFLASH_BOOTSTRAP_WORKAROUND
 	/*
@@ -143,8 +158,30 @@ void
 	 * Stack grows downwards; the stack base is set-up by the first
 	 * value in the first word in the vectors.
 	 */
-	memcpy(&_data_start, &_data_lma_start, &_data_end - &_data_start);
-	memset(&_bss_start, 0, &_bss_end - &_bss_start);
+
+	//
+	// Copy sections from Flash
+	//
+	unsigned int LoadAddr, ExeAddr, SectionLen, loop;
+	unsigned int *SectionTableAddr;
+
+	// Load base address of Global Section Table
+	SectionTableAddr = &__section_table_start;
+
+	// Copy the text,image_top and data sections from flash to SRAM and RAM.
+	while (SectionTableAddr < &__section_table_end) {
+		LoadAddr = *SectionTableAddr++;
+		ExeAddr = *SectionTableAddr++;
+		SectionLen = *SectionTableAddr++;
+		unsigned int *pulDest = (unsigned int*) ExeAddr;
+		unsigned int *pulSrc = (unsigned int*) LoadAddr;
+		for (loop = 0; loop < SectionLen; loop = loop + 4)
+			*pulDest++ = *pulSrc++;
+	}
+
+	unsigned int *pulDest = (unsigned int*) &_bss_start;
+	for (loop = 0; loop < (&_bss_end - &_bss_start); loop = loop + 4)
+		*pulDest++ = 0;
 
 	/*
 	 * In U-boot (armboot) lingvo, "go to the C code" -
@@ -158,6 +195,30 @@ void
 	 * the malloc pool right behind the stack. See how armboot_start
 	 * is defined in the CPU specific .lds file.
 	 */
+	 
+	// Clear all pending interrupts in the NVIC
+	volatile unsigned int *NVIC_ICPR = (unsigned int *) 0xE000E280;
+	unsigned int irqpendloop;
+	for (irqpendloop = 0; irqpendloop < 8; irqpendloop++) {
+		*(NVIC_ICPR+irqpendloop)= 0xFFFFFFFF;
+	}
+	 
+#ifdef CONFIG_LPC18XX_USB
+	// Reenable interrupts
+	__enable_irq();
+#endif
+
+	// ******************************
+	// Check to see if we are running the code from a non-zero
+    // address (eg RAM, external flash), in which case we need
+    // to modify the VTOR register to tell the CPU that the
+    // vector table is located at a non-0x0 address.
+	unsigned int * pSCB_VTOR = (unsigned int *) 0xE000ED08;
+	if ((unsigned int *)vectors!=(unsigned int *) 0x00000000) {
+		// CMSIS : SCB->VTOR = <address of vector table>
+		*pSCB_VTOR = (unsigned int)vectors;
+	}
+	 
 	_armboot_start = (unsigned long)&_mem_stack_base;
 	start_armboot();
 }

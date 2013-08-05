@@ -72,6 +72,20 @@
  */
 #define CONFIG_LPC18XX_BOOTHEADER
 
+
+/*
+ * Autocomplete commands
+ */
+#define CONFIG_AUTO_COMPLETE
+
+/*
+ * Console over USB
+ */
+#define CONFIG_USB_TTY
+#define CONFIG_LPC18XX_USB
+#define USE_USB0
+
+
 /*
  * Enable GPIO driver
  */
@@ -140,7 +154,7 @@
  * No internal flash on the NXP LPC4350 MCU. Setting CONFIG_MEM_NVM_LEN to the
  * size of the contiguous region of internal SRAM at address 0x10000000.
  */
-#define CONFIG_MEM_NVM_BASE		0x00000000
+#define CONFIG_MEM_NVM_BASE		0x1C000000
 #define CONFIG_MEM_NVM_LEN		(128 * 1024)
 
 #define CONFIG_LPC43xx_LOCAL_SRAM	0x10000000
@@ -355,7 +369,7 @@
 #define CONFIG_ZERO_BOOTDELAY_CHECK
 #define CONFIG_HOSTNAME			lpc4350-db1
 #define CONFIG_BOOTARGS			"lpc18xx_platform=diolan-lpc4350-db1 "\
-					"console=ttyS0,115200 panic=10"
+					"console=ttyUSB0,115200 panic=10"
 #define CONFIG_BOOTCOMMAND		"run flashboot"
 
 /*

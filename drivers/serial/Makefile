@@ -54,7 +54,15 @@ COBJS-$(CONFIG_XILINX_UARTLITE) += serial_xuartlite.o
 COBJS-$(CONFIG_SCIF_CONSOLE) += serial_sh.o
 COBJS-$(CONFIG_STM32_USART_CONSOLE) += stm32_usart.o
 COBJS-$(CONFIG_KINETIS_UART_CONSOLE) += kinetis_uart.o
+
+ifdef CONFIG_LPC18XX_USB
+COBJS-$(CONFIG_LPC18XX_USB) += lpc43_usbtty.o
+else
 COBJS-$(CONFIG_USB_TTY) += usbtty.o
+endif
+
+
+
 
 COBJS	:= $(sort $(COBJS-y))
 SRCS	:= $(COBJS:.o=.c)

@@ -287,6 +287,7 @@ static const struct lpc18xx_pin_config diolan_lpc4350_iomux[] = {
 	{{0x1, 15}, LPC18XX_IOMUX_CONFIG(3, 0, 1, 0, 1, 1)},
 	/* P0.0 = ENET_RXD1 */
 	{{0x0,  0}, LPC18XX_IOMUX_CONFIG(2, 0, 1, 0, 1, 1)},
+
 	/* P9.3 = ENET_RXD2 */
 	{{0x9,  3}, LPC18XX_IOMUX_CONFIG(5, 0, 1, 0, 1, 1)},
 	/* P9.2 = ENET_RXD3 */

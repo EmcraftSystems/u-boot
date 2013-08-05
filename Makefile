@@ -21,8 +21,8 @@
 # MA 02111-1307 USA
 #
 
-VERSION = 2010
-PATCHLEVEL = 03
+VERSION = 2013
+PATCHLEVEL = 06
 SUBLEVEL =
 EXTRAVERSION =
 ifneq "$(SUBLEVEL)" ""
@@ -222,6 +222,12 @@ LIBS += drivers/pci/libpci.a
 LIBS += drivers/pcmcia/libpcmcia.a
 LIBS += drivers/power/libpower.a
 LIBS += drivers/spi/libspi.a
+ifdef CONFIG_LPC18XX_USB
+LIBS += drivers/usb/lpc43_cdc/liblpc43_usb_cdc.a
+endif
+ifdef CONFIG_DIWEL_LCD
+# LIBS += drivers/lcd/liblcd.a
+endif
 ifeq ($(CPU),mpc83xx)
 LIBS += drivers/qe/qe.a
 endif
@@ -253,6 +259,11 @@ LIBS := $(addprefix $(obj),$(LIBS))
 
 LIBBOARD = board/$(BOARDDIR)/lib$(BOARD).a
 LIBBOARD := $(addprefix $(obj),$(LIBBOARD))
+
+# External libraries
+ifdef CONFIG_LPC_SPIFI
+EXT_LIBS = external_libs/libspifi_drv_M4.a
+endif
 
 # Add GCC lib
 ifdef USE_PRIVATE_LIBGCC
@@ -287,7 +298,8 @@ ONENAND_BIN ?= $(obj)onenand_ipl/onenand-ipl-2k.bin
 endif
 
 __OBJS := $(subst $(obj),,$(OBJS))
-__LIBS := $(subst $(obj),,$(LIBS)) $(subst $(obj),,$(LIBBOARD))
+# + User added libraries
+__LIBS := $(subst $(obj),,$(LIBS)) $(EXT_LIBS) $(subst $(obj),,$(LIBBOARD))
 
 #########################################################################
 #########################################################################
@@ -310,13 +322,21 @@ $(obj)u-boot.srec:	$(obj)u-boot
 
 $(obj)u-boot.bin:	$(obj)u-boot
 		$(OBJCOPY) ${OBJCFLAGS} -O binary $< $@
+
 ifeq ($(CONFIG_LPC178X_FCG),y)
 		$(obj)tools/lpc178x_fcg $(obj)u-boot.bin $(obj)u-boot-lpc.bin
 		mv $(obj)u-boot-lpc.bin $(obj)u-boot.bin
 endif
+
+#
+# U-Boot DFU must have a header.
+# Diwel board : if U-Boot has a header, it's the DFU version
+#
 ifeq ($(CONFIG_LPC18XX_BOOTHEADER),y)
-		$(obj)tools/lpc18xx_bootheader $(obj)u-boot.bin $(obj)u-boot-bootheader.bin # add header
-		mv $(obj)u-boot-bootheader.bin $(obj)u-boot.bin # replace u-boot.bin 
+		$(obj)tools/lpc18xx_bootheader $(obj)u-boot.bin $(obj)u-boot-bootheader.bin
+		mv $(obj)u-boot-bootheader.bin $(obj)u-boot-dfu.bin # U-Boot DFU created
+else
+		mv $(obj)u-boot.bin $(obj)u-boot-not-dfu.bin
 endif
 
 $(obj)u-boot.upgrade:	$(obj)u-boot.bin
@@ -3261,11 +3281,21 @@ lpc4350-eval_config : unconfig
 
 lpc1850-eval_config : unconfig
 	@$(MKCONFIG) $(@:_config=) arm arm_cortexm3 lpc1850-eval hitex lpc18xx
-
-
+	
 lpc4350-db1_config : unconfig
 	@$(MKCONFIG) $(@:_config=) arm arm_cortexm3 lpc4350-db1 diolan lpc18xx
+	
+	
+	#	#	#	#	#	#	#	#
+	# 			DIWEL			# 
+	#	#	#	#	#	#	#	#
+diwel-lpc43_config : unconfig
+	@$(MKCONFIG) $(@:_config=) arm arm_cortexm4 diwel-lpc43 diwel lpc18xx
 
+diwel-lpc43-dfu_config : unconfig
+	@$(MKCONFIG) $(@:_config=) arm arm_cortexm4-dfu diwel-lpc43 diwel lpc18xx
+	
+	
 
 m2s-som_config :  unconfig
 	@$(MKCONFIG) $(@:_config=) arm arm_cortexm3 m2s-som emcraft m2s
@@ -3818,6 +3848,7 @@ grsim_leon2_config : unconfig
 #########################################################################
 
 clean:
+	@echo "Some binaries have been kept :"
 	@rm -f $(obj)examples/standalone/82559_eeprom			  \
 	       $(obj)examples/standalone/atmel_df_pow2			  \
 	       $(obj)examples/standalone/eepro100_eeprom		  \
@@ -3853,14 +3884,17 @@ clean:
 	@rm -f $(TIMESTAMP_FILE) $(VERSION_FILE)
 	@find $(OBJTREE) -type f \
 		\( -name 'core' -o -name '*.bak' -o -name '*~' \
-		-o -name '*.o'	-o -name '*.a' -o -name '*.exe'	\) -print \
-		| xargs rm -f
+		-o -name '*.o' -o -name "*.a" -o -name '*.exe' \) -print \
+		| grep -v 'external_libs' | xargs rm -f
+	@find $(OBJTREE) -type f \
+		\( -name 'core' -o -name '*.bak' -o -name '*~' \
+		-o -name '*.o' -o -name "*.a" -o -name '*.exe' \) -print 
 
 clobber:	clean
 	@find $(OBJTREE) -type f \( -name .depend \
 		-o -name '*.srec' -o -name '*.bin' -o -name u-boot.img \) \
 		-print0 \
-		| xargs -0 rm -f
+		| grep -v 'u-boot-diwel.bin\|u-boot-dfu.bin' | xargs -0 rm -f
 	@rm -f $(OBJS) $(obj)*.bak $(obj)ctags $(obj)etags $(obj)TAGS \
 		$(obj)cscope.* $(obj)*.*~
 	@rm -f $(obj)u-boot $(obj)u-boot.map $(obj)u-boot.hex $(ALL)
@@ -3871,6 +3905,10 @@ clobber:	clean
 	@rm -f $(obj)include/asm/proc $(obj)include/asm/arch $(obj)include/asm
 	@[ ! -d $(obj)nand_spl ] || find $(obj)nand_spl -name "*" -type l -print | xargs rm -f
 	@[ ! -d $(obj)onenand_ipl ] || find $(obj)onenand_ipl -name "*" -type l -print | xargs rm -f
+	
+	@find $(OBJTREE) -type f \( -name '*.srec' \
+	-o -name '*.bin' -o -name u-boot.img \) \
+	-print
 
 ifeq ($(OBJTREE),$(SRCTREE))
 mrproper \

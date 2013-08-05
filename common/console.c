@@ -670,7 +670,7 @@ int console_init_r(void)
 #endif
 
 	/* Scan devices looking for input and output devices */
-	list_for_each(pos, list) {
+	list_for_each_prev(pos, list) {
 		dev = list_entry(pos, struct stdio_dev, list);
 
 		if ((dev->flags & DEV_FLAGS_INPUT) && (inputdev == NULL)) {
