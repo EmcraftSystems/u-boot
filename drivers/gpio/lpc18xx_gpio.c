@@ -61,7 +61,7 @@ DECLARE_GLOBAL_DATA_PTR;
  * Check that the given (pin group, pin) pair is a valid LPC18xx pin.
  * Returns 0 on success, -EINVAL otherwise.
  */
-static __attribute__((section(".lpc18xx_image_top_text"))) inline int lpc18xx_validate_pin(const struct lpc18xx_iomux_dsc *dsc)
+static inline int lpc18xx_validate_pin(const struct lpc18xx_iomux_dsc *dsc)
 {
 	int rv;
 

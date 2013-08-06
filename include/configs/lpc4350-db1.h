@@ -35,7 +35,7 @@
  * Sections are not mapped in shadow area
  * See U-boot.lds
  */
-// #define FIXED_SECTIONS_DIOLAN
+#define FIXED_SECTIONS_DIOLAN
 
 
 /*
@@ -70,7 +70,7 @@
  * /!\ Needed for use in DFU
  * /!\ ELF file does not contain header (if debugging)
  */
-#define CONFIG_LPC18XX_BOOTHEADER
+// #define CONFIG_LPC18XX_BOOTHEADER
 
 
 /*
