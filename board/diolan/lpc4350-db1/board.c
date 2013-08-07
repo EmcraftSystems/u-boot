@@ -277,9 +277,9 @@ static const struct lpc18xx_pin_config diolan_lpc4350_iomux[] = {
 	{{0x1, 20}, LPC18XX_IOMUX_CONFIG(3, 0, 1, 0, 1, 1)},
 	
 	/* PC.2 = ENET_TXD2 */
-	{{0xC,  2}, LPC18XX_IOMUX_CONFIG(5, 0, 1, 0, 1, 1)},
+	{{0xC,  2}, LPC18XX_IOMUX_CONFIG(3, 0, 1, 0, 1, 1)},
 	/* PC.3 = ENET_TXD3 */
-	{{0xC,  3}, LPC18XX_IOMUX_CONFIG(5, 0, 1, 0, 1, 1)},
+	{{0xC,  3}, LPC18XX_IOMUX_CONFIG(3, 0, 1, 0, 1, 1)},
 
 	/* P0.1 = ENET_TX_EN */
 	{{0x0,  1}, LPC18XX_IOMUX_CONFIG(6, 0, 1, 0, 1, 1)},
@@ -293,21 +293,21 @@ static const struct lpc18xx_pin_config diolan_lpc4350_iomux[] = {
 	/* P9.2 = ENET_RXD3 */
 	{{0x9,  2}, LPC18XX_IOMUX_CONFIG(5, 0, 1, 0, 1, 1)},
 	/* P1.16 = ENET_CRS */
-	{{0x1, 16}, LPC18XX_IOMUX_CONFIG(5, 0, 1, 0, 1, 1)},
+	{{0x1, 16}, LPC18XX_IOMUX_CONFIG(3, 0, 1, 0, 1, 1)},
 	/* PC.9 = ENET_RX_ER */
-	{{0xC,  9}, LPC18XX_IOMUX_CONFIG(5, 0, 1, 0, 1, 1)},
+	{{0xC,  9}, LPC18XX_IOMUX_CONFIG(3, 0, 1, 0, 1, 1)},
 	/* PC.0 = ENET_RX_CLK */
 	{{0xC,  0}, LPC18XX_IOMUX_CONFIG(3, 0, 1, 0, 1, 1)},
 	
 	/* PC.5 = ENET_TX_ER */
-	// {{0xC,  5}, LPC18XX_IOMUX_CONFIG(3, 0, 1, 0, 1, 1)},
+	{{0xC,  5}, LPC18XX_IOMUX_CONFIG(3, 0, 1, 0, 1, 1)},
 	
 	/* P9.6 = ENET_COL */
 	{{0x9,  6}, LPC18XX_IOMUX_CONFIG(5, 0, 1, 0, 1, 1)},
 	/* P1.19 = ENET_TX_CLK */
 	{{0x1, 19}, LPC18XX_IOMUX_CONFIG(0, 0, 1, 0, 1, 1)},
 	/* PC.8 = ENET_RXDV */
-	{{0xC, 8}, LPC18XX_IOMUX_CONFIG(7, 0, 1, 0, 1, 1)},
+	{{0xC, 8}, LPC18XX_IOMUX_CONFIG(3, 0, 1, 0, 1, 1)},
 #endif /* CONFIG_LPC18XX_ETH */
 
 

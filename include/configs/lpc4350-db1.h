@@ -32,11 +32,9 @@
 // #undef DEBUG
 
 /*
- * Sections are not mapped in shadow area
- * See U-boot.lds
+ * Autocomplete commands
  */
-#define FIXED_SECTIONS_DIOLAN
-
+#define CONFIG_AUTO_COMPLETE
 
 /*
  * Make all tests available
@@ -71,7 +69,11 @@
  * /!\ ELF file does not contain header (if debugging)
  */
 // #define CONFIG_LPC18XX_BOOTHEADER
-
+/*
+ * Sections are not mapped in shadow area
+ * See U-boot.lds
+ */
+#define FIXED_SECTIONS_DIOLAN
 
 /*
  * Autocomplete commands
