@@ -3281,11 +3281,11 @@ lpc4350-eval_config : unconfig
 
 lpc1850-eval_config : unconfig
 	@$(MKCONFIG) $(@:_config=) arm arm_cortexm3 lpc1850-eval hitex lpc18xx
-	
+
 lpc4350-db1_config : unconfig
 	@$(MKCONFIG) $(@:_config=) arm arm_cortexm3 lpc4350-db1 diolan lpc18xx
-	
-	
+
+
 	#	#	#	#	#	#	#	#
 	# 			DIWEL			# 
 	#	#	#	#	#	#	#	#
@@ -3294,8 +3294,8 @@ diwel-lpc43_config : unconfig
 
 diwel-lpc43-dfu_config : unconfig
 	@$(MKCONFIG) $(@:_config=) arm arm_cortexm4-dfu diwel-lpc43 diwel lpc18xx
-	
-	
+
+
 
 m2s-som_config :  unconfig
 	@$(MKCONFIG) $(@:_config=) arm arm_cortexm3 m2s-som emcraft m2s
@@ -3905,7 +3905,7 @@ clobber:	clean
 	@rm -f $(obj)include/asm/proc $(obj)include/asm/arch $(obj)include/asm
 	@[ ! -d $(obj)nand_spl ] || find $(obj)nand_spl -name "*" -type l -print | xargs rm -f
 	@[ ! -d $(obj)onenand_ipl ] || find $(obj)onenand_ipl -name "*" -type l -print | xargs rm -f
-	
+
 	@find $(OBJTREE) -type f \( -name '*.srec' \
 	-o -name '*.bin' -o -name u-boot.img \) \
 	-print
