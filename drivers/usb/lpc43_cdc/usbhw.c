@@ -28,6 +28,7 @@
 * copyright, permission, and disclaimer notice must appear in all copies of
 * this code.
 **********************************************************************/
+
 #include <string.h>
 #include "asm/arch/lpc43xx.h"                        /* lpc43xx definitions */
 #include "asm/arch/lpc_types.h"

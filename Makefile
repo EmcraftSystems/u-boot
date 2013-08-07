@@ -225,9 +225,6 @@ LIBS += drivers/spi/libspi.a
 ifdef CONFIG_LPC18XX_USB
 LIBS += drivers/usb/lpc43_cdc/liblpc43_usb_cdc.a
 endif
-ifdef CONFIG_DIWEL_LCD
-# LIBS += drivers/lcd/liblcd.a
-endif
 ifeq ($(CPU),mpc83xx)
 LIBS += drivers/qe/qe.a
 endif
@@ -330,7 +327,6 @@ endif
 
 #
 # U-Boot DFU must have a header.
-# Diwel board : if U-Boot has a header, it's the DFU version
 #
 ifeq ($(CONFIG_LPC18XX_BOOTHEADER),y)
 		$(obj)tools/lpc18xx_bootheader $(obj)u-boot.bin $(obj)u-boot-bootheader.bin
@@ -3281,22 +3277,10 @@ lpc4350-eval_config : unconfig
 
 lpc1850-eval_config : unconfig
 	@$(MKCONFIG) $(@:_config=) arm arm_cortexm3 lpc1850-eval hitex lpc18xx
-
+	
 lpc4350-db1_config : unconfig
 	@$(MKCONFIG) $(@:_config=) arm arm_cortexm3 lpc4350-db1 diolan lpc18xx
-
-
-	#	#	#	#	#	#	#	#
-	# 			DIWEL			# 
-	#	#	#	#	#	#	#	#
-diwel-lpc43_config : unconfig
-	@$(MKCONFIG) $(@:_config=) arm arm_cortexm4 diwel-lpc43 diwel lpc18xx
-
-diwel-lpc43-dfu_config : unconfig
-	@$(MKCONFIG) $(@:_config=) arm arm_cortexm4-dfu diwel-lpc43 diwel lpc18xx
-
-
-
+	
 m2s-som_config :  unconfig
 	@$(MKCONFIG) $(@:_config=) arm arm_cortexm3 m2s-som emcraft m2s
 
@@ -3894,7 +3878,7 @@ clobber:	clean
 	@find $(OBJTREE) -type f \( -name .depend \
 		-o -name '*.srec' -o -name '*.bin' -o -name u-boot.img \) \
 		-print0 \
-		| grep -v 'u-boot-diwel.bin\|u-boot-dfu.bin' | xargs -0 rm -f
+		| grep -v 'u-boot-dfu.bin' | xargs -0 rm -f
 	@rm -f $(OBJS) $(obj)*.bak $(obj)ctags $(obj)etags $(obj)TAGS \
 		$(obj)cscope.* $(obj)*.*~
 	@rm -f $(obj)u-boot $(obj)u-boot.map $(obj)u-boot.hex $(ALL)
@@ -3905,7 +3889,7 @@ clobber:	clean
 	@rm -f $(obj)include/asm/proc $(obj)include/asm/arch $(obj)include/asm
 	@[ ! -d $(obj)nand_spl ] || find $(obj)nand_spl -name "*" -type l -print | xargs rm -f
 	@[ ! -d $(obj)onenand_ipl ] || find $(obj)onenand_ipl -name "*" -type l -print | xargs rm -f
-
+	
 	@find $(OBJTREE) -type f \( -name '*.srec' \
 	-o -name '*.bin' -o -name u-boot.img \) \
 	-print

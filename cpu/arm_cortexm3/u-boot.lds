@@ -28,8 +28,8 @@ ENTRY(_start)
 
 MEMORY
 {
-	NVM (r):	ORIGIN = NVM_BASE, \
-			LENGTH = NVM_LEN
+	Flash (rx): ORIGIN = (0x1C000000), LENGTH = ((16 * 1024 * 1024) - 0x10)
+	Local_SRAM128 (rwx): ORIGIN = 0x10000000, LENGTH = (128*1024)
 	RAM (rw):	ORIGIN = CONFIG_MEM_RAM_BASE, \
 			LENGTH = CONFIG_MEM_RAM_LEN
 	RAM_BUF (r):	ORIGIN = CONFIG_MEM_RAM_BASE + LENGTH(RAM), \
@@ -42,91 +42,86 @@ MEMORY
 
 SECTIONS
 {
-	.vectors NVM_BASE :
+	.vectors :
 	{
 		*(.vectors)
-	} >NVM
+	} >Local_SRAM128 AT>Flash
 
 	/*
-	 * This section is only necessary for Freescale Kinetis. For other MCUs,
-	 * this section will be empty and the linker will drop it.
-	 */
-	.kinetis_flash_conf 0x00000400 :
-	{
-		KEEP(*(.kinetis_flash_conf))
-	} >NVM
-
-	/*
-	 * Store contents of these two sections in the beginning of the U-Boot
-	 * image to ensure they are loaded by the Boot ROM of the LPC4350 MCU.
-	 */
+	* Store contents of these two sections in the beginning of the U-Boot
+	* image to ensure they are loaded by the Boot ROM of the LPC4350 MCU.
+	*/
 	.lpc18xx_image_top :
 	{
-		*(.lpc18xx_image_top_text)
-		*(.lpc18xx_image_top_data)
-	} >NVM
+	/* Global Section Table */
+	    . = ALIGN(4) ;
+	    __section_table_start = .;
+	    LONG(LOADADDR(.vectors));
+	    LONG(    ADDR(.vectors));
+	    LONG(  SIZEOF(.vectors));
+	    LONG(LOADADDR(.text));
+	    LONG(    ADDR(.text));
+	    LONG(  SIZEOF(.text));
+	    LONG(LOADADDR(.u_boot_cmd));
+	    LONG(    ADDR(.u_boot_cmd));
+	    LONG(  SIZEOF(.u_boot_cmd));
+	    LONG(LOADADDR(.data));
+	    LONG(    ADDR(.data));
+	    LONG(  SIZEOF(.data));
+	    __section_table_end = . ;
+	/* Global Section Table end */
 
+	*(.lpc18xx_image_top_text)
+	*(.lpc18xx_image_top_data)
+	} >Flash
 	.text :
 	{
-		*(.text)
-		*(.rodata*)
-
-	} >NVM
-
+	_text_start = .;
+	*(.text)
+	*(.rodata*)
+	_text_end = .;
+	} >Local_SRAM128 AT>Flash
 	.data :
 	{
-		_data_start = .;
-		_data_lma_start = LOADADDR(.data);
-		*(.data)
-		. = ALIGN(4);
-		*(.ramcode)
-		_data_end = .;
-	} >RAM AT>NVM
-
+	_data_start = .;
+	_data_lma_start = LOADADDR(.data);
+	*(.data)
+	. = ALIGN(4);
+	*(.ramcode)
+	_data_end = .;
+	} >RAM AT>Flash
 	.u_boot_cmd :
 	{
-		. = ALIGN(4);
-		__u_boot_cmd_start = .;
-		*(.u_boot_cmd)
-		__u_boot_cmd_end = .;
-	} >NVM
-
+	. = ALIGN(4);
+	__u_boot_cmd_start = .;
+	*(.u_boot_cmd)
+	__u_boot_cmd_end = .;
+	} >Local_SRAM128 AT>Flash
 	.bss :
 	{
-		_bss_start = .;
-		*(.bss)
-		*(COMMON)
-		_bss_end = .;
+	_bss_start = .;
+	*(.bss)
+	*(COMMON)
+	_bss_end = .;
 	} >RAM
-
 	.stack :
 	{
-		*(.stack)
+	*(.stack)
 	} >STACK
-
-	/* This section has to be removed for debugging 
-	* If done, copying the whole image of U-Boot (see start.c) has to be modified
-	* make an objdump on u-boot image to see how sections are organized
-	*/
-	/*
-	/DISCARD/ :
+	/* Has to be removed to keep .debug_* sections used for debugging
+	* /DISCARD/ :
 	{
-		*(*)
-	}
-	*/
+	*(*)
+	} */
 }
-
-/*
- * Export memory addresses
- */
-_mem_nvm_base		= ORIGIN(NVM);
-_mem_nvm_size		= LENGTH(NVM);
-_mem_ram_base		= ORIGIN(RAM);
-_mem_ram_size		= LENGTH(RAM);
-_mem_ram_buf_base	= ORIGIN(RAM_BUF);
-_mem_ram_buf_size	= LENGTH(RAM_BUF);
-_mem_malloc_base	= ORIGIN(MALLOC);
-_mem_malloc_size	= LENGTH(MALLOC);
-_mem_stack_base		= ORIGIN(STACK);
-_mem_stack_size		= LENGTH(STACK);
-_mem_stack_end		= ORIGIN(STACK) + LENGTH(STACK);
+_mem_nvm_base = ORIGIN(Flash);
+_mem_nvm_size = LENGTH(Flash);
+_mem_ram_base = ORIGIN(RAM);
+_mem_ram_size = LENGTH(RAM);
+_mem_ram_buf_base = ORIGIN(RAM_BUF);
+_mem_ram_buf_size = LENGTH(RAM_BUF);
+_mem_malloc_base = ORIGIN(MALLOC);
+_mem_malloc_size = LENGTH(MALLOC);
+_mem_stack_base = ORIGIN(STACK);
+_mem_stack_size = LENGTH(STACK);
+_mem_stack_end = ORIGIN(STACK) + LENGTH(STACK);
