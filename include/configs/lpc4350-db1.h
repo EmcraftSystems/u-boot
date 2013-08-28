@@ -156,7 +156,7 @@
  * No internal flash on the NXP LPC4350 MCU. Setting CONFIG_MEM_NVM_LEN to the
  * size of the contiguous region of internal SRAM at address 0x10000000.
  */
-#define CONFIG_MEM_NVM_BASE		0x1C000000
+#define CONFIG_MEM_NVM_BASE		0x00000000
 #define CONFIG_MEM_NVM_LEN		(128 * 1024)
 
 #define CONFIG_LPC43xx_LOCAL_SRAM	0x10000000
@@ -213,7 +213,7 @@
 #define CONFIG_SYS_FLASH_CFI_WIDTH		FLASH_CFI_16BIT
 #define CONFIG_SYS_FLASH_BANKS_LIST	{ CONFIG_SYS_FLASH_BANK1_BASE }
 #define CONFIG_SYS_MAX_FLASH_BANKS		1
-#define CONFIG_SYS_MAX_FLASH_SECT		32 /* 32 * 64kB = 2MB */
+#define CONFIG_SYS_MAX_FLASH_SECT		35 /* 31*64kB+1*32kB+1*16kB+2*8kB = 2MB */
 
 /*
  * Store env in flash.
