@@ -23,6 +23,7 @@
 #include <asm/errno.h>
 
 #include <asm/arch/lpc18xx_creg.h>
+#include <asm/arch/lpc18xx.h>
 #include "clock.h"
 
 /*
@@ -194,12 +195,6 @@ struct lpc18xx_rgu_regs {
 static u32 clock_val[CLOCK_END];
 
 /*
- * Set LPC18XX_PLL1_CLK_OUT to the output rate of PLL1
- */
-#define LPC18XX_PLL1_CLK_OUT \
-	(CONFIG_LPC18XX_EXTOSC_RATE * CONFIG_LPC18XX_PLL1_M)
-
-/*
  * Compile time sanity checks for defined board clock setup
  */
 #ifndef CONFIG_LPC18XX_EXTOSC_RATE
@@ -211,7 +206,7 @@ static u32 clock_val[CLOCK_END];
  * of 156 MHz to 320 MHz, so that the PLL1 Direct Mode is applicable.
  * Our clock configuration code (`clock_setup()`) support only this mode.
  */
-#if LPC18XX_PLL1_CLK_OUT < 156000000
+#if LPC18XX_PLL1_CLK_OUT < 144000000
 #error Requested PLL1 output frequency is too low
 #endif
 #if LPC18XX_PLL1_CLK_OUT > 320000000
@@ -337,6 +332,7 @@ void eth_clock_setup(void)
 	int timeout;
 	int rv;
 
+#ifndef CONFIG_LPC18XX_ENET_USE_PHY_RMII
 	/*
 	 * This clock configuration is valid only for MII
 	 */
@@ -344,13 +340,18 @@ void eth_clock_setup(void)
 		LPC18XX_CGU_CLKSEL_ENET_RX | LPC18XX_CGU_AUTOBLOCK_MSK;
 	LPC18XX_CGU->phy_tx_clk =
 		LPC18XX_CGU_CLKSEL_ENET_TX | LPC18XX_CGU_AUTOBLOCK_MSK;
+#endif /* CONFIG_LPC18XX_ENET_USE_PHY_RMII */
 
 	/*
 	 * Choose the MII Ethernet mode
 	 */
 	LPC18XX_CREG->creg6 =
 		(LPC18XX_CREG->creg6 & ~LPC18XX_CREG_CREG6_ETHMODE_MSK) |
+#ifndef CONFIG_LPC18XX_ENET_USE_PHY_RMII
 		LPC18XX_CREG_CREG6_ETHMODE_MII;
+#else
+		LPC18XX_CREG_CREG6_ETHMODE_RMII;
+#endif
 
 	/*
 	 * Reset the Ethernet module of the MCU

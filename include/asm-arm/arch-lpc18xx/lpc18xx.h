@@ -71,4 +71,10 @@ unsigned long clock_get(enum clock clck);
  */
 void lpc18xx_reset_cpu(void);
 
+/*
+ * Set LPC18XX_PLL1_CLK_OUT to the output rate of PLL1
+ */
+#define LPC18XX_PLL1_CLK_OUT \
+	(CONFIG_LPC18XX_EXTOSC_RATE * CONFIG_LPC18XX_PLL1_M)
+
 #endif /* _MACH_LPC18XX_H_ */

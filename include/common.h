@@ -489,7 +489,7 @@ ulong	get_tbclk     (void);
  */
 #if defined(CONFIG_SYS_A2F) || defined(CONFIG_SYS_STM32) || \
     defined(CONFIG_SYS_LPC178X) || defined(CONFIG_SYS_KINETIS) || \
-    defined(CONFIG_SYS_M2S)
+    defined(CONFIG_SYS_LPC18XX) || defined(CONFIG_SYS_M2S)
 #define CONFIG_ARMCORTEXM3_RAMCODE
 #endif
 

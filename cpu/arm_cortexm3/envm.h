@@ -27,6 +27,10 @@
  */
 void envm_init(void);
 
+#if !defined(CONFIG_ARMCORTEXM3_RAMCODE) && defined(CONFIG_LPC43XX_ENVM)
+# error "LPC43XX ENVM requires RAMCODE"
+#endif
+
 /*
  * Write a data buffer to eNVM.
  * Note that we need for this function to reside in RAM since it

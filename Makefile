@@ -3271,6 +3271,9 @@ k70-som_config : unconfig
 lpc4350-eval_config : unconfig
 	@$(MKCONFIG) $(@:_config=) arm arm_cortexm3 lpc4350-eval hitex lpc18xx
 
+ea-lpc4357_config : unconfig
+	@$(MKCONFIG) $(@:_config=) arm arm_cortexm3 ea-lpc4357 nxp lpc18xx
+
 lpc1850-eval_config : unconfig
 	@$(MKCONFIG) $(@:_config=) arm arm_cortexm3 lpc1850-eval hitex lpc18xx
 

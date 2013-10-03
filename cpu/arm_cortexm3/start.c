@@ -40,6 +40,12 @@ extern char _data_lma_start;
 extern char _data_start;
 extern char _data_end;
 
+#if defined(CONFIG_MEM_RAMCODE_BASE) && defined(CONFIG_MEM_RAMCODE_LEN)
+extern char _ramcode_lma_start;
+extern char _ramcode_start;
+extern char _ramcode_end;
+#endif
+
 extern char _mem_stack_base, _mem_stack_end;
 unsigned long _armboot_start;
 
@@ -145,6 +151,14 @@ void
 	 */
 	memcpy(&_data_start, &_data_lma_start, &_data_end - &_data_start);
 	memset(&_bss_start, 0, &_bss_end - &_bss_start);
+
+	/*
+	 * Copy RAMCODE separately, if it is separated
+	 */
+#if defined(CONFIG_MEM_RAMCODE_BASE) && defined(CONFIG_MEM_RAMCODE_LEN)
+	memcpy(&_ramcode_start, &_ramcode_lma_start,
+		&_ramcode_end - &_ramcode_start);
+#endif
 
 	/*
 	 * In U-boot (armboot) lingvo, "go to the C code" -
