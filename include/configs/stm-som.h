@@ -4,6 +4,7 @@
  * Yuri Tikhonov, Emcraft Systems, yur@emcraft.com
  * Alexander Potashev, Emcraft Systems, aspotashev@emcraft.com
  * Vladimir Khusainov, Emcraft Systems, vlad@emcraft.com
+ * Pavel Boldin, Emcraft Systems, paboldin@emcraft.com
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License as
@@ -22,11 +23,14 @@
  */
 
 /*
- * Configuration settings for the STMicroelectronic STM3220G-EVAL board.
+ * Configuration settings for the Emcraft's STM SOM Rev 1.A and 2.A
  */
 
 #ifndef __CONFIG_H
 #define __CONFIG_H
+
+
+#define CONFIG_SYS_BOARD_REV	0x2A
 
 /*
  * Disable debug messages
@@ -57,12 +61,20 @@
 #define CONFIG_DISPLAY_CPUINFO		1
 #define CONFIG_DISPLAY_BOARDINFO	1
 
-#define CONFIG_SYS_BOARD_REV_STR	"Rev 1.A"
+#if CONFIG_SYS_BOARD_REV == 0x2A
+# define CONFIG_SYS_BOARD_REV_STR	"Rev 2.A"
+#elif CONFIG_SYS_BOARD_REV == 0x1A
+# define CONFIG_SYS_BOARD_REV_STR	"Rev 1.A"
+#endif
 
 /*
  * Monitor prompt
  */
-#define CONFIG_SYS_PROMPT		"STM-SOM> "
+#if CONFIG_SYS_BOARD_REV == 0x2A
+# define CONFIG_SYS_PROMPT		"STM32F4X9-SOM> "
+#elif CONFIG_SYS_BOARD_REV == 0x1A
+# define CONFIG_SYS_PROMPT		"STM-SOM> "
+#endif
 
 /*
  * We want to call the CPU specific initialization
@@ -118,30 +130,45 @@
 #define FSMC_NOR_PSRAM_CS_ADDR(n) \
 	(0x60000000 + ((n) - 1) * 0x4000000)
 
+#if CONFIG_SYS_BOARD_REV == 0x2A
+
 /*
- * Configuration of the external PSRAM memory
+ * Configuration of the external SDRAM memory for Rev 2.A
  */
-#define CONFIG_NR_DRAM_BANKS		1
-#define CONFIG_SYS_RAM_SIZE		(16 * 1024 * 1024)
-#define CONFIG_SYS_RAM_CS		1
+# define CONFIG_NR_DRAM_BANKS		1
+# define CONFIG_SYS_RAM_SIZE		(32 * 1024 * 1024)
+# define CONFIG_SYS_RAM_CS		1
+# define CONFIG_SYS_RAM_FREQ_DIV	2
+# define CONFIG_SYS_RAM_BASE		0xC0000000
 
-#define CONFIG_SYS_RAM_BURST
-#define CONFIG_SYS_FSMC_PSRAM_BCR	0x00005059
-#define CONFIG_SYS_FSMC_PSRAM_BTR	0x10000904
-#define CONFIG_SYS_FSMC_PSRAM_BWTR	0x10000804
-#define CONFIG_FSMC_NOR_PSRAM_CS2_ENABLE
-
-#define CONFIG_SYS_RAM_BASE		FSMC_NOR_PSRAM_CS_ADDR(CONFIG_SYS_RAM_CS)
+#elif CONFIG_SYS_BOARD_REV == 0x1A
 
 /*
- * Configuration of the external Flash memory
+ * Configuration of the external PSRAM memory for Rev 1.A
+ */
+# define CONFIG_NR_DRAM_BANKS		1
+# define CONFIG_SYS_RAM_SIZE		(16 * 1024 * 1024)
+# define CONFIG_SYS_RAM_CS		1
+
+# define CONFIG_SYS_RAM_BURST
+# define CONFIG_SYS_FSMC_PSRAM_BCR	0x00005059
+# define CONFIG_SYS_FSMC_PSRAM_BTR	0x10000904
+# define CONFIG_SYS_FSMC_PSRAM_BWTR	0x10000804
+# define CONFIG_FSMC_NOR_PSRAM_CS1_ENABLE
+
+# define CONFIG_SYS_RAM_BASE		FSMC_NOR_PSRAM_CS_ADDR(CONFIG_SYS_RAM_CS)
+
+#endif /* CONFIG_SYS_BOARD_REV is 1A */
+
+/*
+ * Configuration of the external Flash memory, common for both revisions
  */
 #define CONFIG_SYS_FLASH_CS		2
 
-#define CONFIG_SYS_FSMC_FLASH_BCR	0x00005015
+#define CONFIG_SYS_FSMC_FLASH_BCR	0x00105055
 #define CONFIG_SYS_FSMC_FLASH_BTR	0x00021206
 #define CONFIG_SYS_FSMC_FLASH_BWTR	0x00021106
-#define CONFIG_FSMC_NOR_PSRAM_CS1_ENABLE
+#define CONFIG_FSMC_NOR_PSRAM_CS2_ENABLE
 
 #define CONFIG_SYS_FLASH_BANK1_BASE	FSMC_NOR_PSRAM_CS_ADDR(CONFIG_SYS_FLASH_CS)
 
@@ -168,11 +195,30 @@
  * Serial console configuration
  */
 #define CONFIG_STM32_USART_CONSOLE
-#define CONFIG_STM32_USART_PORT		3	/* USART3 */
-#define CONFIG_STM32_USART_TX_IO_PORT	2	/* PORTC */
-#define CONFIG_STM32_USART_RX_IO_PORT	2	/* PORTC */
-#define CONFIG_STM32_USART_TX_IO_PIN	10	/* GPIO10 */
-#define CONFIG_STM32_USART_RX_IO_PIN	11	/* GPIO11 */
+
+#if CONFIG_SYS_BOARD_REV == 0x2A
+/* Rev 2A console: USART1, TX PB.6, RX PA.10 */
+
+# define CONFIG_STM32_USART_PORT	1	/* USART1 */
+
+# define CONFIG_STM32_USART_TX_IO_PORT	1	/* PORTB */
+# define CONFIG_STM32_USART_TX_IO_PIN	6	/* GPIO6 */
+
+# define CONFIG_STM32_USART_RX_IO_PORT	0	/* PORTA */
+# define CONFIG_STM32_USART_RX_IO_PIN	10	/* GPIO10 */
+
+#elif CONFIG_SYS_BOARD_REV == 0x1A
+/* Rev 1A console: USART3, TX PC.10, RX PC.11 */
+
+# define CONFIG_STM32_USART_PORT	3	/* USART3 */
+
+# define CONFIG_STM32_USART_TX_IO_PORT	2	/* PORTC */
+# define CONFIG_STM32_USART_TX_IO_PIN	10	/* GPIO10 */
+
+# define CONFIG_STM32_USART_RX_IO_PORT	2	/* PORTC */
+# define CONFIG_STM32_USART_RX_IO_PIN	11	/* GPIO11 */
+
+#endif
 
 #define CONFIG_BAUDRATE			115200
 #define CONFIG_SYS_BAUDRATE_TABLE	{ 9600, 19200, 38400, 57600, 115200 }
@@ -259,10 +305,25 @@
  */
 #define CONFIG_BOOTDELAY		3
 #define CONFIG_ZERO_BOOTDELAY_CHECK
-#define CONFIG_HOSTNAME			stm-som
-#define CONFIG_BOOTARGS			"stm32_platform=stm-som "\
-					"console=ttyS2,115200 panic=10"
 #define CONFIG_BOOTCOMMAND		"run flashboot"
+
+#if CONFIG_SYS_BOARD_REV == 0x2A
+/* Rev 2.A boot args and env */
+# define CONFIG_HOSTNAME	stm32f4x9-som
+# define CONFIG_BOOTARGS	"stm32_platform=stm32f4x9-som "\
+				"console=ttyS0,115200 panic=10"
+
+# define LOADADDR	"0xC0000000"
+
+#elif CONFIG_SYS_BOARD_REV == 0x1A
+/* Rev 1.A boot args and env */
+# define CONFIG_HOSTNAME	stm-som
+# define CONFIG_BOOTARGS	"stm32_platform=stm-som "\
+				"console=ttyS2,115200 panic=10"
+
+# define LOADADDR	"0x60000000"
+
+#endif
 
 #define CONFIG_SYS_CONSOLE_IS_IN_ENV
 
@@ -270,7 +331,7 @@
  * Short-cuts to some useful commands (macros)
  */
 #define CONFIG_EXTRA_ENV_SETTINGS				\
-	"loadaddr=0x60000000\0"					\
+	"loadaddr=" LOADADDR "\0"				\
 	"addip=setenv bootargs ${bootargs} ip=${ipaddr}:${serverip}:${gatewayip}:${netmask}:${hostname}:eth0:off\0"				\
 	"flashaddr=64020000\0"					\
 	"flashboot=run addip;bootm ${flashaddr}\0"		\

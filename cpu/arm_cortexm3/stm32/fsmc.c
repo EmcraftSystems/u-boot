@@ -119,17 +119,18 @@ static const struct stm32f2_gpio_dsc ext_ram_fsmc_gpio[] = {
 #endif
 };
 
+int fsmc_gpio_init_done = 0;
+
 int fsmc_nor_psram_init(u32 cs, u32 bcr, u32 btr, u32 bwtr)
 {
 	int rv = 0;
-	static int common_init_done = 0;
 
 	cs--;
 
 	if (cs > 3)
 		return -EINVAL;
 
-	if (!common_init_done) {
+	if (!fsmc_gpio_init_done) {
 		int	i;
 
 		/*
@@ -142,13 +143,13 @@ int fsmc_nor_psram_init(u32 cs, u32 bcr, u32 btr, u32 bwtr)
 				goto out;
 		}
 
-		/*
-		 * Enable FSMC interface clock
-		 */
-		STM32_RCC->ahb3enr |= STM32_RCC_ENR_FSMC;
-
-		common_init_done = 1;
+		fsmc_gpio_init_done = 1;
 	}
+
+	/*
+	 * Enable FSMC interface clock
+	 */
+	STM32_RCC->ahb3enr |= STM32_RCC_ENR_FSMC;
 
 	/*
 	 * Fake BCR read; if don't do this, then BCR remains configured

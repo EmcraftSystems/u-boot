@@ -72,6 +72,7 @@ enum stm32f2_gpio_role {
 	STM32F2_GPIO_ROLE_ETHERNET,	/* MAC				      */
 	STM32F2_GPIO_ROLE_MCO,		/* MC external output clock	      */
 	STM32F2_GPIO_ROLE_FSMC,		/* FSMC static memory controller      */
+	STM32F2_GPIO_ROLE_FMC = STM32F2_GPIO_ROLE_FSMC,
 	STM32F2_GPIO_ROLE_GPOUT,	/* GPOUT			      */
 
 	STM32F2_GPIO_ROLE_LAST		/* for internal usage, must be last   */

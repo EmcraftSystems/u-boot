@@ -284,15 +284,12 @@ static void clock_setup(void)
 	 * STM lib code as well.
 	 */
 	STM32_RCC->cr |= STM32_RCC_CR_PLLON;
-	while (STM32_RCC->cr & STM32_RCC_CR_PLLRDY);
+	while (!(STM32_RCC->cr & STM32_RCC_CR_PLLRDY));
 
 	/*
 	 * Select PLL as system source if it's setup OK, and HSE otherwise
 	 */
-	if (!(STM32_RCC->cr & STM32_RCC_CR_PLLRDY))
-		val = STM32_RCC_CFGR_SWS_PLL;
-	else
-		val = STM32_RCC_CFGR_SWS_HSE;
+	val = STM32_RCC_CFGR_SWS_PLL;
 # else
 	/*
 	 * Select HSE as system source
