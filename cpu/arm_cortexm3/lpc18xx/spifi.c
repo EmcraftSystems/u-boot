@@ -2,6 +2,7 @@
  * (C) Copyright 2013
  *
  * Dmitry Konyshev, Emcraft Systems, probables@emcraft.com
+ * Pavel Boldin, Emcraft Systems, paboldin@emcraft.com
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License as
@@ -30,9 +31,19 @@ int spifi_initialize(void)
 	int ret;
 
 	if (spifilib_flash_hdr->signature == SPIFILIB_SIG) {
+		/*
+		 * Already initalized, skip
+		 */
+		if (spifilib_ram_hdr != NULL)
+			return 0;
+
+#ifndef CONFIG_SPIFILIB_IN_ENVM
 		spifilib_ram_hdr = spifilib_flash_hdr->link_addr;
 		memcpy(spifilib_flash_hdr->link_addr, spifilib_flash_hdr,
 				spifilib_flash_hdr->lib_size);
+#else
+		spifilib_ram_hdr = spifilib_flash_hdr;
+#endif
 		if ((ret = spifilib_ram_hdr->init_func(&spifi_obj, 10, S_MODE3, 25))) {
 			spifilib_ram_hdr = NULL;
 			printf("SPIFI lib init failed with code %i\n", ret);

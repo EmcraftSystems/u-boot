@@ -24,6 +24,16 @@
 #include <errno.h>
 #include "envm.h"
 
+
+/*
+ * Convinience macro for selecting value for bank.
+ */
+#ifdef CONFIG_MEM_NVM2_BASE
+# define CONFIG_NVM_VALUE(bank, VALUE) (bank ? CONFIG_MEM_NVM2_##VALUE : CONFIG_MEM_NVM_##VALUE)
+#else
+# define CONFIG_NVM_VALUE(bank, VALUE) (CONFIG_MEM_NVM_##VALUE)
+#endif
+
 /*
  * IAP library for editing eNVM
  */
@@ -197,11 +207,7 @@ void envm_init(void)
 static u32 __attribute__((section(".ramcode")))
 	   __attribute__((long_call))
 find_sector(u32 addr, u32 bank) {
-	u32 i, j, current = CONFIG_MEM_NVM_BASE, sector = 0;
-
-#ifdef CONFIG_MEM_NVM2_BASE
-	current = bank ? CONFIG_MEM_NVM2_BASE : CONFIG_MEM_NVM_BASE;
-#endif
+	u32 i, j, current = CONFIG_NVM_VALUE(bank, BASE), sector = 0;
 
 	for (i = 0; flash_layout[i].sectors; i++)
 	{
@@ -236,11 +242,7 @@ lpc43xn_flash_erase(u32 offset, u32 size, u32 bank)
 	last = find_sector(offset + size - 1, bank);
 
 	if (first < 0 || last < first ||
-		last >=
-#ifdef CONFIG_MEM_NVM2_BASE
-			bank ? CONFIG_MEM_NVM2_SECTORS :
-#endif
-		CONFIG_MEM_NVM_SECTORS) {
+			last >= CONFIG_NVM_VALUE(bank, SECTORS)) {
 		rv = -EINVAL;
 		goto out;
 	}
@@ -306,11 +308,7 @@ lpc43xn_flash_program(u32 dest_addr, u8 *src, u32 size)
 	/*
 	 * Write range should not exceed the end of FLASH
 	 */
-	if (size >
-#ifdef CONFIG_MEM_NVM2_LEN
-		bank ? CONFIG_MEM_NVM2_LEN :
-#endif
-		CONFIG_MEM_NVM_LEN) {
+	if (size > CONFIG_NVM_VALUE(bank, LEN)) {
 		rv = -EINVAL;
 		goto out;
 	}
@@ -382,7 +380,7 @@ u32 __attribute__((section(".ramcode")))
     __attribute__((long_call))
 envm_write(u32 offset, void *buf, u32 size)
 {
-	u32 rv = 0, bank = 0;
+	int rv = 0, bank = 0;
 
 	/*
 	 * Clock in is CPU in KHz
@@ -410,10 +408,13 @@ envm_write(u32 offset, void *buf, u32 size)
 	bank = CONFIG_MEM_NVM2_BASE <= offset;
 #endif
 
-	if (lpc43xn_flash_erase(offset, size, bank) < 0 ||
-	    lpc43xn_flash_program(offset, buf,
-				  (size + IAP_BLOCK_MASK) &
-				  ~IAP_BLOCK_MASK) < 0)
+	rv = lpc43xn_flash_erase(offset, size, bank);
+	if (rv < 0)
+		goto out;
+
+	rv = lpc43xn_flash_program(offset, buf,
+		(size + IAP_BLOCK_MASK) & ~IAP_BLOCK_MASK);
+	if (rv < 0)
 		goto out;
 
 	rv = size;

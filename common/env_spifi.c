@@ -63,9 +63,26 @@ int saveenv(void)
  */
 int env_init(void)
 {
+#ifndef CONFIG_SPIFILIB_IN_ENVM
+	/* SPIFI lib is not accessible before DRAM initialization */
+	gd->env_addr  = (ulong)&default_environment[0];
+	gd->env_valid = 0;
+	return 0;
+#else
 	ulong crc, len, new;
 	unsigned off;
 	uchar buf[64];
+
+	if (spifi_initialize()) {
+		/*
+		 * SPIFI initalization failed
+		 */
+		gd->env_addr  = (ulong)&default_environment[0];
+		gd->env_valid = 0;
+
+		goto out;
+	}
+
 	if (gd->env_valid == 0){
 		/* read old CRC */
 		memcpy((char *)&crc, (char *)CONFIG_ENV_ADDR + offsetof(env_t, crc),
@@ -89,5 +106,7 @@ int env_init(void)
 		}
 	}
 
+out:
 	return (0);
+#endif /* CONFIG_SPIFILIB_IN_ENVM */
 }

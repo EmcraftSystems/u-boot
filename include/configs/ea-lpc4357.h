@@ -172,10 +172,12 @@
  */
 #define CONFIG_LPC18XX_EMC_HALFCPU
 
+/*
 #define CONFIG_ENV_IS_NOWHERE
 
 #define CONFIG_ENV_SIZE			(4 * 1024)
 #define CONFIG_ENV_ADDR			0
+*/
 
 /* Uncomment the following line to disable Flash support */
 #define CONFIG_SYS_NO_FLASH
@@ -183,7 +185,7 @@
 /*
  * Configuration of the external Flash memory
  */
-#define CONFIG_SYS_FLASH_CS		0
+#define CONFIG_SYS_FLASH_CS		1
 #define CONFIG_SYS_FLASH_CFG		0x81 /* 16 bit, Byte Lane enabled */
 #define CONFIG_SYS_FLASH_WE		(1 - 1)		/* Minimum is enough */
 #define CONFIG_SYS_FLASH_OE		0		/* Minimum is enough */
@@ -213,17 +215,18 @@
 
 
 /* Uncomment the following line to enable the SPIFI interface */
-/*#define CONFIG_SPIFI*/
+#define CONFIG_SPIFI
 
 #ifdef CONFIG_SPIFI
 #define CONFIG_SPIFI_BASE		0x14000000
-#define CONFIG_SPIFI_SIZE		(16*1024*1024)
+#define CONFIG_SPIFI_SIZE		(2*1024*1024)
 
-#ifndef CONFIG_ENV_IS_IN_FLASH
+#define CONFIG_SPIFILIB_IN_ENVM		/* Place SPIFI lib into ENVM */
+
+#if !defined(CONFIG_ENV_IS_IN_FLASH) && !defined(CONFIG_ENV_IS_NOWHERE)
 #define CONFIG_ENV_IS_IN_SPIFI
 #define CONFIG_ENV_SIZE			(4 * 1024)
-#define CONFIG_ENV_ADDR \
-	(CONFIG_SPIFI_BASE + 128 * 1024)
+#define CONFIG_ENV_ADDR			CONFIG_SPIFI_BASE
 #define CONFIG_ENV_OVERWRITE		1
 #endif
 #endif
@@ -369,7 +372,7 @@
 #define CONFIG_EXTRA_ENV_SETTINGS				\
 	"loadaddr=0x28000000\0"					\
 	"addip=setenv bootargs ${bootargs} ip=${ipaddr}:${serverip}:${gatewayip}:${netmask}:${hostname}:eth0:off\0"				\
-	"flashaddr=1C040000\0"					\
+	"flashaddr=0x14001000\0"				\
 	"flashboot=run addip;bootm ${flashaddr}\0"		\
 	"ethaddr=C0:B1:3C:88:78:93\0"				\
 	"ipaddr=172.17.4.215\0"					\

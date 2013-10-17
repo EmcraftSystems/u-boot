@@ -49,7 +49,7 @@
 /* Active to read/write delay (RAS latency) */
 #define SDRAM_RAS		3		/* From EA example */
 /* CAS latency (CL) */
-#define SDRAM_CAS		3		/* CL = 2 */
+#define SDRAM_CAS		3		/* CL = 3 */
 /* Command delayed strategy, using EMCCLKDELAY */
 #define SDRAM_RDCFG_RD		1
 /* Precharge command period (tRP) */
@@ -82,7 +82,7 @@
  * Indicates the multiple of 16 CCLKs between SDRAM refresh cycles.
  */
 /* (64ms / 4096 row) */
-#define SDRAM_REFRESH		(NS2CLK(64000000 / 4096) / 16)
+#define SDRAM_REFRESH		((NS2CLK(64000000 / 4096) / 16) - 1)
 /* Only for initialization */
 #define SDRAM_REFRESH_FAST	2
 
@@ -124,9 +124,9 @@
 /*
  * See IS42S32800D mode register (IS42S32800D datasheet, page 23),
  * and EA example code.
- * CAS3, Burst Length = 8.
+ * CAS3, Burst Length = 4.
  */
-#define SDRAM_MODEREG_BL		3	/* Burst Length code */
+#define SDRAM_MODEREG_BL		2	/* Burst Length code */
 #define SDRAM_MODEREG_CAS		3	/* CAS Latency */
 
 #define SDRAM_MODEREG_VALUE \
@@ -137,7 +137,6 @@
  * SDRAM chip-specific options
  */
 /*
- * FIXME
  * Offset of the 12 least-significant bits of mode register (A0..A11)
  * in addresses on the AHB bus.
  *
@@ -175,7 +174,7 @@
 DECLARE_GLOBAL_DATA_PTR;
 
 /*
- * Pin configuration table for Hitex LPC4350 Eval.
+ * Pin configuration table for EA LPC4357 OEM.
  *
  * This table does not list all MCU pins that will be configured. See also
  * the code in `iomux_init()`.
@@ -389,6 +388,22 @@ static const struct lpc18xx_pin_config ea_lpc4357_iomux[] = {
 	/* P1.5 = CS0# - NOR */
 	{{0x1, 5}, LPC18XX_IOMUX_EMC_CONFIG(3)},
 #endif /* CONFIG_SYS_FLASH_CS */
+
+#if defined(CONFIG_SPIFI)
+	/* P3.3 = SPIFI_SCK */
+	{{0x3, 3}, LPC18XX_IOMUX_EMC_CONFIG(3)},
+	/* P3.4 = SPIFI_SIO3 */
+	{{0x3, 4}, LPC18XX_IOMUX_SPIFI_CONFIG(3)},
+	/* P3.5 = SPIFI_SIO2 */
+	{{0x3, 5}, LPC18XX_IOMUX_SPIFI_CONFIG(3)},
+	/* P3.6 = SPIFI_MISO */
+	{{0x3, 6}, LPC18XX_IOMUX_SPIFI_CONFIG(3)},
+	/* P3.6 = SPIFI_MOSI */
+	{{0x3, 7}, LPC18XX_IOMUX_SPIFI_CONFIG(3)},
+	/* P3.6 = SPIFI_CS */
+	{{0x3, 8}, LPC18XX_IOMUX_CONFIG(3, 0, 1, 0, 0, 0)},
+#endif
+
 };
 
 /*
@@ -578,8 +593,6 @@ void __attribute__((section(".lpc18xx_image_top_text")))
  */
 int board_init(void)
 {
-	volatile struct lpc_emc_st_regs *st;
-
 	/*
 	 * Set SDRAM clock output delay to ~3.5ns (0x7777),
 	 * the SDRAM chip does not work otherwise.
@@ -611,10 +624,6 @@ int board_init(void)
 	st->ta = CONFIG_SYS_FLASH_TA;
 #endif
 
-#if defined(CONFIG_LPC_SPI)
-	spi_init();
-#endif
-
 	return 0;
 }
 
@@ -643,8 +652,6 @@ int misc_init_r(void)
 	return 0;
 }
 #endif /* CONFIG_MISC_INIT_R */
-
-#define mdelay(n) ({unsigned long msec=(n); while (msec--) udelay(1000);})
 
 /*
  * Setup external RAM.
@@ -681,9 +688,9 @@ int dram_init(void)
 	dy->rascas =
 		(SDRAM_RAS << LPC_EMC_DYRASCAS_RAS_BITS) |
 		(SDRAM_CAS << LPC_EMC_DYRASCAS_CAS_BITS);
+
 	LPC_EMC->dy_rdcfg =
 		(SDRAM_RDCFG_RD << LPC_EMC_DYRDCFG_RD_BITS);
-
 
 	LPC_EMC->dy_trp  = SDRAM_T_RP;
 	LPC_EMC->dy_tras = SDRAM_T_RAS;
@@ -696,7 +703,7 @@ int dram_init(void)
 	LPC_EMC->dy_xsr  = SDRAM_T_XSR;
 	LPC_EMC->dy_rrd  = SDRAM_T_RRD;
 	LPC_EMC->dy_mrd  = SDRAM_T_MRD;
-	mdelay(100);
+	udelay(100);
 
 	/*
 	 * Issue SDRAM NOP (no operation) command
@@ -704,7 +711,7 @@ int dram_init(void)
 	LPC_EMC->dy_ctrl =
 		LPC_EMC_DYCTRL_CE_MSK | LPC_EMC_DYCTRL_CS_MSK |
 		(LPC_EMC_DYCTRL_I_NOP << LPC_EMC_DYCTRL_I_BITS);
-	mdelay(200);
+	udelay(200);
 
 	/*
 	 * Pre-charge all with fast refresh
@@ -713,7 +720,7 @@ int dram_init(void)
 		LPC_EMC_DYCTRL_CE_MSK | LPC_EMC_DYCTRL_CS_MSK |
 		(LPC_EMC_DYCTRL_I_PALL << LPC_EMC_DYCTRL_I_BITS);
 	LPC_EMC->dy_rfsh = SDRAM_REFRESH_FAST;
-	mdelay(200);
+	udelay(200);
 
 	/*
 	 * Set refresh period
