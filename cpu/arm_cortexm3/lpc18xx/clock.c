@@ -306,8 +306,13 @@ static void clock_setup(void)
 	/*
 	 * Set-up clocks for UARTs
 	 */
+#ifdef CONFIG_UART0_CLOCK_XTAL
+	LPC18XX_CGU->uart0_clk = LPC18XX_CGU_CLKSEL_XTAL |
+		LPC18XX_CGU_AUTOBLOCK_MSK;
+#else
 	LPC18XX_CGU->uart0_clk = LPC18XX_CGU_CLKSEL_PLL1 |
 		LPC18XX_CGU_AUTOBLOCK_MSK;
+#endif
 	LPC18XX_CGU->uart1_clk = LPC18XX_CGU_CLKSEL_PLL1 |
 		LPC18XX_CGU_AUTOBLOCK_MSK;
 	LPC18XX_CGU->uart2_clk = LPC18XX_CGU_CLKSEL_PLL1 |
@@ -407,7 +412,11 @@ void clock_init(void)
 	/*
 	 * Set UARTx base clock rate
 	 */
+#ifdef CONFIG_UART0_CLOCK_XTAL
+	clock_val[CLOCK_UART0] = CONFIG_LPC18XX_EXTOSC_RATE;
+#else
 	clock_val[CLOCK_UART0] = LPC18XX_PLL1_CLK_OUT;
+#endif
 	clock_val[CLOCK_UART1] = LPC18XX_PLL1_CLK_OUT;
 	clock_val[CLOCK_UART2] = LPC18XX_PLL1_CLK_OUT;
 	clock_val[CLOCK_UART3] = LPC18XX_PLL1_CLK_OUT;

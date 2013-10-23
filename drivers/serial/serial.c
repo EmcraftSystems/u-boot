@@ -146,6 +146,11 @@ static int calc_divisor (NS16550_t port)
 #define MODE_X_DIV 16
 #endif
 
+#ifdef CONFIG_SERIAL0_SPECIAL_BAUDRATE
+	if (port == serial_ports[0])
+		return CONFIG_SERIAL0_SPECIAL_BAUDRATE;
+#endif
+
 	/* Compute divisor value. Normally, we should simply return:
 	 *   CONFIG_SYS_NS16550_CLK) / MODE_X_DIV / gd->baudrate
 	 * but we need to round that value by adding 0.5.

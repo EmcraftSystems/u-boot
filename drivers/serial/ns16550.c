@@ -31,6 +31,8 @@ void NS16550_init (NS16550_t com_port, int baud_divisor)
 	com_port->lcr = UART_LCR_BKSE | UART_LCRVAL;
 	com_port->dll = baud_divisor & 0xff;
 	com_port->dlm = (baud_divisor >> 8) & 0xff;
+	if ((baud_divisor >> 16) & 0xff)
+		com_port->regA = (baud_divisor >> 16) & 0xff;
 	com_port->lcr = UART_LCRVAL;
 #if defined(CONFIG_OMAP) && !defined(CONFIG_OMAP3_ZOOM2)
 #if defined(CONFIG_APTIX)
