@@ -65,6 +65,11 @@
 #define LPC18XX_IOMUX_EMC_CONFIG(func) \
 	(LPC18XX_IOMUX_CONFIG(func, 0, 1, 1, 1, 1))
 /*
+ * Pin settings for EMC output only pins
+ */
+#define LPC18XX_IOMUX_EMC_OUTPUT_CONFIG(func) \
+	(LPC18XX_IOMUX_CONFIG(func, 0, 1, 1, 0, 1))
+/*
  * Pin settings for slow EMC pins (SPIFI)
  */
 #define LPC18XX_IOMUX_SPIFI_CONFIG(func) \

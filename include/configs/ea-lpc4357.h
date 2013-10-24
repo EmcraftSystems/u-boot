@@ -248,6 +248,12 @@
  */
 #define CONFIG_SYS_NS16550_CLK		clock_get(CLOCK_UART0)
 #define CONFIG_CONS_INDEX		1
+
+#if 0
+# define CONFIG_UART0_CLOCK_XTAL
+# define CONFIG_SERIAL0_SPECIAL_BAUDRATE		0xC10006
+#endif
+
 /*
  * USART0 registers base: 0x40081000
  * UART1 registers base:  0x40082000

@@ -106,16 +106,15 @@ struct lpc_emc_regs {
 /*
  * Set the EMC clock freq.
  */
-#ifndef CONFIG_LPC18XX_EMC_HALFCPU
+#ifdef CONFIG_LPC18XX_EMC_HALFCPU
 # define LPC18XX_EMC_CLK_OUT		(LPC18XX_PLL1_CLK_OUT / 2)
 #else
 # define LPC18XX_EMC_CLK_OUT		LPC18XX_PLL1_CLK_OUT
 #endif
 
-//#define NS2CLK(time) (((LPC18XX_EMC_CLK_OUT / 1000000) * (time)) / 1000)
 static inline uint32_t NS2CLK(uint32_t time){
 	uint32_t tmp = LPC18XX_EMC_CLK_OUT/1000000;
-	return (tmp * time + 999) / 1000;
+	return (tmp * time) / 1000;
 }
 
 
