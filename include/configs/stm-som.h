@@ -165,9 +165,27 @@
  */
 #define CONFIG_SYS_FLASH_CS		2
 
-#define CONFIG_SYS_FSMC_FLASH_BCR	0x00105055
-#define CONFIG_SYS_FSMC_FLASH_BTR	0x00021206
-#define CONFIG_SYS_FSMC_FLASH_BWTR	0x00021106
+/* Flash is in ModeC, that means 'OE toggle on write' */
+/*
+ * MBKEN(0) = 1, enable memory bank
+ * MTYP(3-2) = 0b10, NOR flash
+ * MWID(5-4) = 0b01, 16 bit
+ * FACCEN(6) = 1,
+ * reserved(7) = 0,
+ * WREN(12) = 1,
+ * EXTMOD(14) = 1
+ */
+#define CONFIG_SYS_FSMC_FLASH_BCR	0x00005059
+/*
+ * Flash timinigs are almost same for write and read.
+ * See Spansion memory reference manual for S29GL128S10DHI010
+ * tACC(MAX) = ADDSET(3-0) = 110 ns = 18.48 HCLK (on 168 MHz)
+ * tRC(MIN) = DATAST(15-8) = 110 ns = 18.48 HCLK (on 168 MHz)
+ * tNE switch = BUSTURN(19-16) = 10 ns = 2 HCLK
+ * ACCMODE(29-28) = 0x2 (mode C)
+ */
+#define CONFIG_SYS_FSMC_FLASH_BTR	0x20021206
+#define CONFIG_SYS_FSMC_FLASH_BWTR	0x20021106
 #define CONFIG_FSMC_NOR_PSRAM_CS2_ENABLE
 
 #define CONFIG_SYS_FLASH_BANK1_BASE	FSMC_NOR_PSRAM_CS_ADDR(CONFIG_SYS_FLASH_CS)
