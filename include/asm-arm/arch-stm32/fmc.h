@@ -71,14 +71,25 @@ struct stm32_fmc_regs {
 
 #define FMC_SDCMR_NRFS_SHIFT	5
 
+#define FMC_SDCMR_MODE_NORMAL		0
 #define FMC_SDCMR_MODE_START_CLOCK	1
 #define FMC_SDCMR_MODE_PRECHARGE	2
 #define FMC_SDCMR_MODE_AUTOREFRESH	3
 #define FMC_SDCMR_MODE_WRITE_MODE	4
+#define FMC_SDCMR_MODE_SELFREFRESH	5
+#define FMC_SDCMR_MODE_POWERDOWN	6
 
 #define FMC_SDCMR_BANK_1		(1 << 4)
 #define FMC_SDCMR_BANK_2		(1 << 3)
 
 #define FMC_SDCMR_MODE_REGISTER_SHIFT	9
+
+#define FMC_SDSR_BUSY			(1 << 5)
+
+#define FMC_BUSY_WAIT()		do { \
+		__asm__ __volatile__ ("dsb" : : : "memory"); \
+		while(STM32_SDRAM_FMC->sdsr & FMC_SDSR_BUSY); \
+	} while(0);
+
 
 #endif /* _MACH_FMC_H_ */

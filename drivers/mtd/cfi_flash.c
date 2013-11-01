@@ -136,6 +136,12 @@ u8 flash_read8(void *addr)__attribute__((weak, alias("__flash_read8")));
 u16 flash_read16(void *addr)__attribute__((weak, alias("__flash_read16")));
 u32 flash_read32(void *addr)__attribute__((weak, alias("__flash_read32")));
 u64 flash_read64(void *addr)__attribute__((weak, alias("__flash_read64")));
+
+# ifdef CONFIG_SYS_FLASH_USE_BUFFER_WRITE
+u32 flash_write_buffer(void *src, void *dst, int cnt, int portwidth)__attribute__((weak, alias("__flash_write_buffer")));
+u32 flash_check_flag(void *src, void *dst, int cnt, int portwidth)__attribute__((weak, alias("__flash_check_flag")));
+# endif
+
 #else
 #define flash_write8	__flash_write8
 #define flash_write16	__flash_write16
@@ -145,6 +151,11 @@ u64 flash_read64(void *addr)__attribute__((weak, alias("__flash_read64")));
 #define flash_read16	__flash_read16
 #define flash_read32	__flash_read32
 #define flash_read64	__flash_read64
+
+# ifdef CONFIG_SYS_FLASH_USE_BUFFER_WRITE
+#  define flash_write_buffer	__flash_write_buffer
+#  define flash_check_flag	__flash_check_flag
+# endif
 #endif
 
 /*-----------------------------------------------------------------------
@@ -761,6 +772,76 @@ static int flash_write_cfiword (flash_info_t * info, ulong dest,
 
 #ifdef CONFIG_SYS_FLASH_USE_BUFFER_WRITE
 
+u32 __flash_check_flag(void *src, void *dst, int cnt, int portwidth)
+{
+	int flag = 0;
+
+	while ((cnt-- > 0) && (flag == 0)) {
+		switch (portwidth) {
+		case FLASH_CFI_8BIT:
+			flag = ((flash_read8(dst) & flash_read8(src)) ==
+				flash_read8(src));
+			src += 1, dst += 1;
+			break;
+		case FLASH_CFI_16BIT:
+			flag = ((flash_read16(dst) & flash_read16(src)) ==
+				flash_read16(src));
+			src += 2, dst += 2;
+			break;
+		case FLASH_CFI_32BIT:
+			flag = ((flash_read32(dst) & flash_read32(src)) ==
+				flash_read32(src));
+			src += 4, dst += 4;
+			break;
+		case FLASH_CFI_64BIT:
+			flag = ((flash_read64(dst) & flash_read64(src)) ==
+				flash_read64(src));
+			src += 8, dst += 8;
+			break;
+		}
+	}
+
+	return flag;
+}
+
+
+u32 __flash_write_buffer(void *src, void *dst, int cnt, int portwidth)
+{
+	int retcode = 0;
+
+	switch (portwidth) {
+	case FLASH_CFI_8BIT:
+		while (cnt-- > 0) {
+			flash_write8(flash_read8(src), dst);
+			src += 1, dst += 1;
+		}
+		break;
+	case FLASH_CFI_16BIT:
+		while (cnt-- > 0) {
+			flash_write16(flash_read16(src), dst);
+			src += 2, dst += 2;
+		}
+		break;
+	case FLASH_CFI_32BIT:
+		while (cnt-- > 0) {
+			flash_write32(flash_read32(src), dst);
+			src += 4, dst += 4;
+		}
+		break;
+	case FLASH_CFI_64BIT:
+		while (cnt-- > 0) {
+			flash_write64(flash_read64(src), dst);
+			src += 8, dst += 8;
+		}
+		break;
+	default:
+		retcode = ERR_INVAL;
+		goto out;
+	}
+
+out:
+	return retcode;
+}
 static int flash_write_cfibuffer (flash_info_t * info, ulong dest, uchar * cp,
 				  int len)
 {
@@ -769,7 +850,6 @@ static int flash_write_cfibuffer (flash_info_t * info, ulong dest, uchar * cp,
 	int retcode;
 	void *src = cp;
 	void *dst = (void *)dest;
-	void *dst2 = dst;
 	int flag = 0;
 	uint offset = 0;
 	unsigned int shift;
@@ -795,36 +875,12 @@ static int flash_write_cfibuffer (flash_info_t * info, ulong dest, uchar * cp,
 
 	cnt = len >> shift;
 
-	while ((cnt-- > 0) && (flag == 0)) {
-		switch (info->portwidth) {
-		case FLASH_CFI_8BIT:
-			flag = ((flash_read8(dst2) & flash_read8(src)) ==
-				flash_read8(src));
-			src += 1, dst2 += 1;
-			break;
-		case FLASH_CFI_16BIT:
-			flag = ((flash_read16(dst2) & flash_read16(src)) ==
-				flash_read16(src));
-			src += 2, dst2 += 2;
-			break;
-		case FLASH_CFI_32BIT:
-			flag = ((flash_read32(dst2) & flash_read32(src)) ==
-				flash_read32(src));
-			src += 4, dst2 += 4;
-			break;
-		case FLASH_CFI_64BIT:
-			flag = ((flash_read64(dst2) & flash_read64(src)) ==
-				flash_read64(src));
-			src += 8, dst2 += 8;
-			break;
-		}
-	}
+	flag = flash_check_flag (src, dst, cnt, info->portwidth);
 	if (!flag) {
 		retcode = ERR_NOT_ERASED;
 		goto out_unmap;
 	}
 
-	src = cp;
 	sector = find_sector (info, dest);
 
 	switch (info->vendor) {
@@ -844,29 +900,10 @@ static int flash_write_cfibuffer (flash_info_t * info, ulong dest, uchar * cp,
 			 * the port */
 			cnt = len >> shift;
 			flash_write_cmd (info, sector, 0, cnt - 1);
-			while (cnt-- > 0) {
-				switch (info->portwidth) {
-				case FLASH_CFI_8BIT:
-					flash_write8(flash_read8(src), dst);
-					src += 1, dst += 1;
-					break;
-				case FLASH_CFI_16BIT:
-					flash_write16(flash_read16(src), dst);
-					src += 2, dst += 2;
-					break;
-				case FLASH_CFI_32BIT:
-					flash_write32(flash_read32(src), dst);
-					src += 4, dst += 4;
-					break;
-				case FLASH_CFI_64BIT:
-					flash_write64(flash_read64(src), dst);
-					src += 8, dst += 8;
-					break;
-				default:
-					retcode = ERR_INVAL;
-					goto out_unmap;
-				}
-			}
+			retcode = flash_write_buffer (
+				src, dst, cnt, info->portwidth);
+			if (retcode)
+				goto out_unmap;
 			flash_write_cmd (info, sector, 0,
 					 FLASH_CMD_WRITE_BUFFER_CONFIRM);
 			retcode = flash_full_status_check (
@@ -887,35 +924,10 @@ static int flash_write_cfibuffer (flash_info_t * info, ulong dest, uchar * cp,
 		cnt = len >> shift;
 		flash_write_cmd(info, sector, offset, cnt - 1);
 
-		switch (info->portwidth) {
-		case FLASH_CFI_8BIT:
-			while (cnt-- > 0) {
-				flash_write8(flash_read8(src), dst);
-				src += 1, dst += 1;
-			}
-			break;
-		case FLASH_CFI_16BIT:
-			while (cnt-- > 0) {
-				flash_write16(flash_read16(src), dst);
-				src += 2, dst += 2;
-			}
-			break;
-		case FLASH_CFI_32BIT:
-			while (cnt-- > 0) {
-				flash_write32(flash_read32(src), dst);
-				src += 4, dst += 4;
-			}
-			break;
-		case FLASH_CFI_64BIT:
-			while (cnt-- > 0) {
-				flash_write64(flash_read64(src), dst);
-				src += 8, dst += 8;
-			}
-			break;
-		default:
-			retcode = ERR_INVAL;
+		retcode = flash_write_buffer (
+			src, dst, cnt, info->portwidth);
+		if (retcode)
 			goto out_unmap;
-		}
 
 		flash_write_cmd (info, sector, 0, AMD_CMD_WRITE_BUFFER_CONFIRM);
 		retcode = flash_full_status_check (info, sector,

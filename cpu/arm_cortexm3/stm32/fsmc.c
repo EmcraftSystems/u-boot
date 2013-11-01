@@ -151,6 +151,9 @@ int fsmc_nor_psram_init(u32 cs, u32 bcr, u32 btr, u32 bwtr)
 	 */
 	STM32_RCC->ahb3enr |= STM32_RCC_ENR_FSMC;
 
+	/* Errata 2.1.6 */
+	__asm__ __volatile__ ("dsb" : : : "memory");
+
 	/*
 	 * Fake BCR read; if don't do this, then BCR remains configured
 	 * with defaults.
