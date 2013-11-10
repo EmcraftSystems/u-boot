@@ -299,7 +299,7 @@ int saveenv(void)
 #else
 	/* this is the last sector, and the size is hardcoded here */
 	/* otherwise we will get stack problems on loading 128 KB environment */
-	end_addr = flash_sect_addr + 0x20000 - 1;
+	end_addr = flash_sect_addr + 16 * 1024 - 1;
 #endif
 
 	debug ("Protect off %08lX ... %08lX\n",
@@ -311,6 +311,9 @@ int saveenv(void)
 	puts ("Erasing Flash...");
 	if (flash_sect_erase (flash_sect_addr, end_addr))
 		return 1;
+
+	env_ptr->crc = crc32(0, env_ptr->data, ENV_SIZE);
+	printf("CRC32 : 0X%x\n", env_ptr->crc);
 
 	puts ("Writing to Flash... ");
 	rc = flash_write((char *)env_buffer, flash_sect_addr, len);

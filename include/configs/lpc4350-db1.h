@@ -73,7 +73,7 @@
  * Sections are not mapped in shadow area
  * See U-boot.lds
  */
-//#define FIXED_SECTIONS_DIOLAN
+// #define FIXED_SECTIONS_DIOLAN
 
 /*
  * Autocomplete commands
@@ -227,9 +227,8 @@
 #define CONFIG_SYS_NO_FLASH
 #endif
 
-#define CONFIG_ENV_SIZE			(4 * 1024)
-#define CONFIG_ENV_ADDR \
-	(CONFIG_SYS_FLASH_BANK1_BASE + 128 * 1024)
+#define CONFIG_ENV_SIZE			(16 * 1024)
+#define CONFIG_ENV_ADDR 		0x1C1FC000
 #define CONFIG_INFERNO			1
 #define CONFIG_ENV_OVERWRITE		1
 
