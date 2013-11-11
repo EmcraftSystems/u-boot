@@ -611,7 +611,7 @@ static void clock_fei_to_fbe(void)
 		KINETIS_MCG_S_CLKST_EXT_REF);
 }
 
-#ifndef KINETIS_MCGOUT_PLL1
+#if defined(KINETIS_MCGOUT_PLL0) || !defined(KINETIS_MCGOUT_PLL1)
 static void clock_setup_pll0(void)
 {
 	/*
@@ -649,7 +649,7 @@ static void clock_setup_pll0(void)
 	 */
 	while (!(KINETIS_MCG->status & KINETIS_MCG_S_LOCK_MSK));
 }
-#endif /* !KINETIS_MCGOUT_PLL1 */
+#endif /* KINETIS_MCGOUT_PLL0 */
 
 #if defined(KINETIS_MCGOUT_PLL1) || \
     (defined(CONFIG_KINETIS_DDR) && !defined(CONFIG_KINETIS_DDR_SYNC))
@@ -701,17 +701,21 @@ static void clock_fbe_to_pbe(void)
 	/*
 	 * Configure the PLL that we will use for the MCGOUTCLK
 	 */
-#ifdef KINETIS_MCGOUT_PLL1
+#if defined(KINETIS_MCGOUT_PLL1)
 	clock_setup_pll1();
+#endif
 
+#if defined(KINETIS_MCGOUT_PLL0)
+	clock_setup_pll0();
+#endif
+
+#if defined(KINETIS_MCGOUT_PLL1)
 	/* Select PLL1 output as the MCG source clock */
 	KINETIS_MCG->c11 |= KINETIS_MCG_C11_PLLCS_MSK;
 #else
-	clock_setup_pll0();
-
 	/* Select PLL0 output as the MCG source clock */
 	KINETIS_MCG->c11 &= ~KINETIS_MCG_C11_PLLCS_MSK;
-#endif /* KINETIS_MCGOUT_PLL1 */
+#endif
 
 	/*
 	 * Switch to the PBE mode

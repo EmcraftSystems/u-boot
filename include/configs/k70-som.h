@@ -192,8 +192,8 @@
 
 /* PLL input divider: 12/1 = 12 MHz */
 #define KINETIS_PLL_PRDIV	1
-/* PLL multiplier: 12*25/2 = 150 MHz */
-#define KINETIS_PLL_VDIV	25
+/* PLL multiplier: 12*16/2 = 96 MHz */
+#define KINETIS_PLL_VDIV	16
 /* PLL1 input divider: 12/1 = 12 MHz */
 #define KINETIS_PLL1_PRDIV	1
 /* PLL1 multiplier: 12*25/2 = 150 MHz */
@@ -203,6 +203,10 @@
 
 /* Use PLL1 for MCGOUT (required for synchronous mode of the DDR controller) */
 #define KINETIS_MCGOUT_PLL1
+
+/* Use PLL0 (required for USB-FS) */
+#define KINETIS_MCGOUT_PLL0
+
 /*
  * Number of clock ticks in 1 sec
  */
