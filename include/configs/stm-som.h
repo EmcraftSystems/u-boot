@@ -29,8 +29,9 @@
 #ifndef __CONFIG_H
 #define __CONFIG_H
 
-
+#if !defined(CONFIG_SYS_BOARD_REV)
 #define CONFIG_SYS_BOARD_REV	0x2A
+#endif
 
 /*
  * Disable debug messages

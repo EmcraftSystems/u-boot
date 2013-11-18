@@ -3234,8 +3234,17 @@ a2f-hoermann-brd_config :  unconfig
 sf2-dev-kit_config :  unconfig
 	@$(MKCONFIG) $(@:_config=) arm arm_cortexm3 sf2-dev-kit actel m2s
 
-stm-som_config : unconfig
-	@$(MKCONFIG) $(@:_config=) arm arm_cortexm3 stm-som emcraft stm32
+stm-som_config \
+stm-som-1a_config : unconfig
+	@mkdir -p $(obj)include
+	@ >$(obj)include/config.h
+
+	@[ -z "$(findstring 1a,$@)" ] || \
+		{ echo "#define CONFIG_SYS_BOARD_REV	0x1A" >>$(obj)include/config.h ; \
+		  echo "...for STM-SOM Rev 1A" ; \
+		}
+
+	@$(MKCONFIG) -a stm-som arm arm_cortexm3 stm-som emcraft stm32
 
 stm3220g-eval_config : unconfig
 	@$(MKCONFIG) $(@:_config=) arm arm_cortexm3 stm3220g-eval stm stm32
