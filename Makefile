@@ -3243,8 +3243,11 @@ stm-som-1a_config : unconfig
 		{ echo "#define CONFIG_SYS_BOARD_REV	0x1A" >>$(obj)include/config.h ; \
 		  echo "...for STM-SOM Rev 1A" ; \
 		}
-
 	@$(MKCONFIG) -a stm-som arm arm_cortexm3 stm-som emcraft stm32
+
+stm32f429-discovery_config : unconfig
+	@$(MKCONFIG) $(@:_config=) arm arm_cortexm3 stm32f429-discovery \
+	stm stm32
 
 stm3220g-eval_config : unconfig
 	@$(MKCONFIG) $(@:_config=) arm arm_cortexm3 stm3220g-eval stm stm32
