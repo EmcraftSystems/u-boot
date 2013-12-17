@@ -33,24 +33,12 @@
 #include <asm/arch/stm32.h>
 #include <asm/arch/stm32f2_gpio.h>
 
-#if CONFIG_SYS_BOARD_REV == 0x2A
-# include <asm/arch/fmc.h>
-# include <flash.h>
-# include <asm/io.h>
-# include <asm/system.h>
-#endif
+#include <asm/arch/fmc.h>
+#include <flash.h>
+#include <asm/io.h>
+#include <asm/system.h>
 
 #include <asm/arch/fsmc.h>
-
-#if CONFIG_SYS_BOARD_REV == 0x1A && (CONFIG_NR_DRAM_BANKS > 0)
-/*
- * Check if RAM configured
- */
-# if !defined(CONFIG_SYS_RAM_CS) || !defined(CONFIG_SYS_FSMC_PSRAM_BCR) ||     \
-     !defined(CONFIG_SYS_FSMC_PSRAM_BTR)
-#  error "Incorrect PSRAM FSMC configuration."
-# endif
-#endif /* CONFIG_NR_DRAM_BANKS */
 
 DECLARE_GLOBAL_DATA_PTR;
 
@@ -148,7 +136,6 @@ static const struct stm32f2_gpio_dsc ext_ram_fsmc_fmc_gpio[] = {
 	/* E2, FMC_A0 */
 	{STM32F2_GPIO_PORT_F, STM32F2_GPIO_PIN_0},
 
-#if CONFIG_SYS_BOARD_REV == 0x2A
 	/* SDRAM only, Revision 0x2A */
 	/* M4, SDRAM_NE */
 	{STM32F2_GPIO_PORT_C, STM32F2_GPIO_PIN_2},
@@ -163,19 +150,6 @@ static const struct stm32f2_gpio_dsc ext_ram_fsmc_fmc_gpio[] = {
 
 	/* H14, SDRAM_CLK */
 	{STM32F2_GPIO_PORT_G, STM32F2_GPIO_PIN_8},
-#endif /* CONFIG_SYS_BOARD_REV == 0x2A */
-
-#if CONFIG_SYS_BOARD_REV == 0x1A
-	/* PSRAM only */
-	/* B11, FMC_NWAIT */
-	{STM32F2_GPIO_PORT_D, STM32F2_GPIO_PIN_6},
-	/* A2, FMC_CRE */
-	{STM32F2_GPIO_PORT_E, STM32F2_GPIO_PIN_2},
-	/* B5, FMC_NL */
-	{STM32F2_GPIO_PORT_B, STM32F2_GPIO_PIN_7},
-	/* D11, FMC_CLK */
-	{STM32F2_GPIO_PORT_D, STM32F2_GPIO_PIN_3},
-#endif /* CONFIG_SYS_BOARD_REV == 0x1A */
 
 #ifdef CONFIG_FSMC_NOR_PSRAM_CS1_ENABLE
 	{STM32F2_GPIO_PORT_D, STM32F2_GPIO_PIN_7},
@@ -220,10 +194,8 @@ out:
 int board_init(void)
 {
 	int rv;
-#if CONFIG_SYS_BOARD_REV == 0x2A
 	int i;
 	char v;
-#endif
 
 	rv = fmc_fsmc_setup_gpio();
 	if (rv)
@@ -231,7 +203,6 @@ int board_init(void)
 
 #if !defined(CONFIG_SYS_NO_FLASH)
 
-#if CONFIG_SYS_BOARD_REV == 0x2A
 	/* Disable first bank */
 	fsmc_nor_psram_init(1, 0, 0, 0);
 	fsmc_nor_psram_init(3, 0, 0, 0);
@@ -254,14 +225,12 @@ int board_init(void)
 	STM32_SDRAM_FMC->sdcmr = FMC_SDCMR_BANK_1 | FMC_SDCMR_MODE_SELFREFRESH;
 	FMC_BUSY_WAIT();
 	udelay(60);
-#endif
 
 	if ((rv = fsmc_nor_psram_init(CONFIG_SYS_FLASH_CS, CONFIG_SYS_FSMC_FLASH_BCR,
 			CONFIG_SYS_FSMC_FLASH_BTR,
 			CONFIG_SYS_FSMC_FLASH_BWTR)))
 		return rv;
 
-#if CONFIG_SYS_BOARD_REV == 0x2A
 	for (i = 1; i < 0x1000000; i <<= 1) {
 		v = *(volatile char*)(0x64000000 + i);
 		v = *(volatile char*)(0x64000000 + i - 1);
@@ -269,7 +238,6 @@ int board_init(void)
 		nop(); nop();
 		nop(); nop();
 	}
-#endif
 #endif
 
 	return 0;
@@ -286,94 +254,6 @@ int checkboard(void)
 	return 0;
 }
 
-#if CONFIG_SYS_BOARD_REV == 0x1A
-/*
- * Setup external RAM.
- */
-int dram_init(void)
-{
-	static struct stm32f2_gpio_dsc	ctrl_gpio = {STM32F2_GPIO_PORT_I,
-						     STM32F2_GPIO_PIN_9};
-	int				rv = 0;
-
-	rv = fsmc_nor_psram_init(CONFIG_SYS_RAM_CS,
-			CONFIG_SYS_FSMC_PSRAM_BCR,
-			CONFIG_SYS_FSMC_PSRAM_BTR,
-#ifdef CONFIG_SYS_FSMC_PSRAM_BWTR
-			CONFIG_SYS_FSMC_PSRAM_BWTR
-#else
-			(u32)-1
-#endif
-		);
-	if (rv != 0)
-		goto out;
-
-	rv = stm32f2_gpio_config(&ctrl_gpio, STM32F2_GPIO_ROLE_GPOUT);
-	if (rv != 0)
-		goto out;
-
-# if defined(CONFIG_SYS_RAM_BURST)
-	/*
-	 * FIXME: all this hardcoded stuff.
-	 */
-
-	/* Step.2 */
-	stm32f2_gpout_set(&ctrl_gpio, 1);
-
-	/* Step.3 */
-	*(volatile u16 *)(CONFIG_SYS_RAM_BASE + 0x0010223E) = 0;
-
-	/* Step.4-5 */
-	stm32f2_gpout_set(&ctrl_gpio, 0);
-
-	/* Step.6 */
-	fsmc_nor_psram_init(CONFIG_SYS_RAM_CS, 0x00083115,
-			0x0010FFFF, -1);
-
-	/* Step.7 */
-	rv = *(volatile u16 *)(CONFIG_SYS_RAM_BASE + 0x000000);
-
-	/* Step.8 */
-	fsmc_nor_psram_init(CONFIG_SYS_RAM_CS, 0x00005059,
-			0x10000702, 0x10000602);
-
-	/* Step.9 */
-	stm32f2_gpout_set(&ctrl_gpio, 1);
-
-	/* Step.10 */
-	*(volatile u16 *)(CONFIG_SYS_RAM_BASE + 0x0110223E) = 0;
-
-	/* Step.11 */
-	stm32f2_gpout_set(&ctrl_gpio, 0);
-
-	/* Step.12 */
-	fsmc_nor_psram_init(CONFIG_SYS_RAM_CS, 0x00083115,
-			0x0010FFFF, -1);
-
-	/* Step.13 */
-	rv = *(volatile u16 *)(CONFIG_SYS_RAM_BASE + 0x01000000);
-
-# else
-	/*
-	 * Switch PSRAM in the Asyncronous Read/Write Mode
-	 */
-	stm32f2_gpout_set(&ctrl_gpio, 0);
-# endif /* CONFIG_SYS_RAM_BURST */
-
-	/*
-	 * Fill in global info with description of SRAM configuration
-	 */
-	gd->bd->bi_dram[0].start = CONFIG_SYS_RAM_BASE;
-	gd->bd->bi_dram[0].size  = CONFIG_SYS_RAM_SIZE;
-
-	rv = 0;
-
-out:
-	return rv;
-}
-#endif /* CONFIG_SYS_BOARD_REV == 0x1A */
-
-#if CONFIG_SYS_BOARD_REV == 0x2A
 /*
  * STM32 RCC FMC specific definitions
  */
@@ -629,9 +509,6 @@ u32 flash_check_flag(void *src, void *dst, int cnt, int portwidth)
 out:
 	return flag;
 }
-
-#endif /* CONFIG_SYS_BOARD_REV == 0x2A */
-
 
 #ifdef CONFIG_STM32_ETH
 /*
