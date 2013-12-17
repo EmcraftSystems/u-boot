@@ -87,7 +87,6 @@ static const struct stm32f2_gpio_dsc ext_ram_fsmc_fmc_gpio[] = {
 	/* C11, FMC_NWE */
 	{STM32F2_GPIO_PORT_D, STM32F2_GPIO_PIN_5},
 
-
 	/* B3, FMC_A22 */
 	{STM32F2_GPIO_PORT_E, STM32F2_GPIO_PIN_6},
 	/* B2, FMC_A21 */
@@ -136,7 +135,7 @@ static const struct stm32f2_gpio_dsc ext_ram_fsmc_fmc_gpio[] = {
 	/* E2, FMC_A0 */
 	{STM32F2_GPIO_PORT_F, STM32F2_GPIO_PIN_0},
 
-	/* SDRAM only, Revision 0x2A */
+	/* SDRAM only */
 	/* M4, SDRAM_NE */
 	{STM32F2_GPIO_PORT_C, STM32F2_GPIO_PIN_2},
 	/* R6, SDRAM_NRAS */
@@ -150,19 +149,6 @@ static const struct stm32f2_gpio_dsc ext_ram_fsmc_fmc_gpio[] = {
 
 	/* H14, SDRAM_CLK */
 	{STM32F2_GPIO_PORT_G, STM32F2_GPIO_PIN_8},
-
-#ifdef CONFIG_FSMC_NOR_PSRAM_CS1_ENABLE
-	{STM32F2_GPIO_PORT_D, STM32F2_GPIO_PIN_7},
-#endif
-#ifdef CONFIG_FSMC_NOR_PSRAM_CS2_ENABLE
-	{STM32F2_GPIO_PORT_G, STM32F2_GPIO_PIN_9},
-#endif
-#ifdef CONFIG_FSMC_NOR_PSRAM_CS3_ENABLE
-	{STM32F2_GPIO_PORT_G, STM32F2_GPIO_PIN_10},
-#endif
-#ifdef CONFIG_FSMC_NOR_PSRAM_CS4_ENABLE
-	{STM32F2_GPIO_PORT_G, STM32F2_GPIO_PIN_12},
-#endif
 };
 
 /*
@@ -194,51 +180,10 @@ out:
 int board_init(void)
 {
 	int rv;
-	int i;
-	char v;
 
 	rv = fmc_fsmc_setup_gpio();
 	if (rv)
 		return rv;
-
-#if !defined(CONFIG_SYS_NO_FLASH)
-
-	/* Disable first bank */
-	fsmc_nor_psram_init(1, 0, 0, 0);
-	fsmc_nor_psram_init(3, 0, 0, 0);
-	fsmc_nor_psram_init(4, 0, 0, 0);
-
-	/*
-	 * Put SDRAM in Self-refresh mode to workaround
-	 * bug with Flash/SDRAM accessing,
-	 * see errata 2.8.7
-	 */
-	STM32_RCC->ahb3enr |= 1;
-	__asm__ __volatile__ ("dsb" : : : "memory");
-
-	STM32_SDRAM_FMC->sdcr1 =
-		CONFIG_SYS_RAM_FREQ_DIV << FMC_SDCR_SDCLK_SHIFT;
-
-	STM32_SDRAM_FMC->sdcmr = FMC_SDCMR_BANK_1 | FMC_SDCMR_MODE_START_CLOCK;
-	FMC_BUSY_WAIT();
-
-	STM32_SDRAM_FMC->sdcmr = FMC_SDCMR_BANK_1 | FMC_SDCMR_MODE_SELFREFRESH;
-	FMC_BUSY_WAIT();
-	udelay(60);
-
-	if ((rv = fsmc_nor_psram_init(CONFIG_SYS_FLASH_CS, CONFIG_SYS_FSMC_FLASH_BCR,
-			CONFIG_SYS_FSMC_FLASH_BTR,
-			CONFIG_SYS_FSMC_FLASH_BWTR)))
-		return rv;
-
-	for (i = 1; i < 0x1000000; i <<= 1) {
-		v = *(volatile char*)(0x64000000 + i);
-		v = *(volatile char*)(0x64000000 + i - 1);
-		nop(); nop();
-		nop(); nop();
-		nop(); nop();
-	}
-#endif
 
 	return 0;
 }
@@ -248,8 +193,7 @@ int board_init(void)
  */
 int checkboard(void)
 {
-	printf("Board: STM-SOM Rev %s, www.emcraft.com\n",
-		CONFIG_SYS_BOARD_REV_STR);
+	printf("Board: STM32F429-DISCOVERY Rev %s\n", CONFIG_SYS_BOARD_REV_STR);
 
 	return 0;
 }
@@ -260,7 +204,6 @@ int checkboard(void)
 #define STM32_RCC_ENR_FMC		(1 << 0)	/* FMC module clock  */
 
 static int dram_initialized = 0;
-
 
 static inline u32 _ns2clk(u32 ns, u32 freq)
 {
@@ -355,7 +298,6 @@ int dram_init(void)
 	udelay(100);
 	FMC_BUSY_WAIT();
 
-
 #define SDRAM_MODE_BL_SHIFT		0
 #define SDRAM_MODE_CAS_SHIFT		4
 
@@ -392,122 +334,6 @@ int dram_init(void)
 	dram_initialized = 1;
 
 	return rv;
-}
-
-/*
- * STM32 Flash bug workaround.
- */
-extern char	_mem_ram_buf_base, _mem_ram_buf_size;
-
-#define SOC_RAM_BUFFER_BASE	(ulong)(&_mem_ram_buf_base)
-#define SOC_RAM_BUFFER_SIZE	(ulong)((&_mem_ram_buf_size) - 0x100)
-
-void stop_ram(void)
-{
-	if (!dram_initialized)
-		return;
-
-	STM32_SDRAM_FMC->sdcmr = FMC_SDCMR_BANK_1 | FMC_SDCMR_MODE_SELFREFRESH;
-
-	FMC_BUSY_WAIT();
-}
-
-void start_ram(void)
-{
-	if (!dram_initialized)
-		return;
-
-	/*
-	 * Precharge according to chip requirement, page 12.
-	 */
-
-	STM32_SDRAM_FMC->sdcmr = FMC_SDCMR_BANK_1 | FMC_SDCMR_MODE_PRECHARGE;
-	FMC_BUSY_WAIT();
-
-
-	STM32_SDRAM_FMC->sdcmr = FMC_SDCMR_BANK_1 | FMC_SDCMR_MODE_NORMAL;
-	FMC_BUSY_WAIT();
-
-	udelay(60);
-}
-
-#define NOP10()		do {	nop(); nop(); nop(); nop(); nop(); \
-				nop(); nop(); nop(); nop(); nop(); \
-			} while(0);
-
-u16 flash_read16(void *addr)
-{
-	u16 value;
-	stop_ram();
-	value = __raw_readw(addr);
-	NOP10();
-	start_ram();
-	return value;
-}
-
-void flash_write16(u16 value, void *addr)
-{
-	stop_ram();
-	__raw_writew(value, addr);
-	NOP10();
-	NOP10();
-	start_ram();
-}
-
-__attribute__((noinline)) void copy_one(volatile u16* src, volatile u16* dst)
-{
-	*dst = *src;
-}
-
-u32 flash_write_buffer(void *src, void *dst, int cnt, int portwidth)
-{
-	u32 retval = 0;
-
-	if (portwidth != FLASH_CFI_16BIT) {
-		retval = ERR_INVAL;
-		goto out;
-	}
-
-	memcpy((void*)SOC_RAM_BUFFER_BASE, (void*)src, cnt * portwidth);
-
-	stop_ram();
-	__asm__ __volatile__("": : :"memory");
-
-	src = (void*) SOC_RAM_BUFFER_BASE;
-
-	while(cnt-- > 0) {
-		copy_one(src, dst);
-		src += 2, dst += 2;
-		NOP10();
-		NOP10();
-	}
-
-	__asm__ __volatile__("": : :"memory");
-	start_ram();
-out:
-	return retval;
-}
-
-u32 flash_check_flag(void *src, void *dst, int cnt, int portwidth)
-{
-	u32 flag = 1;
-
-	if (portwidth != FLASH_CFI_16BIT) {
-		flag = 0;
-		goto out;
-	}
-
-	stop_ram();
-
-	while((cnt-- > 0) && (flag == 1)) {
-		flag = *(u16*)dst == 0xFFFF;
-		dst += 2;
-	}
-
-	start_ram();
-
-out:
-	return flag;
 }
 
 #ifdef CONFIG_STM32_ETH

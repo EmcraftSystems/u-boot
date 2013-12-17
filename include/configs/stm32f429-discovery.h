@@ -133,79 +133,29 @@
  */
 #define CONFIG_SYS_MALLOC_LEN		CONFIG_MEM_MALLOC_LEN
 
-#define FSMC_NOR_PSRAM_CS_ADDR(n) \
-	(0x60000000 + ((n) - 1) * 0x4000000)
-
 /*
- * Configuration of the external SDRAM memory for Rev 2.A
+ * Configuration of the external SDRAM memory
  */
-# define CONFIG_NR_DRAM_BANKS		1
-# define CONFIG_SYS_RAM_SIZE		(32 * 1024 * 1024)
-# define CONFIG_SYS_RAM_CS		1
-# define CONFIG_SYS_RAM_FREQ_DIV	2
-# define CONFIG_SYS_RAM_BASE		0xC0000000
+#define CONFIG_NR_DRAM_BANKS		1
+#define CONFIG_SYS_RAM_SIZE		(8 * 1024 * 1024)
+#define CONFIG_SYS_RAM_CS		1
+#define CONFIG_SYS_RAM_FREQ_DIV	2
+#define CONFIG_SYS_RAM_BASE		0xC0000000
 
 /*
- * Configuration of the external Flash memory, common for both revisions
+ * No external Flash
  */
-#define CONFIG_SYS_FLASH_CS		2
-
-/* Flash is in ModeC, that means 'OE toggle on write' */
-/*
- * MBKEN(0) = 1, enable memory bank
- * MTYP(3-2) = 0b10, NOR flash
- * MWID(5-4) = 0b01, 16 bit
- * FACCEN(6) = 1,
- * reserved(7) = 0,
- * WREN(12) = 1,
- * EXTMOD(14) = 1
- */
-#define CONFIG_SYS_FSMC_FLASH_BCR	0x00005059
-/*
- * Flash timinigs are almost same for write and read.
- * See Spansion memory reference manual for S29GL128S10DHI010
- * tACC(MAX) = ADDSET(3-0) = 110 ns = 18.48 HCLK (on 168 MHz)
- * tRC(MIN) = DATAST(15-8) = 110 ns = 18.48 HCLK (on 168 MHz)
- * tNE switch = BUSTURN(19-16) = 10 ns = 2 HCLK
- * ACCMODE(29-28) = 0x2 (mode C)
- */
-#define CONFIG_SYS_FSMC_FLASH_BTR	0x2002120f
-#define CONFIG_SYS_FSMC_FLASH_BWTR	0x2002110f
-#define CONFIG_FSMC_NOR_PSRAM_CS2_ENABLE
-
-#define CONFIG_SYS_FLASH_BANK1_BASE	FSMC_NOR_PSRAM_CS_ADDR(CONFIG_SYS_FLASH_CS)
-
-#define CONFIG_SYS_FLASH_CFI		1
-#define CONFIG_FLASH_CFI_DRIVER		1
-#define CONFIG_SYS_FLASH_CFI_WIDTH	FLASH_CFI_16BIT
-#define CONFIG_SYS_FLASH_BANKS_LIST	{ CONFIG_SYS_FLASH_BANK1_BASE }
-#define CONFIG_SYS_MAX_FLASH_BANKS	1
-#define CONFIG_SYS_MAX_FLASH_SECT	128
-#define CONFIG_SYS_FLASH_CFI_AMD_RESET	1
-#define CONFIG_SYS_FLASH_PROTECTION	1
-#define CONFIG_SYS_FLASH_USE_BUFFER_WRITE
-
-#define CONFIG_CFI_FLASH_USE_WEAK_ACCESSORS
+#define CONFIG_SYS_NO_FLASH
 
 /*
- * Store env in Flash memory
+ * Store env in embedded Flash
  */
 #define CONFIG_ENV_IS_IN_ENVM
-
-#ifdef CONFIG_ENV_IS_IN_FLASH
-#define CONFIG_ENV_SIZE			(4 * 1024)
-#define CONFIG_ENV_ADDR			CONFIG_SYS_FLASH_BANK1_BASE
-#define CONFIG_INFERNO			1
-#define CONFIG_ENV_OVERWRITE		1
-#endif
-
-#ifdef CONFIG_ENV_IS_IN_ENVM
 #define CONFIG_ENV_SIZE			(4 * 1024)
 #define CONFIG_ENV_ADDR 		\
 	(CONFIG_SYS_ENVM_BASE + CONFIG_SYS_ENVM_LEN - (128 * 1024))
 #define CONFIG_INFERNO			1
 #define CONFIG_ENV_OVERWRITE		1
-#endif
 
 /*
  * Serial console configuration
@@ -285,7 +235,6 @@
 #undef CONFIG_CMD_NFS
 #undef CONFIG_CMD_SOURCE
 #undef CONFIG_CMD_XIMG
-#define CONFIG_CMD_BUFCOPY
 
 /*
  * To save memory disable long help
@@ -310,9 +259,6 @@
 #define LOADADDR		"0xC0007FC0"
 
 #define REV_EXTRA_ENV		\
-	"flashboot=run addip;"						\
-		"stmbufcopy ${loadaddr} ${flashaddr} ${kernelsize};"	\
-		"bootm ${loadaddr}\0"					\
 	"envmboot=run addip;bootm ${envmaddr}\0"			\
 	"update=tftp ${image};"						\
 		"prot off ${flashaddr} +${filesize};"			\
@@ -330,7 +276,6 @@
 #define CONFIG_EXTRA_ENV_SETTINGS				\
 	"loadaddr=" LOADADDR "\0"				\
 	"addip=setenv bootargs ${bootargs} ip=${ipaddr}:${serverip}:${gatewayip}:${netmask}:${hostname}:eth0:off\0"				\
-	"flashaddr=64020000\0"					\
 	"envmaddr=08020000\0"					\
 	"ethaddr=C0:B1:3C:88:88:85\0"				\
 	"ipaddr=172.17.4.206\0"					\
