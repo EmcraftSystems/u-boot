@@ -32,6 +32,15 @@ void envm_init(void);
 #endif
 
 /*
+ * Check if an address is in the eNVM.
+ */
+static inline int envm_addr(unsigned long addr)
+{
+	return addr >= CONFIG_SYS_ENVM_BASE &&
+		addr < CONFIG_SYS_ENVM_BASE + CONFIG_SYS_ENVM_LEN;
+}
+
+/*
  * Write a data buffer to eNVM.
  * Note that we need for this function to reside in RAM since it
  * will be used to self-upgrade U-boot in eNMV.
