@@ -31,6 +31,8 @@ void envm_init(void);
 # error "LPC43XX ENVM requires RAMCODE"
 #endif
 
+#if defined(CONFIG_ENVM)
+
 /*
  * Check if an address is in the eNVM.
  */
@@ -39,6 +41,8 @@ static inline int envm_addr(unsigned long addr)
 	return addr >= CONFIG_SYS_ENVM_BASE &&
 		addr < CONFIG_SYS_ENVM_BASE + CONFIG_SYS_ENVM_LEN;
 }
+
+#endif
 
 /*
  * Write a data buffer to eNVM.
