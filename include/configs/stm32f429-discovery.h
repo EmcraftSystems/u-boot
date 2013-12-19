@@ -74,15 +74,15 @@
  * Clock configuration (see mach-stm32/clock.c for details):
  * - use PLL as the system clock;
  * - use HSE as the PLL source;
- * - configure PLL to get 168MHz system clock.
+ * - configure PLL to get a 180 MHz system clock.
  */
 #define CONFIG_STM32_SYS_CLK_PLL
 #define CONFIG_STM32_PLL_SRC_HSE
-#define CONFIG_STM32_HSE_HZ		12000000	/* 12 MHz */
-#define CONFIG_STM32_PLL_M		12
-#define CONFIG_STM32_PLL_N		336
-#define CONFIG_STM32_PLL_P		2
-#define CONFIG_STM32_PLL_Q		7
+#define CONFIG_STM32_HSE_HZ		8000000		/* 8 MHz */
+#define CONFIG_STM32_PLL_M		4
+#define CONFIG_STM32_PLL_N		360
+#define CONFIG_STM32_PLL_P		4
+#define CONFIG_STM32_PLL_Q		15
 
 /*
  * Number of clock ticks in 1 sec
@@ -161,11 +161,11 @@
  * Serial console configuration
  */
 #define CONFIG_STM32_USART_CONSOLE
-# define CONFIG_STM32_USART_PORT	1	/* USART1 */
-# define CONFIG_STM32_USART_TX_IO_PORT	1	/* PORTB */
-# define CONFIG_STM32_USART_TX_IO_PIN	6	/* GPIO6 */
-# define CONFIG_STM32_USART_RX_IO_PORT	0	/* PORTA */
-# define CONFIG_STM32_USART_RX_IO_PIN	10	/* GPIO10 */
+#define CONFIG_STM32_USART_PORT		1	/* USART1 */
+#define CONFIG_STM32_USART_TX_IO_PORT	0	/* PORTA */
+#define CONFIG_STM32_USART_TX_IO_PIN	9	/* GPIO9 */
+#define CONFIG_STM32_USART_RX_IO_PORT	0	/* PORTA */
+#define CONFIG_STM32_USART_RX_IO_PIN	10	/* GPIO10 */
 #define CONFIG_BAUDRATE			115200
 #define CONFIG_SYS_BAUDRATE_TABLE	{ 9600, 19200, 38400, 57600, 115200 }
 
@@ -251,7 +251,7 @@
  */
 #define CONFIG_BOOTDELAY		3
 #define CONFIG_ZERO_BOOTDELAY_CHECK
-#define CONFIG_BOOTCOMMAND		"run flashboot"
+#define CONFIG_BOOTCOMMAND		"run envmboot"
 
 #define CONFIG_HOSTNAME	stm32f4x9-som
 #define CONFIG_BOOTARGS	"stm32_platform=stm32f4x9-som "\
@@ -260,13 +260,8 @@
 
 #define REV_EXTRA_ENV		\
 	"envmboot=run addip;bootm ${envmaddr}\0"			\
-	"update=tftp ${image};"						\
-		"prot off ${flashaddr} +${filesize};"			\
-		"era ${flashaddr} +${filesize};"			\
-		"cp.b ${loadaddr} ${flashaddr} ${filesize};"		\
-		"setenv kernelsize ${filesize};"			\
-		"setenv filesize; setenv fileaddr;"			\
-		"saveenv\0"
+	"update=tftp ${eimage};"					\
+		"cptf ${envmaddr} ${loadaddr} ${filesize}\0"
 
 #define CONFIG_SYS_CONSOLE_IS_IN_ENV
 
@@ -276,11 +271,12 @@
 #define CONFIG_EXTRA_ENV_SETTINGS				\
 	"loadaddr=" LOADADDR "\0"				\
 	"addip=setenv bootargs ${bootargs} ip=${ipaddr}:${serverip}:${gatewayip}:${netmask}:${hostname}:eth0:off\0"				\
-	"envmaddr=08020000\0"					\
+	"envmaddr=08040000\0"					\
 	"ethaddr=C0:B1:3C:88:88:85\0"				\
 	"ipaddr=172.17.4.206\0"					\
 	"serverip=172.17.0.1\0"					\
-	"image=stm32f429/uImage\0"		\
+	"image=stm32f429/uImage\0"				\
+	"eimage=stm32f429/eImage\0"				\
 	"stdin=serial\0"					\
 	"netboot=tftp ${image};run addip;bootm\0"		\
 	REV_EXTRA_ENV

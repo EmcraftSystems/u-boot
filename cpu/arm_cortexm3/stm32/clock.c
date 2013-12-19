@@ -137,7 +137,7 @@
 # define STM32_FLASH_WS			3
 #elif (STM32_SYS_CLK > 120000000) && (STM32_SYS_CLK <= 150000000)
 # define STM32_FLASH_WS			4
-#elif (STM32_SYS_CLK > 150000000) && (STM32_SYS_CLK <= 168000000)
+#elif (STM32_SYS_CLK > 150000000) && (STM32_SYS_CLK <= 180000000)
 # define STM32_FLASH_WS			5
 #else
 # error "Incorrect System clock value configuration."
