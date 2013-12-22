@@ -139,8 +139,8 @@
 #define CONFIG_NR_DRAM_BANKS		1
 #define CONFIG_SYS_RAM_SIZE		(8 * 1024 * 1024)
 #define CONFIG_SYS_RAM_CS		1
-#define CONFIG_SYS_RAM_FREQ_DIV	2
-#define CONFIG_SYS_RAM_BASE		0xC0000000
+#define CONFIG_SYS_RAM_FREQ_DIV		2
+#define CONFIG_SYS_RAM_BASE		0xD0000000
 
 /*
  * No external Flash
@@ -256,7 +256,7 @@
 #define CONFIG_HOSTNAME	stm32f4x9-som
 #define CONFIG_BOOTARGS	"stm32_platform=stm32f4x9-som "\
 				"console=ttyS0,115200 panic=10"
-#define LOADADDR		"0xC0007FC0"
+#define LOADADDR		"0xD0007FC0"
 
 #define REV_EXTRA_ENV		\
 	"envmboot=run addip;bootm ${envmaddr}\0"			\
