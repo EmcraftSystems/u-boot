@@ -188,7 +188,7 @@ static inline u32 _ns2clk(u32 ns, u32 freq)
 /*
  * Following are timings for IS42S16400J, from corresponding datasheet
  */
-#define SDRAM_CAS	2
+#define SDRAM_CAS	3
 #define SDRAM_NB	1	/* Number of banks */
 #define SDRAM_MWID	1	/* 16 bit memory */
 
