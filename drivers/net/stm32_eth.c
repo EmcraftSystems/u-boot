@@ -399,7 +399,7 @@ s32 stm32_eth_init(bd_t *bd)
 	 * Set MII mode
 	 */
 	val = STM32_SYSCFG->pmc;
-	val &= STM32_SYSCFG_PMC_SEL_MSK << STM32_SYSCFG_PMC_SEL_BIT;
+	val &= ~(STM32_SYSCFG_PMC_SEL_MSK << STM32_SYSCFG_PMC_SEL_BIT);
 #ifndef CONFIG_STM32_ETH_RMII
 	val |= STM32_SYSCFG_PMC_SEL_MII << STM32_SYSCFG_PMC_SEL_BIT;
 #else
