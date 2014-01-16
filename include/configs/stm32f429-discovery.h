@@ -260,7 +260,7 @@
 
 #define REV_EXTRA_ENV		\
 	"envmboot=run addip;bootm ${envmaddr}\0"			\
-	"update=tftp ${eimage};"					\
+	"update=tftp ${image};"					\
 		"cptf ${envmaddr} ${loadaddr} ${filesize}\0"
 
 #define CONFIG_SYS_CONSOLE_IS_IN_ENV
@@ -276,7 +276,6 @@
 	"ipaddr=172.17.4.206\0"					\
 	"serverip=172.17.0.1\0"					\
 	"image=stm32f429/uImage\0"				\
-	"eimage=stm32f429/eImage\0"				\
 	"stdin=serial\0"					\
 	"netboot=tftp ${image};run addip;bootm\0"		\
 	REV_EXTRA_ENV
