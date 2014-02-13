@@ -89,6 +89,7 @@ phy_info_t phyinfo[] = {
 	{0x001378e0, "LXT971"},		/* LXT971 and 972 */
 	{0x00221619, "KS8721BL"},	/* Micrel KS8721BL/SL */
 	{0x00221512, "KSZ8041NL"},	/* Micrel KSZ8041NL */
+	{0x00221430, "KSZ8863"},	/* Micrel KSZ8863 MLL/FLL/RLL */
 	{0x20005CE1, "N83640"},		/* National 83640 */
 	{0x20005C90, "N83848"},		/* National 83848 */
 	{0x20005CA2, "N83849"},		/* National 83849 */
