@@ -113,12 +113,17 @@ struct kinetis_flash_conf {
 	KINETIS_FLASH_CONF_FSEC_SEC_UNSECURE)		\
 
 /*
- * Enable EzPort.
+ * Enable or disable EzPort (disabled by default).
  * Disable low-power boot.
  */
+#if 0
 #define KINETIS_FLASH_CONF_FOPT \
 	(KINETIS_FLASH_CONF_FOPT_EZPORT_EN | \
 	KINETIS_FLASH_CONF_FOPT_LPBOOT_NORMAL)
+#else
+#define KINETIS_FLASH_CONF_FOPT \
+	KINETIS_FLASH_CONF_FOPT_LPBOOT_NORMAL
+#endif
 
 /*
  * FlexRAM is unprotected
