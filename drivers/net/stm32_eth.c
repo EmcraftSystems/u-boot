@@ -162,6 +162,7 @@
 #define STM32_RCC_ENR_ETHMACEN		(1 << 25)	/* Ethernet MAC clock */
 #define STM32_RCC_ENR_ETHMACTXEN	(1 << 26)	/* Ethernet Tx clock  */
 #define STM32_RCC_ENR_ETHMACRXEN	(1 << 27)	/* Ethernet Rx clock  */
+#define STM32_RCC_ENR_ETHMACPEN		(1 << 28)	/* Ethernet ? clock  */
 
 /*
  * Different timeouts
@@ -398,7 +399,7 @@ s32 stm32_eth_init(bd_t *bd)
 	 * Set MII mode
 	 */
 	val = STM32_SYSCFG->pmc;
-	val &= STM32_SYSCFG_PMC_SEL_MSK << STM32_SYSCFG_PMC_SEL_BIT;
+	val &= ~(STM32_SYSCFG_PMC_SEL_MSK << STM32_SYSCFG_PMC_SEL_BIT);
 #ifndef CONFIG_STM32_ETH_RMII
 	val |= STM32_SYSCFG_PMC_SEL_MII << STM32_SYSCFG_PMC_SEL_BIT;
 #else
@@ -906,7 +907,7 @@ static s32 stm_mac_hw_init(struct stm_eth_dev *mac)
 		/* CSR Clock range between 60-100 MHz */
 		tmp = STM32_MAC_MIIAR_CR_DIV42 << STM32_MAC_MIIAR_CR_BIT;
 	} else {
-		/* CSR Clock range between 100-168 MHz */
+		/* CSR Clock range between 100-180 MHz */
 		tmp = STM32_MAC_MIIAR_CR_DIV62 << STM32_MAC_MIIAR_CR_BIT;
 	}
 

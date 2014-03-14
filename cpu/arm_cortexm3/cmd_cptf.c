@@ -57,8 +57,8 @@ int
 	/*
 	 * Copy the buffer to the destination.
 	 */
-	if (envm_write((uint) dst, (void *) src, (uint) size) != size) {
-		ret = -1;
+	ret = envm_write((uint) dst, (void *) src, (uint) size);
+	if (ret != size) {
 		goto Done;
 	}
 
@@ -119,8 +119,9 @@ int do_cptf(cmd_tbl_t *cmdtp, int flag, int argc, char *argv[])
 	/*
 	 * Copy the buffer to the destination.
 	 */
-	if (envm_write_and_reset(dst, src, size, do_reset)) {
-		printf("%s: nvm_write_and_reset failed\n", (char *) argv[0]);
+	if ((ret = envm_write_and_reset(dst, src, size, do_reset)) <= 0) {
+		printf("%s: envm_write_and_reset failed: %d\n",
+						(char *) argv[0], ret);
 		goto Done;
 	}
 

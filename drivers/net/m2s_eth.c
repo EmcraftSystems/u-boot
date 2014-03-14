@@ -294,7 +294,6 @@ static  int m2s_mii_write(char *devname, u8 addr, u8 reg, u16 val);
 
 #ifndef CONFIG_M2S_ETH_MODE_SGMII
 static  int m2s_phy_probe(void);
-static  int m2s_phy_link_setup(void);
 #endif
 
 static void m2s_mac_dump_regs(char *who);
@@ -1001,68 +1000,6 @@ static int m2s_phy_probe(void)
 		goto out;
 	}
 
-	rv = 0;
-out:
-	return rv;
-}
-
-/*
- * Setup link status
- */
-static int m2s_phy_link_setup(void)
-{
-	int	rv, timeout;
-	u16	val;
-
-	/*
-	 * Get current link status
-	 */
-	rv = miiphy_link(M2S_MII_NAME, m2s_phy_addr);
-	if (rv == 1)
-		goto link_up;
-
-	/*
-	 * Enable auto-negotiation
-	 */
-	printf("Auto-negotiation...");
-	rv = miiphy_read(M2S_MII_NAME, m2s_phy_addr, PHY_BMCR, &val);
-	if (rv != 0)
-		goto out;
-	rv = miiphy_write(M2S_MII_NAME, m2s_phy_addr, PHY_BMCR,
-			  val | PHY_BMCR_AUTON | PHY_BMCR_RST_NEG);
-	if (rv != 0)
-		goto out;
-
-	/*
-	 * Wait until auto-negotiation completes
-	 */
-	timeout = M2S_AUTONEG_TOUT;
-	while (timeout--) {
-		rv = miiphy_read(M2S_MII_NAME, m2s_phy_addr, PHY_BMSR, &val);
-		if (rv != 0) {
-			printf("mii err %d.\n", rv);
-			goto done;
-		}
-		if (!(val & PHY_BMSR_AUTN_COMP)) {
-			udelay(1000);
-			continue;
-		}
-		break;
-	}
-	if (timeout)
-		printf("completed.\n");
-	else
-		printf("timeout.\n");
-done:
-	rv = miiphy_link(M2S_MII_NAME, m2s_phy_addr);
-	if (rv == 0) {
-		printf("Link is DOWN.\n");
-		rv = -ENETUNREACH;
-		goto out;
-	}
-
-link_up:
-	printf("Link is UP.\n");
 	rv = 0;
 out:
 	return rv;

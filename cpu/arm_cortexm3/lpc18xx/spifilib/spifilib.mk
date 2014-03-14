@@ -17,14 +17,24 @@
 # MA 02111-1307 USA
 #
 
-spifilib.bin: spifilib
+# This should be done with .incbin and Position-Independent-Code
+
+SPIFILIB_VERSION ?= M3
+
+spifilib-envm.bin: spifilib-envm
 	$(OBJCOPY) -O binary $< $@
 
-spifilib: spifilib.o spifi_drv_M3.lib spifilib.lds
-	$(LD) $(LDLAGS) -Map spifilib.map -Tspifilib.lds -nostdlib -o $@ spifilib.o spifi_drv_M3.lib
+spifilib-dram.bin: spifilib-dram
+	$(OBJCOPY) -O binary $< $@
+
+spifilib-envm: spifilib.o spifi_drv_$(SPIFILIB_VERSION).lib spifilib-envm.lds
+	$(LD) $(LDLAGS) -Map spifilib.map -Tspifilib-envm.lds -nostdlib -o $@ spifilib.o spifi_drv_$(SPIFILIB_VERSION).lib
+
+spifilib-dram: spifilib.o spifi_drv_$(SPIFILIB_VERSION).lib spifilib-dram.lds
+	$(LD) $(LDLAGS) -Map spifilib.map -Tspifilib-dram.lds -nostdlib -o $@ spifilib.o spifi_drv_$(SPIFILIB_VERSION).lib
 
 spifilib.o: spifilib.h spifilib.c
 	$(CC) $(CFLAGS) -fshort-wchar -fshort-enums -c $+
 
 clean:
-	$(RM) spifilib.o spifilib spifilib.bin
+	$(RM) spifilib.o spifilib-envm spifilib-dram spifilib-envm.bin spifilib-dram.bin

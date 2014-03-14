@@ -23,11 +23,16 @@
 #define __SPIFILIB_H
 
 #include "spifi_rom_api.h"
+#include <config.h>
 
 #define SPIFILIB_SIG	0x591F121B
 #define SPIFILIB_SIZE	(16*1024)
 
-#define SPIFI_BASE_ADDR 0x14000000
+#ifdef CONFIG_SPIFILIB_IN_ENVM
+# define SPIFI_BASE_ADDR CONFIG_MEM_NVM_BASE
+#else
+# define SPIFI_BASE_ADDR 0x14000000
+#endif
 
 typedef int32_t (*spifi_init_t)(SPIFIobj *obj, uint32_t csHigh, uint32_t options, uint32_t mhz);
 typedef int32_t (*spifi_program_t)(SPIFIobj *obj, char *source, SPIFIopers *opers);

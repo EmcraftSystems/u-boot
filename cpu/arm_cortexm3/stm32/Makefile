@@ -30,6 +30,9 @@ include $(TOPDIR)/config.mk
 LIB	= $(obj)lib$(SOC).a
 
 COBJS	:= clock.o cpu.o envm.o wdt.o fsmc.o
+ifeq ($(CONFIG_CMD_BUFCOPY),y)
+COBJS	+= cmd_bufcopy.o
+endif
 SOBJS	:=
 
 SRCS	:= $(COBJS:.o=.c)

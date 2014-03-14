@@ -1,10 +1,7 @@
 #
-# (C) Copyright 2000-2003
-# Wolfgang Denk, DENX Software Engineering, wd@denx.de.
+# (C) Copyright 2011
 #
-# (C) Copyright 2012
-# Port to NXP LPC18xx MCU
-# Alexander Potashev, Emcraft Systems, aspotashev@emcraft.com.
+# Alexander Potashev, Emcraft Systems, aspotashev@emcraft.com
 #
 # See file CREDITS for list of people who contributed to this
 # project.
@@ -27,30 +24,20 @@
 
 include $(TOPDIR)/config.mk
 
-LIB	= $(obj)lib$(SOC).a
+LIB	= $(obj)lib$(BOARD).a
 
-COBJS	:= clock.o cpu.o wdt.o
-ifeq ($(CONFIG_LPC43XX_ENVM),y)
-COBJS	+= envm-lpc43xx.o
-else
-COBJS	+= envm-lpc18xx.o
-endif
-ifeq ($(CONFIG_SPIFI),y)
-COBJS	+= spifi.o
-endif
-SOBJS	:=
+COBJS	:= board.o
 
 SRCS	:= $(COBJS:.o=.c)
 OBJS	:= $(addprefix $(obj),$(COBJS))
-SOBJS	:= $(addprefix $(obj),$(SOBJS))
 
-$(LIB):	$(obj).depend $(OBJS) $(SOBJS)
+$(LIB):	$(obj).depend $(OBJS)
 	$(AR) $(ARFLAGS) $@ $(OBJS)
 
 clean:
-	rm -f $(SOBJS) $(OBJS)
+	rm -f $(OBJS)
 
-distclean:
+distclean:	clean
 	rm -f $(LIB) core *.bak $(obj).depend
 
 #########################################################################
@@ -59,5 +46,3 @@ distclean:
 include $(SRCTREE)/rules.mk
 
 sinclude $(obj).depend
-
-#########################################################################

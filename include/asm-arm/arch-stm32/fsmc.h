@@ -68,4 +68,6 @@
  */
 int fsmc_nor_psram_init(u32 num, u32 bcr, u32 btr, u32 bwtr);
 
+extern int fsmc_gpio_init_done;
+
 #endif /* _MACH_FSMC_H_ */

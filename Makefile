@@ -309,9 +309,13 @@ $(obj)u-boot.srec:	$(obj)u-boot
 		$(OBJCOPY) -O srec $< $@
 
 ifeq ($(CONFIG_SYS_LPC18XX)$(CONFIG_SPIFI),yy)
-SPIFILIB_DEP = cpu/arm_cortexm3/lpc18xx/spifilib/spifilib.bin
+ifeq ($(CONFIG_SPIFILIB_IN_ENVM),y)
+SPIFILIB_DEP = cpu/arm_cortexm3/lpc18xx/spifilib/spifilib-envm.bin
+else
+SPIFILIB_DEP = cpu/arm_cortexm3/lpc18xx/spifilib/spifilib-dram.bin
+endif
 $(SPIFILIB_DEP): depend
-		$(MAKE) -C cpu/arm_cortexm3/lpc18xx/spifilib -f spifilib.mk
+		$(MAKE) -C cpu/arm_cortexm3/lpc18xx/spifilib $(notdir $(SPIFILIB_DEP)) -f spifilib.mk
 endif
 
 $(obj)u-boot.bin:	$(obj)u-boot $(SPIFILIB_DEP)
@@ -325,7 +329,7 @@ ifeq ($(CONFIG_LPC18XX_BOOTHEADER),y)
 		mv $(obj)u-boot-bootheader.bin $(obj)u-boot.bin
 endif
 ifeq ($(CONFIG_SYS_LPC18XX)$(CONFIG_SPIFI),yy)
-		dd if=cpu/arm_cortexm3/lpc18xx/spifilib/spifilib.bin of=u-boot.bin seek=112 bs=1024
+		dd if=$(SPIFILIB_DEP) of=u-boot.bin seek=112 bs=1024
 endif
 
 $(obj)u-boot.upgrade:	$(obj)u-boot.bin
@@ -3230,8 +3234,20 @@ a2f-hoermann-brd_config :  unconfig
 sf2-dev-kit_config :  unconfig
 	@$(MKCONFIG) $(@:_config=) arm arm_cortexm3 sf2-dev-kit actel m2s
 
-stm-som_config : unconfig
-	@$(MKCONFIG) $(@:_config=) arm arm_cortexm3 stm-som emcraft stm32
+stm-som_config \
+stm-som-1a_config : unconfig
+	@mkdir -p $(obj)include
+	@ >$(obj)include/config.h
+
+	@[ -z "$(findstring 1a,$@)" ] || \
+		{ echo "#define CONFIG_SYS_BOARD_REV	0x1A" >>$(obj)include/config.h ; \
+		  echo "...for STM-SOM Rev 1A" ; \
+		}
+	@$(MKCONFIG) -a stm-som arm arm_cortexm3 stm-som emcraft stm32
+
+stm32f429-discovery_config : unconfig
+	@$(MKCONFIG) $(@:_config=) arm arm_cortexm3 stm32f429-discovery \
+	stm stm32
 
 stm3220g-eval_config : unconfig
 	@$(MKCONFIG) $(@:_config=) arm arm_cortexm3 stm3220g-eval stm stm32
@@ -3271,11 +3287,25 @@ k70-som_config : unconfig
 lpc4350-eval_config : unconfig
 	@$(MKCONFIG) $(@:_config=) arm arm_cortexm3 lpc4350-eval hitex lpc18xx
 
+ea-lpc4357_config : unconfig
+	@$(MKCONFIG) $(@:_config=) arm arm_cortexm3 ea-lpc4357 nxp lpc18xx
+
 lpc1850-eval_config : unconfig
 	@$(MKCONFIG) $(@:_config=) arm arm_cortexm3 lpc1850-eval hitex lpc18xx
 
+m2s-som-1a_config \
 m2s-som_config :  unconfig
-	@$(MKCONFIG) $(@:_config=) arm arm_cortexm3 m2s-som emcraft m2s
+	@mkdir -p $(obj)include
+	@ >$(obj)include/config.h
+	@[ -z "$(findstring -1a,$@)" ] || \
+		{ echo "#define CONFIG_SYS_BOARD_REV  0x1A" >>$(obj)include/config.h ; \
+		  echo "...for rev 1A" ; \
+		}
+	@$(MKCONFIG) -a m2s-som arm arm_cortexm3 m2s-som emcraft m2s
+
+
+m2s-fg484-som_config :  unconfig
+	@$(MKCONFIG) $(@:_config=) arm arm_cortexm3 m2s-fg484-som emcraft m2s
 
 m2s-som-copy2_config :  unconfig
 	@$(MKCONFIG) $(@:_config=) arm arm_cortexm3 m2s-som emcraft m2s

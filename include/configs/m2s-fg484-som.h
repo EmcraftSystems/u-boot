@@ -1,12 +1,13 @@
 /*
- * (C) Copyright 2012
+ * (C) Copyright 2012,2013
  * Emcraft Systems, <www.emcraft.com>
  * Alexander Potashev <aspotashev@emcraft.com>
  * Vladimir Khusainov, <vlad@emcraft.com>
  * Yuri Tikhonov, <yur@emcraft.com>
+ * Sergei Poselenov, <sposelenov@emcraft.com>
  *
- * Configuration settings for Actel SmartFusion2 validation board
- * (G4M Validation Board).
+ * Configuration settings for Emcraft SmartFusion2 SOM board
+ * (M2S-FG484-SOM).
  *
  * See file CREDITS for list of people who contributed to this
  * project.
@@ -55,18 +56,10 @@
 /*
  * This is a specific revision of the board
  */
-#if !defined(CONFIG_SYS_BOARD_REV)
-#define CONFIG_SYS_BOARD_REV		0x2A
-#endif
+#define CONFIG_SYS_BOARD_REV		0x1A
 
-#if (CONFIG_SYS_BOARD_REV!=0x1A) && (CONFIG_SYS_BOARD_REV!=0x2A)
-#error CONFIG_SYS_BOARD_REV must be 1A or 2A
-#endif
-
-#if (CONFIG_SYS_BOARD_REV==0x1A)
-# define CONFIG_SYS_BOARD_REV_STR	"1A"
-#else
-# define CONFIG_SYS_BOARD_REV_STR	"2A"
+#if (CONFIG_SYS_BOARD_REV!=0x1A)
+#error CONFIG_SYS_BOARD_REV must be 1A
 #endif
 
 /*
@@ -75,10 +68,12 @@
 #define CONFIG_DISPLAY_CPUINFO		1
 #define CONFIG_DISPLAY_BOARDINFO	1
 
+#define CONFIG_SYS_BOARD_REV_STR	"1A"
+
 /*
  * Monitor prompt
  */
-#define CONFIG_SYS_PROMPT		"M2S-SOM> "
+#define CONFIG_SYS_PROMPT		"M2S-FG484-SOM> "
 
 /*
  * We want to call the CPU specific initialization
@@ -291,8 +286,8 @@
  */
 #define CONFIG_BOOTDELAY		3
 #define CONFIG_ZERO_BOOTDELAY_CHECK
-#define CONFIG_HOSTNAME			m2s-som
-#define CONFIG_BOOTARGS			"m2s_platform=m2s-som "\
+#define CONFIG_HOSTNAME			m2s-fg484-som
+#define CONFIG_BOOTARGS			"m2s_platform=m2s-fg484-som "\
 					"console=ttyS0,115200 panic=10"
 #define CONFIG_BOOTCOMMAND		"run flashboot"
 
@@ -317,9 +312,9 @@
 	"spiaddr=" MK_STR(CONFIG_ENV_IMG_OFFSET) "\0"		\
 	"spisize=400000\0"					\
 	"spiprobe=sf probe " MK_STR(CONFIG_SPI_FLASH_BUS) "\0"	\
-	"addip=setenv bootargs ${bootargs}" 			\
+	"addip=setenv bootargs ${bootargs}"			\
 	" ip=${ipaddr}:${serverip}:${gatewayip}:"		\
-	"${netmask}:${hostname}:eth0:off\0" 			\
+	"${netmask}:${hostname}:eth0:off\0"			\
 	"flashboot=run addip;run spiprobe;"			\
 	" sf read ${loadaddr} ${spiaddr} ${spisize};"		\
 	" bootm ${loadaddr}\0"					\

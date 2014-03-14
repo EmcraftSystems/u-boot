@@ -1,7 +1,7 @@
 /*
  * (C) Copyright 2013
- *
  * Dmitry Konyshev, Emcraft Systems, probables@emcraft.com
+ * Pavel Boldin, Emcraft Systems, paboldin@emcraft.com
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License as
@@ -19,21 +19,29 @@
  * MA 02111-1307 USA
  */
 
-#ifndef __SPIFI_H
-#define __SPIFI_H
+OUTPUT_FORMAT("elf32-littlearm", "elf32-bigarm",
+	      "elf32-littlearm")
+OUTPUT_ARCH(arm)
+ENTRY(_start)
 
-static inline int spifi_addr(unsigned long addr)
+MEMORY
 {
-	return addr >= CONFIG_SPIFI_BASE &&
-		addr < CONFIG_SPIFI_BASE + CONFIG_SPIFI_SIZE;
+	RAM (rw):	ORIGIN = 0x1A01C000, LENGTH = 0x4000
 }
 
-extern int spifi_initialize(void);
-extern int spifi_write(ulong off, const void *buf, ulong size);
-extern void spifi_cancel_mem_mode(void);
+SECTIONS
+{
+	.text :
+	{
+		*(.rodata.spifilib.header)
+		*(.text)
+		*(.rodata*)
+		*(.constdata*)
 
-#if defined(CONFIG_ENV_IS_IN_SPIFI) && !defined(CONFIG_SPIFILIB_IN_ENVM)
-# error "Keeping environment in SPIFI requires it to reside in eNVM or IRAM, not in DRAM"
-#endif
+	} >RAM
 
-#endif
+	/DISCARD/ :
+	{
+		*(*)
+	}
+}

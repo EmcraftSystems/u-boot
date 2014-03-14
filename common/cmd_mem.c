@@ -36,6 +36,9 @@
 #ifdef CONFIG_SPIFI
 #include <spifi.h>
 #endif
+#ifdef CONFIG_ENVM
+#include <envm.h>
+#endif
 
 #include <u-boot/md5.h>
 #include <sha1.h>
@@ -464,6 +467,21 @@ int do_mem_cp ( cmd_tbl_t *cmdtp, int flag, int argc, char *argv[])
 			return 1;
 		}
 		return spifi_write(dest, (void *)addr, count);
+	}
+#endif
+
+#ifdef CONFIG_ENVM
+	if (envm_addr(dest) || envm_addr(dest + count)) {
+		if (envm_addr(addr) || envm_addr(addr + count)) {
+			puts ("Cannot copy from ENVM to ENVM, aborting.\n\r");
+			return 1;
+		}
+		if (!envm_addr(dest) || !envm_addr(dest + count)) {
+			puts ("Cannot copy across ENVM boundaries, "\
+				"aborting.\n\r");
+			return 1;
+		}
+		return envm_write(dest, (void *)addr, count);
 	}
 #endif
 

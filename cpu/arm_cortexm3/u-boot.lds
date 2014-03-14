@@ -38,6 +38,10 @@ MEMORY
 			LENGTH = CONFIG_MEM_MALLOC_LEN
 	STACK (r):	ORIGIN = ORIGIN(MALLOC) + LENGTH(MALLOC), \
 			LENGTH = CONFIG_MEM_STACK_LEN
+#if defined(CONFIG_MEM_RAMCODE_BASE) && defined(CONFIG_MEM_RAMCODE_LEN)
+	RAMCODE (rw):	ORIGIN = CONFIG_MEM_RAMCODE_BASE, \
+			LENGTH = CONFIG_MEM_RAMCODE_LEN
+#endif
 }
 
 SECTIONS
@@ -79,9 +83,21 @@ SECTIONS
 		_data_lma_start = LOADADDR(.data);
 		*(.data)
 		. = ALIGN(4);
+#if ! (defined(CONFIG_MEM_RAMCODE_BASE) && defined(CONFIG_MEM_RAMCODE_LEN))
 		*(.ramcode)
+#endif
 		_data_end = .;
 	} >RAM AT>NVM
+
+#if defined(CONFIG_MEM_RAMCODE_BASE) && defined(CONFIG_MEM_RAMCODE_LEN)
+	.ramcode :
+	{
+		_ramcode_start = .;
+		_ramcode_lma_start = LOADADDR(.ramcode);
+		*(.ramcode)
+		_ramcode_end = .;
+	} >RAMCODE AT>NVM
+#endif
 
 	.u_boot_cmd :
 	{

@@ -23,15 +23,11 @@
  */
 
 /*
- * Configuration settings for the Emcraft's STM SOM Rev 1.A and 2.A
+ * Configuration settings for the STmicro STM32F429 Discovery board
  */
 
 #ifndef __CONFIG_H
 #define __CONFIG_H
-
-#if !defined(CONFIG_SYS_BOARD_REV)
-#define CONFIG_SYS_BOARD_REV	0x2A
-#endif
 
 /*
  * Disable debug messages
@@ -62,20 +58,12 @@
 #define CONFIG_DISPLAY_CPUINFO		1
 #define CONFIG_DISPLAY_BOARDINFO	1
 
-#if CONFIG_SYS_BOARD_REV == 0x2A
-# define CONFIG_SYS_BOARD_REV_STR	"Rev 2.A"
-#elif CONFIG_SYS_BOARD_REV == 0x1A
-# define CONFIG_SYS_BOARD_REV_STR	"Rev 1.A"
-#endif
+#define CONFIG_SYS_BOARD_REV_STR	"1.A"
 
 /*
  * Monitor prompt
  */
-#if CONFIG_SYS_BOARD_REV == 0x2A
-# define CONFIG_SYS_PROMPT		"STM32F4X9-SOM> "
-#elif CONFIG_SYS_BOARD_REV == 0x1A
-# define CONFIG_SYS_PROMPT		"STM-SOM> "
-#endif
+#define CONFIG_SYS_PROMPT		"STM32F429-DISCO> "
 
 /*
  * We want to call the CPU specific initialization
@@ -86,15 +74,15 @@
  * Clock configuration (see mach-stm32/clock.c for details):
  * - use PLL as the system clock;
  * - use HSE as the PLL source;
- * - configure PLL to get 168MHz system clock.
+ * - configure PLL to get a 180 MHz system clock.
  */
 #define CONFIG_STM32_SYS_CLK_PLL
 #define CONFIG_STM32_PLL_SRC_HSE
-#define CONFIG_STM32_HSE_HZ		12000000	/* 12 MHz */
-#define CONFIG_STM32_PLL_M		12
-#define CONFIG_STM32_PLL_N		336
-#define CONFIG_STM32_PLL_P		2
-#define CONFIG_STM32_PLL_Q		7
+#define CONFIG_STM32_HSE_HZ		8000000		/* 8 MHz */
+#define CONFIG_STM32_PLL_M		4
+#define CONFIG_STM32_PLL_N		360
+#define CONFIG_STM32_PLL_P		4
+#define CONFIG_STM32_PLL_Q		15
 
 /*
  * Number of clock ticks in 1 sec
@@ -116,6 +104,23 @@
  */
 #define CONFIG_MEM_NVM_BASE		0x00000000
 #define CONFIG_MEM_NVM_LEN		(1024 * 1024 * 2)
+#define CONFIG_ENVM			1
+#if defined(CONFIG_ENVM)
+#define CONFIG_SYS_ENVM_BASE		0x08000000
+#define CONFIG_SYS_ENVM_LEN		CONFIG_MEM_NVM_LEN
+#endif
+
+#if 0
+/*
+ * Define the constant below to build U-boot for running
+ * from offset 0x20000 (128KB) in eNVM. When built this way,
+ * use the following commands to test the newly built U-boot:
+ * - tftp u-boot.bin
+ * - cptf 0x08020000 ${loadaddr} ${filesize} 0
+ * - go 20375 (or check address of _start in u-boot.map)
+ */
+#define CONFIG_MEM_NVM_UBOOT_OFF	(128 * 1024)
+#endif
 
 #define CONFIG_MEM_RAM_BASE		0x20000000
 #define CONFIG_MEM_RAM_LEN		(20 * 1024)
@@ -128,89 +133,27 @@
  */
 #define CONFIG_SYS_MALLOC_LEN		CONFIG_MEM_MALLOC_LEN
 
-#define FSMC_NOR_PSRAM_CS_ADDR(n) \
-	(0x60000000 + ((n) - 1) * 0x4000000)
-
-#if CONFIG_SYS_BOARD_REV == 0x2A
+/*
+ * Configuration of the external SDRAM memory
+ */
+#define CONFIG_NR_DRAM_BANKS		1
+#define CONFIG_SYS_RAM_SIZE		(8 * 1024 * 1024)
+#define CONFIG_SYS_RAM_CS		1
+#define CONFIG_SYS_RAM_FREQ_DIV		2
+#define CONFIG_SYS_RAM_BASE		0xD0000000
 
 /*
- * Configuration of the external SDRAM memory for Rev 2.A
+ * No external Flash
  */
-# define CONFIG_NR_DRAM_BANKS		1
-# define CONFIG_SYS_RAM_SIZE		(32 * 1024 * 1024)
-# define CONFIG_SYS_RAM_CS		1
-# define CONFIG_SYS_RAM_FREQ_DIV	2
-# define CONFIG_SYS_RAM_BASE		0xC0000000
-
-#elif CONFIG_SYS_BOARD_REV == 0x1A
+#define CONFIG_SYS_NO_FLASH
 
 /*
- * Configuration of the external PSRAM memory for Rev 1.A
+ * Store env in embedded Flash
  */
-# define CONFIG_NR_DRAM_BANKS		1
-# define CONFIG_SYS_RAM_SIZE		(16 * 1024 * 1024)
-# define CONFIG_SYS_RAM_CS		1
-
-# define CONFIG_SYS_RAM_BURST
-# define CONFIG_SYS_FSMC_PSRAM_BCR	0x00005059
-# define CONFIG_SYS_FSMC_PSRAM_BTR	0x10000904
-# define CONFIG_SYS_FSMC_PSRAM_BWTR	0x10000804
-# define CONFIG_FSMC_NOR_PSRAM_CS1_ENABLE
-
-# define CONFIG_SYS_RAM_BASE		FSMC_NOR_PSRAM_CS_ADDR(CONFIG_SYS_RAM_CS)
-
-#endif /* CONFIG_SYS_BOARD_REV is 1A */
-
-/*
- * Configuration of the external Flash memory, common for both revisions
- */
-#define CONFIG_SYS_FLASH_CS		2
-
-/* Flash is in ModeC, that means 'OE toggle on write' */
-/*
- * MBKEN(0) = 1, enable memory bank
- * MTYP(3-2) = 0b10, NOR flash
- * MWID(5-4) = 0b01, 16 bit
- * FACCEN(6) = 1,
- * reserved(7) = 0,
- * WREN(12) = 1,
- * EXTMOD(14) = 1
- */
-#define CONFIG_SYS_FSMC_FLASH_BCR	0x00005059
-/*
- * Flash timinigs are almost same for write and read.
- * See Spansion memory reference manual for S29GL128S10DHI010
- * tACC(MAX) = ADDSET(3-0) = 110 ns = 18.48 HCLK (on 168 MHz)
- * tRC(MIN) = DATAST(15-8) = 110 ns = 18.48 HCLK (on 168 MHz)
- * tNE switch = BUSTURN(19-16) = 10 ns = 2 HCLK
- * ACCMODE(29-28) = 0x2 (mode C)
- */
-#define CONFIG_SYS_FSMC_FLASH_BTR	0x2002120f
-#define CONFIG_SYS_FSMC_FLASH_BWTR	0x2002110f
-#define CONFIG_FSMC_NOR_PSRAM_CS2_ENABLE
-
-#define CONFIG_SYS_FLASH_BANK1_BASE	FSMC_NOR_PSRAM_CS_ADDR(CONFIG_SYS_FLASH_CS)
-
-#define CONFIG_SYS_FLASH_CFI		1
-#define CONFIG_FLASH_CFI_DRIVER		1
-#define CONFIG_SYS_FLASH_CFI_WIDTH	FLASH_CFI_16BIT
-#define CONFIG_SYS_FLASH_BANKS_LIST	{ CONFIG_SYS_FLASH_BANK1_BASE }
-#define CONFIG_SYS_MAX_FLASH_BANKS	1
-#define CONFIG_SYS_MAX_FLASH_SECT	128
-#define CONFIG_SYS_FLASH_CFI_AMD_RESET	1
-#define CONFIG_SYS_FLASH_PROTECTION	1
-#define CONFIG_SYS_FLASH_USE_BUFFER_WRITE
-
-#if CONFIG_SYS_BOARD_REV == 0x2A
-# define CONFIG_CFI_FLASH_USE_WEAK_ACCESSORS
-#endif
-
-/*
- * Store env in Flash memory
- */
-#define CONFIG_ENV_IS_IN_FLASH
+#define CONFIG_ENV_IS_IN_ENVM
 #define CONFIG_ENV_SIZE			(4 * 1024)
-#define CONFIG_ENV_ADDR			CONFIG_SYS_FLASH_BANK1_BASE
+#define CONFIG_ENV_ADDR 		\
+	(CONFIG_SYS_ENVM_BASE + (128 * 1024))
 #define CONFIG_INFERNO			1
 #define CONFIG_ENV_OVERWRITE		1
 
@@ -218,31 +161,11 @@
  * Serial console configuration
  */
 #define CONFIG_STM32_USART_CONSOLE
-
-#if CONFIG_SYS_BOARD_REV == 0x2A
-/* Rev 2A console: USART1, TX PB.6, RX PA.10 */
-
-# define CONFIG_STM32_USART_PORT	1	/* USART1 */
-
-# define CONFIG_STM32_USART_TX_IO_PORT	1	/* PORTB */
-# define CONFIG_STM32_USART_TX_IO_PIN	6	/* GPIO6 */
-
-# define CONFIG_STM32_USART_RX_IO_PORT	0	/* PORTA */
-# define CONFIG_STM32_USART_RX_IO_PIN	10	/* GPIO10 */
-
-#elif CONFIG_SYS_BOARD_REV == 0x1A
-/* Rev 1A console: USART3, TX PC.10, RX PC.11 */
-
-# define CONFIG_STM32_USART_PORT	3	/* USART3 */
-
-# define CONFIG_STM32_USART_TX_IO_PORT	2	/* PORTC */
-# define CONFIG_STM32_USART_TX_IO_PIN	10	/* GPIO10 */
-
-# define CONFIG_STM32_USART_RX_IO_PORT	2	/* PORTC */
-# define CONFIG_STM32_USART_RX_IO_PIN	11	/* GPIO11 */
-
-#endif
-
+#define CONFIG_STM32_USART_PORT		1	/* USART1 */
+#define CONFIG_STM32_USART_TX_IO_PORT	0	/* PORTA */
+#define CONFIG_STM32_USART_TX_IO_PIN	9	/* GPIO9 */
+#define CONFIG_STM32_USART_RX_IO_PORT	0	/* PORTA */
+#define CONFIG_STM32_USART_RX_IO_PIN	10	/* GPIO10 */
 #define CONFIG_BAUDRATE			115200
 #define CONFIG_SYS_BAUDRATE_TABLE	{ 9600, 19200, 38400, 57600, 115200 }
 
@@ -313,11 +236,6 @@
 #undef CONFIG_CMD_SOURCE
 #undef CONFIG_CMD_XIMG
 
-#if CONFIG_SYS_BOARD_REV == 0x2A
-/* For loading from flash into memory */
-# define CONFIG_CMD_BUFCOPY
-#endif
-
 /*
  * To save memory disable long help
  */
@@ -333,43 +251,17 @@
  */
 #define CONFIG_BOOTDELAY		3
 #define CONFIG_ZERO_BOOTDELAY_CHECK
-#define CONFIG_BOOTCOMMAND		"run flashboot"
+#define CONFIG_BOOTCOMMAND		"run envmboot"
 
-#if CONFIG_SYS_BOARD_REV == 0x2A
-/* Rev 2.A boot args and env */
-# define CONFIG_HOSTNAME	stm32f4x9-som
-# define CONFIG_BOOTARGS	"stm32_platform=stm32f4x9-som "\
+#define CONFIG_HOSTNAME	stm-disco
+#define CONFIG_BOOTARGS	"stm32_platform=stm-disco "\
 				"console=ttyS0,115200 panic=10"
+#define LOADADDR		"0xD0007FC0"
 
-# define LOADADDR		"0xC0007FC0"
-
-# define REV_EXTRA_ENV		\
-	"flashboot=run addip;"						\
-		"stmbufcopy ${loadaddr} ${flashaddr} ${kernelsize};"	\
-		"bootm ${loadaddr}\0"					\
-	"update=tftp ${image};"						\
-		"prot off ${flashaddr} +${filesize};"			\
-		"era ${flashaddr} +${filesize};"			\
-		"cp.b ${loadaddr} ${flashaddr} ${filesize};"		\
-		"setenv kernelsize ${filesize};"			\
-		"setenv filesize; setenv fileaddr;"			\
-		"saveenv\0"
-
-#elif CONFIG_SYS_BOARD_REV == 0x1A
-/* Rev 1.A boot args and env */
-# define CONFIG_HOSTNAME	stm-som
-# define CONFIG_BOOTARGS	"stm32_platform=stm-som "\
-				"console=ttyS2,115200 panic=10"
-
-# define LOADADDR		"0x60000000"
-# define REV_EXTRA_ENV		\
-	"flashboot=run addip;bootm ${flashaddr}\0"		\
+#define REV_EXTRA_ENV		\
+	"envmboot=run addip;bootm ${envmaddr}\0"			\
 	"update=tftp ${image};"					\
-		"prot off ${flashaddr} +${filesize};"		\
-		"era ${flashaddr} +${filesize};"		\
-		"cp.b ${loadaddr} ${flashaddr} ${filesize}\0"
-
-#endif
+		"cptf ${envmaddr} ${loadaddr} ${filesize}\0"
 
 #define CONFIG_SYS_CONSOLE_IS_IN_ENV
 
@@ -379,11 +271,11 @@
 #define CONFIG_EXTRA_ENV_SETTINGS				\
 	"loadaddr=" LOADADDR "\0"				\
 	"addip=setenv bootargs ${bootargs} ip=${ipaddr}:${serverip}:${gatewayip}:${netmask}:${hostname}:eth0:off\0"				\
-	"flashaddr=64020000\0"					\
+	"envmaddr=08040000\0"					\
 	"ethaddr=C0:B1:3C:88:88:85\0"				\
 	"ipaddr=172.17.4.206\0"					\
 	"serverip=172.17.0.1\0"					\
-	"image=stm32f4x9/uImage\0"		\
+	"image=stm32f429/uImage\0"				\
 	"stdin=serial\0"					\
 	"netboot=tftp ${image};run addip;bootm\0"		\
 	REV_EXTRA_ENV
