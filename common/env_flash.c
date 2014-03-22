@@ -243,18 +243,23 @@ Done:
 
 #else /* ! CONFIG_ENV_ADDR_REDUND */
 
+
+
 int  env_init(void)
 {
+	// TODO Fouge (2014-03-22 - lpc4350-db1) env_ptr->crc returns 0x0 !
+	// crc32(0, env_ptr->data, ENV_SIZE) returns the right value so env_ptr->data is well read but env_ptr->crc isn't !
 	if (crc32(0, env_ptr->data, ENV_SIZE) == env_ptr->crc) {
 		gd->env_addr  = (ulong)&(env_ptr->data);
 		gd->env_valid = 1;
-		return(0);
+		return 0;
 	}
 
 	gd->env_addr  = (ulong)&default_environment[0];
 	gd->env_valid = 0;
 	return (0);
 }
+
 
 #ifdef CMD_SAVEENV
 

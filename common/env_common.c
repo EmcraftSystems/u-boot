@@ -37,7 +37,7 @@ DECLARE_GLOBAL_DATA_PTR;
 	extern void disable_nvram(void);
 #endif
 
-#undef DEBUG_ENV
+// #undef DEBUG_ENV
 #ifdef DEBUG_ENV
 #define DEBUGF(fmt,args...) printf(fmt ,##args)
 #else
@@ -249,15 +249,28 @@ void env_relocate (void)
 	/*
 	 * We must allocate a buffer for the environment
 	 */
+
+#ifdef CONFIG_ENV_IS_IN_FLASH // Temporary workaround; see env_init() in env_flash.c
+	if (crc32(0, env_ptr->data, ENV_SIZE) == env_ptr->crc) {
+		gd->env_addr  = (ulong)&(env_ptr->data);
+		gd->env_valid = 1;
+	}
+	else {
+		gd->env_addr  = (ulong)&default_environment[0];
+		gd->env_valid = 0;
+	}
+#endif
+
 	env_ptr = (env_t *)malloc (CONFIG_ENV_SIZE);
 	DEBUGF ("%s[%d] malloced ENV at %p\n", __FUNCTION__,__LINE__,env_ptr);
 #endif
 
 	if (gd->env_valid == 0) {
-#if defined(CONFIG_GTH)	|| defined(CONFIG_ENV_IS_NOWHERE)	/* Environment not changable */
+#if defined(CONFIG_GTH)	|| defined(CONFIG_ENV_IS_NOWHERE)	/* Environment not changeable */
 		puts ("Using default environment\n\n");
 #else
 		puts ("*** Warning - bad CRC, using default environment\n\n");
+
 		show_boot_progress (-60);
 #endif
 		set_default_env();

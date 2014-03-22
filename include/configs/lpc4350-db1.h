@@ -68,12 +68,12 @@
  * /!\ Needed for use in DFU
  * /!\ ELF file does not contain header (if debugging)
  */
-#define CONFIG_LPC18XX_BOOTHEADER
+// #define CONFIG_LPC18XX_BOOTHEADER
 /*
  * Sections are not mapped in shadow area
  * See U-boot.lds
  */
-// #define FIXED_SECTIONS_DIOLAN
+#define FIXED_SECTIONS_DIOLAN
 
 /*
  * Autocomplete commands
@@ -227,9 +227,9 @@
 #define CONFIG_SYS_NO_FLASH
 #endif
 
-#define CONFIG_ENV_SIZE			(16 * 1024)
-#define CONFIG_ENV_ADDR 		0x1C1FC000
-#define CONFIG_INFERNO			1
+#define CONFIG_ENV_SIZE				(16 * 1024)
+#define CONFIG_ENV_ADDR 			0x1C1FC000
+#define CONFIG_INFERNO				1
 #define CONFIG_ENV_OVERWRITE		1
 
 /*

@@ -113,6 +113,7 @@ SECTIONS
 	{
 	*(*)
 	} */
+	
 }
 _mem_nvm_base = ORIGIN(Flash);
 _mem_nvm_size = LENGTH(Flash);
