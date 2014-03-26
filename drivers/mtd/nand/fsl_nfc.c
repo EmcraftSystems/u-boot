@@ -333,6 +333,16 @@ fsl_nfc_command(struct mtd_info *mtd, unsigned command,
 	get_id = 0;
 	get_status = 0;
 
+	nfc_set_field(mtd, NFC_FLASH_CONFIG,
+		CONFIG_ECC_MODE_MASK,
+		CONFIG_ECC_MODE_SHIFT, ECC_45_BYTE);
+
+	if (!(page % 0x40)) {
+		nfc_set_field(mtd, NFC_FLASH_CONFIG,
+			CONFIG_ECC_MODE_MASK,
+			CONFIG_ECC_MODE_SHIFT, ECC_BYPASS);
+	}
+
 	switch (command) {
 	case NAND_CMD_PAGEPROG:
 		fsl_nfc_send_cmd(mtd,
