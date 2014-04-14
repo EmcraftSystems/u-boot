@@ -144,6 +144,9 @@ arg_off_size(int argc, char *argv[], nand_info_t *nand, ulong *off, size_t *size
 #if defined(CONFIG_CMD_MTDPARTS)
 out:
 #endif
+	/* Round up to the block boundary */
+	*size = (*size + nand->writesize - 1) & ~(nand->writesize - 1);
+
 	printf("device %d ", idx);
 	if (*size == nand->size)
 		puts("whole chip\n");

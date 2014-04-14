@@ -368,13 +368,9 @@
 	"flashaddr=00100000\0"					\
 	"flashboot=nboot ${loadaddr} 0 ${flashaddr};"		\
 		"run addip;bootm\0"				\
-	/* We hardcode the maximum size of the kernel image, */ \
-	/* because the `nand write` command only accepts a   */ \
-	/* write length when it is page aligned, so we       */ \
-	/* cannot just pass ${filesize} to this command.     */ \
 	"update=tftp ${image};"					\
-		"nand erase ${flashaddr} 1f00000;"		\
-		"nand write ${loadaddr} ${flashaddr} 1f00000\0"
+		"nand erase ${flashaddr} ${filesize};"		\
+		"nand write ${loadaddr} ${flashaddr} ${filesize}\0"
 
 /*
  * Linux kernel boot parameters configuration
