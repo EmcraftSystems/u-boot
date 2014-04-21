@@ -68,12 +68,12 @@
  * /!\ Needed for use in DFU
  * /!\ ELF file does not contain header (if debugging)
  */
-// #define CONFIG_LPC18XX_BOOTHEADER
+#define CONFIG_LPC18XX_BOOTHEADER
 /*
  * Sections are not mapped in shadow area
  * See U-boot.lds
  */
-#define FIXED_SECTIONS_DIOLAN
+// #define FIXED_SECTIONS_DIOLAN
 
 /*
  * Autocomplete commands
@@ -370,7 +370,7 @@
 #define CONFIG_ZERO_BOOTDELAY_CHECK
 #define CONFIG_HOSTNAME			lpc4350-db1
 #define CONFIG_BOOTARGS			"lpc18xx_platform=diolan-lpc4350-db1 "\
-					"console=ttyUSB0,115200 panic=10"
+					"console=ttyS0,115200 panic=10"
 #define CONFIG_BOOTCOMMAND		"run flashboot"
 
 /*
