@@ -3268,8 +3268,8 @@ lpc-lnx-evb_config :  unconfig
 	@$(MKCONFIG) $(@:_config=) arm arm_cortexm3 lpc-lnx-evb emcraft lpc178x
 
 k61-som_config \
-k61-som-150_config \
-k70-som-150_config \
+k61-som-120_config \
+k70-som-120_config \
 k70-som_config : unconfig
 	@mkdir -p $(obj)include
 	@ >$(obj)include/config.h
@@ -3278,9 +3278,9 @@ k70-som_config : unconfig
 		  echo "...for K61-SOM" ; \
 		}
 
-	@[ -z "$(findstring -150,$@)" ] || \
-		{ echo "#define CONFIG_KINETIS_150MHZ" >>$(obj)include/config.h ; \
-		  echo "...for 150MHz" ; \
+	@[ -z "$(findstring -120,$@)" ] || \
+		{ echo "#define CONFIG_KINETIS_120MHZ" >>$(obj)include/config.h ; \
+		  echo "...for 120MHz" ; \
 		}
 	@$(MKCONFIG) -a k70-som arm arm_cortexm3 k70-som emcraft kinetis
 
