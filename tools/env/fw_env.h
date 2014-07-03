@@ -39,16 +39,23 @@
 #define ENV2_SIZE         0x4000
 #define DEVICE2_ESIZE     0x4000
 
+#ifndef CONFIG_BAUDRATE
 #define CONFIG_BAUDRATE		115200
+#endif
+#ifndef CONFIG_BOOTDELAY
 #define CONFIG_BOOTDELAY	5	/* autoboot after 5 seconds	*/
+#endif
+#ifndef CONFIG_BOOTCOMMAND
 #define CONFIG_BOOTCOMMAND							\
 	"bootp; "								\
 	"setenv bootargs root=/dev/nfs nfsroot=${serverip}:${rootpath} "	\
 	"ip=${ipaddr}:${serverip}:${gatewayip}:${netmask}:${hostname}::off; "	\
 	"bootm"
+#endif
 
 extern int   fw_printenv(int argc, char *argv[]);
 extern char *fw_getenv  (char *name);
 extern int fw_setenv  (int argc, char *argv[]);
+extern int fw_parse_script(char *fname);
 
 extern unsigned	long  crc32	 (unsigned long, const unsigned char *, unsigned);

@@ -43,9 +43,9 @@
 # include <mtd/mtd-user.h>
 #endif
 
-#include "fw_env.h"
 
 #include <config.h>
+#include "fw_env.h"
 
 #define WHITESPACE(c) ((c == '\t') || (c == ' '))
 
@@ -81,7 +81,9 @@ static int dev_current;
 #define ENVSECTORS(i) envdevices[(i)].env_sectors
 #define DEVTYPE(i)    envdevices[(i)].mtd_type
 
+#ifndef CONFIG_ENV_SIZE
 #define CONFIG_ENV_SIZE ENVSIZE(dev_current)
+#endif
 
 #define ENV_SIZE      getenvsize()
 
@@ -212,6 +214,7 @@ static char default_environment[] = {
 static int flash_io (int mode);
 static char *envmatch (char * s1, char * s2);
 static int parse_config (void);
+static int fw_env_open(void);
 
 #if defined(CONFIG_FILE)
 static int get_config (char *);
@@ -1073,7 +1076,7 @@ static char *envmatch (char * s1, char * s2)
 /*
  * Prevent confusion if running from erased flash memory
  */
-int fw_env_open(void)
+static int fw_env_open(void)
 {
 	int crc0, crc0_ok;
 	unsigned char flag0;
@@ -1092,7 +1095,7 @@ int fw_env_open(void)
 	addr0 = calloc (1, CONFIG_ENV_SIZE);
 	if (addr0 == NULL) {
 		fprintf (stderr,
-			"Not enough memory for environment (%ld bytes)\n",
+			"Not enough memory for environment (%d bytes)\n",
 			CONFIG_ENV_SIZE);
 		return -1;
 	}
@@ -1131,7 +1134,7 @@ int fw_env_open(void)
 		addr1 = calloc (1, CONFIG_ENV_SIZE);
 		if (addr1 == NULL) {
 			fprintf (stderr,
-				"Not enough memory for environment (%ld bytes)\n",
+				"Not enough memory for environment (%d bytes)\n",
 				CONFIG_ENV_SIZE);
 			return -1;
 		}
