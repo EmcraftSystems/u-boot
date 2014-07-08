@@ -40,8 +40,6 @@ extern char _data_lma_start;
 extern char _data_start;
 extern char _data_end;
 
-extern unsigned int __section_table_start, __section_table_end;
-
 extern char _mem_stack_base, _mem_stack_end;
 unsigned long _armboot_start;
 
@@ -145,7 +143,7 @@ void
 	 * The Boot ROM on LPC4350 parts cannot load more than 32KBytes
 	 * from NOR flash when booting.
 	 */
-	lpc18xx_bootstrap_from_norflash();
+	/* lpc18xx_bootstrap_from_norflash(); */
 #endif /* CONFIG_LPC18XX_NORFLASH_BOOTSTRAP_WORKAROUND */
 
 	/*
@@ -159,29 +157,8 @@ void
 	 * value in the first word in the vectors.
 	 */
 
-	//
-	// Copy sections from Flash
-	//
-	unsigned int LoadAddr, ExeAddr, SectionLen, loop;
-	unsigned int *SectionTableAddr;
-
-	// Load base address of Global Section Table
-	SectionTableAddr = &__section_table_start;
-
-	// Copy the text,image_top and data sections from flash to SRAM and RAM.
-	while (SectionTableAddr < &__section_table_end) {
-		LoadAddr = *SectionTableAddr++;
-		ExeAddr = *SectionTableAddr++;
-		SectionLen = *SectionTableAddr++;
-		unsigned int *pulDest = (unsigned int*) ExeAddr;
-		unsigned int *pulSrc = (unsigned int*) LoadAddr;
-		for (loop = 0; loop < SectionLen; loop = loop + 4)
-			*pulDest++ = *pulSrc++;
-	}
-
-	unsigned int *pulDest = (unsigned int*) &_bss_start;
-	for (loop = 0; loop < (&_bss_end - &_bss_start); loop = loop + 4)
-		*pulDest++ = 0;
+	 memcpy(&_data_start, &_data_lma_start, &_data_end - &_data_start);
+	 memset(&_bss_start, 0, &_bss_end - &_bss_start);
 
 	/*
 	 * In U-boot (armboot) lingvo, "go to the C code" -
@@ -195,13 +172,6 @@ void
 	 * the malloc pool right behind the stack. See how armboot_start
 	 * is defined in the CPU specific .lds file.
 	 */
-	 
-	// Clear all pending interrupts in the NVIC
-	volatile unsigned int *NVIC_ICPR = (unsigned int *) 0xE000E280;
-	unsigned int irqpendloop;
-	for (irqpendloop = 0; irqpendloop < 8; irqpendloop++) {
-		*(NVIC_ICPR+irqpendloop)= 0xFFFFFFFF;
-	}
 	 
 #ifdef CONFIG_LPC18XX_USB
 	// Reenable interrupts

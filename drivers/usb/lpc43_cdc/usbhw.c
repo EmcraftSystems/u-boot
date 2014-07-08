@@ -32,10 +32,10 @@
 #include <string.h>
 #include "asm/arch/lpc43xx.h"                        /* lpc43xx definitions */
 #include "asm/arch/lpc_types.h"
-#include "usb/lpc43_cdc/usb.h"
-#include "usb/lpc43_cdc/usbhw.h"
-#include "usb/lpc43_cdc/usbcfg.h"
-#include "usb/lpc43_cdc/usbcore.h"
+#include "usb/lpc18xx_usb/usb.h"
+#include "usb/lpc18xx_usb/usbhw.h"
+#include "usb/lpc18xx_usb/usbcfg.h"
+#include "usb/lpc18xx_usb/usbcore.h"
 #include "asm/arch/lpc43xx_scu.h"
 #include "asm/arch/lpc43xx_cgu.h"
 

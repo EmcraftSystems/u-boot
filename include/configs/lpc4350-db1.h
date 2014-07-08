@@ -69,6 +69,7 @@
  * /!\ ELF file does not contain header (if debugging)
  */
 #define CONFIG_LPC18XX_BOOTHEADER
+ 
 /*
  * Sections are not mapped in shadow area
  * See U-boot.lds
@@ -83,9 +84,9 @@
 /*
  * Console over USB
  */
-#define CONFIG_USB_TTY
-#define CONFIG_LPC18XX_USB
-#define USE_USB0
+// #define CONFIG_USB_TTY
+// #define CONFIG_LPC18XX_USB
+// #define USE_USB0
 
 
 /*
