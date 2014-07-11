@@ -62,6 +62,7 @@
  */
 #define CONFIG_SYS_LPC18XX
 
+
 /*
  * Add header to the U-Boot image to pass necessary information
  * to the Boot ROM bootloader.
@@ -69,20 +70,19 @@
  * /!\ ELF file does not contain header (if debugging)
  */
 #define CONFIG_LPC18XX_BOOTHEADER
- 
+
+
 /*
  * Sections are not mapped in shadow area
- * See U-boot.lds
+ * See in cpu/arm_cortexm3/ 
+ *	replace u-boot.lds and start.c by 
+ * 	u-boot-not-dfu.lds and start-not-dfu.c
  */
 // #define FIXED_SECTIONS_DIOLAN
 
 /*
- * Autocomplete commands
- */
-#define CONFIG_AUTO_COMPLETE
-
-/*
- * Console over USB
+ * Console over USB 
+ * /!\ works only if no header added (FIXED_SECTIONS_DIOLAN)
  */
 // #define CONFIG_USB_TTY
 // #define CONFIG_LPC18XX_USB
