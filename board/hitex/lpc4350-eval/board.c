@@ -187,6 +187,7 @@ static const struct lpc18xx_pin_config hitex_lpc4350_iomux[] = {
 		LPC18XX_IOMUX_CONFIG(1, 0, 1, 0, 1, 0)},
 
 #ifdef CONFIG_LPC18XX_ETH
+# ifndef CONFIG_LPC18XX_ENET_USE_PHY_RMII
 	/*
 	 * Pin configuration for Ethernet (MII + MDIO)
 	 */
@@ -226,6 +227,29 @@ static const struct lpc18xx_pin_config hitex_lpc4350_iomux[] = {
 	{{0x1, 19}, LPC18XX_IOMUX_CONFIG(0, 0, 1, 0, 1, 1)},
 	/* P1.16 = ENET_RXDV */
 	{{0x1, 16}, LPC18XX_IOMUX_CONFIG(7, 0, 1, 0, 1, 1)},
+# else /* CONFIG_LPC18XX_ENET_USE_PHY_RMII */
+	/*
+	 * Pin configuration for Ethernet (RMII + MDIO)
+	 */
+	/* PC.1 = ENET_MDC */
+	{{0xC,  1}, LPC18XX_IOMUX_CONFIG(3, 0, 0, 0, 1, 1)},
+	/* P1.17 = ENET_MDIO (high-drive pin) */
+	{{0x1, 17}, LPC18XX_IOMUX_CONFIG(3, 0, 0, 0, 1, 1)},
+	/* P1.18 = ENET_TXD0 */
+	{{0x1, 18}, LPC18XX_IOMUX_CONFIG(3, 0, 0, 0, 1, 1)},
+	/* P1.20 = ENET_TXD1 */
+	{{0x1, 20}, LPC18XX_IOMUX_CONFIG(3, 0, 0, 0, 1, 1)},
+	/* P0.1 = ENET_TX_EN */
+	{{0x0,  1}, LPC18XX_IOMUX_CONFIG(6, 0, 0, 0, 1, 1)},
+	/* P1.15 = ENET_RXD0 */
+	{{0x1, 15}, LPC18XX_IOMUX_CONFIG(3, 0, 0, 0, 1, 1)},
+	/* P0.0 = ENET_RXD1 */
+	{{0x0,  0}, LPC18XX_IOMUX_CONFIG(2, 0, 0, 0, 1, 1)},
+	/* P1.19 = ENET_REF_CLK */
+	{{0x1, 19}, LPC18XX_IOMUX_CONFIG(0, 0, 0, 0, 1, 1)},
+	/* P1.16 = ENET_RXDV */
+	{{0x1, 16}, LPC18XX_IOMUX_CONFIG(7, 0, 0, 0, 1, 1)},
+# endif /* CONFIG_LPC18XX_ENET_USE_PHY_RMII */
 #endif /* CONFIG_LPC18XX_ETH */
 
 #if defined(CONFIG_NR_DRAM_BANKS) || defined(CONFIG_SYS_FLASH_CS)

@@ -87,7 +87,7 @@
 /*
  * PLL1 multiplier value (1..256)
  */
-#define CONFIG_LPC18XX_PLL1_M		17	/* 12 MHz * 17 = 204 MHz */
+#define CONFIG_LPC18XX_PLL1_M		15	/* 12 MHz * 15 = 180 MHz */
 
 /*
  * Number of clock ticks in 1 sec
@@ -273,6 +273,9 @@
 #define CONFIG_NET_MULTI
 #define CONFIG_LPC18XX_ETH
 #define CONFIG_LPC18XX_ETH_DIV_SEL	4	/* 150-250 MHz */
+#define CONFIG_LPC18XX_ENET_USE_PHY_RMII
+#define CONFIG_LPC18XX_PHY_RMII_REG	0x17
+#define CONFIG_LPC18XX_PHY_RMII_MASK	(1<<5)
 
 /*
  * Ethernet RX buffers are malloced from the internal SRAM (more precisely,

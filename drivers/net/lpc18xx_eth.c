@@ -516,6 +516,16 @@ static int lpc18xx_phy_link_setup(struct lpc18xx_eth_dev *mac)
 	int rv, timeout;
 	int link_up, full_dup, speed;
 
+#if defined(CONFIG_LPC18XX_PHY_RMII_REG) && defined(CONFIG_LPC18XX_PHY_RMII_MASK)
+	rv = lpc18xx_phy_read(mac, CONFIG_LPC18XX_PHY_RMII_REG, &bmsr);
+	if (rv != 0)
+		goto out;
+	bmsr |= CONFIG_LPC18XX_PHY_RMII_MASK;
+	rv = lpc18xx_phy_write(mac, CONFIG_LPC18XX_PHY_RMII_REG, bmsr);
+	if (rv != 0)
+		goto out;
+#endif
+
 	rv = lpc18xx_phy_read(mac, PHY_BMSR, &bmsr);
 	if (rv != 0)
 		goto out;
