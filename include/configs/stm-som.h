@@ -116,6 +116,14 @@
  */
 #define CONFIG_MEM_NVM_BASE		0x00000000
 #define CONFIG_MEM_NVM_LEN		(1024 * 1024 * 2)
+#define CONFIG_MEM_NVM_BASE		0x00000000
+#define CONFIG_MEM_NVM_LEN		(1024 * 1024 * 2)
+#define CONFIG_ENVM			1
+#if defined(CONFIG_ENVM)
+# define CONFIG_SYS_ENVM_BASE		0x08000000
+# define CONFIG_SYS_ENVM_LEN		CONFIG_MEM_NVM_LEN
+#endif
+
 
 #define CONFIG_MEM_RAM_BASE		0x20000000
 #define CONFIG_MEM_RAM_LEN		(20 * 1024)
@@ -208,9 +216,18 @@
 /*
  * Store env in Flash memory
  */
-#define CONFIG_ENV_IS_IN_FLASH
+#if 0
+# define CONFIG_ENV_IS_IN_ENVM
+#else
+# define CONFIG_ENV_IS_IN_FLASH
+#endif
 #define CONFIG_ENV_SIZE			(4 * 1024)
-#define CONFIG_ENV_ADDR			CONFIG_SYS_FLASH_BANK1_BASE
+#if defined(CONFIG_ENV_IS_IN_ENVM)
+# define CONFIG_ENV_ADDR 		\
+	(CONFIG_SYS_ENVM_BASE + (128 * 1024))
+#else
+# define CONFIG_ENV_ADDR		CONFIG_SYS_FLASH_BANK1_BASE
+#endif
 #define CONFIG_INFERNO			1
 #define CONFIG_ENV_OVERWRITE		1
 
@@ -343,7 +360,10 @@
 
 # define LOADADDR		"0xC0007FC0"
 
-# define REV_EXTRA_ENV		\
+# define REV_EXTRA_ENV							\
+	"envmboot=run addip;bootm ${envmaddr}\0"			\
+	"envmupdate=tftp ${image};"					\
+		"cptf ${envmaddr} ${loadaddr} ${filesize}\0"		\
 	"flashboot=run addip;"						\
 		"stmbufcopy ${loadaddr} ${flashaddr} ${kernelsize};"	\
 		"bootm ${loadaddr}\0"					\
@@ -380,6 +400,7 @@
 	"loadaddr=" LOADADDR "\0"				\
 	"addip=setenv bootargs ${bootargs} ip=${ipaddr}:${serverip}:${gatewayip}:${netmask}:${hostname}:eth0:off\0"				\
 	"flashaddr=64020000\0"					\
+	"envmaddr=08040000\0"					\
 	"ethaddr=C0:B1:3C:88:88:85\0"				\
 	"ipaddr=172.17.4.206\0"					\
 	"serverip=172.17.0.1\0"					\

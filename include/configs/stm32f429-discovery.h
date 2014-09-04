@@ -259,7 +259,7 @@
 #define LOADADDR		"0xD0007FC0"
 
 #define REV_EXTRA_ENV		\
-	"envmboot=run addip;bootm ${envmaddr}\0"			\
+	"envmboot=run addip;bootm ${envmaddr}\0"		\
 	"update=tftp ${image};"					\
 		"cptf ${envmaddr} ${loadaddr} ${filesize}\0"
 
