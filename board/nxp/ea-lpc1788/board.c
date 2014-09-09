@@ -117,12 +117,16 @@
 
 /* EMC data pins (DQ0..DQ31) */
 #define LPC178X_EMC_DATA_PINS	31
+#ifdef CONFIG_SYS_NAND_CS
+#define LPC178X_EMC_ADDR_PINS	31
+#else
 #if !defined(CONFIG_SYS_FLASH_CS)
 /* EMC row/column address pins (A0..A11) */
 #define LPC178X_EMC_ADDR_PINS	12
 #else
 /* ..and NOR Flash pins up to A22 */
 #define LPC178X_EMC_ADDR_PINS	22
+#endif
 #endif
 
 /*
@@ -366,6 +370,10 @@ static const struct lpc178x_gpio_pin_config ea_lpc1788_gpio[] = {
 	{{4, 27}, LPC178X_GPIO_CONFIG_D(1, LPC178X_NO_PULLUP, 0, 0, 1, 0)},
 
 #endif
+
+#ifdef CONFIG_SYS_NAND_CS
+	{{2, 21}, LPC178X_GPIO_CONFIG_D(0, LPC178X_NO_PULLUP, 0, 0, 0, 0)},
+#endif
 };
 
 /*
@@ -449,6 +457,19 @@ int board_init(void)
 	st->wr = CONFIG_SYS_FLASH_WR;
 	st->ta = CONFIG_SYS_FLASH_TA;
 #endif
+
+#ifdef CONFIG_SYS_NAND_CS
+	/* Set timing for flash */
+	st = &LPC178X_EMC->st[CONFIG_SYS_NAND_CS];
+	st->cfg = CONFIG_SYS_NAND_CFG;
+	st->we = CONFIG_SYS_NAND_WE;
+	st->oe = CONFIG_SYS_NAND_OE;
+	st->rd = CONFIG_SYS_NAND_RD;
+	st->page  = CONFIG_SYS_NAND_PAGE;
+	st->wr = CONFIG_SYS_NAND_WR;
+	st->ta = CONFIG_SYS_NAND_TA;
+#endif
+
 	return 0;
 }
 

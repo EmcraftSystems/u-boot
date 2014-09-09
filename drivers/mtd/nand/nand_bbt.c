@@ -998,7 +998,11 @@ int nand_scan_bbt(struct mtd_info *mtd, struct nand_bbt_descr *bd)
 	/* Allocate a temporary buffer for one eraseblock incl. oob */
 	len = (1 << this->bbt_erase_shift);
 	len += (len >> this->page_shift) * mtd->oobsize;
+#ifdef CONFIG_NAND_BBT_BLOCK_BUFFER
+	buf = (uint8_t *) CONFIG_NAND_BBT_BLOCK_BUFFER;
+#else
 	buf = vmalloc(len);
+#endif
 	if (!buf) {
 		printk(KERN_ERR "nand_bbt: Out of memory\n");
 		kfree(this->bbt);
@@ -1022,7 +1026,9 @@ int nand_scan_bbt(struct mtd_info *mtd, struct nand_bbt_descr *bd)
 	if (md)
 		mark_bbt_region(mtd, md);
 
+#ifndef CONFIG_NAND_BBT_BLOCK_BUFFER
 	vfree(buf);
+#endif
 	return res;
 }
 

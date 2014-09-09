@@ -244,6 +244,11 @@ int saveenv(void)
 
 	if (CONFIG_ENV_RANGE < CONFIG_ENV_SIZE)
 		return 1;
+
+	/* we will erase the block anyway, so prevent warning */
+	if (nand_erase_options.length < nand_info[0].erasesize)
+		nand_erase_options.length = nand_info[0].erasesize;
+
 	puts ("Erasing Nand...\n");
 	if (nand_erase_opts(&nand_info[0], &nand_erase_options))
 		return 1;

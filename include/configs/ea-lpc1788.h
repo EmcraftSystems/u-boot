@@ -182,8 +182,8 @@
 
 #define CONFIG_MEM_RAM_BASE		0x10000000
 #define CONFIG_MEM_RAM_LEN		(32 * 1024)
-#define CONFIG_MEM_RAM_BUF_LEN		(16 * 1024)
-#define CONFIG_MEM_MALLOC_LEN		(12 * 1024)
+#define CONFIG_MEM_RAM_BUF_LEN		(12 * 1024)
+#define CONFIG_MEM_MALLOC_LEN		(16 * 1024)
 #define CONFIG_MEM_STACK_LEN		(4 * 1024)
 
 /*
@@ -234,22 +234,70 @@
 #define CONFIG_SYS_MAX_FLASH_BANKS	1
 #define CONFIG_SYS_MAX_FLASH_SECT	1024
 
-/*
- * Store env in flash.
- */
-#define CONFIG_ENV_IS_IN_FLASH
 #else
-/*
- * Store env in memory only, if no flash.
- */
-#define CONFIG_ENV_IS_NOWHERE
 #define CONFIG_SYS_NO_FLASH
 #endif
 
+/* NAND */
+#define CONFIG_CMD_NAND			1
+
+#ifdef CONFIG_CMD_NAND
+#define CONFIG_SYS_MAX_NAND_DEVICE	1
+#define CONFIG_SYS_NAND_BASE		0x90000000
+
+#define CONFIG_SYS_NAND_CS		1
+
+#define CONFIG_SYS_NAND_CFG		0x80
+#define CONFIG_SYS_NAND_WE		0x2
+#define CONFIG_SYS_NAND_OE		0x2
+#define CONFIG_SYS_NAND_RD		0x1f
+#define CONFIG_SYS_NAND_PAGE		0x1f
+#define CONFIG_SYS_NAND_WR		0x1f
+#define CONFIG_SYS_NAND_TA		0x1f
+
+#define CONFIG_NAND_BBT_BLOCK_BUFFER	\
+	(CONFIG_SYS_RAM_BASE + (16 * 1024 * 1024))
+#endif
+
+/* ENVM */
+#define CONFIG_ENVM			1
+#ifdef CONFIG_ENVM
+#define CONFIG_SYS_ENVM_BASE		CONFIG_MEM_NVM_BASE
+#define CONFIG_SYS_ENVM_LEN		CONFIG_MEM_NVM_LEN
+#endif
+
+/*
+ * Environment
+ */
+
+#define CONFIG_ENV_IS_IN_FLASH
+#ifdef CONFIG_ENV_IS_IN_FLASH
 #define CONFIG_ENV_SIZE			(4 * 1024)
+#define CONFIG_ENV_OVERWRITE		1
 #define CONFIG_ENV_ADDR			CONFIG_SYS_FLASH_BANK1_BASE
 #define CONFIG_INFERNO			1
+#endif
+
+#undef CONFIG_ENV_IS_IN_NAND
+#ifdef CONFIG_ENV_IS_IN_NAND
+#define CONFIG_ENV_IS_IN_NAND
+#define CONFIG_ENV_SIZE			(4 * 1024)
 #define CONFIG_ENV_OVERWRITE		1
+#define CONFIG_ENV_OFFSET 0
+#endif
+
+#undef CONFIG_ENV_IS_IN_ENVM
+#ifdef CONFIG_ENV_IS_IN_ENVM
+#define CONFIG_ENV_SIZE			(4 * 1024)
+#define CONFIG_ENV_ADDR \
+	(CONFIG_SYS_ENVM_BASE + CONFIG_SYS_ENVM_LEN - (128 * 1024))
+#endif
+
+#if	!defined(CONFIG_ENV_IS_IN_FLASH)	&& \
+	!defined(CONFIG_ENV_IS_IN_NAND)		&& \
+	!defined(CONFIG_ENV_IS_IN_ENVM)
+#define CONFIG_ENV_IS_NOWHERE
+#endif
 
 /*
  * Serial console configuration
