@@ -77,7 +77,11 @@ int lpc17xx_gpio_get_state(unsigned char grp, unsigned char pin)
 #endif
 
 /* Set this define to 0 to use hardware detection */
-#define USE_NAND_DELAY 25
+#ifdef CONFIG_NAND_CHIP_DELAY
+#define USE_NAND_DELAY CONFIG_NAND_CHIP_DELAY
+#else
+#define USE_NAND_DELAY 0
+#endif
 
 /*
  * EA1788 board setup with CS1 as chip select. ALE uses A19, CLE uses A21,

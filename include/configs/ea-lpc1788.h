@@ -257,6 +257,8 @@
 
 #define CONFIG_NAND_BBT_BLOCK_BUFFER	\
 	(CONFIG_SYS_RAM_BASE + (16 * 1024 * 1024))
+
+#define CONFIG_NAND_CHIP_DELAY		100
 #endif
 
 /* ENVM */
