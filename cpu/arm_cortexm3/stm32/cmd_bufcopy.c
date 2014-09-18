@@ -139,8 +139,6 @@ int do_bufcopy(cmd_tbl_t *cmdtp, int flag, int argc, char *argv[])
 		goto Done;
 	}
 
-	printf("%s: Doing bufcopy, please wait ...\n", (char *) argv[0]);
-
 	/*
 	 * Copy the buffer to the destination.
 	 */
