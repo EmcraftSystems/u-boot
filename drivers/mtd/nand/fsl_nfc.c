@@ -99,15 +99,15 @@ static struct nand_bbt_descr bbt_mirror_descr = {
 
 static struct nand_ecclayout fsl_nfc_ecc45 = {
 	.eccbytes = 45,
-	.eccpos = {19, 20, 21, 22, 23,
+	.eccpos = {16, 17, 20, 21, 22, 23,
 		   24, 25, 26, 27, 28, 29, 30, 31,
 		   32, 33, 34, 35, 36, 37, 38, 39,
 		   40, 41, 42, 43, 44, 45, 46, 47,
 		   48, 49, 50, 51, 52, 53, 54, 55,
 		   56, 57, 58, 59, 60, 61, 62, 63},
 	.oobfree = {
-		{.offset = 8,
-		.length = 11} }
+		{.offset = 4,
+		.length = 8} }
 };
 
 static inline u32 nfc_read(struct mtd_info *mtd, uint reg)
@@ -337,11 +337,6 @@ fsl_nfc_command(struct mtd_info *mtd, unsigned command,
 		CONFIG_ECC_MODE_MASK,
 		CONFIG_ECC_MODE_SHIFT, ECC_45_BYTE);
 
-	if (!(page % 0x40)) {
-		nfc_set_field(mtd, NFC_FLASH_CONFIG,
-			CONFIG_ECC_MODE_MASK,
-			CONFIG_ECC_MODE_SHIFT, ECC_BYPASS);
-	}
 
 	switch (command) {
 	case NAND_CMD_PAGEPROG:
