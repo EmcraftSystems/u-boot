@@ -753,6 +753,11 @@ static int m2s_eth_init(struct eth_device *dev, bd_t *bd_unused)
 	M2S_SYSREG->mac_cr = (M2S_SYSREG->mac_cr & ~M2S_SYS_MAC_CR_LS_MSK) |
 		m2s_mii_speed;
 	M2S_MAC_CFG->cfg2 |= M2S_MAC_CFG2_FULL_DUP;
+	M2S_MAC_CFG->cfg2 &= ~(M2S_MAC_CFG2_MODE_MSK << M2S_MAC_CFG2_MODE_BIT);
+	if (m2s_mii_speed == M2S_SYS_MAC_CR_LS_1000)
+		M2S_MAC_CFG->cfg2 |= (M2S_MAC_CFG2_MODE_BYTE << M2S_MAC_CFG2_MODE_BIT);
+	else
+		M2S_MAC_CFG->cfg2 |= (M2S_MAC_CFG2_MODE_MII << M2S_MAC_CFG2_MODE_BIT);
 
 	/*
 	 * Enable MAC Rx and Tx
