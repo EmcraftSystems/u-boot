@@ -3245,6 +3245,9 @@ stm-som-1a_config : unconfig
 		}
 	@$(MKCONFIG) -a stm-som arm arm_cortexm3 stm-som emcraft stm32
 
+stm32f7-som_config : unconfig
+	@$(MKCONFIG) $(@:_config=) arm arm_cortexm3 stm32f7-som emcraft stm32
+
 stm32f429-discovery_config : unconfig
 	@$(MKCONFIG) $(@:_config=) arm arm_cortexm3 stm32f429-discovery \
 	stm stm32
