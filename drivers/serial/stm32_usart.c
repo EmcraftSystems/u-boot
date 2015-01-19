@@ -103,7 +103,11 @@
 /*
  * CR1 bit masks
  */
+#if defined (CONFIG_SYS_STM32F7)
+#define STM32_USART_CR1_UE	(1 << 0)	/* USART enable		     */
+#else
 #define STM32_USART_CR1_UE	(1 << 13)	/* USART enable		     */
+#endif
 #define STM32_USART_CR1_TE	(1 <<  3)	/* Transmitter enable	     */
 #define STM32_USART_CR1_RE	(1 <<  2)	/* Receiver enable	     */
 
@@ -131,6 +135,21 @@
 /*
  * USART register map
  */
+#if defined (CONFIG_SYS_STM32F7)
+struct stm32_usart_regs	{
+	uint32_t cr1;    /* Control 1 */
+	uint32_t cr2;    /* Control 2 */
+	uint32_t cr3;    /* Control 3 */
+	uint32_t brr;    /* Baud rate */
+	uint32_t gtpr;   /* Guard time and prescaler */
+	uint32_t rtor;   /* Receiver Time Out */
+	uint32_t rqr;    /* Request */
+	uint32_t isr;    /* Interrupt and status */
+	uint32_t icr;    /* Interrupt flag Clear */
+	uint32_t rdr;    /* Receive Data */
+	uint32_t tdr;    /* Transmit Data */
+};
+#else
 struct stm32_usart_regs {
 	u16	sr;		/* Status				      */
 	u16	rsv0;
@@ -146,6 +165,7 @@ struct stm32_usart_regs {
 	u16	rsv5;
 	u16	gtpr;		/* Guard time and prescaler		      */
 };
+#endif
 
 /*
  * U-Boot global data to get the baudrate from
@@ -291,9 +311,15 @@ void serial_setbrg(void)
  */
 s32 serial_getc(void)
 {
+#if defined (CONFIG_SYS_STM32F7)
+	while (!(usart_regs->isr & STM32_USART_SR_RXNE));
+
+	return usart_regs->rdr & 0xFF;
+#else
 	while (!(usart_regs->sr & STM32_USART_SR_RXNE));
 
 	return usart_regs->dr & 0xFF;
+#endif
 }
 
 /*
@@ -304,9 +330,15 @@ void serial_putc(const char c)
 	if (c == '\n')
 		serial_putc('\r');
 
+#if defined (CONFIG_SYS_STM32F7)
+	while (!(usart_regs->isr & STM32_USART_SR_TXE));
+
+	usart_regs->tdr = c;
+#else
 	while (!(usart_regs->sr & STM32_USART_SR_TXE));
 
 	usart_regs->dr = c;
+#endif
 }
 
 /*
@@ -323,5 +355,9 @@ void serial_puts(const char *s)
  */
 s32 serial_tstc(void)
 {
+#if defined (CONFIG_SYS_STM32F7)
+	return (usart_regs->isr & STM32_USART_SR_RXNE) ? 1 : 0;
+#else
 	return (usart_regs->sr & STM32_USART_SR_RXNE) ? 1 : 0;
+#endif
 }

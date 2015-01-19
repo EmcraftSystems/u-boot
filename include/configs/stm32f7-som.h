@@ -113,7 +113,7 @@
 /*
  * Memory layout configuration
  */
-#define CONFIG_MEM_NVM_BASE		0x00000000
+#define CONFIG_MEM_NVM_BASE		0x08000000
 #define CONFIG_MEM_NVM_LEN		(1024 * 1024 * 1)
 #define CONFIG_ENVM			1
 #if defined(CONFIG_ENVM)
