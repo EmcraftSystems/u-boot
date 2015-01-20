@@ -140,14 +140,13 @@
  */
 #define CONFIG_NR_DRAM_BANKS		1
 #define CONFIG_SYS_RAM_SIZE		(32 * 1024 * 1024)
-#define CONFIG_SYS_RAM_CS		1
 #define CONFIG_SYS_RAM_FREQ_DIV	2
 #define CONFIG_SYS_RAM_BASE		0xC0000000
 
 /*
  * Configuration of the external Flash memory
  */
-#define CONFIG_SYS_FLASH_CS		2
+#define CONFIG_SYS_FLASH_CS		1
 
 /*
  * Flash is in ModeC, that means 'OE toggle on write'
@@ -172,7 +171,7 @@
  */
 #define CONFIG_SYS_FSMC_FLASH_BTR	0x2002120f
 #define CONFIG_SYS_FSMC_FLASH_BWTR	0x2002110f
-#define CONFIG_FSMC_NOR_PSRAM_CS2_ENABLE
+#define CONFIG_FSMC_NOR_PSRAM_CS1_ENABLE
 
 #define CONFIG_SYS_FLASH_BANK1_BASE	\
 	FSMC_NOR_PSRAM_CS_ADDR(CONFIG_SYS_FLASH_CS)
@@ -342,12 +341,12 @@
 #define CONFIG_EXTRA_ENV_SETTINGS				\
 	"loadaddr=" LOADADDR "\0"				\
 	"addip=setenv bootargs ${bootargs} ip=${ipaddr}:${serverip}:${gatewayip}:${netmask}:${hostname}:eth0:off\0"				\
-	"flashaddr=64020000\0"					\
+	"flashaddr=60020000\0"					\
 	"envmaddr=08040000\0"					\
 	"ethaddr=C0:B1:3C:88:88:85\0"				\
 	"ipaddr=172.17.4.206\0"					\
 	"serverip=172.17.0.1\0"					\
-	"image=stm32f4x9/uImage\0"		\
+	"image=stm32f7/uImage\0"		\
 	"stdin=serial\0"					\
 	"netboot=tftp ${image};run addip;bootm\0"		\
 	REV_EXTRA_ENV
