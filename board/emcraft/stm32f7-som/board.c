@@ -41,18 +41,17 @@
 DECLARE_GLOBAL_DATA_PTR;
 
 static const struct stm32f2_gpio_dsc ext_ram_fsmc_fmc_gpio[] = {
-	/* Chip is UFBGA176, see DM00077036.pdf for details */
-	/* N15, FMC_D15 */
+	/* K15, FMC_D15 */
 	{STM32F2_GPIO_PORT_D, STM32F2_GPIO_PIN_10},
-	/* P14, FMC_D14 */
+	/* L14, FMC_D14 */
 	{STM32F2_GPIO_PORT_D, STM32F2_GPIO_PIN_9},
-	/* P15, FMC_D13 */
+	/* L15, FMC_D13 */
 	{STM32F2_GPIO_PORT_D, STM32F2_GPIO_PIN_8},
 	/* R11, FMC_D12 */
 	{STM32F2_GPIO_PORT_E, STM32F2_GPIO_PIN_15},
 	/* P11, FMC_D11 */
 	{STM32F2_GPIO_PORT_E, STM32F2_GPIO_PIN_14},
-	/* N11, FMC_D10 */
+	/* R12, FMC_D10 */
 	{STM32F2_GPIO_PORT_E, STM32F2_GPIO_PIN_13},
 	/* R10, FMC_D9 */
 	{STM32F2_GPIO_PORT_E, STM32F2_GPIO_PIN_12},
@@ -62,7 +61,7 @@ static const struct stm32f2_gpio_dsc ext_ram_fsmc_fmc_gpio[] = {
 	{STM32F2_GPIO_PORT_E, STM32F2_GPIO_PIN_10},
 	/* P9, FMC_D6 */
 	{STM32F2_GPIO_PORT_E, STM32F2_GPIO_PIN_9},
-	/* P8, FMC_D5 */
+	/* N9, FMC_D5 */
 	{STM32F2_GPIO_PORT_E, STM32F2_GPIO_PIN_8},
 	/* R8, FMC_D4 */
 	{STM32F2_GPIO_PORT_E, STM32F2_GPIO_PIN_7},
@@ -70,85 +69,86 @@ static const struct stm32f2_gpio_dsc ext_ram_fsmc_fmc_gpio[] = {
 	{STM32F2_GPIO_PORT_D, STM32F2_GPIO_PIN_1},
 	/* B12, FMC_D2 */
 	{STM32F2_GPIO_PORT_D, STM32F2_GPIO_PIN_0},
-	/* L14, FMC_D1 */
+	/* K13, FMC_D1 */
 	{STM32F2_GPIO_PORT_D, STM32F2_GPIO_PIN_15},
-	/* M14, FMC_D0 */
+	/* L12, FMC_D0 */
 	{STM32F2_GPIO_PORT_D, STM32F2_GPIO_PIN_14},
 
-	/* A3, FMC_NBL1 */
+	/* A5, FMC_NBL1 */
 	{STM32F2_GPIO_PORT_E, STM32F2_GPIO_PIN_1},
-	/* A4, FMC_NBL0 */
+	/* A6, FMC_NBL0 */
 	{STM32F2_GPIO_PORT_E, STM32F2_GPIO_PIN_0},
 
-	/* D10, FMC_NOE */
+	/* D11, FMC_NOE */
 	{STM32F2_GPIO_PORT_D, STM32F2_GPIO_PIN_4},
-	/* C11, FMC_NWE */
+	/* C10, FMC_NWE */
 	{STM32F2_GPIO_PORT_D, STM32F2_GPIO_PIN_5},
 
-	/* B3, FMC_A22 */
+	/* B2, FMC_A22 */
 	{STM32F2_GPIO_PORT_E, STM32F2_GPIO_PIN_6},
-	/* B2, FMC_A21 */
+	/* B1, FMC_A21 */
 	{STM32F2_GPIO_PORT_E, STM32F2_GPIO_PIN_5},
-	/* B1, FMC_A20 */
+	/* A1, FMC_A20 */
 	{STM32F2_GPIO_PORT_E, STM32F2_GPIO_PIN_4},
-	/* A1, FMC_A19 */
+	/* A2, FMC_A19 */
 	{STM32F2_GPIO_PORT_E, STM32F2_GPIO_PIN_3},
-	/* M15, FMC_A18 */
+	/* M11, FMC_A18 */
 	{STM32F2_GPIO_PORT_D, STM32F2_GPIO_PIN_13},
-	/* N13, FMC_A17 */
+	/* M10, FMC_A17 */
 	{STM32F2_GPIO_PORT_D, STM32F2_GPIO_PIN_12},
-	/* N14, FMC_A16 */
+	/* N10, FMC_A16 */
 	{STM32F2_GPIO_PORT_D, STM32F2_GPIO_PIN_11},
 
-	/* K13, FMC_A15, BA1 */
+	/* N11, FMC_A15, BA1 */
 	{STM32F2_GPIO_PORT_G, STM32F2_GPIO_PIN_5},
-	/* K14, FMC_A14, BA0 */
+	/* N12, FMC_A14, BA0 */
 	{STM32F2_GPIO_PORT_G, STM32F2_GPIO_PIN_4},
-	/* K15, FMC_A13 */
+	/* M12, FMC_A13 */
 	{STM32F2_GPIO_PORT_G, STM32F2_GPIO_PIN_3},
-	/* L15, FMC_A12 */
+	/* M13, FMC_A12 */
 	{STM32F2_GPIO_PORT_G, STM32F2_GPIO_PIN_2},
 	/* M7, FMC_A11 */
 	{STM32F2_GPIO_PORT_G, STM32F2_GPIO_PIN_1},
 	/* N7, FMC_A10 */
 	{STM32F2_GPIO_PORT_G, STM32F2_GPIO_PIN_0},
-	/* P7, FMC_A9 */
+	/* M8, FMC_A9 */
 	{STM32F2_GPIO_PORT_F, STM32F2_GPIO_PIN_15},
-	/* R7, FMC_A8 */
+	/* P6, FMC_A8 */
 	{STM32F2_GPIO_PORT_F, STM32F2_GPIO_PIN_14},
 	/* N6, FMC_A7 */
 	{STM32F2_GPIO_PORT_F, STM32F2_GPIO_PIN_13},
-	/* P6, FMC_A6 */
+	/* M6, FMC_A6 */
 	{STM32F2_GPIO_PORT_F, STM32F2_GPIO_PIN_12},
 	/* K3, FMC_A5 */
 	{STM32F2_GPIO_PORT_F, STM32F2_GPIO_PIN_5},
-	/* J3, FMC_A4 */
+	/* J2, FMC_A4 */
 	{STM32F2_GPIO_PORT_F, STM32F2_GPIO_PIN_4},
-	/* J2, FMC_A3 */
+	/* H2, FMC_A3 */
 	{STM32F2_GPIO_PORT_F, STM32F2_GPIO_PIN_3},
-	/* H2, FMC_A2 */
+	/* G2, FMC_A2 */
 	{STM32F2_GPIO_PORT_F, STM32F2_GPIO_PIN_2},
-	/* H3, FMC_A1 */
+	/* E2, FMC_A1 */
 	{STM32F2_GPIO_PORT_F, STM32F2_GPIO_PIN_1},
-	/* E2, FMC_A0 */
+	/* D2, FMC_A0 */
 	{STM32F2_GPIO_PORT_F, STM32F2_GPIO_PIN_0},
 
 	/* SDRAM */
 	/* M4, SDRAM_NE */
 	{STM32F2_GPIO_PORT_C, STM32F2_GPIO_PIN_2},
-	/* R6, SDRAM_NRAS */
+	/* P8, SDRAM_NRAS */
 	{STM32F2_GPIO_PORT_F, STM32F2_GPIO_PIN_11},
 	/* B7, SDRAM_NCAS */
 	{STM32F2_GPIO_PORT_G, STM32F2_GPIO_PIN_15},
-	/* J4, SDRAM_NWE */
+	/* J3, SDRAM_NWE */
 	{STM32F2_GPIO_PORT_H, STM32F2_GPIO_PIN_5},
-	/* M5, SDRAM_CKE */
+	/* L4, SDRAM_CKE */
 	{STM32F2_GPIO_PORT_C, STM32F2_GPIO_PIN_3},
 
 	/* H14, SDRAM_CLK */
 	{STM32F2_GPIO_PORT_G, STM32F2_GPIO_PIN_8},
 
 #ifdef CONFIG_FSMC_NOR_PSRAM_CS1_ENABLE
+	/* A11, FMC_NE1 */
 	{STM32F2_GPIO_PORT_D, STM32F2_GPIO_PIN_7},
 #endif
 #ifdef CONFIG_FSMC_NOR_PSRAM_CS2_ENABLE
@@ -199,42 +199,11 @@ int board_init(void)
 
 #if !defined(CONFIG_SYS_NO_FLASH)
 
-	/* Disable first bank */
-	fsmc_nor_psram_init(1, 0, 0, 0);
-	fsmc_nor_psram_init(3, 0, 0, 0);
-	fsmc_nor_psram_init(4, 0, 0, 0);
-
-	/*
-	 * Put SDRAM in Self-refresh mode to workaround
-	 * bug with Flash/SDRAM accessing,
-	 * see errata 2.8.7
-	 */
-	STM32_RCC->ahb3enr |= 1;
-	__asm__ __volatile__ ("dsb" : : : "memory");
-
-	STM32_SDRAM_FMC->sdcr1 =
-		CONFIG_SYS_RAM_FREQ_DIV << FMC_SDCR_SDCLK_SHIFT;
-
-	STM32_SDRAM_FMC->sdcmr = FMC_SDCMR_BANK_1 | FMC_SDCMR_MODE_START_CLOCK;
-	FMC_BUSY_WAIT();
-
-	STM32_SDRAM_FMC->sdcmr = FMC_SDCMR_BANK_1 | FMC_SDCMR_MODE_SELFREFRESH;
-	FMC_BUSY_WAIT();
-	udelay(60);
-
 	if ((rv = fsmc_nor_psram_init(CONFIG_SYS_FLASH_CS,
 			CONFIG_SYS_FSMC_FLASH_BCR,
 			CONFIG_SYS_FSMC_FLASH_BTR,
 			CONFIG_SYS_FSMC_FLASH_BWTR))) {
 		goto Done;
-	}
-
-	for (i = 1; i < 0x1000000; i <<= 1) {
-		v = *(volatile char*)(0x64000000 + i);
-		v = *(volatile char*)(0x64000000 + i - 1);
-		nop(); nop();
-		nop(); nop();
-		nop(); nop();
 	}
 
 #endif
