@@ -223,7 +223,7 @@ static void clock_setup(void)
 	int	i;
 
 	/*
-	 * Enable HSE, and wait it becomes ready
+	 * Enable HSE, and wait while it becomes ready
 	 */
 	STM32_RCC->cr |= STM32_RCC_CR_HSEON;
 	for (i = 0; i < STM32_HSE_STARTUP_TIMEOUT; i++) {
