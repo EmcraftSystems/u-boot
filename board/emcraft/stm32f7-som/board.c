@@ -5,6 +5,7 @@
  * Alexander Potashev, Emcraft Systems, aspotashev@emcraft.com
  * Vladimir Khusainov, Emcraft Systems, vlad@emcraft.com
  * Pavel Boldin, Emcraft Systems, paboldin@emcraft.com
+ * Vladimir Skvortsov, Emcraft Systems, vskvortsov@emcraft.com
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License as
@@ -190,8 +191,7 @@ out:
  */
 int board_init(void)
 {
-	int rv, i;
-	char v;
+	int rv;
 
 	rv = fmc_fsmc_setup_gpio();
 	if (rv)

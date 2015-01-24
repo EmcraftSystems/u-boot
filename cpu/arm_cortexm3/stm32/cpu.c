@@ -31,10 +31,14 @@ int print_cpuinfo(void)
 {
 	char	buf[4][32];
 
+#if defined(CONFIG_SYS_STM32F7)
+	printf("CPU  : %s\n", "STM32F7 (Cortex-M7)");
+#else
 #if defined(CONFIG_SYS_ARMCORTEXM4)
 	printf("CPU  : %s\n", "STM32F4 (Cortex-M4)");
 #else
 	printf("CPU  : %s\n", "STM32F2 (Cortex-M3)");
+#endif
 #endif
 
 	strmhz(buf[0], clock_get(CLOCK_SYSCLK));
