@@ -5,6 +5,7 @@
  * Alexander Potashev, Emcraft Systems, aspotashev@emcraft.com
  * Vladimir Khusainov, Emcraft Systems, vlad@emcraft.com
  * Pavel Boldin, Emcraft Systems, paboldin@emcraft.com
+ * Vladimir Skvortsov, Emcraft Systems, vskvortsov@emcraft.com
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License as
@@ -91,9 +92,9 @@
 #define CONFIG_STM32_PLL_SRC_HSE
 #define CONFIG_STM32_HSE_HZ		12000000	/* 12 MHz */
 #define CONFIG_STM32_PLL_M		12
-#define CONFIG_STM32_PLL_N		336
+#define CONFIG_STM32_PLL_N		400
 #define CONFIG_STM32_PLL_P		2
-#define CONFIG_STM32_PLL_Q		7
+#define CONFIG_STM32_PLL_Q		8
 
 /*
  * Number of clock ticks in 1 sec
@@ -162,15 +163,20 @@
 #define CONFIG_SYS_FSMC_FLASH_BCR	0x00005059
 
 /*
- * Flash timinigs are almost same for write and read.
  * See Spansion memory reference manual for S29GL128S10DHI010
- * tACC(MAX) = ADDSET(3-0) = 110 ns = 18.48 HCLK (on 168 MHz)
- * tRC(MIN) = DATAST(15-8) = 110 ns = 18.48 HCLK (on 168 MHz)
- * tNE switch = BUSTURN(19-16) = 10 ns = 2 HCLK
+ * Read:
+ * ADDSET(3-0) = 25 ns = 5 HCLK (on 200 MHz)
+ * DATAST(15-8) = 110 ns = 22 HCLK (on 200 MHz)
+ * BUSTURN(19-16) = 10 ns = 2 HCLK
+ * ACCMODE(29-28) = 0x2 (mode C)
+ * Write:
+ * ADDSET(3-0) = 35 ns = 7 HCLK (on 200 MHz)
+ * DATAST(15-8) = 25 ns + 1HCLC = 6 HCLK (on 200 MHz)
+ * BUSTURN(19-16) = 10 ns = 2 HCLK
  * ACCMODE(29-28) = 0x2 (mode C)
  */
-#define CONFIG_SYS_FSMC_FLASH_BTR	0x2002120f
-#define CONFIG_SYS_FSMC_FLASH_BWTR	0x2002110f
+#define CONFIG_SYS_FSMC_FLASH_BTR	0x20021605
+#define CONFIG_SYS_FSMC_FLASH_BWTR	0x20020607
 #define CONFIG_FSMC_NOR_PSRAM_CS1_ENABLE
 
 #define CONFIG_SYS_FLASH_BANK1_BASE	\
@@ -292,7 +298,7 @@
 
 #if CONFIG_SYS_BOARD_REV == 0x1A
 # undef CONFIG_CMD_BUFCOPY
-#else	
+#else
 # define CONFIG_CMD_BUFCOPY
 #endif
 

@@ -1,7 +1,8 @@
 /*
- * (C) Copyright 2011
+ * (C) Copyright 2011, 2015
  *
  * Yuri Tikhonov, Emcraft Systems, yur@emcraft.com
+ * Vladimir Skvortsov, Emcraft Systems, vskvortsov@emcraft.com
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License as
@@ -93,6 +94,21 @@ enum clock {
 #define STM32_RCC_BASE			(STM32_AHB1PERIPH_BASE + 0x3800)
 #define STM32_RCC			((volatile struct stm32_rcc_regs *) \
 					STM32_RCC_BASE)
+/*
+ * PWR registers map
+ */
+struct stm32_pwr_regs {
+	u32 cr1;   /* power control register 1 */
+	u32 csr1;  /* power control/status register 2 */
+	u32 cr2;   /* power control register 2 */
+	u32 csr2;  /* power control/status register 2 */
+};
+
+
+#define STM32_PWR_BASE			(STM32_APB1PERIPH_BASE + 0x7000)
+#define STM32_PWR			((volatile struct stm32_pwr_regs *) \
+					STM32_PWR_BASE)
+
 
 /******************************************************************************
  * FIXME: get rid of this

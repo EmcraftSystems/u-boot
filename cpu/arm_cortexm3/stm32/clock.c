@@ -1,7 +1,8 @@
 /*
- * (C) Copyright 2011
+ * (C) Copyright 2011, 2015
  *
  * Yuri Tikhonov, Emcraft Systems, yur@emcraft.com
+ * Vladimir Skvortsov, Emcraft Systems, vskvortsov@emcraft.com
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License as
@@ -139,9 +140,11 @@
 # define STM32_FLASH_WS			4
 #elif (STM32_SYS_CLK > 150000000) && (STM32_SYS_CLK <= 180000000)
 # define STM32_FLASH_WS			5
+#elif (STM32_SYS_CLK > 180000000) && (STM32_SYS_CLK <= 250000000)
+# define STM32_FLASH_WS			6
 #else
 # error "Incorrect System clock value configuration."
-# define STM32_FLASH_WS			0	/* to avoid compile-time err  */
+# define STM32_FLASH_WS			0	/* to avoid compile-time err */
 #endif
 
 /*
@@ -151,6 +154,8 @@
 #define STM32_RCC_CR_HSERDY		(1 << 17) /* HSE clock ready	      */
 #define STM32_RCC_CR_PLLON		(1 << 24) /* PLL clock enable	      */
 #define STM32_RCC_CR_PLLRDY		(1 << 25) /* PLL clock ready	      */
+
+#define STM32_RCC_APB1ENR_PWREN		(1 << 28) /* Power interface clock enable */
 
 #define STM32_RCC_CFGR_SW_BIT		0	/* System clock switch	      */
 #define STM32_RCC_CFGR_SW_MSK		0x3
@@ -204,6 +209,15 @@
 #define STM32_RCC_PLLCFGR_PLLQ_MSK	0xF
 
 /*
+ * Offsets and bitmasks of some PWR regs
+ */
+#define STM32_PWR_CR1_ODEN		(1 << 16) /* Over-drive enable */
+#define STM32_PWR_CR1_ODSWEN		(1 << 17) /* Over-drive switching enabled */
+
+#define STM32_PWR_CSR1_ODRDY		(1 << 16) /* Over-drive mode ready */
+#define STM32_PWR_CSR1_ODSWRDY		(1 << 17) /* Over-drive mode switching ready */
+
+/*
  * Timeouts (in cycles)
  */
 #define STM32_HSE_STARTUP_TIMEOUT	0x05000
@@ -212,6 +226,27 @@
  * Clock values
  */
 static u32 clock_val[CLOCK_END];
+
+#if defined (CONFIG_SYS_STM32F7)
+static int enable_over_drive(void)
+{
+  uint32_t tickstart = 0;
+
+  STM32_RCC->apb1enr |= STM32_RCC_APB1ENR_PWREN;
+
+  /* Enable the Over-drive to extend the clock frequency to 200 Mhz */
+  STM32_PWR->cr1 |= STM32_PWR_CR1_ODEN;
+  /* Infinite wait! */
+  while (!(STM32_PWR->csr1 & STM32_PWR_CSR1_ODRDY)) {}
+
+  /* Enable the Over-drive switch */
+  STM32_PWR->cr1 |= STM32_PWR_CR1_ODSWEN;
+  /* Infinite wait! */
+  while (!(STM32_PWR->csr1 & STM32_PWR_CSR1_ODSWRDY));
+
+  return 0;
+}
+#endif
 
 #if !defined(CONFIG_STM32_SYS_CLK_HSI)
 /*
@@ -297,6 +332,10 @@ static void clock_setup(void)
 	val = STM32_RCC_CFGR_SWS_HSE;
 # endif /* CONFIG_STM32_SYS_CLK_PLL */
 
+#if defined (CONFIG_SYS_STM32F7)
+	/* Enable over-drive in order to reach 200MHz */
+	enable_over_drive();
+#endif
 	/*
 	 * Configure Flash prefetch, Instruction cache, and wait
 	 * latency.
