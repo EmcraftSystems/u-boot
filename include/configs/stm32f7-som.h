@@ -112,6 +112,16 @@
 #undef CONFIG_USE_IRQ
 
 /*
+ * Cache configuration
+ */
+#define CONFIG_STM32F7_ICACHE_ON
+/* #undef CONFIG_STM32F7_ICACHE_ON */
+#define CONFIG_STM32F7_DCACHE_ON
+/* #undef CONFIG_STM32F7_DCACHE_ON */
+
+#define CONFIG_ARMCORTEXM3_SOC_INIT
+
+/*
  * Memory layout configuration
  */
 #define CONFIG_MEM_NVM_BASE		0x08000000

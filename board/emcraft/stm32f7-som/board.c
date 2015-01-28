@@ -355,7 +355,9 @@ int dram_init(void)
 
 	rv = 0;
 
+#if !defined(CONFIG_STM32F7_DCACHE_ON)
 	cortex_m3_mpu_full_access();
+#endif
 
 	dram_initialized = 1;
 
