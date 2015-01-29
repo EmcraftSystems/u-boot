@@ -21,30 +21,40 @@
 
 #include <common.h>
 
-
 /* ARMv7-M registers */
-#define _CCR		*((volatile u32*)(0xE000ED14))	/* Configuration and Control Register*/
+/* Configuration and Control Register */
+#define _CCR		*((volatile u32*)(0xE000ED14))
 /* CCR bis*/
-#define CCR_IC		(1 << 17)	/* Instruction cache enable bit */
-#define CCR_DC		(1 << 16)	/* Data cache enable bit */
+/* Instruction cache enable bit */
+#define CCR_IC		(1 << 17)
+#define CCR_DC		(1 << 16)
 
-#define _CLIDR		*((volatile u32*)(0xE000ED78))	/* Cache Level ID Register */
-#define _CTR		*((volatile u32*)(0xE000ED7C))	/* Cache Type Register */
-#define _CCSIDR		*((volatile u32*)(0xE000ED80))	/* Cache Size ID Registers */
-#define _CSSELR		*((volatile u32*)(0xE000ED84))	/* Cache Size Selection Register */
+/* Cache Level ID Register */
+#define _CLIDR		*((volatile u32*)(0xE000ED78))
+/* Cache Type Register */
+#define _CTR		*((volatile u32*)(0xE000ED7C))
+/* Cache Size ID Registers */
+#define _CCSIDR		*((volatile u32*)(0xE000ED80))
+/* Cache Size Selection Register */
+#define _CSSELR		*((volatile u32*)(0xE000ED84))
 
 /* decode CCSIDR bits */
-#define CCSIDR_NSETS(x)		(((x) >> 13) & 0x7fff)	/* Number of sets (0-based) */
-#define CCSIDR_ASC(x)		(((x) >> 3) & 0x3ff)	/* Associativity */
-#define CCSIDR_LINESZ(x)	(((x) >> 0) & 0x7)	/* Line Size */
+/* Number of sets (0-based) */
+#define CCSIDR_NSETS(x)		(((x) >> 13) & 0x7fff)
+/* Associativity */
+#define CCSIDR_ASC(x)		(((x) >> 3) & 0x3ff)
+/* Line Size */
+#define CCSIDR_LINESZ(x)	(((x) >> 0) & 0x7)
 
-#define _ICIALLU	*((volatile u32*)(0xE000EF50))	/* Instruction cache invalidate all to Point of Unification (PoU) */
-#define _DCISW		*((volatile u32*)(0xE000EF60))	/* Data cache invalidate by set/way */
-
+/* Instruction cache invalidate all to Point of Unification (PoU) */
+#define _ICIALLU	*((volatile u32*)(0xE000EF50))
+/* Data cache invalidate by set/way */
+#define _DCISW		*((volatile u32*)(0xE000EF60))
 
 #if defined(CONFIG_STM32F7_ICACHE_ON)
 /* Invalidate Instruction cache */
-static void invalidate_icache(void ) {
+static void invalidate_icache(void)
+{
 	_ICIALLU = 0;
 	__asm__ volatile("dsb");
 	__asm__ volatile("isb");
@@ -53,7 +63,8 @@ static void invalidate_icache(void ) {
 
 #if defined(CONFIG_STM32F7_DCACHE_ON)
 /* Invalidate Data cache */
-static void invalidate_dcache(void ) {
+static void invalidate_dcache(void)
+{
 	u32 ccsidr;
 	u32 nsets, asc, linesz;
 	int wshift, sshift;
@@ -85,22 +96,29 @@ static void invalidate_dcache(void ) {
 #endif
 
 #if defined(CONFIG_STM32F7_DCACHE_ON)
-static void config_cached_regions(void) {
-
+static void config_cached_regions(void)
+{
 	cortex_m3_mpu_enable(0);
-	/* Whole 4GB space */
+	/* Make the whole 4GB space uncached */
 	cortex_m3_mpu_add_region(0,
-				 0x00000000 | 1 << 4,
-				 0<<28 | 3 <<24 | 0<<19 | 0<<18 | 0<<17 | 0<<16 | 0<<8 | 31<<1 | 1<<0);
-	/* SDRAM (cached) */
+		0x00000000 | 1 << 4,
+		0<<28 | 3 <<24 | 0<<19 |
+			0<<18 | 0<<17 | 0<<16 | 0<<8 | 31<<1 | 1<<0);
+	/* Enable cache for SDRAM (32MB) */
 	cortex_m3_mpu_add_region(1,
-				 CONFIG_SYS_RAM_BASE | 1 << 4 | 1 << 0,
-				 0<<28 | 3 <<24 | 0<<19 | 0<<18 | 1<<17 | 0<<16 | 0<<8 | 24<<1 | 1<<0);
+		CONFIG_SYS_RAM_BASE | 1 << 4 | 1 << 0,
+		0<<28 | 3 <<24 | 0<<19 |
+			0<<18 | 1<<17 | 0<<16 | 0<<8 | 24<<1 | 1<<0);
+	/*
+	 * We don't enable cache for SDRAM because some device drivers
+	 * put buffer descriptors and DMA buffers there.
+	 * Cache for eNVM could potentially be enabled and this should
+	 * help U-Boot performance. However, the envm driver would have
+	 * to be updated to ensure cache flushes when updating eNVM.
+	 */
 	cortex_m3_mpu_enable(1);
-
 }
 #endif
-
 
 #if defined(CONFIG_STM32F7_ICACHE_ON) || defined(CONFIG_STM32F7_DCACHE_ON)
 /* Enable Data and Instruction caches */
