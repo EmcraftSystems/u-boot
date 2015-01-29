@@ -1,5 +1,5 @@
 /*
- * (C) Copyright 2011, 2015
+ * (C) Copyright 2011-2015
  *
  * Yuri Tikhonov, Emcraft Systems, yur@emcraft.com
  * Vladimir Skvortsov, Emcraft Systems, vskvortsov@emcraft.com
@@ -230,21 +230,20 @@ static u32 clock_val[CLOCK_END];
 #if defined (CONFIG_SYS_STM32F7)
 static int enable_over_drive(void)
 {
-  uint32_t tickstart = 0;
 
-  STM32_RCC->apb1enr |= STM32_RCC_APB1ENR_PWREN;
+	STM32_RCC->apb1enr |= STM32_RCC_APB1ENR_PWREN;
 
-  /* Enable the Over-drive to extend the clock frequency to 200 Mhz */
-  STM32_PWR->cr1 |= STM32_PWR_CR1_ODEN;
-  /* Infinite wait! */
-  while (!(STM32_PWR->csr1 & STM32_PWR_CSR1_ODRDY)) {}
+	/* Enable the Over-drive to extend the clock frequency to 200 Mhz */
+	STM32_PWR->cr1 |= STM32_PWR_CR1_ODEN;
+	/* Infinite wait! */
+	while (!(STM32_PWR->csr1 & STM32_PWR_CSR1_ODRDY)) {}
 
-  /* Enable the Over-drive switch */
-  STM32_PWR->cr1 |= STM32_PWR_CR1_ODSWEN;
-  /* Infinite wait! */
-  while (!(STM32_PWR->csr1 & STM32_PWR_CSR1_ODSWRDY));
+	/* Enable the Over-drive switch */
+	STM32_PWR->cr1 |= STM32_PWR_CR1_ODSWEN;
+	/* Infinite wait! */
+	while (!(STM32_PWR->csr1 & STM32_PWR_CSR1_ODSWRDY));
 
-  return 0;
+	return 0;
 }
 #endif
 
