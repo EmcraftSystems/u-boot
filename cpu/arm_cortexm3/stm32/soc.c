@@ -95,22 +95,41 @@ static void invalidate_dcache(void)
 }
 #endif
 
-#if defined(CONFIG_STM32F7_DCACHE_ON)
-static void config_cached_regions(void)
+/*
+ * Configure MPU.
+ * We don't want to use common cortex_m3_mpu_full_access() to avoid messing
+ * with region indexes in case if some changes to cortex_m3_mpu_full_access()
+ * in the future.
+ */
+static void stm32f7_mpu_config(void)
 {
-	cortex_m3_mpu_enable(0);
-	/* Make the whole 4GB space uncached */
+	/*
+	 * Make the whole 4GB space as 'Strongly-ordered'
+	 */
 	cortex_m3_mpu_add_region(0,
 		0x00000000 | 1 << 4,
-		0<<28 | 3 <<24 | 0<<19 |
-			0<<18 | 0<<17 | 0<<16 | 0<<8 | 31<<1 | 1<<0);
-	/* Enable cache for SDRAM (32MB) */
+		0 << 28 |  3 << 24 |
+		0 << 19 |  0 << 18 | 0 << 17 | 0 << 16 |
+		0 <<  8 | 31 <<  1 | 1 <<  0);
+
+	/*
+	 * Configure 32MB SDRAM region as Normal memory with the appropriate
+	 * cacheability attributes
+	 */
 	cortex_m3_mpu_add_region(1,
 		CONFIG_SYS_RAM_BASE | 1 << 4 | 1 << 0,
-		0<<28 | 3 <<24 | 0<<19 |
-			0<<18 | 1<<17 | 0<<16 | 0<<8 | 24<<1 | 1<<0);
+		0 << 28 |  3 << 24 |
+#if defined(CONFIG_STM32F7_DCACHE_ON) || defined(CONFIG_STM32F7_ICACHE_ON)
+		/* Outer and inner write-back; write and read allocate */
+		1 << 19 |  0 << 18 | 1 << 17 | 1 << 16 |
+#else
+		/* Outer and inner Non-cacheable */
+		1 << 19 |  0 << 18 | 0 << 17 | 0 << 16 |
+#endif
+		0 <<  8 | 24 <<  1 | 1 <<  0);
+
 	/*
-	 * We don't enable cache for SDRAM because some device drivers
+	 * We don't enable cache for SRAM because some device drivers
 	 * put buffer descriptors and DMA buffers there.
 	 * Cache for eNVM could potentially be enabled and this should
 	 * help U-Boot performance. However, the envm driver would have
@@ -118,17 +137,14 @@ static void config_cached_regions(void)
 	 */
 	cortex_m3_mpu_enable(1);
 }
-#endif
 
 #if defined(CONFIG_STM32F7_ICACHE_ON) || defined(CONFIG_STM32F7_DCACHE_ON)
-/* Enable Data and Instruction caches */
+/*
+ * Enable Data and/or Instruction caches
+ */
 static void stm32f7_enable_cache(void)
 {
 	u32 ccr;
-#if defined(CONFIG_STM32F7_DCACHE_ON)
-	/* Configure regions prior to enable cache. */
-	config_cached_regions();
-#endif
 
 	/* Invalidate caches prior to enable */
 #if defined(CONFIG_STM32F7_ICACHE_ON)
@@ -159,6 +175,8 @@ static void stm32f7_enable_cache(void)
 #ifdef CONFIG_ARMCORTEXM3_SOC_INIT
 void cortex_m3_soc_init(void)
 {
+	stm32f7_mpu_config();
+
 #if defined(CONFIG_STM32F7_ICACHE_ON) || defined(CONFIG_STM32F7_DCACHE_ON)
 	stm32f7_enable_cache();
 #endif
