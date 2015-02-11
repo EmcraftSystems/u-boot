@@ -129,6 +129,10 @@ static void stm32f7_mpu_config(void)
 		0 <<  8 | 24 <<  1 | 1 <<  0);
 
 	/*
+	 * !!! NOTE: MPU region [2] is set in arch_preboot_os() !!!
+	 */
+
+	/*
 	 * We don't enable cache for SRAM because some device drivers
 	 * put buffer descriptors and DMA buffers there.
 	 * Cache for eNVM could potentially be enabled and this should
@@ -137,6 +141,40 @@ static void stm32f7_mpu_config(void)
 	 */
 	cortex_m3_mpu_enable(1);
 }
+
+#if defined(CONFIG_STM32F7_DCACHE_ON)
+/*
+ * Use 'dmamem' from cmdline passed to kernel to configure non-cacheable
+ * region appropriately ('dmamem' is in MB)
+ */
+void arch_preboot_os(void)
+{
+	char	buf[256], *s, *e;
+	char	*cmdline = getenv ("bootargs");
+	int	dmamem = 0;
+
+	if (!cmdline)
+		return;
+	s = strstr(cmdline, "dmamem=");
+	if (!s)
+		return;
+	s += strlen("dmamem=");
+	e = strchr(s, ' ');
+	strncpy(buf, s, e - s);
+	dmamem = simple_strtoul(buf, NULL, 10);
+	if (!dmamem)
+		return;
+
+	cortex_m3_mpu_enable(0);
+	cortex_m3_mpu_add_region(2,
+		(CONFIG_SYS_RAM_BASE + CONFIG_SYS_RAM_SIZE -
+		 (dmamem * 1024 * 1024)) | 1 << 4 | 2 << 0,
+		0 << 28 | 3 << 24 |
+		1 << 19 | 0 << 18 | 0 << 17 | 0 << 16 |
+		0 <<  8 | ((ffs(dmamem) + 18) <<  1) | 1 <<  0);
+	cortex_m3_mpu_enable(1);
+}
+#endif
 
 #if defined(CONFIG_STM32F7_ICACHE_ON) || defined(CONFIG_STM32F7_DCACHE_ON)
 /*

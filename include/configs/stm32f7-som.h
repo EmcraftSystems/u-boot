@@ -119,6 +119,12 @@
 #define CONFIG_STM32F7_DCACHE_ON
 /* #undef CONFIG_STM32F7_DCACHE_ON */
 
+#ifdef CONFIG_STM32F7_DCACHE_ON
+# define CONFIG_DMAMEM_SIZE		1	/* 1MB, must be a pwr of 2 */
+#else
+# define CONFIG_DMAMEM_SIZE		0
+#endif
+
 #define CONFIG_ARMCORTEXM3_SOC_INIT
 
 /*
@@ -332,7 +338,8 @@
 /* boot args and env */
 #define CONFIG_HOSTNAME			stm32f7-som
 #define CONFIG_BOOTARGS			"stm32_platform=stm32f7-som "	\
-					"console=ttyS0,115200 panic=10"
+					"console=ttyS0,115200 panic=10 "\
+					"dmamem=" MK_STR(CONFIG_DMAMEM_SIZE)
 
 #define LOADADDR			"0xC0007FC0"
 
