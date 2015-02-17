@@ -38,14 +38,20 @@
  * This array defines the layout of the Embedded Flash on the STM32 chips
  */
 static u32 flash_bsize[] = {
+#if defined(CONFIG_SYS_STM32F7)
+	[0 ... 3]	=  32 * 1024,
+	[4]		= 128 * 1024,
+	[5 ... 7]	= 256 * 1024,
+#else
 	[0 ... 3]	=  16 * 1024,
 	[4]		=  64 * 1024,
 	[5 ... 11]	= 128 * 1024
-#if defined(CONFIG_SYS_STM32F43X)
+# if defined(CONFIG_SYS_STM32F43X)
 	,
 	[12 ... 15]	=  16 * 1024,
 	[16]		=  64 * 1024,
 	[17 ... 23]	= 128 * 1024
+# endif
 #endif
 	};
 
