@@ -105,7 +105,7 @@ struct cm3_systick {
 
 u8 cortex_m3_irq_vec_get(void);
 
-void cortex_m3_mpu_add_region(u32 region, u32 address, u32 attr);
+void cortex_m3_mpu_set_region(u32 region, u32 address, u32 attr);
 void cortex_m3_mpu_enable(int enable);
 void cortex_m3_mpu_full_access(void);
 

@@ -51,6 +51,20 @@
 /* Data cache invalidate by set/way */
 #define _DCISW		*((volatile u32*)(0xE000EF60))
 
+/*
+ * MPU regions. The order below is important: if regions overlap, then
+ * the region with high number is more prioritive (in the sense of settings
+ * used for this region)
+ */
+enum mpu_rgn {
+	MPU_RGN_4GB		= 0,	/* 4GB address space region */
+	MPU_RGN_SDRAM_CA,		/* Cacheable SDRAM */
+	MPU_RGN_SDRAM_NC,		/* Non-cacheable SDRAM */
+	MPU_RGN_ENVM_CA,		/* Cacheable eNVM */
+
+	MPU_RGN_MAX		= 15	/* RBAR[REGION] bits; actually - less */
+};
+
 #if defined(CONFIG_STM32F7_ICACHE_ON)
 /* Invalidate Instruction cache */
 static void invalidate_icache(void)
@@ -95,6 +109,49 @@ static void invalidate_dcache(void)
 }
 #endif
 
+#if defined(CONFIG_STM32F7_DCACHE_ON) || defined(CONFIG_STM32F7_ICACHE_ON)
+/*
+ * To be able to program eNVM we must reconfigure the appropriate MPU region to
+ * 'Strongly-ordered' or 'Device' memory type. Switching cache off isn't enough:
+ * we've got garbage in eNVM when programming it as a 'Normal' memory.
+ * So:
+ * - when 'dev' = 0, then configure 1MB eNVM as Normal memory with 'Write-back;
+ *   write and read allocate' cache attributes;
+ * - when 'dev' = 0, then configure eNVM as 'Stringly ordered' mem.
+ */
+static void stm32f7_envm_mpu_cfg(u8 dev, u8 mpu_run)
+{
+	if (mpu_run)
+		cortex_m3_mpu_enable(0);
+
+	cortex_m3_mpu_set_region(MPU_RGN_ENVM_CA,
+		CONFIG_MEM_NVM_BASE | 1 << 4 | MPU_RGN_ENVM_CA << 0,
+		0 << 28 |  3 << 24 |
+		(dev ? (0 << 19 |  0 << 18 | 0 << 17 | 0 << 16) :
+		       (1 << 19 |  0 << 18 | 1 << 17 | 1 << 16)) |
+		0 <<  8 | 19 <<  1 | 1 <<  0);
+
+	if (mpu_run)
+		cortex_m3_mpu_enable(1);
+}
+
+/*
+ * Configure eNVM as 'Strongly ordered' memory type
+ */
+void stm32f7_envm_as_dev(void)
+{
+	stm32f7_envm_mpu_cfg(1, 1);
+}
+
+/*
+ * Configure eNVM as 'Normal' memory type
+ */
+void stm32f7_envm_as_mem(void)
+{
+	stm32f7_envm_mpu_cfg(0, 1);
+}
+#endif
+
 /*
  * Configure MPU.
  * We don't want to use common cortex_m3_mpu_full_access() to avoid messing
@@ -106,8 +163,8 @@ static void stm32f7_mpu_config(void)
 	/*
 	 * Make the whole 4GB space as 'Strongly-ordered'
 	 */
-	cortex_m3_mpu_add_region(0,
-		0x00000000 | 1 << 4,
+	cortex_m3_mpu_set_region(MPU_RGN_4GB,
+		0x00000000 | 1 << 4 | MPU_RGN_4GB << 0,
 		0 << 28 |  3 << 24 |
 		0 << 19 |  0 << 18 | 0 << 17 | 0 << 16 |
 		0 <<  8 | 31 <<  1 | 1 <<  0);
@@ -116,28 +173,25 @@ static void stm32f7_mpu_config(void)
 	 * Configure 32MB SDRAM region as Normal memory with the appropriate
 	 * cacheability attributes
 	 */
-	cortex_m3_mpu_add_region(1,
-		CONFIG_SYS_RAM_BASE | 1 << 4 | 1 << 0,
+	cortex_m3_mpu_set_region(MPU_RGN_SDRAM_CA,
+		CONFIG_SYS_RAM_BASE | 1 << 4 | MPU_RGN_SDRAM_CA << 0,
 		0 << 28 |  3 << 24 |
 #if defined(CONFIG_STM32F7_DCACHE_ON) || defined(CONFIG_STM32F7_ICACHE_ON)
-		/* Outer and inner write-back; write and read allocate */
+		/* Write-back; write and read allocate */
 		1 << 19 |  0 << 18 | 1 << 17 | 1 << 16 |
 #else
-		/* Outer and inner Non-cacheable */
+		/* Non-cacheable */
 		1 << 19 |  0 << 18 | 0 << 17 | 0 << 16 |
 #endif
 		0 <<  8 | 24 <<  1 | 1 <<  0);
 
-	/*
-	 * !!! NOTE: MPU region [2] is set in arch_preboot_os() !!!
-	 */
+#if defined(CONFIG_STM32F7_DCACHE_ON) || defined(CONFIG_STM32F7_ICACHE_ON)
+	stm32f7_envm_mpu_cfg(0, 0);
+#endif
 
 	/*
 	 * We don't enable cache for SRAM because some device drivers
 	 * put buffer descriptors and DMA buffers there.
-	 * Cache for eNVM could potentially be enabled and this should
-	 * help U-Boot performance. However, the envm driver would have
-	 * to be updated to ensure cache flushes when updating eNVM.
 	 */
 	cortex_m3_mpu_enable(1);
 }
@@ -166,9 +220,9 @@ void arch_preboot_os(void)
 		return;
 
 	cortex_m3_mpu_enable(0);
-	cortex_m3_mpu_add_region(2,
+	cortex_m3_mpu_set_region(MPU_RGN_SDRAM_NC,
 		(CONFIG_SYS_RAM_BASE + CONFIG_SYS_RAM_SIZE -
-		 (dmamem * 1024 * 1024)) | 1 << 4 | 2 << 0,
+		 (dmamem * 1024 * 1024)) | 1 << 4 | MPU_RGN_SDRAM_NC << 0,
 		0 << 28 | 3 << 24 |
 		1 << 19 | 0 << 18 | 0 << 17 | 0 << 16 |
 		0 <<  8 | ((ffs(dmamem) + 18) <<  1) | 1 <<  0);

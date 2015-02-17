@@ -64,4 +64,9 @@ unsigned int
 void envm_config(u32 wait_states);
 #endif /* CONFIG_SYS_STM32 */
 
+#if defined(CONFIG_STM32F7_DCACHE_ON) || defined(CONFIG_STM32F7_ICACHE_ON)
+void stm32f7_envm_as_dev(void);
+void stm32f7_envm_as_mem(void);
+#endif
+
 #endif /* __ENVM_H__ */

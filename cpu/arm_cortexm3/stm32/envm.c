@@ -260,6 +260,9 @@ stm32_flash_program(u32 offset, void *buf, u32 size)
 	stm32_flash_cr_unlock();
 	STM32_FLASH_REGS->cr |= STM32_FLASH_CR_PG;
 
+#if defined(CONFIG_STM32F7_DCACHE_ON) || defined(CONFIG_STM32F7_ICACHE_ON)
+	stm32f7_envm_as_dev();
+#endif
 	/* Since we are using 32x parallelism (set in CR), copy by 4 bytes */
 	while (words--) {
 		*dst++ = *src++;
@@ -267,6 +270,9 @@ stm32_flash_program(u32 offset, void *buf, u32 size)
 		while (STM32_FLASH_REGS->sr & STM32_FLASH_SR_BSY)
 			;
 	}
+#if defined(CONFIG_STM32F7_DCACHE_ON) || defined(CONFIG_STM32F7_ICACHE_ON)
+	stm32f7_envm_as_mem();
+#endif
 	STM32_FLASH_REGS->cr &= ~STM32_FLASH_CR_PG;
 	stm32_flash_cr_lock();
 

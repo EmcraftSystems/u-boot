@@ -166,13 +166,13 @@ u8 cortex_m3_irq_vec_get(void)
 }
 
 /*
- * Add a custom MPU region
+ * Set a custom MPU region
  *
  * region = Region Number
  * address = Region Base Address
  * attr = Region Attributes and Size
  */
-void cortex_m3_mpu_add_region(u32 region, u32 address, u32 attr)
+void cortex_m3_mpu_set_region(u32 region, u32 address, u32 attr)
 {
 	CM3_MPU_REGS->rnr = region;
 	CM3_MPU_REGS->rbar = address;
@@ -194,7 +194,7 @@ void cortex_m3_mpu_enable(int enable)
  */
 void cortex_m3_mpu_full_access(void)
 {
-	cortex_m3_mpu_add_region(0, 0x00000000,
+	cortex_m3_mpu_set_region(0, 0x00000000,
 		CM3_MPU_RASR_AP_RW_RW | CM3_MPU_RASR_SIZE_4GB |
 		CM3_MPU_RASR_EN);
 	cortex_m3_mpu_enable(1);
