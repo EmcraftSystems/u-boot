@@ -114,6 +114,7 @@
 /*
  * Cache configuration
  */
+#define CONFIG_SYS_CACHELINE_SIZE	32
 #define CONFIG_STM32F7_ICACHE_ON
 /* #undef CONFIG_STM32F7_ICACHE_ON */
 #define CONFIG_STM32F7_DCACHE_ON

@@ -50,6 +50,12 @@
 #define _ICIALLU	*((volatile u32*)(0xE000EF50))
 /* Data cache invalidate by set/way */
 #define _DCISW		*((volatile u32*)(0xE000EF60))
+/* Data cache clean by address to PoU */
+#define _DCCMVAU	*((volatile u32*)(0xE000EF64))
+/* Instruction cache invalidate by address to PoU */
+#define _ICIMVAU	*((volatile u32*)(0xE000EF58))
+/* Branch predictor invalidate all */
+#define _BPIALL		*((volatile u32*)(0xE000EF78))
 
 /*
  * MPU regions. The order below is important: if regions overlap, then
@@ -256,6 +262,27 @@ static void stm32f7_enable_cache(void)
 	ccr |= CCR_DC;
 #endif
 	_CCR = ccr;
+	__asm__ volatile("dsb");
+	__asm__ volatile("isb");
+}
+#endif
+
+#if defined(CONFIG_STM32F7_DCACHE_ON) && defined(CONFIG_STM32F7_ICACHE_ON)
+/*
+ * Clean D-cache, invalidate I-cache, and invalidate B-cache within
+ * the specified region.
+ * - s - start address of region
+ * - e - end address of region
+ */
+void stm32f7_cache_sync_range(u32 s, u32 e)
+{
+	for ( ; s < e; s += CONFIG_SYS_CACHELINE_SIZE) {
+		_DCCMVAU = s;
+		_ICIMVAU = s;
+	}
+
+	_BPIALL = 0;
+
 	__asm__ volatile("dsb");
 	__asm__ volatile("isb");
 }

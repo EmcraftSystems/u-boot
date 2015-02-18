@@ -36,6 +36,7 @@
 #include <lmb.h>
 #include <linux/ctype.h>
 #include <asm/byteorder.h>
+#include <asm/cache.h>
 
 #if defined(CONFIG_CMD_USB)
 #include <usb.h>
@@ -703,6 +704,11 @@ int do_bootm (cmd_tbl_t *cmdtp, int flag, int argc, char *argv[])
 	}
 
 	arch_preboot_os();
+
+#if defined(CONFIG_STM32F7_DCACHE_ON) && defined(CONFIG_STM32F7_ICACHE_ON)
+	stm32f7_cache_sync_range(images.os.load,
+				 images.os.load + images.os.image_len);
+#endif
 
 	boot_fn(0, argc, argv, &images);
 

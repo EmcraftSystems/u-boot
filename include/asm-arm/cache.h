@@ -27,6 +27,15 @@
 
 #include <asm/system.h>
 
+#if defined(CONFIG_STM32F7_DCACHE_ON) && defined(CONFIG_STM32F7_ICACHE_ON)
+/*
+ * Ensure that the I and D caches are coherent within specified
+ * region. This is typically used when code has been written to
+ * a memory region, and will be executed.
+ */
+void stm32f7_cache_sync_range(u32 s, u32 e);
+#endif
+
 /*
  * Invalidate L2 Cache using co-proc instruction
  */
