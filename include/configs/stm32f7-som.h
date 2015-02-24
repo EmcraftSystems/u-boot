@@ -120,10 +120,19 @@
 #define CONFIG_STM32F7_DCACHE_ON
 /* #undef CONFIG_STM32F7_DCACHE_ON */
 
-#ifdef CONFIG_STM32F7_DCACHE_ON
-# define CONFIG_DMAMEM_SIZE		1	/* 1MB, must be a pwr of 2 */
-#else
-# define CONFIG_DMAMEM_SIZE		0
+/*
+ * Actually we don't need DMAMEM if DCACHE is off. But we
+ * want to be able to run the same kernel image with or
+ * without DCACHE. So, pass DMAMEM tag always.
+ * Note, SZ_ALL must be power of 2 (to program MPU correctly)!
+ */
+#define CONFIG_DMAMEM_TAG
+#if defined(CONFIG_DMAMEM_TAG)
+# define CONFIG_DMAMEM_SZ_ALL		(1 << 20)	/* 1MB */
+# define CONFIG_DMAMEM_SZ_FB		(640 * 1024)
+# define CONFIG_DMAMEM_BASE		(CONFIG_SYS_RAM_BASE + \
+					 (CONFIG_SYS_RAM_SIZE / 2) - \
+					 CONFIG_DMAMEM_SZ_ALL)
 #endif
 
 #define CONFIG_ARMCORTEXM3_SOC_INIT
@@ -339,8 +348,7 @@
 /* boot args and env */
 #define CONFIG_HOSTNAME			stm32f7-som
 #define CONFIG_BOOTARGS			"stm32_platform=stm32f7-som "	\
-					"console=ttyS0,115200 panic=10 "\
-					"dmamem=" MK_STR(CONFIG_DMAMEM_SIZE)
+					"console=ttyS0,115200 panic=10"
 
 #define LOADADDR			"0xC0007FC0"
 
