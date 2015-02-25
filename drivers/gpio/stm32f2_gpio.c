@@ -1,7 +1,8 @@
 /*
- * (C) Copyright 2011
+ * (C) Copyright 2011-2015
  *
  * Yuri Tikhonov, Emcraft Systems, yur@emcraft.com
+ * Alexander Potashev, Emcraft Systems, aspotashev@emcraft.com
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License as
@@ -149,7 +150,7 @@ s32 stm32f2_gpio_config(const struct stm32f2_gpio_dsc *dsc,
 	/*
 	 * Check params
 	 */
-	if (!dsc || dsc->port > 8 || dsc->pin > 15) {
+	if (!dsc || dsc->port >= ARRAY_SIZE(io_base) || dsc->pin > 15) {
 		if (gd->have_console) {
 			printf("%s: incorrect params %d.%d.\n", __func__,
 				dsc ? dsc->port : -1,
@@ -256,7 +257,7 @@ s32 stm32f2_gpout_set(const struct stm32f2_gpio_dsc *dsc, int state)
 	volatile struct stm32f2_gpio_regs	*gpio_regs;
 	s32					rv;
 
-	if (!dsc || dsc->port > 8 || dsc->pin > 15) {
+	if (!dsc || dsc->port >= ARRAY_SIZE(io_base) || dsc->pin > 15) {
 		if (gd->have_console) {
 			printf("%s: incorrect params %d.%d.\n", __func__,
 				dsc ? dsc->port : -1,
