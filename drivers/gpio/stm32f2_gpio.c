@@ -214,6 +214,14 @@ s32 stm32f2_gpio_config(const struct stm32f2_gpio_dsc *dsc,
 		gpio_regs->afr[dsc->pin >> 3] |= af_val[role] << i;
 	}
 
+	i = dsc->pin;
+
+	/*
+	 * Output mode configuration
+	 */
+	gpio_regs->otyper &= ~(0x1 << i);
+	gpio_regs->otyper |= otype << i;
+
 	i = dsc->pin * 2;
 
 	/*
@@ -221,12 +229,6 @@ s32 stm32f2_gpio_config(const struct stm32f2_gpio_dsc *dsc,
 	 */
 	gpio_regs->moder &= ~(0x3 << i);
 	gpio_regs->moder |= mode << i;
-
-	/*
-	 * Output mode configuration
-	 */
-	gpio_regs->otyper &= ~(0x3 << i);
-	gpio_regs->otyper |= otype << i;
 
 	/*
 	 * Speed mode configuration
