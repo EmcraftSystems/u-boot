@@ -3,6 +3,7 @@
  *
  * Yuri Tikhonov, Emcraft Systems, yur@emcraft.com
  * Vladimir Skvortsov, Emcraft Systems, vskvortsov@emcraft.com
+ * Alexander Potashev, Emcraft Systems, aspotashev@emcraft.com
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License as
@@ -85,6 +86,7 @@ enum clock {
 	CLOCK_PCLK1,		/* PCLK1 clock frequency expressed in Hz      */
 	CLOCK_PCLK2,		/* PCLK2 clock frequency expressed in Hz      */
 	CLOCK_SYSTICK,		/* Systimer clock frequency expressed in Hz   */
+	CLOCK_DIVM,		/* Input clock for PLL, PLLI2S, PLLSAI in Hz */
 	CLOCK_END		/* for internal usage			      */
 };
 

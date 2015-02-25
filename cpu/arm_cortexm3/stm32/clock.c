@@ -3,6 +3,7 @@
  *
  * Yuri Tikhonov, Emcraft Systems, yur@emcraft.com
  * Vladimir Skvortsov, Emcraft Systems, vskvortsov@emcraft.com
+ * Alexander Potashev, Emcraft Systems, aspotashev@emcraft.com
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License as
@@ -406,9 +407,13 @@ void clock_init(void)
 			/* HSI used as PLL clock source */
 			tmp = STM32_HSI_HZ;
 		}
+
+		/* Input clock for PLL, PLLI2S and PLLSAI */
+		clock_val[CLOCK_DIVM] = tmp / pllm;
+
 		pllvco  = STM32_RCC->pllcfgr >> STM32_RCC_PLLCFGR_PLLN_BIT;
 		pllvco &= STM32_RCC_PLLCFGR_PLLN_MSK;
-		pllvco *= tmp / pllm;
+		pllvco *= clock_val[CLOCK_DIVM];
 
 		pllp  = STM32_RCC->pllcfgr >> STM32_RCC_PLLCFGR_PLLP_BIT;
 		pllp &= STM32_RCC_PLLCFGR_PLLP_MSK;
