@@ -234,6 +234,8 @@ void lcd_show_board_info(void);
 #define LCD_COLOR4	2
 #define LCD_COLOR8	3
 #define LCD_COLOR16	4
+#define LCD_COLOR24	24
+#define LCD_COLOR32	5
 
 /*----------------------------------------------------------------------*/
 #if defined(CONFIG_LCD_INFO_BELOW_LOGO)
@@ -256,7 +258,9 @@ void lcd_show_board_info(void);
 #endif
 
 /* Calculate nr. of bits per pixel  and nr. of colors */
-#define NBITS(bit_code)		(1 << (bit_code))
+#define NBITS(bit_code)		((bit_code) <= 5 ? \
+				(1 << (bit_code)) : (bit_code))
+
 #define NCOLORS(bit_code)	(1 << NBITS(bit_code))
 
 /************************************************************************/
@@ -322,7 +326,8 @@ void lcd_show_board_info(void);
 #if LCD_BPP == LCD_MONOCHROME
 # define COLOR_MASK(c)		((c)	  | (c) << 1 | (c) << 2 | (c) << 3 | \
 				 (c) << 4 | (c) << 5 | (c) << 6 | (c) << 7)
-#elif (LCD_BPP == LCD_COLOR8) || (LCD_BPP == LCD_COLOR16)
+#elif (LCD_BPP == LCD_COLOR8) || (LCD_BPP == LCD_COLOR16) \
+	|| (LCD_BPP == LCD_COLOR24) || (LCD_BPP == LCD_COLOR32)
 # define COLOR_MASK(c)		(c)
 #else
 # error Unsupported LCD BPP.
