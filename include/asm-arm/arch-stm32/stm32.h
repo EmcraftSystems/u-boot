@@ -115,6 +115,11 @@ struct stm32_pwr_regs {
 #define STM32_PWR			((volatile struct stm32_pwr_regs *) \
 					STM32_PWR_BASE)
 
+/*
+ * LTDC registers map
+ */
+#define STM32F4_LTDC_BASE	(STM32_APB2PERIPH_BASE + 0x6800)
+
 
 /******************************************************************************
  * FIXME: get rid of this
