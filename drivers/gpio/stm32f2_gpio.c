@@ -102,6 +102,11 @@ DECLARE_GLOBAL_DATA_PTR;
 #define STM32F2_GPIO_AF_FSMC	0x0C
 
 /*
+ * LTDC AF
+ */
+#define STM32F2_GPIO_AF_LTDC   0x0E
+
+/*
  * GPIO register map
  */
 struct stm32f2_gpio_regs {
@@ -134,6 +139,7 @@ static const u32 af_val[STM32F2_GPIO_ROLE_LAST] = {
 	STM32F2_GPIO_AF_USART4, STM32F2_GPIO_AF_USART5, STM32F2_GPIO_AF_USART6,
 	STM32F2_GPIO_AF_MAC,
 	(u32)-1,
+	STM32F2_GPIO_AF_LTDC,
 	STM32F2_GPIO_AF_FSMC,
 	(u32)-1
 };
@@ -191,6 +197,12 @@ s32 stm32f2_gpio_config(const struct stm32f2_gpio_dsc *dsc,
 		ospeed = STM32F2_GPIO_SPEED_50M;
 		pupd   = STM32F2_GPIO_PUPD_NO;
 		mode   = STM32F2_GPIO_MODE_OUT;
+		break;
+	case STM32F2_GPIO_ROLE_LTDC:
+		otype  = STM32F2_GPIO_OTYPE_PP;
+		ospeed = STM32F2_GPIO_SPEED_50M;
+		pupd   = STM32F2_GPIO_PUPD_NO;
+		mode   = STM32F2_GPIO_MODE_AF;
 		break;
 	default:
 		if (gd->have_console)

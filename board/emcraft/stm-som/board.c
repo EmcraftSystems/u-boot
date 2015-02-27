@@ -1,5 +1,5 @@
 /*
- * (C) Copyright 2011, 2012, 2013
+ * (C) Copyright 2011, 2012, 2013, 2015
  *
  * Yuri Tikhonov, Emcraft Systems, yur@emcraft.com
  * Alexander Potashev, Emcraft Systems, aspotashev@emcraft.com
@@ -191,6 +191,124 @@ static const struct stm32f2_gpio_dsc ext_ram_fsmc_fmc_gpio[] = {
 #endif
 };
 
+#ifdef CONFIG_VIDEO_STM32F4_LTDC
+static const struct stm32f2_gpio_dsc ltdc_iomux[] = {
+#if defined(CONFIG_SYS_STM32F7)
+	/*
+	 * STM32F7-SOM
+	 */
+	/* PI14 = LCD_CLK */
+	{STM32F2_GPIO_PORT_I, STM32F2_GPIO_PIN_14},
+	/* PK7  = LCD_DE */
+	{STM32F2_GPIO_PORT_K, STM32F2_GPIO_PIN_7},
+	/* PI12 = LCD_HSYNC */
+	{STM32F2_GPIO_PORT_I, STM32F2_GPIO_PIN_12},
+	/* PI13 = LCD_VSYNC */
+	{STM32F2_GPIO_PORT_I, STM32F2_GPIO_PIN_13},
+	/* PJ12 = LCD_B0 */
+	{STM32F2_GPIO_PORT_J, STM32F2_GPIO_PIN_12},
+	/* PJ13 = LCD_B1 */
+	{STM32F2_GPIO_PORT_J, STM32F2_GPIO_PIN_13},
+	/* PJ14 = LCD_B2 */
+	{STM32F2_GPIO_PORT_J, STM32F2_GPIO_PIN_14},
+	/* PJ15 = LCD_B3 */
+	{STM32F2_GPIO_PORT_J, STM32F2_GPIO_PIN_15},
+	/* PK3  = LCD_B4 */
+	{STM32F2_GPIO_PORT_K, STM32F2_GPIO_PIN_3},
+	/* PK4  = LCD_B5 */
+	{STM32F2_GPIO_PORT_K, STM32F2_GPIO_PIN_4},
+	/* PK5  = LCD_B6 */
+	{STM32F2_GPIO_PORT_K, STM32F2_GPIO_PIN_5},
+	/* PK6  = LCD_B7 */
+	{STM32F2_GPIO_PORT_K, STM32F2_GPIO_PIN_6},
+	/* PJ7  = LCD_G0 */
+	{STM32F2_GPIO_PORT_J, STM32F2_GPIO_PIN_7},
+	/* PJ8  = LCD_G1 */
+	{STM32F2_GPIO_PORT_J, STM32F2_GPIO_PIN_8},
+	/* PJ9  = LCD_G2 */
+	{STM32F2_GPIO_PORT_J, STM32F2_GPIO_PIN_9},
+	/* PJ10 = LCD_G3 */
+	{STM32F2_GPIO_PORT_J, STM32F2_GPIO_PIN_10},
+	/* PJ11 = LCD_G4 */
+	{STM32F2_GPIO_PORT_J, STM32F2_GPIO_PIN_11},
+	/* PK0  = LCD_G5 */
+	{STM32F2_GPIO_PORT_K, STM32F2_GPIO_PIN_0},
+	/* PK1  = LCD_G6 */
+	{STM32F2_GPIO_PORT_K, STM32F2_GPIO_PIN_1},
+	/* PK2  = LCD_G7 */
+	{STM32F2_GPIO_PORT_K, STM32F2_GPIO_PIN_2},
+	/* PI15 = LCD_R0 */
+	{STM32F2_GPIO_PORT_I, STM32F2_GPIO_PIN_15},
+	/* PJ0  = CD_R1 */
+	{STM32F2_GPIO_PORT_J, STM32F2_GPIO_PIN_0},
+	/* PJ1  = LCD_R2 */
+	{STM32F2_GPIO_PORT_J, STM32F2_GPIO_PIN_1},
+	/* PJ2  = LCD_R3 */
+	{STM32F2_GPIO_PORT_J, STM32F2_GPIO_PIN_2},
+	/* PJ3  = LCD_R4 */
+	{STM32F2_GPIO_PORT_J, STM32F2_GPIO_PIN_3},
+	/* PJ4  = LCD_R5 */
+	{STM32F2_GPIO_PORT_J, STM32F2_GPIO_PIN_4},
+	/* PJ5  = LCD_R6 */
+	{STM32F2_GPIO_PORT_J, STM32F2_GPIO_PIN_5},
+	/* PJ6  = LCD_R7 */
+	{STM32F2_GPIO_PORT_J, STM32F2_GPIO_PIN_6},
+#else
+	/*
+	 * STM-SOM
+	 */
+	/* PG7  = LCD_CLK */
+	{STM32F2_GPIO_PORT_G, STM32F2_GPIO_PIN_7},
+	/* PF10 = LCD_DE */
+	{STM32F2_GPIO_PORT_F, STM32F2_GPIO_PIN_10},
+	/* PI10 = LCD_HSYNC */
+	{STM32F2_GPIO_PORT_I, STM32F2_GPIO_PIN_10},
+	/* PI9  = LCD_VSYNC */
+	{STM32F2_GPIO_PORT_I, STM32F2_GPIO_PIN_9},
+	/* PG12 = LCD_B1 */
+	{STM32F2_GPIO_PORT_G, STM32F2_GPIO_PIN_12},
+	/* PG10 = LCD_B2 */
+	{STM32F2_GPIO_PORT_G, STM32F2_GPIO_PIN_10},
+	/* PI4  = LCD_B4 */
+	{STM32F2_GPIO_PORT_I, STM32F2_GPIO_PIN_4},
+	/* PI5  = LCD_B5 */
+	{STM32F2_GPIO_PORT_I, STM32F2_GPIO_PIN_5},
+	/* PI6  = LCD_B6 */
+	{STM32F2_GPIO_PORT_I, STM32F2_GPIO_PIN_6},
+	/* PI7  = LCD_B7 */
+	{STM32F2_GPIO_PORT_I, STM32F2_GPIO_PIN_7},
+	/* PH13 = LCD_G2 */
+	{STM32F2_GPIO_PORT_H, STM32F2_GPIO_PIN_13},
+	/* PH14 = LCD_G3 */
+	{STM32F2_GPIO_PORT_H, STM32F2_GPIO_PIN_14},
+	/* PH15 = LCD_G4 */
+	{STM32F2_GPIO_PORT_H, STM32F2_GPIO_PIN_15},
+	/* PI0  = LCD_G5 */
+	{STM32F2_GPIO_PORT_I, STM32F2_GPIO_PIN_0},
+	/* PC7  = LCD_G6 */
+	{STM32F2_GPIO_PORT_C, STM32F2_GPIO_PIN_7},
+	/* PI2  = LCD_G7 */
+	{STM32F2_GPIO_PORT_I, STM32F2_GPIO_PIN_2},
+	/* PH2  = LCD_R0 */
+	{STM32F2_GPIO_PORT_H, STM32F2_GPIO_PIN_2},
+	/* PH3  = LCD_R1 */
+	{STM32F2_GPIO_PORT_H, STM32F2_GPIO_PIN_3},
+	/* PH8  = LCD_R2 */
+	{STM32F2_GPIO_PORT_H, STM32F2_GPIO_PIN_8},
+	/* PH9  = LCD_R3 */
+	{STM32F2_GPIO_PORT_H, STM32F2_GPIO_PIN_9},
+	/* PH10 = LCD_R4 */
+	{STM32F2_GPIO_PORT_H, STM32F2_GPIO_PIN_10},
+	/* PH11 = LCD_R5 */
+	{STM32F2_GPIO_PORT_H, STM32F2_GPIO_PIN_11},
+	/* PH12 = LCD_R6 */
+	{STM32F2_GPIO_PORT_H, STM32F2_GPIO_PIN_12},
+	/* PG6  = LCD_R7 */
+	{STM32F2_GPIO_PORT_G, STM32F2_GPIO_PIN_6},
+#endif
+};
+#endif /* CONFIG_VIDEO_STM32F4_LTDC */
+
 /*
  * Init FMC/FSMC GPIOs based
  */
@@ -213,6 +331,29 @@ static int fmc_fsmc_setup_gpio(void)
 out:
 	return rv;
 }
+
+#ifdef CONFIG_VIDEO_STM32F4_LTDC
+/*
+ * Initialize LCD pins
+ */
+static int ltdc_setup_iomux(void)
+{
+	int rv = 0;
+	int i;
+
+	/*
+	 * Connect GPIOs to FMC controller
+	 */
+	for (i = 0; i < ARRAY_SIZE(ltdc_iomux); i++) {
+		rv = stm32f2_gpio_config(&ltdc_iomux[i],
+				STM32F2_GPIO_ROLE_LTDC);
+		if (rv)
+			break;
+	}
+
+	return rv;
+}
+#endif /* CONFIG_VIDEO_STM32F4_LTDC */
 
 /*
  * Early hardware init.
@@ -271,6 +412,12 @@ int board_init(void)
 	}
 #endif
 #endif
+
+#ifdef CONFIG_VIDEO_STM32F4_LTDC
+	rv = ltdc_setup_iomux();
+	if (rv)
+		return rv;
+#endif /* CONFIG_VIDEO_STM32F4_LTDC */
 
 	return 0;
 }
