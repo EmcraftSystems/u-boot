@@ -155,6 +155,7 @@
 #define STM32_RCC_CR_HSERDY		(1 << 17) /* HSE clock ready	      */
 #define STM32_RCC_CR_PLLON		(1 << 24) /* PLL clock enable	      */
 #define STM32_RCC_CR_PLLRDY		(1 << 25) /* PLL clock ready	      */
+#define STM32_RCC_CR_PLLSAION		(1 << 28) /* PLLSAI enable	      */
 
 #define STM32_RCC_APB1ENR_PWREN		(1 << 28) /* Power interface clock enable */
 
@@ -209,6 +210,9 @@
 #define STM32_RCC_PLLCFGR_PLLQ_BIT	24	/* Div factor for USB,SDIO,.. */
 #define STM32_RCC_PLLCFGR_PLLQ_MSK	0xF
 
+#define STM32_RCC_DCKCFGR_PLLSAIDIVR	(3 << 16)
+#define STM32_RCC_PLLSAIDivR_Div8	(2 << 16)
+
 /*
  * Offsets and bitmasks of some PWR regs
  */
@@ -247,6 +251,71 @@ static int enable_over_drive(void)
 	return 0;
 }
 #endif
+
+#if defined(CONFIG_VIDEO_STM32F4_LTDC)
+/*
+ * Disable the LCD pixel clock
+ */
+static void sai_r_clk_disable(void)
+{
+	STM32_RCC->cr &= ~STM32_RCC_CR_PLLSAION;
+}
+
+/*
+ * Enable the LCD pixel clock
+ */
+void sai_r_clk_enable(void)
+{
+	u32 parent_rate;
+	u32 sai_n;
+	u32 sai_q;
+	u32 sai_r;
+	u32 sai_div_r;
+	u32 dckcfgr;
+
+	/*
+	 * These are good divider values for PLLSAI to keep N (see "sai_n"
+	 * below) in its recommended range.
+	 *
+	 * Q = 7 (division of PLLSAI internal clcok to produce PLLSAICLK,
+	 *          not used for LCD)
+	 * R = 3 (division of PLLSAI internal clock to produce PLLLCDCLK)
+	 * divR = 8 (further division of PLLLCDCLK to produce the pixel clock)
+	 *
+	 * divR cannot take arbitrary values, see also STM32_RCC_PLLSAIDivR_Div8
+	 * below.
+	 */
+	sai_q = 7;
+	sai_r = 3;
+	sai_div_r = 8;
+
+	parent_rate = clock_val[CLOCK_DIVM];
+
+	/* Calculate N to match the requested rate */
+	sai_n = CONFIG_STM32_LTDC_PIXCLK * sai_r * sai_div_r / parent_rate;
+
+	/* Disable PLLSAI */
+	sai_r_clk_disable();
+
+	/* Configure PLLSAI */
+	STM32_RCC->pllsaicfgr = (sai_n << 6) | (sai_q << 24) | (sai_r << 28);
+
+	/* Configure divider on the "R" output of PLLSAI */
+	dckcfgr = STM32_RCC->dckcfgr;
+
+	/* Clear PLLSAIDIVR[2:0] bits */
+	dckcfgr &= ~STM32_RCC_DCKCFGR_PLLSAIDIVR;
+
+	/* Set PLLSAIDIVR values */
+	dckcfgr |= STM32_RCC_PLLSAIDivR_Div8;
+
+	/* Store the new value */
+	STM32_RCC->dckcfgr = dckcfgr;
+
+	STM32_RCC->cr |= STM32_RCC_CR_PLLSAION;
+	while ((STM32_RCC->cr & (1 << 29)) == 0);
+}
+#endif /* CONFIG_VIDEO_STM32F4_LTDC */
 
 #if !defined(CONFIG_STM32_SYS_CLK_HSI)
 /*
