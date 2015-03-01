@@ -304,6 +304,46 @@
 #define CONFIG_MONITOR_IS_IN_RAM	1
 
 /*
+ * Framebuffer configuration
+ */
+#define CONFIG_LCD
+
+#ifdef CONFIG_LCD
+
+#define CONFIG_FB_ADDR			CONFIG_DMAMEM_BASE
+
+#define CONFIG_VIDEO_STM32F4_LTDC
+#define CONFIG_STM32_LTDC_PIXCLK	(9 * 1000 * 1000)
+#define LCD_EMCRAFT_IOT_LCD
+
+#define CONFIG_SPLASH_SCREEN
+#define CONFIG_SPLASH_SCREEN_ALIGN
+
+#define CONFIG_BMP
+#undef CONFIG_CMD_BMP
+#define CONFIG_BMP_24BPP
+#define LCD_BPP				LCD_COLOR24
+
+#ifdef LCD_EMCRAFT_IOT_LCD
+# define CONFIG_STM32F4_LTDC_XRES	480
+# define CONFIG_STM32F4_LTDC_YRES	272
+# define CONFIG_STM32F4_LTDC_BPP	LCD_BPP
+
+# define CONFIG_STM32F4_LTDC_LEFT_MARGIN	2
+# define CONFIG_STM32F4_LTDC_HSYNC_LEN		41
+# define CONFIG_STM32F4_LTDC_RIGHT_MARGIN	2
+
+# define CONFIG_STM32F4_LTDC_UPPER_MARGIN	2
+# define CONFIG_STM32F4_LTDC_VSYNC_LEN		10
+# define CONFIG_STM32F4_LTDC_LOWER_MARGIN	2
+
+#elif defined(CONFIG_VIDEO_STM32F4_LTDC)
+# error "STM32F7 LTDC is enabled but no LCD configured"
+#endif
+
+#endif /* CONFIG_LCD */
+
+/*
  * Enable all those monitor commands that are needed
  */
 #include <config_cmd_default.h>
