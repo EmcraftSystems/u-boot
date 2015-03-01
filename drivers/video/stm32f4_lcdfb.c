@@ -126,7 +126,7 @@ static void fb_enable_panel(void *lcdbase, int bpp)
 
 	switch (bpp) {
 		case 24:
-			/* Set pixel format to RGB */
+			/* Set pixel format to RGB888 */
 			ltdc_writel(1, LTDC_LAYER_PFCR(i));
 			break;
 		case 32:
@@ -140,8 +140,8 @@ static void fb_enable_panel(void *lcdbase, int bpp)
 
 	ltdc_writel((u32)lcdbase, LTDC_LAYER_CFBAR(i));
 
-	ltdc_writel(((CONFIG_STM32F4_LTDC_XRES * 4) << 16) |
-		(CONFIG_STM32F4_LTDC_XRES * 4 + 7),
+	ltdc_writel(((CONFIG_STM32F4_LTDC_XRES * (bpp >> 3)) << 16) |
+		(CONFIG_STM32F4_LTDC_XRES * (bpp >> 3) + 7),
 		LTDC_LAYER_CFBLR(i));
 	ltdc_writel(CONFIG_STM32F4_LTDC_YRES, LTDC_LAYER_CFBLNR(i));
 
@@ -206,8 +206,8 @@ void lcd_ctrl_init(void *lcdbase)
 	acc_v_cycles += CONFIG_STM32F4_LTDC_LOWER_MARGIN;
 	ltdc_writel((acc_h_cycles << 16) | acc_v_cycles, LTDC_TWCR);
 
-	/* Disable uncommon features of LTDC */
-	ltdc_writel(ltdc_readl(LTDC_GCR) & GCR_MASK, LTDC_GCR);
+	/* Disable uncommon features of LTDC, and invert input pixclock */
+	ltdc_writel((ltdc_readl(LTDC_GCR) & GCR_MASK) | (1 << 28), LTDC_GCR);
 
 	/* Set background color to black */
 	ltdc_writel(0, LTDC_BCCR);
