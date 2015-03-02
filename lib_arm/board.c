@@ -280,7 +280,7 @@ void start_armboot (void)
 {
 	init_fnc_t **init_fnc_ptr;
 	char *s;
-#if defined(CONFIG_VFD) || defined(CONFIG_LCD)
+#if defined(CONFIG_VFD) || (defined(CONFIG_LCD) && !defined(CONFIG_FB_ADDR))
 	unsigned long addr;
 #endif
 
