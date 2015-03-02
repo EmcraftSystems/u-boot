@@ -225,7 +225,7 @@ static void lcd_drawchars (ushort x, ushort y, uchar *str, int count)
 		int i;
 #if LCD_BPP == LCD_COLOR16
 		ushort *d = (ushort *)dest;
-#else
+#elif LCD_BPP != LCD_COLOR32
 		uchar *d = dest;
 #endif
 
