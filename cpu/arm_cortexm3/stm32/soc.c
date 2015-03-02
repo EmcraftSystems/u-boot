@@ -139,6 +139,9 @@ static void stm32f7_envm_mpu_cfg(u8 dev, u8 mpu_run)
 
 	if (mpu_run)
 		cortex_m3_mpu_enable(1);
+
+	__asm__ volatile("dsb");
+	__asm__ volatile("isb");
 }
 
 /*
