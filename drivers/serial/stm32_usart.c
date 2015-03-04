@@ -105,6 +105,7 @@
  */
 #if defined (CONFIG_SYS_STM32F7)
 #define STM32_USART_CR1_UE	(1 << 0)	/* USART enable		     */
+#define STM32_USART_CR3_OVRDIS	(1 << 12)	/* Disable rx overrun detect */
 #else
 #define STM32_USART_CR1_UE	(1 << 13)	/* USART enable		     */
 #endif
@@ -264,6 +265,9 @@ s32 serial_init(void)
 	 * - full duplex
 	 */
 	usart_regs->cr3 = 0;
+#if defined (CONFIG_SYS_STM32F7)
+	usart_regs->cr3 |= STM32_USART_CR3_OVRDIS;
+#endif
 
 	/*
 	 * Set baudrate
