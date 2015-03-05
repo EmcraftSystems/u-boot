@@ -50,7 +50,7 @@ static void setup_initrd_tag (bd_t *bd, ulong initrd_start,
 # endif
 static void setup_end_tag (bd_t *bd);
 
-# if defined (CONFIG_VFD) || defined (CONFIG_LCD)
+# if defined (CONFIG_SETUP_VIDEOLFB_TAG) && (defined (CONFIG_VFD) || defined (CONFIG_LCD))
 static void setup_videolfb_tag (gd_t *gd);
 # endif
 
@@ -113,7 +113,7 @@ int do_bootm_linux(int flag, int argc, char *argv[], bootm_headers_t *images)
 	if (images->rd_start && images->rd_end)
 		setup_initrd_tag (bd, images->rd_start, images->rd_end);
 #endif
-#if defined (CONFIG_VFD) || defined (CONFIG_LCD)
+#if defined (CONFIG_SETUP_VIDEOLFB_TAG) && (defined (CONFIG_VFD) || defined (CONFIG_LCD))
 	setup_videolfb_tag ((gd_t *) gd);
 #endif
 #ifdef CONFIG_DMAMEM_TAG
@@ -240,7 +240,7 @@ static void setup_initrd_tag (bd_t *bd, ulong initrd_start, ulong initrd_end)
 #endif /* CONFIG_INITRD_TAG */
 
 
-#if defined (CONFIG_VFD) || defined (CONFIG_LCD)
+#if defined (CONFIG_SETUP_VIDEOLFB_TAG) && (defined (CONFIG_VFD) || defined (CONFIG_LCD))
 extern ulong calc_fbsize (void);
 static void setup_videolfb_tag (gd_t *gd)
 {
