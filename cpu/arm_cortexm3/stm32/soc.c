@@ -161,6 +161,7 @@ void stm32f7_envm_as_mem(void)
 }
 #endif
 
+#if defined(CONFIG_SYS_STM32F7)
 /*
  * Configure MPU.
  * We don't want to use common cortex_m3_mpu_full_access() to avoid messing
@@ -215,6 +216,7 @@ static void stm32f7_mpu_config(void)
 	 */
 	cortex_m3_mpu_enable(1);
 }
+#endif
 
 #if defined(CONFIG_STM32F7_ICACHE_ON) || defined(CONFIG_STM32F7_DCACHE_ON)
 /*
