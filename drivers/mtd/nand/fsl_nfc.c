@@ -45,9 +45,9 @@
 /* Timeouts */
 #define NFC_RESET_TIMEOUT	1000		/* 1 ms */
 #define NFC_TIMEOUT		5000	/* 1/10 s */
-#define ECC_SRAM_ADDR	0x100
-#define ECC_STATUS_MASK	0x80
-#define ECC_ERR_COUNT	0x3F
+#define ECC_SRAM_ADDR		(0x840 >> 3)
+#define ECC_STATUS_MASK		0x80
+#define ECC_ERR_COUNT		0x3F
 
 #ifndef MIN
 #define MIN(x, y)		((x < y) ? x : y)
@@ -182,7 +182,7 @@ static void fsl_nfc_done(struct mtd_info *mtd)
 
 	start = get_timer(0);
 
-	while (!nfc_get_field(mtd, NFC_IRQ_STATUS, CMD_DONE_IRQ_MASK)) {
+	while (!nfc_get_field(mtd, NFC_IRQ_STATUS, IDLE_IRQ_MASK)) {
 		if (get_timer(start) > NFC_TIMEOUT) {
 			printf("Timeout while waiting for BUSY.\n");
 			break;
