@@ -444,6 +444,7 @@
  */
 #define CONFIG_EXTRA_ENV_SETTINGS				\
 	"loadaddr=0x08007fc0\0"					\
+	"args=setenv bootargs " CONFIG_BOOTARGS "\0"		\
 	"addip=setenv bootargs ${bootargs} "			\
 		"ip=${ipaddr}:${serverip}:${gatewayip}:"	\
 			"${netmask}:${hostname}:eth0:off\0"	\
@@ -451,10 +452,10 @@
 	"ipaddr=172.17.6.46\0"					\
 	"serverip=172.17.0.1\0"					\
 	"image=k70/uImage\0"					\
-	"netboot=tftp ${image};run addip;bootm\0"		\
+	"netboot=tftp ${image};run args addip;bootm\0"		\
 	"flashaddr=00100000\0"					\
 	"flashboot=nboot ${loadaddr} 0 ${flashaddr};"		\
-		"run addip;bootm\0"				\
+		"run args addip;bootm\0"				\
 	"update=tftp ${image};"					\
 		"nand erase ${flashaddr} ${filesize};"		\
 		"nand write ${loadaddr} ${flashaddr} ${filesize}\0"

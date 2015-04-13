@@ -259,7 +259,7 @@
 #define LOADADDR		"0xD0007FC0"
 
 #define REV_EXTRA_ENV		\
-	"envmboot=run addip;bootm ${envmaddr}\0"		\
+	"envmboot=run args addip;bootm ${envmaddr}\0"		\
 	"update=tftp ${image};"					\
 		"cptf ${envmaddr} ${loadaddr} ${filesize}\0"
 
@@ -270,6 +270,7 @@
  */
 #define CONFIG_EXTRA_ENV_SETTINGS				\
 	"loadaddr=" LOADADDR "\0"				\
+	"args=setenv bootargs " CONFIG_BOOTARGS "\0"		\
 	"addip=setenv bootargs ${bootargs} ip=${ipaddr}:${serverip}:${gatewayip}:${netmask}:${hostname}:eth0:off\0"				\
 	"envmaddr=08040000\0"					\
 	"ethaddr=C0:B1:3C:88:88:85\0"				\
@@ -277,7 +278,7 @@
 	"serverip=172.17.0.1\0"					\
 	"image=stm32f429/uImage\0"				\
 	"stdin=serial\0"					\
-	"netboot=tftp ${image};run addip;bootm\0"		\
+	"netboot=tftp ${image};run args addip;bootm\0"		\
 	REV_EXTRA_ENV
 
 /*
