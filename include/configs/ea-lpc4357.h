@@ -1,8 +1,9 @@
 /*
- * (C) Copyright 2012, 2013
+ * (C) Copyright 2012-2015
  *
  * Alexander Potashev, Emcraft Systems, aspotashev@emcraft.com
  * Pavel Boldin, Emcraft Systems, paboldin@emcraft.com
+ * Vladimir Khusainov, Emcraft Systems, vlad@emcraft.com
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License as
@@ -21,7 +22,7 @@
  */
 
 /*
- * Configuration settings for the Hitex LPC4350 Eval board.
+ * Configuration settings for the Embedded Artists LPC4357 Dev Kit
  */
 
 #ifndef __CONFIG_H
@@ -51,7 +52,7 @@
 #define CONFIG_SYS_LPC18XX
 
 /*
- * Except it have eNVM
+ * Except it has eNVM
  */
 #define CONFIG_LPC43XX_ENVM
 
@@ -77,12 +78,12 @@
 #define CONFIG_DISPLAY_CPUINFO		1
 #define CONFIG_DISPLAY_BOARDINFO	1
 
-#define CONFIG_SYS_BOARD_REV_STR	"1"
+#define CONFIG_SYS_BOARD_REV_STR	"Rev 1"
 
 /*
  * Monitor prompt
  */
-#define CONFIG_SYS_PROMPT		"EA-LPC4357-EVAL> "
+#define CONFIG_SYS_PROMPT		"EA-LPC4357> "
 
 /*
  * We want to call the CPU specific initialization
@@ -96,8 +97,7 @@
 
 /*
  * Clock configuration (see cpu/arm_cortexm3/lpc18xx/clock.c for details)
- */
-/*
+ * ...
  * This should be setup to the board specific rate for the external oscillator
  */
 #define CONFIG_LPC18XX_EXTOSC_RATE		12000000
@@ -132,6 +132,7 @@
 /*
  * Memory layout configuration
  */
+
 /*
  * Internal flash on the NXP LPC4357 MCU. There are two banks.
  */
@@ -384,7 +385,7 @@
 	"ethaddr=C0:B1:3C:88:78:93\0"				\
 	"ipaddr=172.17.4.215\0"					\
 	"serverip=172.17.0.1\0"					\
-	"image=lpc18xx/uImage\0"				\
+	"image=lpc4357.uImage\0"				\
 	"netboot=tftp ${image};run args addip;bootm\0"		\
 	"update=tftp ${image};"					\
 	"prot off ${flashaddr} +${filesize};"			\
@@ -392,7 +393,7 @@
 	"cp.b ${loadaddr} ${flashaddr} ${filesize}\0"		\
 	"uboot_image=u-boot.bin\0"				\
 	"uboot_update=tftp ${uboot_image};"			\
-	"cptf 1A000000 ${loadaddr} ${filesize}\0"
+	"cptf 1A000000 ${loadaddr} ${filesize} 1\0"
 
 /*
  * Linux kernel boot parameters configuration

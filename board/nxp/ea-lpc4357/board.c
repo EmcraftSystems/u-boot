@@ -1,8 +1,9 @@
 /*
- * (C) Copyright 2012, 2013
+ * (C) Copyright 2012-2015
  *
  * Alexander Potashev, Emcraft Systems, aspotashev@emcraft.com
  * Pavel Boldin, Emcraft Systems, paboldin@emcraft.com
+ * Vladimir Khusainov, Emcraft Systems, vlad@emcraft.com
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License as
@@ -21,7 +22,7 @@
  */
 
 /*
- * Board specific code for the Embedded Artists LPC4357 OEM board
+ * Board specific code for the Embedded Artists LPC4357 Dev Kit
  */
 
 #include <common.h>
@@ -632,7 +633,7 @@ int board_init(void)
  */
 int checkboard(void)
 {
-	printf("Board: Embedded Artists LPC4357 OEM rev %s\n",
+	printf("Board: Embedded Artists LPC4357 Dev Kit %s\n",
 		CONFIG_SYS_BOARD_REV_STR);
 
 	return 0;
