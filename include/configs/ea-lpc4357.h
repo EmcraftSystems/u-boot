@@ -78,7 +78,7 @@
 #define CONFIG_DISPLAY_CPUINFO		1
 #define CONFIG_DISPLAY_BOARDINFO	1
 
-#define CONFIG_SYS_BOARD_REV_STR	"Rev 1"
+#define CONFIG_SYS_BOARD_REV_STR	"Rev A1"
 
 /*
  * Monitor prompt
