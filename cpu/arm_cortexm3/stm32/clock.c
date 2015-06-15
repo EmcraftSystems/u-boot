@@ -153,6 +153,7 @@
  */
 #define STM32_RCC_CR_HSEON		(1 << 16) /* HSE clock enable	      */
 #define STM32_RCC_CR_HSERDY		(1 << 17) /* HSE clock ready	      */
+#define STM32_RCC_CR_HSEBYP		(1 << 18) /* HSE clock bypass	      */
 #define STM32_RCC_CR_PLLON		(1 << 24) /* PLL clock enable	      */
 #define STM32_RCC_CR_PLLRDY		(1 << 25) /* PLL clock ready	      */
 #define STM32_RCC_CR_PLLSAION		(1 << 28) /* PLLSAI enable	      */
@@ -329,7 +330,13 @@ static void clock_setup(void)
 	/*
 	 * Enable HSE, and wait while it becomes ready
 	 */
+#ifdef CONFIG_SYS_STM32F7_DISCO
+	STM32_RCC->cr &= ~STM32_RCC_CR_HSEON;
+	STM32_RCC->cr |= STM32_RCC_CR_HSEBYP;
+#else
 	STM32_RCC->cr |= STM32_RCC_CR_HSEON;
+#endif
+
 	for (i = 0; i < STM32_HSE_STARTUP_TIMEOUT; i++) {
 		if (STM32_RCC->cr & STM32_RCC_CR_HSERDY)
 			break;
