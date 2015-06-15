@@ -6,6 +6,7 @@
  * Vladimir Khusainov, Emcraft Systems, vlad@emcraft.com
  * Pavel Boldin, Emcraft Systems, paboldin@emcraft.com
  * Vladimir Skvortsov, Emcraft Systems, vskvortsov@emcraft.com
+ * Anton Protopopov, Emcraft Systems, antonp@emcraft.com
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License as
@@ -135,7 +136,7 @@ static const struct stm32f2_gpio_dsc ext_ram_fsmc_fmc_gpio[] = {
 
 	/* SDRAM */
 	/* M4, SDRAM_NE */
-	{STM32F2_GPIO_PORT_C, STM32F2_GPIO_PIN_2},
+	{STM32F2_GPIO_PORT_H, STM32F2_GPIO_PIN_3},
 	/* P8, SDRAM_NRAS */
 	{STM32F2_GPIO_PORT_F, STM32F2_GPIO_PIN_11},
 	/* B7, SDRAM_NCAS */
@@ -328,14 +329,14 @@ static inline u32 _ns2clk(u32 ns, u32 freq)
 #define NS2CLK(ns) (_ns2clk(ns, freq))
 
 /*
- * Following are timings for M12L2561616A-6BI, from corresponding datasheet
+ * Following are timings for MT48LC4M32B2B5-6A, from corresponding datasheet
  */
 #define SDRAM_CAS	3
 #define SDRAM_NB	1	/* Number of banks */
 #define SDRAM_MWID	1	/* 16 bit memory */
 
-#define SDRAM_NR	0x2	/* 13-bit row */
-#define SDRAM_NC	0x1	/* 9-bit col */
+#define SDRAM_NR	1	/* 12-bit row */
+#define SDRAM_NC	0	/* 8-bit col */
 
 #define SDRAM_TRRD	NS2CLK(12)
 #define SDRAM_TRCD	NS2CLK(18)
@@ -350,7 +351,7 @@ static inline u32 _ns2clk(u32 ns, u32 freq)
 #define SDRAM_TCCD	(1 - 1)
 
 #define SDRAM_TXSR	SDRAM_TRFC	/* Row cycle time after precharge */
-#define SDRAM_TMRD	(3 - 1)		/* Page 10, Mode Register Set */
+#define SDRAM_TMRD	1		/* Page 10, Mode Register Set */
 
 /* Last data in to row precharge, need also comply ineq on page 1648 */
 #define SDRAM_TWR	max(\
