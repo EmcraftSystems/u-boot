@@ -160,9 +160,11 @@
 
 /*
  * Configuration of the external SDRAM memory
+ * Even though the board uses a 16 MByte SDRAM device
+ * only half of that is used by the hardware design
  */
 #define CONFIG_NR_DRAM_BANKS		1
-#define CONFIG_SYS_RAM_SIZE		(16 * 1024 * 1024)
+#define CONFIG_SYS_RAM_SIZE		(8 * 1024 * 1024)
 #define CONFIG_SYS_RAM_FREQ_DIV	2
 #define CONFIG_SYS_RAM_BASE		0xC0000000
 
