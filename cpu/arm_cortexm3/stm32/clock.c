@@ -330,12 +330,7 @@ static void clock_setup(void)
 	/*
 	 * Enable HSE, and wait while it becomes ready
 	 */
-#ifdef CONFIG_SYS_STM32F7_DISCO
-	STM32_RCC->cr &= ~STM32_RCC_CR_HSEON;
-	STM32_RCC->cr |= STM32_RCC_CR_HSEBYP;
-#else
 	STM32_RCC->cr |= STM32_RCC_CR_HSEON;
-#endif
 
 	for (i = 0; i < STM32_HSE_STARTUP_TIMEOUT; i++) {
 		if (STM32_RCC->cr & STM32_RCC_CR_HSERDY)
