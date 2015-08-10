@@ -385,7 +385,7 @@
 /* boot args and env */
 #define CONFIG_HOSTNAME			stm32f7-disco
 #define CONFIG_BOOTARGS			"stm32_platform=stm32f7-disco "	\
-					"console=ttyS0,115200 panic=10"
+					"console=ttyS5,115200 panic=10"
 
 #define LOADADDR			"0xC0007FC0"
 
