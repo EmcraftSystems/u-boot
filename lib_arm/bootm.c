@@ -87,8 +87,15 @@ void arch_lmb_reserve(struct lmb *lmb)
 
 	/* adjust sp by 1K to be safe */
 	sp -= 1024;
-	lmb_reserve(lmb, sp,
-		    gd->bd->bi_dram[0].start + gd->bd->bi_dram[0].size - sp);
+
+	/*
+	 * Skip reservation if our stack is not in external RAM
+	 */
+	if (sp >= gd->bd->bi_dram[0].start &&
+	    sp <  gd->bd->bi_dram[0].start + gd->bd->bi_dram[0].size) {
+		lmb_reserve(lmb, sp, gd->bd->bi_dram[0].start +
+			    gd->bd->bi_dram[0].size - sp);
+	}
 }
 
 static void announce_and_cleanup(void)
