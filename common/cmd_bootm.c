@@ -304,7 +304,6 @@ static int bootm_start(cmd_tbl_t *cmdtp, int flag, int argc, char *argv[])
 		}
 
 #if defined(CONFIG_OF_LIBFDT)
-#if defined(CONFIG_PPC) || defined(CONFIG_M68K) || defined(CONFIG_SPARC)
 		/* find flattened device tree */
 		ret = boot_get_fdt (flag, argc, argv, &images,
 				    &images.ft_addr, &images.ft_len);
@@ -314,7 +313,6 @@ static int bootm_start(cmd_tbl_t *cmdtp, int flag, int argc, char *argv[])
 		}
 
 		set_working_fdt_addr(images.ft_addr);
-#endif
 #endif
 	}
 
@@ -467,7 +465,7 @@ static int bootm_start_standalone(ulong iflag, int argc, char *argv[])
 cmd_tbl_t cmd_bootm_sub[] = {
 	U_BOOT_CMD_MKENT(start, 0, 1, (void *)BOOTM_STATE_START, "", ""),
 	U_BOOT_CMD_MKENT(loados, 0, 1, (void *)BOOTM_STATE_LOADOS, "", ""),
-#if defined(CONFIG_PPC) || defined(CONFIG_M68K) || defined(CONFIG_SPARC)
+#ifdef CONFIG_SYS_BOOT_RAMDISK_HIGH
 	U_BOOT_CMD_MKENT(ramdisk, 0, 1, (void *)BOOTM_STATE_RAMDISK, "", ""),
 #endif
 #ifdef CONFIG_OF_LIBFDT
@@ -526,7 +524,7 @@ int do_bootm_subcommand (cmd_tbl_t *cmdtp, int flag, int argc, char *argv[])
 			lmb_reserve(&images.lmb, images.os.load,
 					(load_end - images.os.load));
 			break;
-#if defined(CONFIG_PPC) || defined(CONFIG_M68K) || defined(CONFIG_SPARC)
+#ifdef CONFIG_SYS_BOOT_RAMDISK_HIGH
 		case BOOTM_STATE_RAMDISK:
 		{
 			ulong rd_len = images.rd_end - images.rd_start;
