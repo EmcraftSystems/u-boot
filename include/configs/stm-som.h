@@ -86,15 +86,15 @@
  * Clock configuration (see mach-stm32/clock.c for details):
  * - use PLL as the system clock;
  * - use HSE as the PLL source;
- * - configure PLL to get 168MHz system clock.
+ * - configure PLL to get 180MHz system clock.
  */
 #define CONFIG_STM32_SYS_CLK_PLL
 #define CONFIG_STM32_PLL_SRC_HSE
 #define CONFIG_STM32_HSE_HZ		12000000	/* 12 MHz */
-#define CONFIG_STM32_PLL_M		12
-#define CONFIG_STM32_PLL_N		336
-#define CONFIG_STM32_PLL_P		2
-#define CONFIG_STM32_PLL_Q		7
+#define CONFIG_STM32_PLL_M		6
+#define CONFIG_STM32_PLL_N		360
+#define CONFIG_STM32_PLL_P		4
+#define CONFIG_STM32_PLL_Q		15
 
 /*
  * Number of clock ticks in 1 sec
@@ -188,13 +188,14 @@
 /*
  * Flash timinigs are almost same for write and read.
  * See Spansion memory reference manual for S29GL128S10DHI010
- * tACC(MAX) = ADDSET(3-0) = 110 ns = 18.48 HCLK (on 168 MHz)
- * tRC(MIN) = DATAST(15-8) = 110 ns = 18.48 HCLK (on 168 MHz)
- * tNE switch = BUSTURN(19-16) = 10 ns = 2 HCLK
+ * ns <-> HCLK below assumes 180 MHz System Clock
+ * tACC(MAX) = ADDSET(3-0) = 110 ns = 19.8 HCLK
+ * tRC(MIN) = DATAST(15-8) = 110 ns = 19.8 HCLK
+ * tNE switch = BUSTURN(19-16) = 10 ns = 1.8 HCLK
  * ACCMODE(29-28) = 0x2 (mode C)
  */
-#define CONFIG_SYS_FSMC_FLASH_BTR	0x2002120f
-#define CONFIG_SYS_FSMC_FLASH_BWTR	0x2002110f
+#define CONFIG_SYS_FSMC_FLASH_BTR	0x2002140f
+#define CONFIG_SYS_FSMC_FLASH_BWTR	0x2002130f
 #define CONFIG_FSMC_NOR_PSRAM_CS2_ENABLE
 
 #define CONFIG_SYS_FLASH_BANK1_BASE	FSMC_NOR_PSRAM_CS_ADDR(CONFIG_SYS_FLASH_CS)
