@@ -474,13 +474,6 @@
  * Enable support for booting with FDT
  */
 #define CONFIG_OF_LIBFDT
-
-/*
- * The early kernel mapping on ARM currently only maps from the base of DRAM
- * to the end of the kernel image.  The kernel is loaded at DRAM base + 0x8000.
- * The early kernel pagetable uses DRAM base + 0x4000 to DRAM base + 0x8000,
- * so that leaves DRAM base to DRAM base + 0x4000 available.
- */
-#define CONFIG_SYS_BOOTMAPSZ		0x4000
+#define CONFIG_SYS_BOOTMAPSZ		CONFIG_SYS_RAM_SIZE
 
 #endif /* __CONFIG_H */
