@@ -380,27 +380,19 @@
  */
 #define CONFIG_BOOTDELAY		3
 #define CONFIG_ZERO_BOOTDELAY_CHECK
-#define CONFIG_BOOTCOMMAND		"run flashboot"
+#define CONFIG_BOOTCOMMAND		"run netboot"
 
 /* boot args and env */
 #define CONFIG_HOSTNAME			stm32f7-disco
 #define CONFIG_BOOTARGS			"stm32_platform=stm32f7-disco "	\
-					"console=ttyS0,115200 panic=10"
+					"console=ttyS5,115200 panic=10"
 
 #define LOADADDR			"0xC0007FC0"
 
 #define REV_EXTRA_ENV							\
 	"envmboot=run args addip;bootm ${envmaddr}\0"			\
 	"envmupdate=tftp ${image};"					\
-		"cptf ${envmaddr} ${loadaddr} ${filesize}\0"		\
-	"flashboot=run args addip;bootm ${flashaddr}\0"			\
-	"update=tftp ${image};"						\
-		"prot off ${flashaddr} +${filesize};"			\
-		"era ${flashaddr} +${filesize};"			\
-		"cp.b ${loadaddr} ${flashaddr} ${filesize};"		\
-		"setenv kernelsize ${filesize};"			\
-		"setenv filesize; setenv fileaddr;"			\
-		"saveenv\0"
+		"cptf ${envmaddr} ${loadaddr} ${filesize}\0"
 
 #define CONFIG_SYS_CONSOLE_IS_IN_ENV
 
@@ -411,7 +403,6 @@
 	"loadaddr=" LOADADDR "\0"				\
 	"args=setenv bootargs " CONFIG_BOOTARGS "\0"		\
 	"addip=setenv bootargs ${bootargs} ip=${ipaddr}:${serverip}:${gatewayip}:${netmask}:${hostname}:eth0:off\0"				\
-	"flashaddr=60020000\0"					\
 	"envmaddr=08040000\0"					\
 	"ethaddr=C0:B1:3C:88:88:85\0"				\
 	"ipaddr=172.17.4.206\0"					\
