@@ -42,22 +42,26 @@
 #define CMD_M25PXX_FAST_READ	0x0b	/* Read Data Bytes at Higher Speed */
 #define CMD_M25PXX_PP		0x02	/* Page Program */
 #define CMD_M25PXX_SE		0xd8	/* Sector Erase */
+#define CMD_M25PXX_SSE		0x20	/* SubSector Erase */
 #define CMD_M25PXX_BE		0xc7	/* Bulk Erase */
 #define CMD_M25PXX_DP		0xb9	/* Deep Power-down */
 #define CMD_M25PXX_RES		0xab	/* Release from DP, and Read Signature */
 
-#define STM_ID_M25P16		0x15
-#define STM_ID_M25P20		0x12
-#define STM_ID_M25P32		0x16
-#define STM_ID_M25P40		0x13
-#define STM_ID_M25P64		0x17
-#define STM_ID_M25P80		0x14
-#define STM_ID_M25P128		0x18
+#define STM_ID_M25P16		0x2015
+#define STM_ID_M25P20		0x2012
+#define STM_ID_M25P32		0x2016
+#define STM_ID_M25P40		0x2013
+#define STM_ID_M25P64		0x2017
+#define STM_ID_M25P80		0x2014
+#define STM_ID_M25P128		0x2018
+
+#define MICRON_ID_N25Q128A	0xba18
+#define MICRON_ID_N25Q00AA	0xba21
 
 #define STMICRO_SR_WIP		(1 << 0)	/* Write-in-Progress */
 
 struct stmicro_spi_flash_params {
-	u8 idcode1;
+	u16 idcode1;
 	u16 page_size;
 	u16 pages_per_sector;
 	u16 nr_sectors;
@@ -126,6 +130,92 @@ static const struct stmicro_spi_flash_params stmicro_spi_flash_table[] = {
 		.nr_sectors = 64,
 		.name = "M25P128",
 	},
+	/* Micron */
+	{
+		.idcode1 = 0xba16,
+		.page_size = 256,
+		.pages_per_sector = 256,
+		.nr_sectors = 64,
+		.name = "N25Q32",
+	},
+	{
+		.idcode1 = 0xbb16,
+		.page_size = 256,
+		.pages_per_sector = 256,
+		.nr_sectors = 64,
+		.name = "N25Q32A",
+	},
+	{
+		.idcode1 = 0xba17,
+		.page_size = 256,
+		.pages_per_sector = 256,
+		.nr_sectors = 128,
+		.name = "N25Q064",
+	},
+	{
+		.idcode1 = 0xbb17,
+		.page_size = 256,
+		.pages_per_sector = 256,
+		.nr_sectors = 128,
+		.name = "N25Q64A",
+	},
+	{
+		.idcode1 = 0xba18,
+		.page_size = 256,
+		.pages_per_sector = 256,
+		.nr_sectors = 256,
+		.name = "N25Q128",
+	},
+	{
+		.idcode1 = 0xbb18,
+		.page_size = 256,
+		.pages_per_sector = 256,
+		.nr_sectors = 256,
+		.name = "N25Q128A",
+	},
+	{
+		.idcode1 = 0xba19,
+		.page_size = 256,
+		.pages_per_sector = 256,
+		.nr_sectors = 512,
+		.name = "N25Q256",
+	},
+	{
+		.idcode1 = 0xbb19,
+		.page_size = 256,
+		.pages_per_sector = 256,
+		.nr_sectors = 512,
+		.name = "N25Q256A",
+	},
+	{
+		.idcode1 = 0xba20,
+		.page_size = 256,
+		.pages_per_sector = 256,
+		.nr_sectors = 1024,
+		.name = "N25Q512",
+	},
+	{
+		.idcode1 = 0xbb20,
+		.page_size = 256,
+		.pages_per_sector = 256,
+		.nr_sectors = 1024,
+		.name = "N25Q512A",
+	},
+	{
+		.idcode1 = 0xba21,
+		.page_size = 256,
+		.pages_per_sector = 256,
+		.nr_sectors = 2048,
+		.name = "N25Q00",
+	},
+	{
+		.idcode1 = 0xbb21,
+		.page_size = 256,
+		.pages_per_sector = 256,
+		.nr_sectors = 2048,
+		.name = "N25Q00A",
+	},
+
 };
 
 static int stmicro_wait_ready(struct spi_flash *flash, unsigned long timeout)
@@ -133,18 +223,11 @@ static int stmicro_wait_ready(struct spi_flash *flash, unsigned long timeout)
 	struct spi_slave *spi = flash->spi;
 	unsigned long timebase;
 	int ret;
-	u8 cmd = CMD_M25PXX_RDSR;
-	u8 status;
-
-	ret = spi_xfer(spi, 8, &cmd, NULL, SPI_XFER_BEGIN);
-	if (ret) {
-		debug("SF: Failed to send command %02x: %d\n", cmd, ret);
-		return ret;
-	}
+	u8 status = 0xff;
 
 	timebase = get_timer(0);
 	do {
-		ret = spi_xfer(spi, 8, NULL, &status, 0);
+		ret = spi_flash_cmd(spi, CMD_M25PXX_RDSR, &status, sizeof(status));
 		if (ret)
 			return -1;
 
@@ -153,7 +236,6 @@ static int stmicro_wait_ready(struct spi_flash *flash, unsigned long timeout)
 
 	} while (get_timer(timebase) < timeout);
 
-	spi_xfer(spi, 0, NULL, NULL, SPI_XFER_END);
 
 	if ((status & STMICRO_SR_WIP) == 0)
 		return 0;
@@ -250,8 +332,7 @@ static int stmicro_write(struct spi_flash *flash,
 int stmicro_erase(struct spi_flash *flash, u32 offset, size_t len)
 {
 	struct stmicro_spi_flash *stm = to_stmicro_spi_flash(flash);
-	unsigned long sector_size;
-	size_t actual;
+	unsigned long sector_size, start, end, pos;
 	int ret;
 	u8 cmd[4];
 
@@ -261,17 +342,13 @@ int stmicro_erase(struct spi_flash *flash, u32 offset, size_t len)
 	 * when possible.
 	 */
 
+	/*
+	 * Fit [offset; offset + len] into the sector aligned
+	 * boundaries [start; end]
+	 */
 	sector_size = stm->params->page_size * stm->params->pages_per_sector;
-
-	if (offset % sector_size || len % sector_size) {
-		debug("SF: Erase offset/length not multiple of sector size\n");
-		return -1;
-	}
-
-	len /= sector_size;
-	cmd[0] = CMD_M25PXX_SE;
-	cmd[2] = 0x00;
-	cmd[3] = 0x00;
+	start = offset & ~(sector_size - 1);
+	end = (offset + len + sector_size - 1) & ~(sector_size - 1);
 
 	ret = spi_claim_bus(flash->spi);
 	if (ret) {
@@ -280,8 +357,13 @@ int stmicro_erase(struct spi_flash *flash, u32 offset, size_t len)
 	}
 
 	ret = 0;
-	for (actual = 0; actual < len; actual++) {
-		cmd[1] = offset >> 16;
+	pos = start;
+	do {
+		cmd[0] = CMD_M25PXX_SE;
+		cmd[1] = pos >> 16;
+		cmd[2] = pos >>  8;
+		cmd[3] = pos >>  0;
+
 		offset += sector_size;
 
 		ret = spi_flash_cmd(flash->spi, CMD_M25PXX_WREN, NULL, 0);
@@ -301,10 +383,14 @@ int stmicro_erase(struct spi_flash *flash, u32 offset, size_t len)
 			debug("SF: STMicro page erase timed out\n");
 			break;
 		}
-	}
 
-	debug("SF: STMicro: Successfully erased %u bytes @ 0x%x\n",
-	      len * sector_size, offset);
+		pos += sector_size;
+	} while (pos < end);
+
+	if (!ret) {
+		debug("SF: STMicro: Successfully erased %lu bytes @ 0x%x\n",
+			len * sector_size, offset);
+	}
 
 	spi_release_bus(flash->spi);
 	return ret;
@@ -314,11 +400,14 @@ struct spi_flash *spi_flash_probe_stmicro(struct spi_slave *spi, u8 * idcode)
 {
 	const struct stmicro_spi_flash_params *params;
 	struct stmicro_spi_flash *stm;
+	unsigned short id;
 	unsigned int i;
+
+	id = ((idcode[1] << 8) | idcode[2]);
 
 	for (i = 0; i < ARRAY_SIZE(stmicro_spi_flash_table); i++) {
 		params = &stmicro_spi_flash_table[i];
-		if (params->idcode1 == idcode[2]) {
+		if (params->idcode1 == id) {
 			break;
 		}
 	}

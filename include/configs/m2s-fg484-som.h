@@ -135,6 +135,14 @@
 #define CONFIG_SYS_MALLOC_LEN		CONFIG_MEM_MALLOC_LEN
 
 /*
+ * With Micron 64K sector size, we need more malloc() space for saveenv,
+ * see in common/env_sf.c.
+ * Use 1 MB at the end of the external memory for the malloc() pool
+ */
+#define CONFIG_SYS_MALLOC_EXT_LEN	(1024 * 1024)
+#define CONFIG_SYS_MALLOC_EXT_BASE \
+	(CONFIG_SYS_RAM_BASE + CONFIG_SYS_RAM_SIZE - CONFIG_SYS_MALLOC_EXT_LEN)
+/*
  * Configuration of the external memory
  */
 #define CONFIG_NR_DRAM_BANKS		1
@@ -160,6 +168,7 @@
 
 #define CONFIG_SPI_FLASH		1
 #define CONFIG_SPI_FLASH_SPANSION	1
+#define CONFIG_SPI_FLASH_STMICRO	1
 #define CONFIG_SPI_FLASH_BUS		0
 #define CONFIG_SPI_FLASH_CS		0
 #define CONFIG_SPI_FLASH_MODE		3
@@ -229,7 +238,8 @@
 
 #define CONFIG_SYS_MEMTEST_START	CONFIG_SYS_RAM_BASE
 #define CONFIG_SYS_MEMTEST_END		(CONFIG_SYS_RAM_BASE + \
-					CONFIG_SYS_RAM_SIZE)
+					 CONFIG_SYS_RAM_SIZE - \
+					 CONFIG_SYS_MALLOC_EXT_LEN)
 
 /*
  * Needed by "loadb"
