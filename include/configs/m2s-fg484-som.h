@@ -1,5 +1,5 @@
 /*
- * (C) Copyright 2012,2013
+ * (C) Copyright 2012-2015
  * Emcraft Systems, <www.emcraft.com>
  * Alexander Potashev <aspotashev@emcraft.com>
  * Vladimir Khusainov, <vlad@emcraft.com>
@@ -68,7 +68,8 @@
 #define CONFIG_DISPLAY_CPUINFO		1
 #define CONFIG_DISPLAY_BOARDINFO	1
 
-#define CONFIG_SYS_BOARD_REV_STR	"1A"
+#define CONFIG_SYS_BOARD_NAME		"M2S-FG484-SOM"
+#define CONFIG_SYS_BOARD_REV_STR	"1A, www.emcraft.com"
 
 /*
  * Monitor prompt

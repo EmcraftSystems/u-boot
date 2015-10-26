@@ -3314,6 +3314,9 @@ m2s-som_config :  unconfig
 m2s-fg484-som_config :  unconfig
 	@$(MKCONFIG) $(@:_config=) arm arm_cortexm3 m2s-fg484-som emcraft m2s
 
+sf2plus_config :  unconfig
+	@$(MKCONFIG) $(@:_config=) arm arm_cortexm3 m2s-fg484-som emcraft m2s
+
 m2s-som-copy2_config :  unconfig
 	@$(MKCONFIG) $(@:_config=) arm arm_cortexm3 m2s-som emcraft m2s
 

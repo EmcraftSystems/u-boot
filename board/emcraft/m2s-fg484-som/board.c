@@ -92,7 +92,7 @@ int board_init(void)
 
 int checkboard(void)
 {
-	printf("Board: M2S-FG484-SOM Rev %s, www.emcraft.com\n",
+	printf("Board: " CONFIG_SYS_BOARD_NAME " Rev %s\n",
 		CONFIG_SYS_BOARD_REV_STR);
 	return 0;
 }
