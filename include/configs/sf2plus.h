@@ -51,7 +51,7 @@
  * known way (as of yet) to read them in run time. Hence,
  * we define them as build-time constants
  */
-#define CONFIG_SYS_M2S_SYSREF		166000000
+#define CONFIG_SYS_M2S_SYSREF		142000000
 
 /*
  * This is a specific revision of the board
