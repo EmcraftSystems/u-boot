@@ -397,7 +397,7 @@
 /*
  * Max number of command args
  */
-#define CONFIG_SYS_MAXARGS		16
+#define CONFIG_SYS_MAXARGS		48
 
 /*
  * Auto-boot sequence configuration
