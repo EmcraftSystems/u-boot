@@ -884,7 +884,8 @@ static int flash_write_buf (int dev, int fd, void *buf, size_t count,
 #ifdef DEBUG
 		printf ("Write 0x%x bytes at 0x%llx\n", erasesize, blockstart);
 #endif
-		if (write (fd, data + processed, erasesize) != erasesize) {
+		if (write (fd, data + processed, CONFIG_ENV_SIZE)
+			!= CONFIG_ENV_SIZE) {
 			fprintf (stderr, "Write error on %s: %s\n",
 				 DEVNAME (dev), strerror (errno));
 			return -1;
