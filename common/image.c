@@ -775,10 +775,13 @@ int boot_get_ramdisk (int argc, char *argv[], bootm_headers_t *images,
 	*rd_end = 0;
 
 	/*
-	 * Look for a '-' which indicates to ignore the
-	 * ramdisk argument
+	 * Look for a '-' which indicates to ignore the ramdisk argument.
+	 * Also skip ramdisk if multi-image consists of 2 files (image+dtb).
 	 */
-	if ((argc >= 3) && (strcmp(argv[2], "-") ==  0)) {
+	if (((argc >= 3) && (strcmp(argv[2], "-") ==  0)) ||
+	    (images->legacy_hdr_valid &&
+	     image_check_type (&images->legacy_hdr_os_copy, IH_TYPE_MULTI) &&
+	     image_multi_count (images->legacy_hdr_os) == 2)) {
 		debug ("## Skipping init Ramdisk\n");
 		rd_len = rd_data = 0;
 	} else if (argc >= 3 || genimg_has_config (images)) {
@@ -1192,6 +1195,16 @@ int boot_relocate_fdt (struct lmb *lmb, ulong bootmap_base,
 		goto error;
 	}
 
+#if defined(CONFIG_OF_FORCE_RELOCATE)
+	/*
+	 * If force dtb relocation is requested, then move dtb to the bootmap
+	 * end. You may want to avoid such force relocation if booting dtb
+	 * separately (i.e. not as a part of multi-image)
+	 */
+	if (!getenv ("fdt_no_force_reloc"))
+		relocate = 1;
+#endif
+
 #ifndef CONFIG_SYS_NO_FLASH
 	/* move the blob if it is in flash (set relocate) */
 	if (addr2info ((ulong)fdt_blob) != NULL)
@@ -1529,17 +1542,18 @@ int boot_get_fdt (int flag, int argc, char *argv[], bootm_headers_t *images,
 	} else if (images->legacy_hdr_valid &&
 			image_check_type (&images->legacy_hdr_os_copy, IH_TYPE_MULTI)) {
 
-		ulong fdt_data, fdt_len;
+		ulong fdt_data, fdt_len, idx;
 
 		/*
 		 * Now check if we have a legacy multi-component image,
-		 * get second entry data start address and len.
+		 * get the appropriate entry data start address and len.
 		 */
 		printf ("## Flattened Device Tree from multi "
 			"component Image at %08lX\n",
 			(ulong)images->legacy_hdr_os);
 
-		image_multi_getimg (images->legacy_hdr_os, 2, &fdt_data, &fdt_len);
+		idx = (image_multi_count (images->legacy_hdr_os) == 2) ? 1 : 2;
+		image_multi_getimg (images->legacy_hdr_os, idx, &fdt_data, &fdt_len);
 		if (fdt_len) {
 
 			fdt_blob = (char *)fdt_data;

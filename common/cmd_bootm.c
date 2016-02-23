@@ -432,7 +432,9 @@ static int bootm_load_os(image_info_t os, ulong *load_end, int boot_progress)
 	if (boot_progress)
 		show_boot_progress (7);
 
-	if ((load < blob_end) && (*load_end > blob_start)) {
+	/* Warn about overlap only if we could really corrupt adjacing imgs */
+	if ((load < blob_end) && (*load_end > blob_start) &&
+	    (load < image_start || *load_end > os.image_start + os.image_len)) {
 		debug ("images.os.start = 0x%lX, images.os.end = 0x%lx\n", blob_start, blob_end);
 		debug ("images.os.load = 0x%lx, load_end = 0x%lx\n", load, *load_end);
 

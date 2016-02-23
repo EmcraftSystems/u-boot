@@ -412,13 +412,19 @@
 # define CONFIG_BOOTARGS	"stm32_platform=stm32f4x9-som "\
 				"console=ttyS0,115200 panic=10"
 
-# define LOADADDR		"0xC0007FC0"
+/*
+ * These are the good addresses to get Image data right at the 'Load Address'
+ * (0xC0008000), and thus avoid additional uImage relocation:
+ * - linux-2.6: 0xC0007FC0 (reserve place for uImage header)
+ * - linux-4.2: 0xC0007FB4 (reserve place for 2-files multi-image header)
+ */
+# define LOADADDR		"0xC0007FB4"
 
 # define REV_EXTRA_ENV							\
 	"envmboot=run args addip;bootm ${envmaddr}\0"			\
 	"envmupdate=tftp ${image};"					\
 		"cptf ${envmaddr} ${loadaddr} ${filesize}\0"		\
-	"flashboot=run args addip;"						\
+	"flashboot=run args addip;"					\
 		"stmbufcopy ${loadaddr} ${flashaddr} ${kernelsize};"	\
 		"bootm ${loadaddr}\0"					\
 	"update=tftp ${image};"						\
@@ -474,6 +480,7 @@
  * Enable support for booting with FDT
  */
 #define CONFIG_OF_LIBFDT
+#define CONFIG_OF_FORCE_RELOCATE
 #define CONFIG_SYS_BOOTMAPSZ		CONFIG_SYS_RAM_SIZE
 
 #endif /* __CONFIG_H */
