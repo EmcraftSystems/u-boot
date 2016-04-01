@@ -42,7 +42,7 @@
 #define CONFIG_SYS_ARMCORTEXM3
 
 /*
- * This is the Actel SmartFusion2 (aka M2S) device
+ * This is the Microsemi SmartFusion2 (aka M2S) device
  */
 #define CONFIG_SYS_M2S
 

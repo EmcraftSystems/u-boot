@@ -5,7 +5,7 @@
  * Vladimir Khusainov, <vlad@emcraft.com>
  * Yuri Tikhonov, <yur@emcraft.com>
  *
- * Configuration settings for Actel SmartFusion2 validation board
+ * Configuration settings for Microsemi SmartFusion2 validation board
  * (G4M Validation Board).
  *
  * See file CREDITS for list of people who contributed to this
@@ -41,7 +41,7 @@
 #define CONFIG_SYS_ARMCORTEXM3
 
 /*
- * This is the Actel SmartFusion2 (aka M2S) device
+ * This is the Microsemi SmartFusion2 (aka M2S) device
  */
 #define CONFIG_SYS_M2S
 
