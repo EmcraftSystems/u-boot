@@ -480,6 +480,22 @@ static s32 stm_phy_init(struct stm_eth_dev *mac)
 ok:
 	debug("%s: found PHY id = %#x at addr %#x\n", __func__,
 	      mac->phy_id, mac->phy_adr);
+
+#ifdef CONFIG_STM32_ETH_RMII
+	/*
+	 * If exiting from PHY power-off state on STM32F7-SOM we may
+	 * sometimes have 16h.0 (MII Override) bit set. Obviously, this
+	 * results to an incorrect PHY operating. So, we always
+	 * set the necessary override val (16h.1 RMII Override) here
+	 */
+	rv = stm_phy_read(mac, PHY_PCSR, &val);
+	if (rv == 0) {
+		val &= ~(1 << 0);	/* Clear MII */
+		val |=  (1 << 1);	/* Set RMII  */
+		stm_phy_write(mac, PHY_PCSR, val);
+	}
+#endif
+
 	rv = 0;
 out:
 	return rv;
