@@ -261,6 +261,7 @@
 #define CONFIG_NET_MULTI
 #define CONFIG_STM32_ETH
 #define CONFIG_STM32_ETH_RMII
+#define CONFIG_KSZ8081_RMII_FORCE
 
 /*
  * Ethernet RX buffers are malloced from the internal SRAM (more precisely,

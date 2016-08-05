@@ -481,10 +481,10 @@ ok:
 	debug("%s: found PHY id = %#x at addr %#x\n", __func__,
 	      mac->phy_id, mac->phy_adr);
 
-#ifdef CONFIG_STM32_ETH_RMII
+#ifdef CONFIG_KSZ8081_RMII_FORCE
 	/*
-	 * If exiting from PHY power-off state on STM32F7-SOM we may
-	 * sometimes have 16h.0 (MII Override) bit set. Obviously, this
+	 * If exiting from PHY power-off state on STM32F7-SOM (KSZ8051 phy) we
+	 * may sometimes have 16h.0 (MII Override) bit set. Obviously, this
 	 * results to an incorrect PHY operating. So, we always
 	 * set the necessary override val (16h.1 RMII Override) here
 	 */
