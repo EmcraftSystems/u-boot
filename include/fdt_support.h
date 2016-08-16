@@ -54,6 +54,10 @@ int fdt_find_and_setprop(void *fdt, const char *node, const char *prop,
 			 const void *val, int len, int create);
 void fdt_fixup_qe_firmware(void *fdt);
 
+#ifdef CONFIG_DMAMEM
+void fdt_fixup_dmamem(void *fdt);
+#endif
+
 #ifdef CONFIG_HAS_FSL_DR_USB
 void fdt_fixup_dr_usb(void *blob, bd_t *bd);
 #else

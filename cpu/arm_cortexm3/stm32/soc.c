@@ -195,17 +195,6 @@ static void stm32f7_mpu_config(void)
 #endif
 		0 <<  8 | 24 <<  1 | 1 <<  0);
 
-#if defined(CONFIG_STM32F7_DCACHE_ON)
-	/*
-	 * Configure DMAMEM as non-cacheable
-	 */
-	cortex_m3_mpu_set_region(MPU_RGN_SDRAM_NC,
-		CONFIG_DMAMEM_BASE | 1 << 4 | MPU_RGN_SDRAM_NC << 0,
-		0 << 28 | 3 << 24 |
-		1 << 19 | 0 << 18 | 0 << 17 | 0 << 16 |
-		0 <<  8 | ((ffs(CONFIG_DMAMEM_SZ_ALL) - 2) <<  1) | 1 <<  0);
-#endif
-
 #if defined(CONFIG_STM32F7_DCACHE_ON) || defined(CONFIG_STM32F7_ICACHE_ON)
 	stm32f7_envm_mpu_cfg(0, 0);
 #endif
@@ -267,6 +256,27 @@ void stm32f7_cache_sync_range(u32 s, u32 e)
 
 	__asm__ volatile("dsb");
 	__asm__ volatile("isb");
+}
+#endif
+
+#if defined(CONFIG_DMAMEM)
+/*
+ * Configure the specified area as DMA memory
+ * - base_adr - start address of the area
+ * - size - size of the area
+ */
+void dmamem_init(unsigned long base_adr, unsigned long size)
+{
+#if defined(CONFIG_STM32F7_DCACHE_ON)
+	/*
+	 * Configure DMAMEM as non-cacheable
+	 */
+	cortex_m3_mpu_set_region(MPU_RGN_SDRAM_NC,
+		base_adr | 1 << 4 | MPU_RGN_SDRAM_NC << 0,
+		0 << 28 | 3 << 24 |
+		1 << 19 | 0 << 18 | 0 << 17 | 0 << 16 |
+		0 <<  8 | ((ffs(size) - 2) <<  1) | 1 <<  0);
+#endif
 }
 #endif
 

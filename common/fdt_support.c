@@ -479,6 +479,52 @@ void fdt_fixup_ethernet(void *fdt)
 	}
 }
 
+#ifdef CONFIG_DMAMEM
+void fdt_fixup_dmamem(void *fdt)
+{
+	/*
+	 * By default assume param values specified in U-Boot config
+	 */
+	u32 mem_adr = CONFIG_DMAMEM_BASE;
+	u32 mem_sz = CONFIG_DMAMEM_SZ_ALL;
+	u32 fb_sz = CONFIG_DMAMEM_SZ_FB;
+	const u32 *val;
+	int node;
+
+	node = fdt_path_offset(fdt, "/dmamem");
+	if (node < 0) {
+		/*
+		 * The device-tree file does not include 'dmamem' node.
+		 * Create it, and fill with U-Boot params
+		 */
+		node = fdt_add_subnode(fdt, 0, "dmamem");
+		if (node < 0)
+			goto out;
+		fdt_setprop_string(fdt, node, "compatible", "dmamem");
+		fdt_setprop_cell(fdt, node, "base-addr", mem_adr);
+		fdt_setprop_cell(fdt, node, "full-size", mem_sz);
+		fdt_setprop_cell(fdt, node, "fb-size", fb_sz);
+		goto out;
+	}
+
+	/*
+	 * Get params from device-tree
+	 */
+	val = fdt_getprop(fdt, node, "base-addr", NULL);
+	if (val)
+		mem_adr = fdt32_to_cpu(*val);
+	val = fdt_getprop(fdt, node, "full-size", NULL);
+	if (val)
+		mem_sz = fdt32_to_cpu(*val);
+out:
+	/*
+	 * Configure the dmamem area if it's not empty
+	 */
+	if (mem_sz)
+		dmamem_init(mem_adr, mem_sz);
+}
+#endif
+
 #ifdef CONFIG_HAS_FSL_DR_USB
 void fdt_fixup_dr_usb(void *blob, bd_t *bd)
 {

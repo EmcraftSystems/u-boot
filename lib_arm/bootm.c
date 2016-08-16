@@ -39,7 +39,7 @@ DECLARE_GLOBAL_DATA_PTR;
     defined (CONFIG_REVISION_TAG) || \
     defined (CONFIG_VFD) || \
     defined (CONFIG_LCD) || \
-    defined (CONFIG_DMAMEM_TAG)
+    defined (CONFIG_DMAMEM)
 static void setup_start_tag (bd_t *bd);
 
 # ifdef CONFIG_SETUP_MEMORY_TAGS
@@ -57,7 +57,7 @@ static void setup_end_tag (bd_t *bd);
 static void setup_videolfb_tag (gd_t *gd);
 # endif
 
-# ifdef CONFIG_DMAMEM_TAG
+# ifdef CONFIG_DMAMEM
 static void setup_dmamem_tag (void);
 # endif
 
@@ -150,7 +150,7 @@ int do_bootm_linux(int flag, int argc, char *argv[], bootm_headers_t *images)
     defined (CONFIG_REVISION_TAG) || \
     defined (CONFIG_LCD) || \
     defined (CONFIG_VFD) || \
-    defined (CONFIG_DMAMEM_TAG)
+    defined (CONFIG_DMAMEM)
 	setup_start_tag (bd);
 #ifdef CONFIG_SERIAL_TAG
 	setup_serial_tag (&params);
@@ -171,7 +171,7 @@ int do_bootm_linux(int flag, int argc, char *argv[], bootm_headers_t *images)
 #if defined (CONFIG_SETUP_VIDEOLFB_TAG) && (defined (CONFIG_VFD) || defined (CONFIG_LCD))
 	setup_videolfb_tag ((gd_t *) gd);
 #endif
-#ifdef CONFIG_DMAMEM_TAG
+#ifdef CONFIG_DMAMEM
 	setup_dmamem_tag();
 #endif
 	setup_end_tag(bd);
@@ -232,6 +232,9 @@ static int bootm_linux_fdt(int machid, bootm_headers_t *images)
 
 	fixup_memory_node(*of_flat_tree);
 	fdt_fixup_ethernet(*of_flat_tree);
+#ifdef CONFIG_DMAMEM
+	fdt_fixup_dmamem(*of_flat_tree);
+#endif
 
 	fdt_initrd(*of_flat_tree, *initrd_start, *initrd_end, 1);
 
@@ -397,7 +400,7 @@ void setup_revision_tag(struct tag **in_params)
 }
 #endif  /* CONFIG_REVISION_TAG */
 
-#ifdef CONFIG_DMAMEM_TAG
+#ifdef CONFIG_DMAMEM
 void setup_dmamem_tag (void)
 {
 	params->hdr.tag = ATAG_DMAMEM;
@@ -405,6 +408,8 @@ void setup_dmamem_tag (void)
 	params->u.dmamem.base = CONFIG_DMAMEM_BASE;
 	params->u.dmamem.sz_all = CONFIG_DMAMEM_SZ_ALL;
 	params->u.dmamem.sz_fb = CONFIG_DMAMEM_SZ_FB;
+	dmamem_init(params->u.dmamem.base, params->u.dmamem.sz_all);
+
 	params = tag_next(params);
 }
 #endif

@@ -644,6 +644,11 @@ ulong	vfd_setmem (ulong);
 /* $(CPU)/.../video.c */
 ulong	video_setmem (ulong);
 
+#if defined(CONFIG_DMAMEM)
+/* $(CPU)/.../<soc> */
+void    dmamem_init(unsigned long, unsigned long);
+#endif
+
 /* lib_$(ARCH)/cache.c */
 void	flush_cache   (unsigned long, unsigned long);
 void	flush_dcache_range(unsigned long start, unsigned long stop);

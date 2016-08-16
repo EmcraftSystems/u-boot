@@ -126,8 +126,8 @@
  * without DCACHE. So, pass DMAMEM tag always.
  * Note, SZ_ALL must be power of 2 (to program MPU correctly)!
  */
-#define CONFIG_DMAMEM_TAG
-#if defined(CONFIG_DMAMEM_TAG)
+#define CONFIG_DMAMEM
+#if defined(CONFIG_DMAMEM)
 # define CONFIG_DMAMEM_SZ_ALL		(1 << 20)	/* 1MB */
 # define CONFIG_DMAMEM_SZ_FB		(640 * 1024)
 # define CONFIG_DMAMEM_BASE		(CONFIG_SYS_RAM_BASE + \
