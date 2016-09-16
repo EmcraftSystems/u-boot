@@ -282,6 +282,15 @@ int board_init(void)
 		return rv;
 
 #if !defined(CONFIG_SYS_NO_FLASH)
+# if defined(CONFIG_ENV_IS_IN_FLASH)
+	/*
+	 * We may sometimes got fixed garbage from NOR flash if access it after
+	 * a sw reset and before external SDRAM initializion complete.
+	 * Erratas say nothing about this, so we just initialize SDRAM earlier
+	 * if want to access NOR to get environment.
+	 */
+	dram_init();
+# endif /* CONFIG_ENV_IS_IN_FLASH */
 
 	if ((rv = fsmc_nor_psram_init(CONFIG_SYS_FLASH_CS,
 			CONFIG_SYS_FSMC_FLASH_BCR,
@@ -289,7 +298,6 @@ int board_init(void)
 			CONFIG_SYS_FSMC_FLASH_BWTR))) {
 		goto Done;
 	}
-
 #endif
 
 #ifdef CONFIG_VIDEO_STM32F4_LTDC
@@ -363,6 +371,9 @@ int dram_init(void)
 {
 	u32 freq;
 	int rv;
+
+	if (dram_initialized)
+		return 0;
 
 	/*
 	 * Enable FMC interface clock

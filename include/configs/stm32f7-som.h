@@ -222,7 +222,7 @@
 /*
  * Store env in Flash memory
  */
-#if 1
+#if 0
 # define CONFIG_ENV_IS_IN_ENVM
 #else
 # define CONFIG_ENV_IS_IN_FLASH
