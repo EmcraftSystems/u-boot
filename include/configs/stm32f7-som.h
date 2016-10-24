@@ -413,6 +413,20 @@
 		"setenv filesize; setenv fileaddr;"			\
 		"saveenv\0"
 
+#ifdef CONFIG_SPLASH_SCREEN
+# define SPLASH_ENV							\
+	"splashfile=\"logo.bmp\"\0"					\
+	"splashaddr=60fa0000\0"						\
+	"splashupdate=tftp ${splashfile};"				\
+		"prot off ${splashaddr} +${filesize};"			\
+		"era ${splashaddr} +${filesize};"			\
+		"cp.b ${loadaddr} ${splashaddr} ${filesize};"		\
+		"setenv splashimage ${splashaddr};"			\
+		"saveenv\0"
+#else
+# define SPLASH_ENV	""
+#endif
+
 #define CONFIG_SYS_CONSOLE_IS_IN_ENV
 
 /*
@@ -430,7 +444,8 @@
 	"image=stm32f7/uImage\0"		\
 	"stdin=serial\0"					\
 	"netboot=tftp ${image};run args addip;bootm\0"		\
-	REV_EXTRA_ENV
+	REV_EXTRA_ENV						\
+	SPLASH_ENV
 
 /*
  * Linux kernel boot parameters configuration
