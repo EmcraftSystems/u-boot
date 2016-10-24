@@ -1,5 +1,5 @@
 /*
- * (C) Copyright 2011-2015
+ * (C) Copyright 2011-2016
  *
  * Yuri Tikhonov, Emcraft Systems, yur@emcraft.com
  * Alexander Potashev, Emcraft Systems, aspotashev@emcraft.com
@@ -29,10 +29,6 @@
 
 #ifndef __CONFIG_H
 #define __CONFIG_H
-
-#if !defined(CONFIG_SYS_BOARD_REV)
-#define CONFIG_SYS_BOARD_REV	0x1A
-#endif
 
 /*
  * Disable debug messages
@@ -64,16 +60,14 @@
 #define CONFIG_DISPLAY_CPUINFO		1
 #define CONFIG_DISPLAY_BOARDINFO	1
 
-#if CONFIG_SYS_BOARD_REV == 0x1A
-# define CONFIG_SYS_BOARD_REV_STR	"1.A"
-#else
-# error "wrong board revision"
-#endif
+#define CONFIG_SYS_BOARD_REV_STR	"1.A"
 
 /*
  * Monitor prompt
  */
-#if CONFIG_SYS_BOARD_REV == 0x1A
+#ifdef CONFIG_SYS_BOARD_UCL_BSB
+# define CONFIG_SYS_PROMPT		"STM32F7-SOM-UCL> "
+#else
 # define CONFIG_SYS_PROMPT		"STM32F7-SOM> "
 #endif
 
@@ -307,15 +301,29 @@
 /*
  * Framebuffer configuration
  */
-#define CONFIG_LCD
+#if defined(CONFIG_SYS_BOARD_UCL_BSB)
+# define CONFIG_LCD
+# define LCD_EMCRAFT_TN43_LCD
+#elif defined(CONFIG_SYS_BOARD_IOT_BSB)
+# define CONFIG_LCD
+# define LCD_EMCRAFT_IOT_LCD
+#else
+# undef CONFIG_LCD
+#endif
 
 #ifdef CONFIG_LCD
 
 #define CONFIG_FB_ADDR			CONFIG_DMAMEM_BASE
 
 #define CONFIG_VIDEO_STM32F4_LTDC
-#define CONFIG_STM32_LTDC_PIXCLK	(9 * 1000 * 1000)
-#define LCD_EMCRAFT_IOT_LCD
+
+#if defined(LCD_EMCRAFT_TN43_LCD)
+# define CONFIG_STM32_LTDC_PIXCLK	(9 * 1000 * 1000)
+#elif defined(LCD_EMCRAFT_IOT_LCD)
+# define CONFIG_STM32_LTDC_PIXCLK	(9 * 1000 * 1000)
+#else
+# error "STM32F7 LTDC is enabled but no LCD configured"
+#endif
 
 #define CONFIG_SPLASH_SCREEN
 #define CONFIG_SPLASH_SCREEN_ALIGN
@@ -325,7 +333,8 @@
 #define CONFIG_BMP_24BPP
 #define LCD_BPP				LCD_COLOR32
 
-#ifdef LCD_EMCRAFT_IOT_LCD
+#if defined(LCD_EMCRAFT_TN43_LCD) || \
+    defined(LCD_EMCRAFT_IOT_LCD)
 # define CONFIG_STM32F4_LTDC_XRES	480
 # define CONFIG_STM32F4_LTDC_YRES	272
 # define CONFIG_STM32F4_LTDC_BPP	LCD_BPP
@@ -337,9 +346,6 @@
 # define CONFIG_STM32F4_LTDC_UPPER_MARGIN	2
 # define CONFIG_STM32F4_LTDC_VSYNC_LEN		10
 # define CONFIG_STM32F4_LTDC_LOWER_MARGIN	2
-
-#elif defined(CONFIG_VIDEO_STM32F4_LTDC)
-# error "STM32F7 LTDC is enabled but no LCD configured"
 #endif
 
 #endif /* CONFIG_LCD */
@@ -362,12 +368,7 @@
 #undef CONFIG_CMD_NFS
 #undef CONFIG_CMD_SOURCE
 #undef CONFIG_CMD_XIMG
-
-#if CONFIG_SYS_BOARD_REV == 0x1A
-# undef CONFIG_CMD_BUFCOPY
-#else
-# define CONFIG_CMD_BUFCOPY
-#endif
+#undef CONFIG_CMD_BUFCOPY
 
 /*
  * To save memory disable long help

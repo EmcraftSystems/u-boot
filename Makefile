@@ -3245,8 +3245,15 @@ stm-som-1a_config : unconfig
 		}
 	@$(MKCONFIG) -a stm-som arm arm_cortexm3 stm-som emcraft stm32
 
-stm32f7-som_config : unconfig
-	@$(MKCONFIG) $(@:_config=) arm arm_cortexm3 stm32f7-som emcraft stm32
+stm32f7-som_config \
+stm32f7-som-ext-bsb_config: unconfig
+	@if [ "$(findstring ext-bsb, $@)" ] ; then \
+		echo "...for EXT-BSB" ; \
+	else				\
+		echo "#define CONFIG_SYS_BOARD_UCL_BSB" >>$(obj)include/config.h ; \
+		echo "...for UCL-BSB" ; \
+	fi;
+	@$(MKCONFIG) -a stm32f7-som arm arm_cortexm3 stm32f7-som emcraft stm32
 
 stm32f429-discovery_config : unconfig
 	@$(MKCONFIG) $(@:_config=) arm arm_cortexm3 stm32f429-discovery \

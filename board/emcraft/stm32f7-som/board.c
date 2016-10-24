@@ -224,6 +224,20 @@ static const struct stm32f2_gpio_dsc ltdc_iomux[] = {
 };
 #endif /* CONFIG_VIDEO_STM32F4_LTDC */
 
+#ifdef CONFIG_SYS_BOARD_UCL_BSB
+/*
+ * Enable peripheral power
+ */
+static int pwr_setup_gpio(void)
+{
+	struct stm32f2_gpio_dsc pwr_en_gpio = {
+		STM32F2_GPIO_PORT_F, STM32F2_GPIO_PIN_10
+	};
+
+	return stm32f2_gpout_set(&pwr_en_gpio, 1);
+}
+#endif /* CONFIG_SYS_BOARD_UCL_BSB */
+
 /*
  * Init FMC/FSMC GPIOs based
  */
@@ -276,6 +290,12 @@ static int ltdc_setup_iomux(void)
 int board_init(void)
 {
 	int rv;
+
+#if defined(CONFIG_SYS_BOARD_UCL_BSB)
+	rv = pwr_setup_gpio();
+	if (rv)
+		printf("WARN: pwr_setup_gpio() error %d\n", rv);
+#endif
 
 	rv = fmc_fsmc_setup_gpio();
 	if (rv)
