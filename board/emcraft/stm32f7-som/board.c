@@ -233,8 +233,15 @@ static int pwr_setup_gpio(void)
 	struct stm32f2_gpio_dsc pwr_en_gpio = {
 		STM32F2_GPIO_PORT_F, STM32F2_GPIO_PIN_10
 	};
+	int rv;
 
-	return stm32f2_gpout_set(&pwr_en_gpio, 1);
+	rv = stm32f2_gpio_config(&pwr_en_gpio, STM32F2_GPIO_ROLE_GPOUT);
+	if (rv)
+		goto out;
+
+	rv = stm32f2_gpout_set(&pwr_en_gpio, 1);
+out:
+	return rv;
 }
 #endif /* CONFIG_SYS_BOARD_UCL_BSB */
 
