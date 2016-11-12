@@ -226,20 +226,26 @@ static const struct stm32f2_gpio_dsc ltdc_iomux[] = {
 
 #ifdef CONFIG_SYS_BOARD_UCL_BSB
 /*
- * Enable peripheral power
+ * Configure GPIOs
  */
 static int pwr_setup_gpio(void)
 {
-	struct stm32f2_gpio_dsc pwr_en_gpio = {
-		STM32F2_GPIO_PORT_F, STM32F2_GPIO_PIN_10
+	struct stm32f2_gpio_dsc pwr_en_gpio[] = {
+		{ STM32F2_GPIO_PORT_F, STM32F2_GPIO_PIN_10 },	/* PWR_EN  */
+		{ STM32F2_GPIO_PORT_I, STM32F2_GPIO_PIN_0  },	/* LCD_DIM */
 	};
-	int rv;
+	int i, rv;
 
-	rv = stm32f2_gpio_config(&pwr_en_gpio, STM32F2_GPIO_ROLE_GPOUT);
-	if (rv)
-		goto out;
+	for (i = 0; i < ARRAY_SIZE(pwr_en_gpio); i++) {
+		rv = stm32f2_gpio_config(&pwr_en_gpio[i],
+					 STM32F2_GPIO_ROLE_GPOUT);
+		if (rv)
+			goto out;
 
-	rv = stm32f2_gpout_set(&pwr_en_gpio, 1);
+		rv = stm32f2_gpout_set(&pwr_en_gpio[i], 1);
+		if (rv)
+			goto out;
+	}
 out:
 	return rv;
 }
