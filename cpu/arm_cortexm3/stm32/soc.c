@@ -291,5 +291,14 @@ void cortex_m3_soc_init(void)
 #if defined(CONFIG_STM32F7_ICACHE_ON) || defined(CONFIG_STM32F7_DCACHE_ON)
 	stm32f7_enable_cache();
 #endif
+
+#if defined(CONFIG_DMAMEM)
+	/*
+	 * Set the default values for now (so that e.g. LCD FB operates
+	 * correctly). The dmamem region may be then reprogrammed after
+	 * obtaining the 'dmamem' params from dtb
+	 */
+	dmamem_init(CONFIG_DMAMEM_BASE, CONFIG_DMAMEM_SZ_ALL);
+#endif
 }
 #endif
