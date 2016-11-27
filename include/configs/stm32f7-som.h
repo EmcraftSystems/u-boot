@@ -416,7 +416,7 @@
 #ifdef CONFIG_SPLASH_SCREEN
 # define SPLASH_ENV							\
 	"splashfile=\"logo.bmp\"\0"					\
-	"splashaddr=60fa0000\0"						\
+	"splashaddr=60d20000\0"						\
 	"splashupdate=tftp ${splashfile};"				\
 		"prot off ${splashaddr} +${filesize};"			\
 		"era ${splashaddr} +${filesize};"			\
@@ -425,6 +425,12 @@
 		"saveenv\0"
 #else
 # define SPLASH_ENV	""
+#endif
+
+#ifdef CONFIG_LCD
+# define LCD_ENV	"gui=qt\0"
+#else
+# define LCD_ENV	""
 #endif
 
 #define CONFIG_SYS_CONSOLE_IS_IN_ENV
@@ -445,7 +451,8 @@
 	"stdin=serial\0"					\
 	"netboot=tftp ${image};run args addip;bootm\0"		\
 	REV_EXTRA_ENV						\
-	SPLASH_ENV
+	SPLASH_ENV						\
+	LCD_ENV
 
 /*
  * Linux kernel boot parameters configuration
