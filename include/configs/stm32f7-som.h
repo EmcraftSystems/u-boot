@@ -416,7 +416,8 @@
 #ifdef CONFIG_SPLASH_SCREEN
 # define SPLASH_ENV							\
 	"splashfile=\"logo.bmp\"\0"					\
-	"splashaddr=60d20000\0"						\
+	"splashaddr=60020000\0"						\
+	"flashaddr=600A0000\0"						\
 	"splashupdate=tftp ${splashfile};"				\
 		"prot off ${splashaddr} +${filesize};"			\
 		"era ${splashaddr} +${filesize};"			\
@@ -424,7 +425,8 @@
 		"setenv splashimage ${splashaddr};"			\
 		"saveenv\0"
 #else
-# define SPLASH_ENV	""
+# define SPLASH_ENV							\
+	"flashaddr=60020000\0"
 #endif
 
 #ifdef CONFIG_LCD
@@ -442,7 +444,6 @@
 	"loadaddr=" LOADADDR "\0"				\
 	"args=setenv bootargs " CONFIG_BOOTARGS "\0"		\
 	"addip=setenv bootargs ${bootargs} ip=${ipaddr}:${serverip}:${gatewayip}:${netmask}:${hostname}:eth0:off\0"				\
-	"flashaddr=60020000\0"					\
 	"envmaddr=08040000\0"					\
 	"ethaddr=C0:B1:3C:88:88:85\0"				\
 	"ipaddr=172.17.4.206\0"					\
