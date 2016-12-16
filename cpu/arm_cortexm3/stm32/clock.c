@@ -100,14 +100,14 @@
 # if (CONFIG_STM32_PLL_Q < 4) || (CONFIG_STM32_PLL_Q > 15)
 #  error "Incorrect PLL_Q value."
 # endif
-# if defined(CONFIG_SYS_STM32F769I_DISCO)
+# if defined(CONFIG_SYS_STM32F76xxx) || defined(CONFIG_SYS_STM32F77xxx)
 #  if !defined(CONFIG_STM32_PLL_R)
 #   error "PLL_R must be set for STM32F769."
 #  endif
 #  if (CONFIG_STM32_PLL_R < 2) || (CONFIG_STM32_PLL_R > 7)
 #   error "Incorrect PLL_R value."
 #  endif
-# endif /* CONFIG_SYS_STM32F769I_DISCO */
+# endif /* STM32F76xxx || STM32F77xxx */
 #endif /* CONFIG_STM32_SYS_CLK_PLL */
 
 /*
