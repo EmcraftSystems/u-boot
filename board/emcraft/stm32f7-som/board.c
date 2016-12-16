@@ -42,6 +42,129 @@
 DECLARE_GLOBAL_DATA_PTR;
 
 static const struct stm32f2_gpio_dsc ext_ram_fsmc_fmc_gpio[] = {
+#if defined(CONFIG_SYS_STM32F769I_DISCO)
+	/* +L12, FMC_D0 */
+	{STM32F2_GPIO_PORT_D, STM32F2_GPIO_PIN_14},
+	/* +K13, FMC_D1 */
+	{STM32F2_GPIO_PORT_D, STM32F2_GPIO_PIN_15},
+	/* +B12, FMC_D2 */
+	{STM32F2_GPIO_PORT_D, STM32F2_GPIO_PIN_0},
+	/* +C12, FMC_D3 */
+	{STM32F2_GPIO_PORT_D, STM32F2_GPIO_PIN_1},
+	/* +R8, FMC_D4 */
+	{STM32F2_GPIO_PORT_E, STM32F2_GPIO_PIN_7},
+	/* +N9, FMC_D5 */
+	{STM32F2_GPIO_PORT_E, STM32F2_GPIO_PIN_8},
+	/* +P9, FMC_D6 */
+	{STM32F2_GPIO_PORT_E, STM32F2_GPIO_PIN_9},
+	/* +R9, FMC_D7 */
+	{STM32F2_GPIO_PORT_E, STM32F2_GPIO_PIN_10},
+	/* +P10, FMC_D8 */
+	{STM32F2_GPIO_PORT_E, STM32F2_GPIO_PIN_11},
+	/* +R10, FMC_D9 */
+	{STM32F2_GPIO_PORT_E, STM32F2_GPIO_PIN_12},
+	/* +R12, FMC_D10 */
+	{STM32F2_GPIO_PORT_E, STM32F2_GPIO_PIN_13},
+	/* +P11, FMC_D11 */
+	{STM32F2_GPIO_PORT_E, STM32F2_GPIO_PIN_14},
+	/* +R11, FMC_D12 */
+	{STM32F2_GPIO_PORT_E, STM32F2_GPIO_PIN_15},
+	/* +L15, FMC_D13 */
+	{STM32F2_GPIO_PORT_D, STM32F2_GPIO_PIN_8},
+	/* +L14, FMC_D14 */
+	{STM32F2_GPIO_PORT_D, STM32F2_GPIO_PIN_9},
+	/* +K15, FMC_D15 */
+	{STM32F2_GPIO_PORT_D, STM32F2_GPIO_PIN_10},
+	/* +P14, FMC_D16 */
+	{STM32F2_GPIO_PORT_H, STM32F2_GPIO_PIN_8},
+	/* +N14, FMC_D17 */
+	{STM32F2_GPIO_PORT_H, STM32F2_GPIO_PIN_9},
+	/* +P15, FMC_D18 */
+	{STM32F2_GPIO_PORT_H, STM32F2_GPIO_PIN_10},
+	/* +N15, FMC_D19 */
+	{STM32F2_GPIO_PORT_H, STM32F2_GPIO_PIN_11},
+	/* +M15, FMC_D20 */
+	{STM32F2_GPIO_PORT_H, STM32F2_GPIO_PIN_12},
+	/* +E12, FMC_D21 */
+	{STM32F2_GPIO_PORT_H, STM32F2_GPIO_PIN_13},
+	/* +E13, FMC_D22 */
+	{STM32F2_GPIO_PORT_H, STM32F2_GPIO_PIN_14},
+	/* +D13, FMC_D23 */
+	{STM32F2_GPIO_PORT_H, STM32F2_GPIO_PIN_15},
+	/* +E14, FMC_D24 */
+	{STM32F2_GPIO_PORT_I, STM32F2_GPIO_PIN_0},
+	/* +D14, FMC_D25 */
+	{STM32F2_GPIO_PORT_I, STM32F2_GPIO_PIN_1},
+	/* +C14, FMC_D26 */
+	{STM32F2_GPIO_PORT_I, STM32F2_GPIO_PIN_2},
+	/* +C13, FMC_D27 */
+	{STM32F2_GPIO_PORT_I, STM32F2_GPIO_PIN_3},
+	/* +D6, FMC_D28 */
+	{STM32F2_GPIO_PORT_I, STM32F2_GPIO_PIN_6},
+	/* +D4, FMC_D29 */
+	{STM32F2_GPIO_PORT_I, STM32F2_GPIO_PIN_7},
+	/* +E4, FMC_D30 */
+	{STM32F2_GPIO_PORT_I, STM32F2_GPIO_PIN_9},
+	/* +D5, FMC_D31 */
+	{STM32F2_GPIO_PORT_I, STM32F2_GPIO_PIN_10},
+
+	/* +D2, FMC_A0 */
+	{STM32F2_GPIO_PORT_F, STM32F2_GPIO_PIN_0},
+	/* +E2, FMC_A1 */
+	{STM32F2_GPIO_PORT_F, STM32F2_GPIO_PIN_1},
+	/* +G2, FMC_A2 */
+	{STM32F2_GPIO_PORT_F, STM32F2_GPIO_PIN_2},
+	/* +H2, FMC_A3 */
+	{STM32F2_GPIO_PORT_F, STM32F2_GPIO_PIN_3},
+	/* +J2, FMC_A4 */
+	{STM32F2_GPIO_PORT_F, STM32F2_GPIO_PIN_4},
+	/* +K3, FMC_A5 */
+	{STM32F2_GPIO_PORT_F, STM32F2_GPIO_PIN_5},
+	/* +M6, FMC_A6 */
+	{STM32F2_GPIO_PORT_F, STM32F2_GPIO_PIN_12},
+	/* +N6, FMC_A7 */
+	{STM32F2_GPIO_PORT_F, STM32F2_GPIO_PIN_13},
+	/* +P6, FMC_A8 */
+	{STM32F2_GPIO_PORT_F, STM32F2_GPIO_PIN_14},
+	/* +M8, FMC_A9 */
+	{STM32F2_GPIO_PORT_F, STM32F2_GPIO_PIN_15},
+	/* +N7, FMC_A10 */
+	{STM32F2_GPIO_PORT_G, STM32F2_GPIO_PIN_0},
+	/* +M7, FMC_A11 */
+	{STM32F2_GPIO_PORT_G, STM32F2_GPIO_PIN_1},
+	/* +M13, FMC_A12 */
+	{STM32F2_GPIO_PORT_G, STM32F2_GPIO_PIN_2},
+
+	/* +A6, FMC_NBL0 */
+	{STM32F2_GPIO_PORT_E, STM32F2_GPIO_PIN_0},
+	/* +A5, FMC_NBL1 */
+	{STM32F2_GPIO_PORT_E, STM32F2_GPIO_PIN_1},
+	/* +C3, FMC_NBL2 */
+	{STM32F2_GPIO_PORT_I, STM32F2_GPIO_PIN_4},
+	/* +D3, FMC_NBL3 */
+	{STM32F2_GPIO_PORT_I, STM32F2_GPIO_PIN_5},
+
+	/* +N12, FMC_BA0 */
+	{STM32F2_GPIO_PORT_G, STM32F2_GPIO_PIN_4},
+	/* +N11, FMC_BA1 */
+	{STM32F2_GPIO_PORT_G, STM32F2_GPIO_PIN_5},
+
+	/* SDRAM */
+	/* +J4, FMC_SDNE0 */
+	{STM32F2_GPIO_PORT_H, STM32F2_GPIO_PIN_3},
+	/* +K4, FMC_SDCKE0 */
+	{STM32F2_GPIO_PORT_H, STM32F2_GPIO_PIN_2},
+	/* +P8, FMC_SDNRAS */
+	{STM32F2_GPIO_PORT_F, STM32F2_GPIO_PIN_11},
+	/* +B7, FMC_SDNCAS */
+	{STM32F2_GPIO_PORT_G, STM32F2_GPIO_PIN_15},
+	/* +J3, FMC_SDNWE */
+	{STM32F2_GPIO_PORT_H, STM32F2_GPIO_PIN_5},
+	/* +H14, FMC_SDCLK */
+	{STM32F2_GPIO_PORT_G, STM32F2_GPIO_PIN_8},
+
+#else /* CONFIG_SYS_STM32F769I_DISCO */
+
 	/* K15, FMC_D15 */
 	{STM32F2_GPIO_PORT_D, STM32F2_GPIO_PIN_10},
 	/* L14, FMC_D14 */
@@ -161,6 +284,7 @@ static const struct stm32f2_gpio_dsc ext_ram_fsmc_fmc_gpio[] = {
 #ifdef CONFIG_FSMC_NOR_PSRAM_CS4_ENABLE
 	{STM32F2_GPIO_PORT_G, STM32F2_GPIO_PIN_12},
 #endif
+#endif /* CONFIG_SYS_STM32F769I_DISCO */
 };
 
 #ifdef CONFIG_VIDEO_STM32F4_LTDC
@@ -348,8 +472,13 @@ Done:
  */
 int checkboard(void)
 {
+#if defined(CONFIG_SYS_STM32F769I_DISCO)
+	printf("Board: STM32F769I-DISCO %s, www.emcraft.com\n",
+	       CONFIG_SYS_BOARD_REV_STR);
+#else
 	printf("Board: STM32F7 SOM Rev %s, www.emcraft.com\n",
 		CONFIG_SYS_BOARD_REV_STR);
+#endif /* CONFIG_SYS_STM32F769I_DISCO */
 
 	return 0;
 }
@@ -368,6 +497,35 @@ static inline u32 _ns2clk(u32 ns, u32 freq)
 }
 
 #define NS2CLK(ns) (_ns2clk(ns, freq))
+
+#if defined(CONFIG_SYS_STM32F769I_DISCO)
+
+/*
+ * Following are timings for MT48LC4M32B2, from corresponding datasheet
+ */
+#define SDRAM_CAS	3
+#define SDRAM_NB	4	/* Number of banks */
+#define SDRAM_MWID	2	/* 32 bit memory */
+
+#define SDRAM_NR	0x1	/* 12-bit row */
+#define SDRAM_NC	0x0	/* 8-bit col */
+
+#define SDRAM_TRRD	NS2CLK(12)
+#define SDRAM_TRCD	NS2CLK(18)
+#define SDRAM_TRP	NS2CLK(18)
+#define SDRAM_TRAS	NS2CLK(42)
+#define SDRAM_TRC	NS2CLK(60)
+#define SDRAM_TRFC	NS2CLK(60)
+#define SDRAM_TCDL	(1 - 1)
+#define SDRAM_TRDL	NS2CLK(12)
+#define SDRAM_TBDL	(1 - 1)
+#define SDRAM_TREF	(NS2CLK(64000000 / 8192) - 20)
+#define SDRAM_TCCD	(1 - 1)
+
+#define SDRAM_TXSR	NS2CLK(70)
+#define SDRAM_TMRD	(3 - 1)
+
+#else /* CONFIG_SYS_STM32F769I_DISCO */
 
 /*
  * Following are timings for M12L2561616A-6BI, from corresponding datasheet
@@ -393,6 +551,8 @@ static inline u32 _ns2clk(u32 ns, u32 freq)
 
 #define SDRAM_TXSR	SDRAM_TRFC	/* Row cycle time after precharge */
 #define SDRAM_TMRD	(3 - 1)		/* Page 10, Mode Register Set */
+
+#endif /* CONFIG_SYS_STM32F769I_DISCO */
 
 /* Last data in to row precharge, need also comply ineq on page 1648 */
 #define SDRAM_TWR	max(\
@@ -531,6 +691,7 @@ void start_ram(void)
 	udelay(60);
 }
 
+#if !defined(CONFIG_SYS_NO_FLASH)
 #define NOP10()		do {	nop(); nop(); nop(); nop(); nop(); \
 				nop(); nop(); nop(); nop(); nop(); \
 			} while(0);
@@ -609,6 +770,7 @@ u32 flash_check_flag(void *src, void *dst, int cnt, int portwidth)
 out:
 	return flag;
 }
+#endif /* !CONFIG_SYS_NO_FLASH */
 
 #ifdef CONFIG_STM32_ETH
 /*

@@ -100,7 +100,15 @@
 # if (CONFIG_STM32_PLL_Q < 4) || (CONFIG_STM32_PLL_Q > 15)
 #  error "Incorrect PLL_Q value."
 # endif
-#endif
+# if defined(CONFIG_SYS_STM32F769I_DISCO)
+#  if !defined(CONFIG_STM32_PLL_R)
+#   error "PLL_R must be set for STM32F769."
+#  endif
+#  if (CONFIG_STM32_PLL_R < 2) || (CONFIG_STM32_PLL_R > 7)
+#   error "Incorrect PLL_R value."
+#  endif
+# endif /* CONFIG_SYS_STM32F769I_DISCO */
+#endif /* CONFIG_STM32_SYS_CLK_PLL */
 
 /*
  * Internal oscillator value
@@ -210,6 +218,9 @@
 
 #define STM32_RCC_PLLCFGR_PLLQ_BIT	24	/* Div factor for USB,SDIO,.. */
 #define STM32_RCC_PLLCFGR_PLLQ_MSK	0xF
+
+#define STM32_RCC_PLLCFGR_PLLR_BIT	28	/* Div factor for DSI clock. */
+#define STM32_RCC_PLLCFGR_PLLR_MSK	0x7
 
 #define STM32_RCC_DCKCFGR_PLLSAIDIVR	(3 << 16)
 #define STM32_RCC_PLLSAIDivR_Div8	(2 << 16)
@@ -380,6 +391,9 @@ static void clock_setup(void)
 	val |= CONFIG_STM32_PLL_N << STM32_RCC_PLLCFGR_PLLN_BIT;
 	val |= ((CONFIG_STM32_PLL_P >> 1) - 1) << STM32_RCC_PLLCFGR_PLLP_BIT;
 	val |= CONFIG_STM32_PLL_Q << STM32_RCC_PLLCFGR_PLLQ_BIT;
+#if defined(CONFIG_STM32_PLL_R)
+	val |= CONFIG_STM32_PLL_R << STM32_RCC_PLLCFGR_PLLR_BIT;
+#endif
 
 	STM32_RCC->pllcfgr = val;
 

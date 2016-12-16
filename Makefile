@@ -3263,6 +3263,9 @@ stm32f746-discovery_config : unconfig
 	@$(MKCONFIG) $(@:_config=) arm arm_cortexm3 stm32f746-discovery \
 	stm stm32
 
+stm32f769i-discovery_config : unconfig
+	@$(MKCONFIG) $(@:_config=) arm arm_cortexm3 stm32f7-som emcraft stm32
+
 stm3220g-eval_config : unconfig
 	@$(MKCONFIG) $(@:_config=) arm arm_cortexm3 stm3220g-eval stm stm32
 

@@ -308,25 +308,25 @@ struct stm_eth_dev {
 
 /*
  * Ethernet GPIOs:
- *				       STM32F7-SOM	STM32F7-DISCO
- * ETH_MII_RX_CLK/ETH_RMII_REF_CLK---> PA1		=
- * ETH_MDIO -------------------------> PA2		=
- * ETH_MII_RX_DV/ETH_RMII_CRS_DV ----> PA7		=
- * ETH_PPS_OUT ----------------------> PB5		-
- * ETH_MII_TXD3 ---------------------> PB8		-
- * ETH_MDC --------------------------> PC1		=
- * ETH_MII_TXD2 ---------------------> PC2		-
- * ETH_MII_TX_CLK -------------------> PC3		-
- * ETH_MII_RXD0/ETH_RMII_RXD0 -------> PC4		=
- * ETH_MII_RXD1/ETH_RMII_RXD1 -------> PC5		=
- * ETH_MII_TX_EN/ETH_RMII_TX_EN -----> PG11		=
- * ETH_MII_TXD0/ETH_RMII_TXD0 -------> PG13		=
- * ETH_MII_TXD1/ETH_RMII_TXD1 -------> PG14		=
- * ETH_MII_CRS ----------------------> PH2		-
- * ETH_MII_COL ----------------------> PH3		-
- * ETH_MII_RXD2 ---------------------> PH6		-
- * ETH_MII_RXD3 ---------------------> PH7		-
- * ETH_MII_RX_ER --------------------> PI10		PG2
+ *				       STM32F7-SOM	STM32F746-DISCO	STM32F769I-DISCO
+ * ETH_MII_RX_CLK/ETH_RMII_REF_CLK---> PA1		=		=
+ * ETH_MDIO -------------------------> PA2		=		=
+ * ETH_MII_RX_DV/ETH_RMII_CRS_DV ----> PA7		=		=
+ * ETH_PPS_OUT ----------------------> PB5		-		-
+ * ETH_MII_TXD3 ---------------------> PB8		-		-
+ * ETH_MDC --------------------------> PC1		=		=
+ * ETH_MII_TXD2 ---------------------> PC2		-		-
+ * ETH_MII_TX_CLK -------------------> PC3		-		-
+ * ETH_MII_RXD0/ETH_RMII_RXD0 -------> PC4		=		=
+ * ETH_MII_RXD1/ETH_RMII_RXD1 -------> PC5		=		=
+ * ETH_MII_TX_EN/ETH_RMII_TX_EN -----> PG11		=		=
+ * ETH_MII_TXD0/ETH_RMII_TXD0 -------> PG13		=		=
+ * ETH_MII_TXD1/ETH_RMII_TXD1 -------> PG14		=		=
+ * ETH_MII_CRS ----------------------> PH2		-		-
+ * ETH_MII_COL ----------------------> PH3		-		-
+ * ETH_MII_RXD2 ---------------------> PH6		-		-
+ * ETH_MII_RXD3 ---------------------> PH7		-		-
+ * ETH_MII_RX_ER --------------------> PI10		PG2		PD5
  */
 static struct stm32f2_gpio_dsc mac_gpio[] = {
 	{STM32F2_GPIO_PORT_A, 1},
@@ -359,6 +359,8 @@ static struct stm32f2_gpio_dsc mac_gpio[] = {
 /* ETH_MII_RX_ER is different on STM32F7-{SOM,DISCO} */
 #ifndef CONFIG_SYS_STM32F7_DISCO
 	{STM32F2_GPIO_PORT_I, 10}
+#elif defined(CONFIG_SYS_STM32F769I_DISCO)
+	{STM32F2_GPIO_PORT_D, 5}
 #else
 	{STM32F2_GPIO_PORT_G, 2}
 #endif
