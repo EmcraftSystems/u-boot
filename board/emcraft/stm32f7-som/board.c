@@ -548,7 +548,7 @@ static inline u32 _ns2clk(u32 ns, u32 freq)
  * Following are timings for MT48LC4M32B2, from corresponding datasheet
  */
 #define SDRAM_CAS	3
-#define SDRAM_NB	4	/* Number of banks */
+#define SDRAM_NB	1	/* Number of banks: 0 -> two, 1 -> four */
 #define SDRAM_MWID	2	/* 32 bit memory */
 
 #define SDRAM_NR	0x1	/* 12-bit row */
