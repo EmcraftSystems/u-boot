@@ -77,6 +77,8 @@ enum stm32f2_gpio_role {
 	STM32F2_GPIO_ROLE_FSMC,		/* FSMC static memory controller      */
 	STM32F2_GPIO_ROLE_FMC = STM32F2_GPIO_ROLE_FSMC,
 	STM32F2_GPIO_ROLE_GPOUT,	/* GPOUT			      */
+	STM32F2_GPIO_ROLE_QSPI_AF9,
+	STM32F2_GPIO_ROLE_QSPI_AF10,
 
 	STM32F2_GPIO_ROLE_LAST		/* for internal usage, must be last   */
 };

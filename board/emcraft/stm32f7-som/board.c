@@ -348,6 +348,23 @@ static const struct stm32f2_gpio_dsc ltdc_iomux[] = {
 };
 #endif /* CONFIG_VIDEO_STM32F4_LTDC */
 
+#ifdef CONFIG_STM32_QSPI
+# ifdef CONFIG_SYS_STM32F769I_DISCO
+static const struct stm32f2_gpio_dsc qspi_af9_iomux[] = {
+	{STM32F2_GPIO_PORT_C, STM32F2_GPIO_PIN_9},	/* D0 */
+	{STM32F2_GPIO_PORT_C, STM32F2_GPIO_PIN_10},	/* D1 */
+	{STM32F2_GPIO_PORT_E, STM32F2_GPIO_PIN_2},	/* D2 */
+	{STM32F2_GPIO_PORT_D, STM32F2_GPIO_PIN_13},	/* D3 */
+	{STM32F2_GPIO_PORT_B, STM32F2_GPIO_PIN_2},	/* CLK */
+};
+static const struct stm32f2_gpio_dsc qspi_af10_iomux[] = {
+	{STM32F2_GPIO_PORT_B, STM32F2_GPIO_PIN_6},	/* NCS */
+};
+# else
+#  error "QSPI is not defined for this platform"
+# endif
+#endif /* CONFIG_STM32_QSPI */
+
 #ifdef CONFIG_SYS_BOARD_UCL_BSB
 /*
  * Configure GPIOs
@@ -421,6 +438,29 @@ static int ltdc_setup_iomux(void)
 }
 #endif /* CONFIG_VIDEO_STM32F4_LTDC */
 
+static int qspi_setup_iomux(void)
+{
+	int rv = 0;
+#ifdef CONFIG_STM32_QSPI
+	int i;
+
+	for (i = 0; i < ARRAY_SIZE(qspi_af9_iomux); i++) {
+		rv = stm32f2_gpio_config(&qspi_af9_iomux[i],
+					 STM32F2_GPIO_ROLE_QSPI_AF9);
+		if (rv)
+			break;
+	}
+
+	for (i = 0; i < ARRAY_SIZE(qspi_af10_iomux); i++) {
+		rv = stm32f2_gpio_config(&qspi_af10_iomux[i],
+					 STM32F2_GPIO_ROLE_QSPI_AF10);
+		if (rv)
+			break;
+	}
+#endif /* CONFIG_STM32_QSPI */
+	return rv;
+}
+
 /*
  * Early hardware init.
  */
@@ -462,6 +502,10 @@ int board_init(void)
 	if (rv)
 		return rv;
 #endif /* CONFIG_VIDEO_STM32F4_LTDC */
+
+	rv = qspi_setup_iomux();
+	if (rv)
+		return rv;
 
 Done:
 	return 0;
