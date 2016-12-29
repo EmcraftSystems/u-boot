@@ -38,6 +38,7 @@
 #include <asm/system.h>
 
 #include <asm/arch/fsmc.h>
+#include <linux/mtd/stm32_qspi.h>
 
 DECLARE_GLOBAL_DATA_PTR;
 
@@ -612,6 +613,9 @@ int dram_init(void)
 	if (dram_initialized)
 		return 0;
 
+	STM32_RCC->ahb3enr |= RCC_AHB3ENR_QSPIEN;
+	STM32_RCC->ahb1enr |= RCC_AHB1ENR_DMA1EN | RCC_AHB1ENR_DMA2EN;
+
 	/*
 	 * Enable FMC interface clock
 	 */
@@ -825,4 +829,9 @@ int board_eth_init(bd_t *bis)
 	return stm32_eth_init(bis);
 }
 #endif
+
+int board_late_init(void)
+{
+	return stm32_qspi_init();
+}
 

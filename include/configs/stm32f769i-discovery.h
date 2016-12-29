@@ -27,6 +27,11 @@
 #ifndef __CONFIG_H
 #define __CONFIG_H
 
+#include <linux/mtd/stm32_qspi.h>
+
+#define stringify(s)	tostring(s)
+#define tostring(s)	#s
+
 #undef DEBUG
 
 /*
@@ -65,9 +70,17 @@
 #define CONFIG_SYS_PROMPT		"STM32F769I-DISCO> "
 
 /*
+ * For "&&" support in commands in env variables
+ */
+#define CONFIG_SYS_HUSH_PARSER
+#define CONFIG_SYS_PROMPT_HUSH_PS2	"> "
+
+/*
  * We want to call the CPU specific initialization
  */
 #define CONFIG_ARCH_CPU_INIT
+
+#define BOARD_LATE_INIT
 
 /*
  * Clock configuration (see mach-stm32/clock.c for details):
@@ -83,6 +96,15 @@
 #define CONFIG_STM32_PLL_P		2
 #define CONFIG_STM32_PLL_Q		9
 #define CONFIG_STM32_PLL_R		2
+
+#define CONFIG_SPI
+#define CONFIG_SPI_FLASH
+#define CONFIG_SPI_FLASH_SIZE_OFF	26 /* 2^26 = 64MiB */
+#define CONFIG_STM32_QSPI
+#define CONFIG_STM32_QSPI_FREQ		108000000
+
+#define MT25Q_64KB_ERASE_TYP_TIME_MS	150
+#define MT25Q_256B_PROGRAM_TYP_TIME_US	350
 
 /*
  * Number of clock ticks in 1 sec
@@ -167,8 +189,13 @@
  * Store env in Flash memory
  */
 #define CONFIG_ENV_IS_IN_ENVM
-#define CONFIG_ENV_SIZE			(4 * 1024)
-#define CONFIG_ENV_ADDR			(CONFIG_SYS_ENVM_BASE + (128 * 1024))
+
+/*
+ * CONFIG_ENV_SIZE = 4 * 1024
+ * CONFIG_ENV_ADDR = CONFIG_SYS_ENVM_BASE + (128 * 1024)
+ */
+#define CONFIG_ENV_SIZE			0x1000
+#define CONFIG_ENV_ADDR			0x8020000
 #define CONFIG_INFERNO			1
 #define CONFIG_ENV_OVERWRITE		1
 
@@ -247,7 +274,7 @@
 #include <config_cmd_default.h>
 #undef CONFIG_CMD_BOOTD
 #undef CONFIG_CMD_CONSOLE
-#undef CONFIG_CMD_ECHO
+#define CONFIG_CMD_ECHO
 #undef CONFIG_CMD_EDITENV
 #undef CONFIG_CMD_FPGA
 #undef CONFIG_CMD_IMI
@@ -276,12 +303,11 @@
  */
 #define CONFIG_BOOTDELAY		1
 #define CONFIG_ZERO_BOOTDELAY_CHECK
-#define CONFIG_BOOTCOMMAND		"run netboot"
+#define CONFIG_BOOTCOMMAND		"run qspiboot || echo 'Boot from QSPI failed, run the update_kernel command'"
 
 /* boot args and env */
 #define CONFIG_HOSTNAME			stm32f769i-disco
-#define CONFIG_BOOTARGS			"stm32_platform=stm32f769i-disco "	\
-					"console=ttyS5,115200 panic=10"
+#define CONFIG_BOOTARGS			"console=ttyS5,115200 panic=10"
 
 /*
  * These are the good addresses to get Image data right at the 'Load Address'
@@ -291,10 +317,21 @@
  */
 #define LOADADDR			"0xC0007FB4"
 
-#define REV_EXTRA_ENV							\
-	"envmboot=run args addip;bootm ${envmaddr}\0"			\
-	"envmupdate=tftp ${image};"					\
-		"cptf ${envmaddr} ${loadaddr} ${filesize}\0"
+#define REV_EXTRA_ENV						\
+	"netboot=tftp ${image} && run args addip && bootm\0"	\
+	"qspiboot=echo 'Booting from QSPI'" \
+	" && cp.b " stringify(STM32_QSPI_BANK) " ${loadaddr} ${kernel_size}" \
+	" && run args addip && bootm\0"				\
+	"update_uboot=tftp ${uboot_image}"			\
+	" && cptf " stringify(CONFIG_MEM_NVM_BASE) " ${loadaddr} ${filesize} do_reset\0" \
+	"update_kernel=tftp ${image}"				\
+	" && qspi erase 0 ${filesize}"				\
+	" && qspi write ${loadaddr} 0 ${filesize}"		\
+	" && setenv kernel_size ${filesize}"			\
+	" && saveenv"						\
+	" && echo 'Successfully updated'\0"			\
+	"env_default=mw.b ${loadaddr} 0xFF " stringify(CONFIG_ENV_SIZE) "" \
+	" && cptf ${envmaddr} ${loadaddr} " stringify(CONFIG_ENV_SIZE) "\0"
 
 #define CONFIG_SYS_CONSOLE_IS_IN_ENV
 
@@ -307,13 +344,13 @@
 	"addip=setenv bootargs ${bootargs}"			\
 	" ip=${ipaddr}:${serverip}:${gatewayip}:"		\
 	 "${netmask}:${hostname}:eth0:off\0"			\
-	"envmaddr=08040000\0"					\
+	"envmaddr=" stringify(CONFIG_ENV_ADDR) "\0"		\
 	"ethaddr=C0:B1:3C:88:88:85\0"				\
 	"ipaddr=172.17.4.206\0"					\
 	"serverip=172.17.0.19\0"				\
 	"image=stm32f7/f769i-disco.uImage\0"			\
+	"uboot_image=stm32f7/f769i-disco.u-boot.bin\0"		\
 	"stdin=serial\0"					\
-	"netboot=tftp ${image}; run args addip; bootm\0"	\
 	REV_EXTRA_ENV
 
 /*
