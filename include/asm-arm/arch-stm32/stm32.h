@@ -31,11 +31,12 @@
  * Peripheral memory map
  ******************************************************************************/
 
-#define STM32_PERIPH_BASE	0x40000000
+#define STM32_PERIPH_BASE	((u32)0x40000000)
 #define STM32_APB1PERIPH_BASE	(STM32_PERIPH_BASE + 0x00000000)
 #define STM32_APB2PERIPH_BASE	(STM32_PERIPH_BASE + 0x00010000)
 #define STM32_AHB1PERIPH_BASE	(STM32_PERIPH_BASE + 0x00020000)
 #define STM32_AHB2PERIPH_BASE	(STM32_PERIPH_BASE + 0x10000000)
+#define STM32_AHB3PERIPH_BASE	(STM32_PERIPH_BASE + 0x60000000)
 
 /******************************************************************************
  * Reset and Clock Control
@@ -137,5 +138,10 @@ unsigned long  __attribute__((section(".ramcode")))
 	       clock_get(enum clock clck);
 
 #define PAGE_SIZE	4096
+
+#define  RCC_AHB1ENR_DMA1EN	((uint32_t)0x00200000)
+#define  RCC_AHB1ENR_DMA2EN	((uint32_t)0x00400000)
+#define  RCC_APB2ENR_SPI1EN	((uint32_t)0x00001000)
+#define  RCC_AHB3ENR_QSPIEN	((uint32_t)(1 << 1))
 
 #endif /* _MACH_STM32_H_ */
