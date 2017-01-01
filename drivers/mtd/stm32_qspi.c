@@ -519,7 +519,8 @@ int stm32_qspi_init(void)
 
 	switch_to_memory_mapped(stm32_qspi);
 
-	printf("%s: mapped QSPI to 0x%x\n", __func__, STM32_QSPI_BANK);
+	printf("QSPI:  %d MB mapped at 0x%x\n",
+		1 << (CONFIG_SPI_FLASH_SIZE_OFF - 20), STM32_QSPI_BANK);
 
 	return 0;
 }
