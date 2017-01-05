@@ -39,6 +39,7 @@
 #include <asm/system.h>
 
 #include <asm/arch/fsmc.h>
+#include <linux/mtd/stm32_qspi.h>
 
 DECLARE_GLOBAL_DATA_PTR;
 
@@ -202,6 +203,19 @@ static const struct stm32f2_gpio_dsc ltdc_iomux[] = {
 };
 #endif /* CONFIG_VIDEO_STM32F4_LTDC */
 
+#ifdef CONFIG_STM32_QSPI
+static const struct stm32f2_gpio_dsc qspi_af9_iomux[] = {
+	{STM32F2_GPIO_PORT_D, STM32F2_GPIO_PIN_11},	/* D0 */
+	{STM32F2_GPIO_PORT_D, STM32F2_GPIO_PIN_12},	/* D1 */
+	{STM32F2_GPIO_PORT_E, STM32F2_GPIO_PIN_2},	/* D2 */
+	{STM32F2_GPIO_PORT_D, STM32F2_GPIO_PIN_13},	/* D3 */
+	{STM32F2_GPIO_PORT_B, STM32F2_GPIO_PIN_2},	/* CLK */
+};
+static const struct stm32f2_gpio_dsc qspi_af10_iomux[] = {
+	{STM32F2_GPIO_PORT_B, STM32F2_GPIO_PIN_6},	/* NCS */
+};
+#endif /* CONFIG_STM32_QSPI */
+
 /*
  * Init FMC/FSMC GPIOs based
  */
@@ -248,6 +262,29 @@ static int ltdc_setup_iomux(void)
 }
 #endif /* CONFIG_VIDEO_STM32F4_LTDC */
 
+#ifdef CONFIG_STM32_QSPI
+static int qspi_setup_iomux(void)
+{
+	int i, rv = 0;
+
+	for (i = 0; i < ARRAY_SIZE(qspi_af9_iomux); i++) {
+		rv = stm32f2_gpio_config(&qspi_af9_iomux[i],
+					 STM32F2_GPIO_ROLE_QSPI_AF9);
+		if (rv)
+			break;
+	}
+
+	for (i = 0; i < ARRAY_SIZE(qspi_af10_iomux); i++) {
+		rv = stm32f2_gpio_config(&qspi_af10_iomux[i],
+					 STM32F2_GPIO_ROLE_QSPI_AF10);
+		if (rv)
+			break;
+	}
+
+	return rv;
+}
+#endif /* CONFIG_STM32_QSPI */
+
 /*
  * Early hardware init.
  */
@@ -275,6 +312,12 @@ int board_init(void)
 	if (rv)
 		return rv;
 #endif /* CONFIG_VIDEO_STM32F4_LTDC */
+
+#ifdef CONFIG_STM32_QSPI
+	rv = qspi_setup_iomux();
+	if (rv)
+		return rv;
+#endif
 
 	return 0;
 }
@@ -437,3 +480,18 @@ int board_eth_init(bd_t *bis)
 }
 #endif
 
+#ifdef BOARD_LATE_INIT
+int board_late_init(void)
+{
+	int	rv = 0;
+
+#ifdef CONFIG_STM32_QSPI
+	STM32_RCC->ahb3enr |= RCC_AHB3ENR_QSPIEN;
+	STM32_RCC->ahb1enr |= RCC_AHB1ENR_DMA1EN | RCC_AHB1ENR_DMA2EN;
+
+	rv = stm32_qspi_init();
+#endif
+
+	return rv;
+}
+#endif /* BOARD_LATE_INIT */

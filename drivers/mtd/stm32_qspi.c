@@ -105,8 +105,6 @@ struct stm32_qspi_regs {
 #define QSPI_TIMEOUT_MS			1000
 #define QSPI_POLLING_INTERVAL		16
 
-#define QSPI_FAST_READ_DUMMY_CYCLES	6
-
 struct stm32_qspi_priv {
 	struct stm32_qspi_regs *regs;
 	size_t size;
@@ -367,7 +365,7 @@ static int write_page(struct stm32_qspi_priv *priv, u32 address, const u8 *buf, 
 	writel(size - 1, &priv->regs->dlr);
 
 	writel(QSPI_CCR_FMODE_INDIRECT_WRITE
-	       | SPINOR_OP_FAST_PROGRAM
+	       | CONFIG_STM32_QSPI_FAST_PROGRAM_CMD
 	       | QSPI_CCR_IMODE_SINGLE_LINE
 	       | QSPI_CCR_ADMODE_FOUR_LINES
 	       | QSPI_CCR_ADSIZE_THREE_BYTES
@@ -490,7 +488,7 @@ int stm32_qspi_init(void)
 
 	stm32_qspi->regs = (struct stm32_qspi_regs *)(uintptr_t)STM32_QSPI_BASE;
 
-	stm32_qspi->fast_read_dummy = QSPI_FAST_READ_DUMMY_CYCLES;
+	stm32_qspi->fast_read_dummy = CONFIG_STM32_QSPI_FAST_READ_DUMMY_CYCLES;
 	stm32_qspi->size = 1 << CONFIG_SPI_FLASH_SIZE_OFF;
 	stm32_qspi->erase_size = SPINOR_MAX_ERASE_SIZE;
 	stm32_qspi->write_size = SPINOR_MAX_WRITE_SIZE;
@@ -561,7 +559,8 @@ int do_qspi(cmd_tbl_t *cmdtp, int flag, int argc, char *argv[])
 				}
 				printf("Erase QSPI flash from 0x%lx to 0x%lx, estimated time %lu s\n",
 				       off, off + size,
-				       (MT25Q_64KB_ERASE_TYP_TIME_MS * size) / stm32_qspi->erase_size / 1000);
+				       (CONFIG_STM32_QSPI_64KB_ERASE_TYP_TIME_MS * size) /
+					stm32_qspi->erase_size / 1000);
 				err = erase(stm32_qspi, off, size);
 				printf("Erase QSPI flash: %s\n", err ? "FAIL" : "OK");
 			} else {
@@ -578,7 +577,8 @@ int do_qspi(cmd_tbl_t *cmdtp, int flag, int argc, char *argv[])
 		    && str2long(argv[4], &size)) {
 			printf("Write from memory 0x%lx to QSPI 0x%lx, size 0x%lx, estimated time %lu s\n",
 			       addr, off, size,
-			       (MT25Q_256B_PROGRAM_TYP_TIME_US * size) / stm32_qspi->write_size / 1000 / 1000);
+			       (CONFIG_STM32_QSPI_256B_PROGRAM_TYP_TIME_US * size) /
+				stm32_qspi->write_size / 1000 / 1000);
 			err = write(stm32_qspi, off, (u8*)addr, size);
 			printf("Write from memory to QSPI: %s\n", err ? "FAIL" : "OK");
 		} else {
