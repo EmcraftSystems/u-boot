@@ -23,6 +23,8 @@
 
 #include <common.h>
 #include <errno.h>
+#include <asm/cache.h>
+
 #include "envm.h"
 
 /*

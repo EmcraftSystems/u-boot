@@ -708,6 +708,7 @@ int do_bootm (cmd_tbl_t *cmdtp, int flag, int argc, char *argv[])
 #if defined(CONFIG_STM32F7_DCACHE_ON) && defined(CONFIG_STM32F7_ICACHE_ON)
 	stm32f7_cache_sync_range(images.os.load,
 				 images.os.load + images.os.image_len);
+	stm32f7_envm_as_dev();
 #endif
 
 	boot_fn(0, argc, argv, &images);

@@ -34,6 +34,9 @@
  * a memory region, and will be executed.
  */
 void stm32f7_cache_sync_range(u32 s, u32 e);
+
+void stm32f7_envm_as_dev(void);
+void stm32f7_envm_as_mem(void);
 #endif
 
 /*
