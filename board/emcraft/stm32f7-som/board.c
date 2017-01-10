@@ -830,8 +830,15 @@ int board_eth_init(bd_t *bis)
 }
 #endif
 
+#ifdef BOARD_LATE_INIT
 int board_late_init(void)
 {
-	return stm32_qspi_init();
-}
+	int rv = 0;
 
+#ifdef CONFIG_STM32_QSPI
+	rv = stm32_qspi_init();
+#endif
+
+	return rv;
+}
+#endif /* BOARD_LATE_INIT */
