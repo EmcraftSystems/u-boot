@@ -224,6 +224,7 @@
 
 #define STM32_RCC_DCKCFGR_PLLSAIDIVR	(3 << 16)
 #define STM32_RCC_PLLSAIDivR_Div8	(2 << 16)
+#define STM32_RCC_PLLSAIDivR_Div2       (0 << 16)
 
 /*
  * Offsets and bitmasks of some PWR regs
@@ -305,6 +306,10 @@ void sai_r_clk_enable(void)
 
 	/* Calculate N to match the requested rate */
 	sai_n = CONFIG_STM32_LTDC_PIXCLK * sai_r * sai_div_r / parent_rate;
+	if (sai_n > STM32_RCC_PLLCFGR_PLLN_MSK) {
+		sai_div_r = 2;
+		sai_n = CONFIG_STM32_LTDC_PIXCLK * sai_r * sai_div_r / parent_rate;
+	}
 
 	/* Disable PLLSAI */
 	sai_r_clk_disable();
@@ -319,7 +324,10 @@ void sai_r_clk_enable(void)
 	dckcfgr &= ~STM32_RCC_DCKCFGR_PLLSAIDIVR;
 
 	/* Set PLLSAIDIVR values */
-	dckcfgr |= STM32_RCC_PLLSAIDivR_Div8;
+	if (8 == sai_div_r)
+		dckcfgr |= STM32_RCC_PLLSAIDivR_Div8;
+	else if (2 == sai_div_r)
+		dckcfgr |= STM32_RCC_PLLSAIDivR_Div2;
 
 	/* Store the new value */
 	STM32_RCC->dckcfgr = dckcfgr;
