@@ -288,7 +288,7 @@ static const struct stm32f2_gpio_dsc ext_ram_fsmc_fmc_gpio[] = {
 #endif /* CONFIG_SYS_STM32F769I_DISCO */
 };
 
-#ifdef CONFIG_VIDEO_STM32F4_LTDC
+#if defined(CONFIG_VIDEO_STM32F4_LTDC) && !defined(CONFIG_SYS_STM32F769I_DISCO)
 static const struct stm32f2_gpio_dsc ltdc_iomux[] = {
 	/* PI14 = LCD_CLK */
 	{STM32F2_GPIO_PORT_I, STM32F2_GPIO_PIN_14},
@@ -416,7 +416,7 @@ out:
 	return rv;
 }
 
-#ifdef CONFIG_VIDEO_STM32F4_LTDC
+#if defined(CONFIG_VIDEO_STM32F4_LTDC) && !defined(CONFIG_SYS_STM32F769I_DISCO)
 /*
  * Initialize LCD pins
  */
@@ -498,7 +498,7 @@ int board_init(void)
 	}
 #endif
 
-#ifdef CONFIG_VIDEO_STM32F4_LTDC
+#if defined(CONFIG_VIDEO_STM32F4_LTDC) && !defined(CONFIG_SYS_STM32F769I_DISCO)
 	rv = ltdc_setup_iomux();
 	if (rv)
 		return rv;
