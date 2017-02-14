@@ -176,13 +176,12 @@ int fec_send(struct eth_device *dev, volatile void *packet, int length)
 #ifndef CONFIG_SYS_FEC_BUF_USE_SRAM
 	/*
 	 * FEC unable to initial transmit data packet.
-	 * A nop will ensure the descriptor polling active completed.
+	 * A delay will ensure the descriptor polling active completed.
 	 * CF Internal RAM has shorter cycle access than DRAM. If use
-	 * DRAM as Buffer descriptor and data, a nop is a must.
+	 * DRAM as Buffer descriptor and data, a delay is a must.
 	 * Affect only V2 and V3.
 	 */
-	__asm__ ("nop");
-
+	udelay(100);
 #endif
 
 #ifdef CONFIG_SYS_UNIFY_CACHE
