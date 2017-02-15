@@ -452,12 +452,12 @@
 	"ipaddr=172.17.6.46\0"					\
 	"serverip=172.17.0.1\0"					\
 	"image=k70/uImage\0"					\
-	"netboot=tftp ${image};run args addip;bootm\0"		\
+	"netboot=tftp ${image} && run args addip && bootm\0"		\
 	"flashaddr=00100000\0"					\
-	"flashboot=nboot ${loadaddr} 0 ${flashaddr};"		\
-		"run args addip;bootm\0"				\
-	"update=tftp ${image};"					\
-		"nand erase ${flashaddr} ${filesize};"		\
+	"flashboot=nboot ${loadaddr} 0 ${flashaddr} && "		\
+		"run args addip && bootm\0"				\
+	"update=tftp ${image} && "					\
+		"nand erase ${flashaddr} ${filesize} && "		\
 		"nand write ${loadaddr} ${flashaddr} ${filesize}\0"
 
 /*
@@ -466,4 +466,6 @@
 #define CONFIG_SETUP_MEMORY_TAGS
 #define CONFIG_CMDLINE_TAG
 
+#define CONFIG_SYS_HUSH_PARSER
+#define CONFIG_SYS_PROMPT_HUSH_PS2	"> "
 #endif /* __CONFIG_H */
