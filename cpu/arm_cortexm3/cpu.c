@@ -40,6 +40,10 @@ extern void cortex_m3_soc_init(void);
  */
 int arch_cpu_init(void)
 {
+#if defined(CONFIG_MEM_NVM_UBOOT_OFF)
+	extern int vectors[];
+	CM3_SCB_REGS->vtor = (int)&vectors[0] & 0x3FFFFF00;
+#endif
 	/*
 	 * Initialize the eNVM driver
 	 */
