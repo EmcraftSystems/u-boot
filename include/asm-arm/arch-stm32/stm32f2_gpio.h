@@ -103,5 +103,6 @@ int stm32f2_gpio_config(const struct stm32f2_gpio_dsc *gpio_dsc,
  * Set GPOUT to the state specified (1, 0)
  */
 int stm32f2_gpout_set(const struct stm32f2_gpio_dsc *gpio_dsc, int state);
+int stm32f2_gpout_get(const struct stm32f2_gpio_dsc *dsc);
 
 #endif /* _STM32F2_GPIO_H_ */

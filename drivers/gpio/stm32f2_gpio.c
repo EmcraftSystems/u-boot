@@ -316,3 +316,24 @@ s32 stm32f2_gpout_set(const struct stm32f2_gpio_dsc *dsc, int state)
 out:
 	return rv;
 }
+
+int stm32f2_gpout_get(const struct stm32f2_gpio_dsc *dsc)
+{
+	volatile struct stm32f2_gpio_regs *gpio_regs;
+	int state;
+
+	if (!dsc || dsc->port >= ARRAY_SIZE(io_base) || dsc->pin > 15) {
+		if (gd->have_console) {
+			printf("%s: incorrect params %d.%d.\n", __func__,
+				dsc ? dsc->port : -1,
+				dsc ? dsc->pin  : -1);
+		}
+		return -EINVAL;
+	}
+
+	gpio_regs = (struct stm32f2_gpio_regs *)io_base[dsc->port];
+
+	state = !!(gpio_regs->idr & (1 << dsc->pin));
+
+	return state;
+}
