@@ -58,6 +58,10 @@ void fdt_fixup_qe_firmware(void *fdt);
 void fdt_fixup_dmamem(void *fdt);
 #endif
 
+#ifdef CONFIG_SWITCH
+void fdt_fixup_switch(void *fdt);
+#endif
+
 #ifdef CONFIG_HAS_FSL_DR_USB
 void fdt_fixup_dr_usb(void *blob, bd_t *bd);
 #else

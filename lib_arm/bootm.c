@@ -235,6 +235,9 @@ static int bootm_linux_fdt(int machid, bootm_headers_t *images)
 #ifdef CONFIG_DMAMEM
 	fdt_fixup_dmamem(*of_flat_tree);
 #endif
+#ifdef CONFIG_SWITCH
+	fdt_fixup_switch(*of_flat_tree);
+#endif
 
 	fdt_initrd(*of_flat_tree, *initrd_start, *initrd_end, 1);
 
