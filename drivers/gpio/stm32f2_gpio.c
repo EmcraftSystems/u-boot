@@ -147,6 +147,8 @@ static const u32 af_val[STM32F2_GPIO_ROLE_LAST] = {
 	(u32)-1,
 	STM32F2_GPIO_AF_QSPI9,	/* STM32F2_GPIO_ROLE_QSPI_AF9 */
 	STM32F2_GPIO_AF_QSPI10,	/* STM32F2_GPIO_ROLE_QSPI_AF10 */
+	STM32F2_GPIO_MODE_IN,
+	STM32F2_GPIO_MODE_IN,
 };
 
 /*
@@ -210,6 +212,18 @@ s32 stm32f2_gpio_config(const struct stm32f2_gpio_dsc *dsc,
 		ospeed = STM32F2_GPIO_SPEED_50M;
 		pupd   = STM32F2_GPIO_PUPD_NO;
 		mode   = STM32F2_GPIO_MODE_AF;
+		break;
+	case STM32F2_GPIO_ROLE_GPIN:
+		otype  = STM32F2_GPIO_OTYPE_PP;
+		ospeed = STM32F2_GPIO_SPEED_2M;
+		pupd   = STM32F2_GPIO_PUPD_NO;
+		mode   = STM32F2_GPIO_MODE_IN;
+		break;
+	case STM32F2_GPIO_ROLE_GPIN_PULLUP:
+		otype  = STM32F2_GPIO_OTYPE_PP;
+		ospeed = STM32F2_GPIO_SPEED_2M;
+		pupd   = STM32F2_GPIO_PUPD_UP;
+		mode   = STM32F2_GPIO_MODE_IN;
 		break;
 	default:
 		if (gd->have_console)
