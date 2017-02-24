@@ -431,9 +431,7 @@
  */
 #define CONFIG_BOOTDELAY		3
 #define CONFIG_ZERO_BOOTDELAY_CHECK
-#define CONFIG_BOOTARGS			"kinetis_platform=" \
-					CONFIG_KINETIS_PLATFORM " " \
-					"console=ttyS2,115200 panic=10"
+#define CONFIG_BOOTARGS			"console=ttyLP2,115200 panic=10"
 #define CONFIG_BOOTCOMMAND		"run flashboot"
 
 /*
