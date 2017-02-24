@@ -379,8 +379,10 @@
 
 /*
  * Needed by "loadb"
+ * Set to be aligned with Linux entry point inside multi uImage
+ * (64-byte header and 12-byte data for 2 embedded images)
  */
-#define CONFIG_SYS_LOAD_ADDR		CONFIG_SYS_RAM_BASE
+#define CONFIG_SYS_LOAD_ADDR		(0x8008000 - 64 - 12)
 
 /*
  * Monitor is actually in eNVM. In terms of U-Boot, it is neither "flash",
@@ -468,4 +470,11 @@
 
 #define CONFIG_SYS_HUSH_PARSER
 #define CONFIG_SYS_PROMPT_HUSH_PS2	"> "
+
+/*
+ * Enable support for booting with FDT
+ */
+#define CONFIG_OF_LIBFDT
+#define CONFIG_SYS_BOOTMAPSZ		CONFIG_SYS_RAM_SIZE
+
 #endif /* __CONFIG_H */
