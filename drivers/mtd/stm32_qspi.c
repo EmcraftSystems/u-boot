@@ -559,8 +559,8 @@ int do_qspi(cmd_tbl_t *cmdtp, int flag, int argc, char *argv[])
 				}
 				printf("Erase QSPI flash from 0x%lx to 0x%lx, estimated time %lu s\n",
 				       off, off + size,
-				       (CONFIG_STM32_QSPI_64KB_ERASE_TYP_TIME_MS * size) /
-					stm32_qspi->erase_size / 1000);
+				       (CONFIG_STM32_QSPI_64KB_ERASE_TYP_TIME_MS * (size / 1000)) /
+					stm32_qspi->erase_size);
 				err = erase(stm32_qspi, off, size);
 				printf("Erase QSPI flash: %s\n", err ? "FAIL" : "OK");
 			} else {
@@ -577,8 +577,8 @@ int do_qspi(cmd_tbl_t *cmdtp, int flag, int argc, char *argv[])
 		    && str2long(argv[4], &size)) {
 			printf("Write from memory 0x%lx to QSPI 0x%lx, size 0x%lx, estimated time %lu s\n",
 			       addr, off, size,
-			       (CONFIG_STM32_QSPI_256B_PROGRAM_TYP_TIME_US * size) /
-				stm32_qspi->write_size / 1000 / 1000);
+			       (CONFIG_STM32_QSPI_256B_PROGRAM_TYP_TIME_US * (size / 1000)) /
+				stm32_qspi->write_size / 1000);
 			err = write(stm32_qspi, off, (u8*)addr, size);
 			printf("Write from memory to QSPI: %s\n", err ? "FAIL" : "OK");
 		} else {
