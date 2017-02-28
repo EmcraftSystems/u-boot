@@ -140,6 +140,7 @@ void fdt_fixup_switch(void *fdt)
 				int gpio_bank_off = fdt_node_offset_by_phandle(fdt, fdt32_to_cpu(v[0]));
 				const char *bank_name = (const char *)fdt_getprop(fdt, gpio_bank_off, "st,bank-name", NULL);
 				const char *status;
+				int need_to_enable;
 				for (i = 0; i < sizeof(gpio_banks)/sizeof(gpio_banks[0]); ++i) {
 					if (0 == strcmp(bank_name, gpio_banks[i].name)) {
 						port = gpio_banks[i].port;
@@ -159,11 +160,36 @@ void fdt_fixup_switch(void *fdt)
 				iomux.port = port;
 				iomux.pin = pin;
 				gpio_value = stm32f2_gpout_get(&iomux);
-				status = ((gpio_value && !active_low) || (!gpio_value && active_low)) ? "okay" : "disabled";
+				need_to_enable = (gpio_value && !active_low) || (!gpio_value && active_low);
+				status = need_to_enable ? "okay" : "disabled";
 				printf("%s: Setting node %s to \"%s\" as instructed by gpio %d.%d (value %d, active %s)\n",
 				       __func__, fdt_get_name(fdt, offset, NULL), status,
 				       port, pin, gpio_value, active_low ? "low" : "high");
 				fdt_setprop(fdt, offset, "status", status, strlen(status) + 1);
+
+				if (!need_to_enable) {
+					const u32 *pinctrl_h;
+					int pinctrl_node;
+					int pins_node;
+					int err;
+
+					pinctrl_h = fdt_getprop(fdt, offset, "pinctrl-0", NULL);
+					if (!pinctrl_h) {
+						continue;
+					}
+
+					pinctrl_node = fdt_node_offset_by_phandle(fdt, fdt32_to_cpu(*pinctrl_h));
+					pins_node = fdt_next_node(fdt, pinctrl_node, NULL);
+
+					err = fdt_del_node(fdt, pins_node);
+					if (err) {
+						error("%s[%d]: failed to remove the st-pins node: %d\n", __func__, __LINE__, err);
+					}
+					pins_node = fdt_add_subnode(fdt, pinctrl_node, "st,pins");
+					if (pins_node <= 0) {
+						error("%s[%d]: failed to add empty st-pins node: %d\n", __func__, __LINE__, pins_node);
+					}
+				}
 			}
 		}
 	} else {
