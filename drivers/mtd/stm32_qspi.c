@@ -296,6 +296,28 @@ fail:
 	return err;
 }
 
+static int stm32_qspi_abort(struct stm32_qspi_priv *priv)
+{
+	int err;
+
+	priv->regs->cr &= ~QSPI_CR_DMAEN;
+	priv->regs->cr |= QSPI_CR_ABORT;
+
+	err = wait_until_complete(priv);
+	priv->regs->cr |= QSPI_CR_DMAEN;
+	if (err)
+		goto fail;
+
+	err = wait_while_busy(priv);
+	if (err)
+		goto fail;
+
+	return 0;
+fail:
+	error("%s: failed: %d\n", __func__, err);
+	return err;
+}
+
 static int switch_to_memory_mapped(struct stm32_qspi_priv *priv)
 {
 	int err;
@@ -378,6 +400,8 @@ static int erase(struct stm32_qspi_priv *priv, u32 address, size_t size)
 		error("%s: non-aligned erase: addr 0x%x\n", __func__, (u32)address);
 		return -EINVAL;
 	}
+
+	stm32_qspi_abort(priv);
 
 	while (size) {
 		int err = erase_block(priv, address);
@@ -462,6 +486,8 @@ static int write(struct stm32_qspi_priv *priv, u32 address, const u8 *buf, size_
 		error("%s: Write past end of device\n", __func__);
 		return -EINVAL;
 	}
+
+	stm32_qspi_abort(priv);
 
 	current_size =
 		(((address & (priv->write_size-1)) + size) > priv->write_size)
