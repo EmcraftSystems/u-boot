@@ -329,10 +329,10 @@ static int switch_to_memory_mapped(struct stm32_qspi_priv *priv)
 		goto fail;
 
 	writel(QSPI_CCR_FMODE_MEMORY_MAP
-	       | SPINOR_OP_FAST_READ
+	       | SPINOR_OP_FAST_READ_4B
 	       | QSPI_CCR_IMODE_SINGLE_LINE
 	       | QSPI_CCR_ADMODE_FOUR_LINES
-	       | QSPI_CCR_ADSIZE_THREE_BYTES
+	       | QSPI_CCR_ADSIZE_FOUR_BYTES
 	       | QSPI_CCR_DMODE_FOUR_LINES
 	       | QSPI_CCR_DCYC(priv->fast_read_dummy),
 	       &priv->regs->ccr);
@@ -363,7 +363,7 @@ static int erase_block(struct stm32_qspi_priv *priv, u32 address)
 	       | SPINOR_OP_SE
 	       | QSPI_CCR_IMODE_SINGLE_LINE
 	       | QSPI_CCR_ADMODE_SINGLE_LINE
-	       | QSPI_CCR_ADSIZE_THREE_BYTES
+	       | QSPI_CCR_ADSIZE_FOUR_BYTES
 	       | QSPI_CCR_DMODE_NONE
 	       | QSPI_CCR_DCYC(0),
 		&priv->regs->ccr);
@@ -439,10 +439,10 @@ static int write_page(struct stm32_qspi_priv *priv, u32 address, const u8 *buf, 
 	writel(size - 1, &priv->regs->dlr);
 
 	writel(QSPI_CCR_FMODE_INDIRECT_WRITE
-	       | CONFIG_STM32_QSPI_FAST_PROGRAM_CMD
+	       | SPINOR_OP_PP_4B
 	       | QSPI_CCR_IMODE_SINGLE_LINE
 	       | QSPI_CCR_ADMODE_FOUR_LINES
-	       | QSPI_CCR_ADSIZE_THREE_BYTES
+	       | QSPI_CCR_ADSIZE_FOUR_BYTES
 	       | QSPI_CCR_DMODE_FOUR_LINES
 	       | QSPI_CCR_DCYC(0),
 		&priv->regs->ccr);
@@ -510,6 +510,40 @@ static int write(struct stm32_qspi_priv *priv, u32 address, const u8 *buf, size_
 	return switch_to_memory_mapped(priv);
 }
 
+static int enter_4_bytes_mode(struct stm32_qspi_priv *priv)
+{
+	int err;
+
+	err = wait_while_busy(priv);
+	if (err)
+		goto fail;
+
+	err = write_enable(priv);
+	if (err)
+		goto fail;
+
+	err = wait_while_busy(priv);
+	if (err)
+		goto fail;
+
+	writel(QSPI_CCR_FMODE_INDIRECT_WRITE
+	       | SPINOR_OP_EN4B
+	       | QSPI_CCR_IMODE_SINGLE_LINE
+	       | QSPI_CCR_ADMODE_NONE
+	       | QSPI_CCR_DMODE_NONE
+	       | QSPI_CCR_DCYC(0),
+		&priv->regs->ccr);
+
+	err = wait_until_complete(priv);
+	if (err)
+		goto fail;
+
+	return 0;
+
+fail:
+	error("%s: failed: %d\n", __func__, err);
+	return err;
+}
 
 int stm32_qspi_init(void)
 {
@@ -550,6 +584,12 @@ int stm32_qspi_init(void)
 	err = wait_while_busy(stm32_qspi);
 	if (err) {
 		error("%s: unable to enable QSPI: %d\n", __func__, err);
+		return err;
+	}
+
+	err = enter_4_bytes_mode(stm32_qspi);
+	if (err) {
+		error("%s: unable to switch to 4 byte mode addressing: %d\n", __func__, err);
 		return err;
 	}
 
