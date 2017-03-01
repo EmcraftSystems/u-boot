@@ -157,6 +157,8 @@ static int wait_for_status(struct stm32_qspi_priv *priv, u32 mask, int active)
 static int wait_while_busy(struct stm32_qspi_priv *priv)
 {
 	int err = wait_for_status(priv, QSPI_SR_BUSY, 0);
+	if (err)
+		error("%s: failed: %d\n", __func__, err);
 	return err;
 }
 
@@ -204,7 +206,7 @@ static int autopoll(struct stm32_qspi_priv *priv, u32 mask, u32 match)
 
 	err = wait_while_busy(priv);
 	if (err)
-		return err;
+		goto fail;
 
 	writel(QSPI_CCR_FMODE_AUTO_POLL
 	       | SPINOR_OP_RDSR
@@ -216,38 +218,61 @@ static int autopoll(struct stm32_qspi_priv *priv, u32 mask, u32 match)
 
 	err = wait_until_match(priv);
 	if (err)
-		return err;
+		goto fail;
 
 	clrbits_le32(&priv->regs->cr,
 		     QSPI_CR_PMM | QSPI_CR_APMS);
 
 	debug("%s: status 0x%x\n", __func__, readl(&priv->regs->dr));
 	return 0;
+fail:
+	error("%s: failed: %d\n", __func__, err);
+	return err;
 }
 
 static int wait_while_writing(struct stm32_qspi_priv *priv)
 {
-	int err = wait_while_busy(priv);
-	if (err)
-		return err;
+	int err;
 
-	return autopoll(priv, SR_WIP, 0);
+	err = wait_while_busy(priv);
+	if (err)
+		goto fail;
+
+	err = autopoll(priv, SR_WIP, 0);
+	if (err)
+		goto fail;
+
+	return 0;
+fail:
+	error("%s: failed: %d\n", __func__, err);
+	return err;
 }
 
 static int wait_until_write_enable(struct stm32_qspi_priv *priv)
 {
-	int err = wait_while_busy(priv);
-	if (err)
-		return err;
+	int err;
 
-	return autopoll(priv, SR_WEL, SR_WEL);
+	err = wait_while_busy(priv);
+	if (err)
+		goto fail;
+
+	err = autopoll(priv, SR_WEL, SR_WEL);
+	if (err)
+		goto fail;
+
+	return 0;
+fail:
+	error("%s: failed: %d\n", __func__, err);
+	return err;
 }
 
 static int write_enable(struct stm32_qspi_priv *priv)
 {
 	int err;
 
-	wait_while_busy(priv);
+	err = wait_while_busy(priv);
+	if (err)
+		goto fail;
 
 	writel(QSPI_CCR_FMODE_INDIRECT_WRITE
 	       | SPINOR_OP_WREN
@@ -259,15 +284,27 @@ static int write_enable(struct stm32_qspi_priv *priv)
 
 	err = wait_until_complete(priv);
 	if (err)
-		return err;
+		goto fail;
 
-	return wait_until_write_enable(priv);
+	err = wait_until_write_enable(priv);
+	if (err)
+		goto fail;
+
+	return 0;
+fail:
+	error("%s: failed: %d\n", __func__, err);
+	return err;
 }
 
 static int switch_to_memory_mapped(struct stm32_qspi_priv *priv)
 {
+	int err;
+
 	setbits_le32(&priv->regs->cr, QSPI_CR_DMAEN);
-	wait_while_busy(priv);
+
+	err = wait_while_busy(priv);
+	if (err)
+		goto fail;
 
 	writel(QSPI_CCR_FMODE_MEMORY_MAP
 	       | SPINOR_OP_FAST_READ
@@ -279,6 +316,9 @@ static int switch_to_memory_mapped(struct stm32_qspi_priv *priv)
 	       &priv->regs->ccr);
 
 	return 0;
+fail:
+	error("%s: failed: %d\n", __func__, err);
+	return err;
 }
 
 static int erase_block(struct stm32_qspi_priv *priv, u32 address)
@@ -287,15 +327,15 @@ static int erase_block(struct stm32_qspi_priv *priv, u32 address)
 
 	err = wait_while_busy(priv);
 	if (err)
-		return err;
+		goto fail;
 
 	err = write_enable(priv);
 	if (err)
-		return err;
+		goto fail;
 
 	err = wait_while_busy(priv);
 	if (err)
-		return err;
+		goto fail;
 
 	writel(QSPI_CCR_FMODE_INDIRECT_WRITE
 	       | SPINOR_OP_SE
@@ -310,9 +350,16 @@ static int erase_block(struct stm32_qspi_priv *priv, u32 address)
 
 	err = wait_until_complete(priv);
 	if (err)
-		return err;
+		goto fail;
 
-	return wait_while_writing(priv);
+	err = wait_while_writing(priv);
+	if (err)
+		goto fail;
+
+	return 0;
+fail:
+	error("%s: failed: %d\n", __func__, err);
+	return err;
 }
 
 static int erase(struct stm32_qspi_priv *priv, u32 address, size_t size)
@@ -355,12 +402,15 @@ static int write_page(struct stm32_qspi_priv *priv, u32 address, const u8 *buf, 
 
 	err = wait_while_busy(priv);
 	if (err)
-		return err;
+		goto fail;
 
 	err = write_enable(priv);
 	if (err)
-		return err;
-	wait_while_busy(priv);
+		goto fail;
+
+	err = wait_while_busy(priv);
+	if (err)
+		goto fail;
 
 	writel(size - 1, &priv->regs->dlr);
 
@@ -384,7 +434,7 @@ static int write_page(struct stm32_qspi_priv *priv, u32 address, const u8 *buf, 
 		int err = wait_for_fifo(priv);
 		if (err) {
 			error("%s: write failed (fifo): %d\n", __func__, err);
-			return err;
+			goto fail;
 		}
 		writeb(*buf++, dr);
 		--size;
@@ -392,13 +442,16 @@ static int write_page(struct stm32_qspi_priv *priv, u32 address, const u8 *buf, 
 
 	err = wait_until_complete(priv);
 	if (err)
-		return err;
+		goto fail;
 
 	err = wait_while_writing(priv);
 	if (err)
-		return err;
+		goto fail;
 
 	return 0;
+fail:
+	error("%s: failed: %d\n", __func__, err);
+	return err;
 }
 
 static int write(struct stm32_qspi_priv *priv, u32 address, const u8 *buf, size_t size)
@@ -515,7 +568,11 @@ int stm32_qspi_init(void)
 		return err;
 	}
 
-	switch_to_memory_mapped(stm32_qspi);
+	err = switch_to_memory_mapped(stm32_qspi);
+	if (err) {
+		error("%s: unable to switch to memory mapping: %d\n", __func__, err);
+		return err;
+	}
 
 	printf("QSPI:  %d MB mapped at 0x%x\n",
 		1 << (CONFIG_SPI_FLASH_SIZE_OFF - 20), STM32_QSPI_BANK);
