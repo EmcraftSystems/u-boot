@@ -510,47 +510,6 @@ static int write(struct stm32_qspi_priv *priv, u32 address, const u8 *buf, size_
 	return switch_to_memory_mapped(priv);
 }
 
-#if defined(DEBUG)
-static int read_unmapped(struct stm32_qspi_priv *priv, u32 address, u8 *buf, size_t size)
-{
-	wait_while_busy(priv);
-
-	writel(size - 1, &priv->regs->dlr);
-
-	writel(QSPI_CCR_FMODE_INDIRECT_WRITE
-	       | SPINOR_OP_FAST_READ
-	       | QSPI_CCR_IMODE_SINGLE_LINE
-	       | QSPI_CCR_ADMODE_FOUR_LINES
-	       | QSPI_CCR_ADSIZE_THREE_BYTES
-	       | QSPI_CCR_DMODE_FOUR_LINES
-	       | QSPI_CCR_DCYC(priv->fast_read_dummy),
-		&priv->regs->ccr);
-
-	writel(address, &priv->regs->ar);
-
-	clrsetbits_le32(&priv->regs->ccr,
-			QSPI_CCR_FMODE(3),
-			QSPI_CCR_FMODE_INDIRECT_READ);
-
-	/* Initiate the transfer by writing the address once more */
-	writel(address, &priv->regs->ar);
-
-	while (size) {
-		u8 *dr = (u8*)&priv->regs->dr;
-		int err = wait_for_fifo(priv);
-		if (err) {
-			error("%s: read failed (fifo): %d\n", __func__, err);
-			return err;
-		}
-		*buf++ = readb(dr);
-		--size;
-	}
-
-	wait_until_complete(priv);
-
-	return switch_to_memory_mapped(priv);
-}
-#endif /* DEBUG */
 
 int stm32_qspi_init(void)
 {
