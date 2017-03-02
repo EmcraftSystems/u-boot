@@ -323,7 +323,7 @@
  */
 #define CONFIG_BOOTDELAY		1
 #define CONFIG_ZERO_BOOTDELAY_CHECK
-#define CONFIG_BOOTCOMMAND		"run qspiboot || echo 'Boot from QSPI failed, run the update_kernel command'"
+#define CONFIG_BOOTCOMMAND		"run qspiboot || echo 'Boot from QSPI failed, run the update command'"
 
 /* boot args and env */
 #define CONFIG_HOSTNAME			stm32f769i-disco
@@ -340,15 +340,12 @@
 #define REV_EXTRA_ENV						\
 	"netboot=tftp ${image} && run args addip && bootm\0"	\
 	"qspiboot=echo 'Booting from QSPI'" \
-	" && cp.b " stringify(STM32_QSPI_BANK) " ${loadaddr} ${kernel_size}" \
-	" && run args addip && bootm\0"				\
+	" && run args addip && bootm "stringify(STM32_QSPI_BANK)"\0"	\
 	"update_uboot=tftp ${uboot_image}"			\
 	" && cptf " stringify(CONFIG_MEM_NVM_BASE) " ${loadaddr} ${filesize} do_reset\0" \
-	"update_kernel=tftp ${image}"				\
+	"update=tftp ${image}"				\
 	" && qspi erase 0 ${filesize}"				\
 	" && qspi write ${loadaddr} 0 ${filesize}"		\
-	" && setenv kernel_size ${filesize}"			\
-	" && saveenv"						\
 	" && echo 'Successfully updated'\0"			\
 	"env_default=mw.b ${loadaddr} 0xFF " stringify(CONFIG_ENV_SIZE) "" \
 	" && cptf ${envmaddr} ${loadaddr} " stringify(CONFIG_ENV_SIZE) "\0"
