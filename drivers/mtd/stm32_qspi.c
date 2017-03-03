@@ -439,7 +439,7 @@ static int write_page(struct stm32_qspi_priv *priv, u32 address, const u8 *buf, 
 	writel(size - 1, &priv->regs->dlr);
 
 	writel(QSPI_CCR_FMODE_INDIRECT_WRITE
-	       | SPINOR_OP_PP_4B
+	       | CONFIG_STM32_QSPI_FAST_PROGRAM_CMD
 	       | QSPI_CCR_IMODE_SINGLE_LINE
 	       | QSPI_CCR_ADMODE_FOUR_LINES
 	       | QSPI_CCR_ADSIZE_FOUR_BYTES

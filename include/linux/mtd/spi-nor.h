@@ -53,7 +53,7 @@
 #define SPINOR_OP_RDCR		0x35	/* Read configuration register */
 #define SPINOR_OP_RDFSR		0x70	/* Read flag status register */
 
-#define SPINOR_OP_FAST_PROGRAM	0x38	/* EXTENDED QUAD INPUT FAST PROGRAM */
+#define SPINOR_OP_FAST_PROG	0x38	/* EXTENDED QUAD INPUT FAST PROGRAM */
 #define SPINOR_OP_FAST_READ	0xEB	/* QUAD INPUT/OUTPUT FAST READ */
 
 /* 4-byte address opcodes - used on Spansion and some Macronix flashes. */
@@ -63,6 +63,7 @@
 #define SPINOR_OP_READ4_1_1_4	0x6c	/* Read data bytes (Quad SPI) */
 #define SPINOR_OP_PP_4B		0x12	/* Page program (up to 256 bytes) */
 #define SPINOR_OP_SE_4B		0xdc	/* Sector erase (usually 64KiB) */
+#define SPINOR_OP_FAST_PROG_4B	0x3e	/* EXTENDED QUAD INPUT FAST PROGRAM */
 #define SPINOR_OP_FAST_READ_4B	0xec	/* QUAD INPUT/OUTPUT FAST READ */
 
 /* Used for SST flashes only. */
