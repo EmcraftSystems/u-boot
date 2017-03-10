@@ -201,6 +201,16 @@ typedef enum {
 /* This option is defined if the board driver allocates its own buffers
    (e.g. because it needs them DMA-coherent */
 #define NAND_OWN_BUFFERS	0x00040000
+/* Chip may not exist, so silence any errors in scan */
+#define NAND_SCAN_SILENT_NODEV	0x00080000
+/*
+ * If passed additionally to NAND_USE_FLASH_BBT then BBT code will not touch
+ * the OOB area.
+ */
+#define NAND_USE_FLASH_BBT_NO_OOB	0x00800000
+/* Create an empty BBT with no vendor information if the BBT is available */
+#define NAND_CREATE_EMPTY_BBT		0x01000000
+
 /* Options set by nand scan */
 /* bbt has already been read */
 #define NAND_BBT_SCANNED	0x40000000
