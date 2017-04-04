@@ -149,7 +149,7 @@
 # define CONFIG_DMAMEM_SZ_ALL		(1 << 20)	/* 1MB */
 # define CONFIG_DMAMEM_SZ_FB		(640 * 1024)
 # define CONFIG_DMAMEM_BASE		(CONFIG_SYS_RAM_BASE + \
-					 (CONFIG_SYS_RAM_SIZE / 2) - \
+					 CONFIG_SYS_RAM_SIZE - \
 					 CONFIG_DMAMEM_SZ_ALL)
 #endif
 
