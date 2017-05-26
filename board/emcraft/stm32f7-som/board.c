@@ -580,7 +580,12 @@ static inline u32 _ns2clk(u32 ns, u32 freq)
 #define SDRAM_MWID	1	/* 16 bit memory */
 
 #define SDRAM_NR	0x2	/* 13-bit row */
+#if (CONFIG_SYS_RAM_SIZE == (32 * 1024 * 1024))
 #define SDRAM_NC	0x1	/* 9-bit col */
+#endif
+#if (CONFIG_SYS_RAM_SIZE == (64 * 1024 * 1024))
+#define SDRAM_NC	0x2	/* 10-bit col */
+#endif
 
 #define SDRAM_TRRD	NS2CLK(12)
 #define SDRAM_TRCD	NS2CLK(18)

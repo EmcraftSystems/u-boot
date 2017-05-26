@@ -160,7 +160,9 @@
  * Configuration of the external SDRAM memory
  */
 #define CONFIG_NR_DRAM_BANKS		1
+#ifndef CONFIG_SYS_RAM_SIZE
 #define CONFIG_SYS_RAM_SIZE		(32 * 1024 * 1024)
+#endif
 #define CONFIG_SYS_RAM_FREQ_DIV	2
 #define CONFIG_SYS_RAM_BASE		0xC0000000
 

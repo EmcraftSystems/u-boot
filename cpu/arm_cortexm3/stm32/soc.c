@@ -180,7 +180,7 @@ static void stm32f7_mpu_config(void)
 		0 <<  8 | 31 <<  1 | 1 <<  0);
 
 	/*
-	 * Configure 32MB SDRAM region as Normal memory with the appropriate
+	 * Configure 64MB SDRAM region as Normal memory with the appropriate
 	 * cacheability attributes
 	 */
 	cortex_m3_mpu_set_region(MPU_RGN_SDRAM_CA,
@@ -193,7 +193,7 @@ static void stm32f7_mpu_config(void)
 		/* Non-cacheable */
 		1 << 19 |  0 << 18 | 0 << 17 | 0 << 16 |
 #endif
-		0 <<  8 | 24 <<  1 | 1 <<  0);
+		0 <<  8 | 25 <<  1 | 1 <<  0);
 
 #if defined(CONFIG_STM32F7_DCACHE_ON) || defined(CONFIG_STM32F7_ICACHE_ON)
 	stm32f7_envm_mpu_cfg(0, 0);
