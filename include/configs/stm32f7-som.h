@@ -432,7 +432,7 @@
 #endif
 
 #ifdef CONFIG_LCD
-# define LCD_ENV	"gui=qt\0"
+# define LCD_ENV	"gui=yes\0"
 #else
 # define LCD_ENV	""
 #endif
