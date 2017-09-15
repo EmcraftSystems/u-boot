@@ -1,5 +1,5 @@
 /*
- * Copyright 2007, Freescale Semiconductor, Inc
+ * Copyright 2007, 2010-2012 Freescale Semiconductor, Inc
  * Andy Fleming
  *
  * Based vaguely on the pxa mmc code:
@@ -58,7 +58,8 @@ struct fsl_esdhc {
 	uint	autoc12err;
 	uint	hostcapblt;
 	uint	wml;
-	char	reserved1[8];
+	uint    mixctrl;
+	char    reserved1[4];
 	uint	fevt;
 	char	reserved2[168];
 	uint	hostver;
@@ -72,11 +73,16 @@ uint esdhc_xfertyp(struct mmc_cmd *cmd, struct mmc_data *data)
 	uint xfertyp = 0;
 
 	if (data) {
-		xfertyp |= XFERTYP_DPSEL | XFERTYP_DMAEN;
-
+		xfertyp |= XFERTYP_DPSEL;
+#ifndef CONFIG_SYS_FSL_ESDHC_USE_PIO
+		xfertyp |= XFERTYP_DMAEN;
+#endif
 		if (data->blocks > 1) {
 			xfertyp |= XFERTYP_MSBSEL;
 			xfertyp |= XFERTYP_BCEN;
+#ifdef CONFIG_SYS_FSL_ERRATUM_ESDHC111
+			xfertyp |= XFERTYP_AC12EN;
+#endif
 		}
 
 		if (data->flags & MMC_DATA_READ)
@@ -94,42 +100,139 @@ uint esdhc_xfertyp(struct mmc_cmd *cmd, struct mmc_data *data)
 	else if (cmd->resp_type & MMC_RSP_PRESENT)
 		xfertyp |= XFERTYP_RSPTYP_48;
 
+#ifdef CONFIG_MX53
+	if (cmd->cmdidx == MMC_CMD_STOP_TRANSMISSION)
+		xfertyp |= XFERTYP_CMDTYP_ABORT;
+#endif
 	return XFERTYP_CMD(cmd->cmdidx) | xfertyp;
 }
 
+#ifdef CONFIG_SYS_FSL_ESDHC_USE_PIO
+/*
+ * PIO Read/Write Mode reduce the performace as DMA is not used in this mode.
+ */
+static void
+esdhc_pio_read_write(struct mmc *mmc, struct mmc_data *data)
+{
+	struct fsl_esdhc_cfg *cfg = mmc->priv;
+	struct fsl_esdhc *regs = (struct fsl_esdhc *)cfg->esdhc_base;
+	uint blocks;
+	char *buffer;
+	uint databuf;
+	uint size;
+	uint irqstat;
+	uint timeout;
+
+	if (data->flags & MMC_DATA_READ) {
+		blocks = data->blocks;
+		buffer = data->dest;
+		while (blocks) {
+			timeout = PIO_TIMEOUT;
+			size = data->blocksize;
+			irqstat = esdhc_read32(&regs->irqstat);
+			while (!(esdhc_read32(&regs->prsstat) & PRSSTAT_BREN)
+				&& --timeout);
+			if (timeout <= 0) {
+				printf("\nData Read Failed in PIO Mode.");
+				return;
+			}
+			while (size && (!(irqstat & IRQSTAT_TC))) {
+#ifndef CONFIG_VYBRID
+				udelay(100); /* Wait before last byte transfer complete */
+#endif
+				irqstat = esdhc_read32(&regs->irqstat);
+				databuf = in_le32(&regs->datport);
+				*((uint *)buffer) = databuf;
+				buffer += 4;
+				size -= 4;
+			}
+			blocks--;
+		}
+	} else {
+		blocks = data->blocks;
+		buffer = (char *)data->src;
+		while (blocks) {
+			timeout = PIO_TIMEOUT;
+			size = data->blocksize;
+			irqstat = esdhc_read32(&regs->irqstat);
+			while (!(esdhc_read32(&regs->prsstat) & PRSSTAT_BWEN)
+				&& --timeout);
+			if (timeout <= 0) {
+				printf("\nData Write Failed in PIO Mode.");
+				return;
+			}
+			while (size && (!(irqstat & IRQSTAT_TC))) {
+				udelay(100); /* Wait before last byte transfer complete */
+				databuf = *((uint *)buffer);
+				buffer += 4;
+				size -= 4;
+				irqstat = esdhc_read32(&regs->irqstat);
+				out_le32(&regs->datport, databuf);
+			}
+			blocks--;
+		}
+	}
+}
+#endif
+
 static int esdhc_setup_data(struct mmc *mmc, struct mmc_data *data)
 {
-	uint wml_value;
 	int timeout;
 	struct fsl_esdhc_cfg *cfg = (struct fsl_esdhc_cfg *)mmc->priv;
 	struct fsl_esdhc *regs = (struct fsl_esdhc *)cfg->esdhc_base;
+#ifndef CONFIG_SYS_FSL_ESDHC_USE_PIO
+	uint wml_value;
 
 	wml_value = data->blocksize/4;
 
 	if (data->flags & MMC_DATA_READ) {
-		if (wml_value > 0x10)
-			wml_value = 0x10;
+		if (wml_value > WML_RD_WML_MAX)
+			wml_value = WML_RD_WML_MAX_VAL;
 
-		wml_value = 0x100000 | wml_value;
-
+		esdhc_clrsetbits32(&regs->wml, WML_RD_WML_MASK, wml_value);
 		esdhc_write32(&regs->dsaddr, (u32)data->dest);
 	} else {
-		if (wml_value > 0x80)
-			wml_value = 0x80;
+		if (wml_value > WML_WR_WML_MAX)
+			wml_value = WML_WR_WML_MAX_VAL;
 		if ((esdhc_read32(&regs->prsstat) & PRSSTAT_WPSPL) == 0) {
 			printf("\nThe SD card is locked. Can not write to a locked card.\n\n");
 			return TIMEOUT;
 		}
-		wml_value = wml_value << 16 | 0x10;
+
+		esdhc_clrsetbits32(&regs->wml, WML_WR_WML_MASK,
+					wml_value << 16);
 		esdhc_write32(&regs->dsaddr, (u32)data->src);
 	}
-
-	esdhc_write32(&regs->wml, wml_value);
+#else	/* CONFIG_SYS_FSL_ESDHC_USE_PIO */
+	if (!(data->flags & MMC_DATA_READ)) {
+		if ((esdhc_read32(&regs->prsstat) & PRSSTAT_WPSPL) == 0) {
+			printf("\nThe SD card is locked. "
+				"Can not write to a locked card.\n\n");
+			return TIMEOUT;
+		}
+		esdhc_write32(&regs->dsaddr, (u32)data->src);
+	} else
+		esdhc_write32(&regs->dsaddr, (u32)data->dest);
+#endif	/* CONFIG_SYS_FSL_ESDHC_USE_PIO */
 
 	esdhc_write32(&regs->blkattr, data->blocks << 16 | data->blocksize);
 
 	/* Calculate the timeout period for data transactions */
-	timeout = fls(mmc->tran_speed/10) - 1;
+	/*
+	 * 1)Timeout period = (2^(timeout+13)) SD Clock cycles
+	 * 2)Timeout period should be minimum 0.250sec as per SD Card spec
+	 *  So, Number of SD Clock cycles for 0.25sec should be minimum
+	 *		(SD Clock/sec * 0.25 sec) SD Clock cycles
+	 *		= (mmc->tran_speed * 1/4) SD Clock cycles
+	 * As 1) >=  2)
+	 * => (2^(timeout+13)) >= mmc->tran_speed * 1/4
+	 * Taking log2 both the sides
+	 * => timeout + 13 >= log2(mmc->tran_speed/4)
+	 * Rounding up to next power of 2
+	 * => timeout + 13 = log2(mmc->tran_speed/4) + 1
+	 * => timeout + 13 = fls(mmc->tran_speed/4)
+	 */
+	timeout = fls(mmc->tran_speed/4);
 	timeout -= 13;
 
 	if (timeout > 14)
@@ -137,6 +240,11 @@ static int esdhc_setup_data(struct mmc *mmc, struct mmc_data *data)
 
 	if (timeout < 0)
 		timeout = 0;
+
+#ifdef CONFIG_SYS_FSL_ERRATUM_ESDHC_A001
+	if ((timeout == 4) || (timeout == 8) || (timeout == 12))
+		timeout++;
+#endif
 
 	esdhc_clrsetbits32(&regs->sysctl, SYSCTL_TIMEOUT_MASK, timeout << 16);
 
@@ -155,6 +263,11 @@ esdhc_send_cmd(struct mmc *mmc, struct mmc_cmd *cmd, struct mmc_data *data)
 	uint	irqstat;
 	struct fsl_esdhc_cfg *cfg = (struct fsl_esdhc_cfg *)mmc->priv;
 	volatile struct fsl_esdhc *regs = (struct fsl_esdhc *)cfg->esdhc_base;
+
+#ifdef CONFIG_SYS_FSL_ERRATUM_ESDHC111
+	if (cmd->cmdidx == MMC_CMD_STOP_TRANSMISSION)
+		return 0;
+#endif
 
 	esdhc_write32(&regs->irqstat, -1);
 
@@ -189,8 +302,13 @@ esdhc_send_cmd(struct mmc *mmc, struct mmc_cmd *cmd, struct mmc_data *data)
 
 	/* Send the command */
 	esdhc_write32(&regs->cmdarg, cmd->cmdarg);
+#if defined(CONFIG_FSL_USDHC)
+	esdhc_write32(&regs->mixctrl,
+	(esdhc_read32(&regs->mixctrl) & 0xFFFFFF80) | (xfertyp & 0x7F));
+	esdhc_write32(&regs->xfertyp, xfertyp & 0xFFFF0000);
+#else
 	esdhc_write32(&regs->xfertyp, xfertyp);
-
+#endif
 	/* Wait for the command to complete */
 	while (!(esdhc_read32(&regs->irqstat) & IRQSTAT_CC))
 		;
@@ -221,16 +339,20 @@ esdhc_send_cmd(struct mmc *mmc, struct mmc_cmd *cmd, struct mmc_data *data)
 
 	/* Wait until all of the blocks are transferred */
 	if (data) {
+#ifdef CONFIG_SYS_FSL_ESDHC_USE_PIO
+		esdhc_pio_read_write(mmc, data);
+#else
 		do {
 			irqstat = esdhc_read32(&regs->irqstat);
 
-			if (irqstat & DATA_ERR)
-				return COMM_ERR;
-
 			if (irqstat & IRQSTAT_DTOE)
 				return TIMEOUT;
+
+			if (irqstat & DATA_ERR)
+				return COMM_ERR;
 		} while (!(irqstat & IRQSTAT_TC) &&
 				(esdhc_read32(&regs->prsstat) & PRSSTAT_DLA));
+#endif
 	}
 
 	esdhc_write32(&regs->irqstat, -1);
@@ -265,18 +387,13 @@ void set_sysctl(struct mmc *mmc, uint clock)
 
 	clk = (pre_div << 8) | (div << 4);
 
-	/* On imx the clock must be stopped before changing frequency */
-	if (cfg->clk_enable)
-		esdhc_clrbits32(&regs->sysctl, SYSCTL_CKEN);
+	esdhc_clrbits32(&regs->sysctl, SYSCTL_CKEN);
 
 	esdhc_clrsetbits32(&regs->sysctl, SYSCTL_CLOCK_MASK, clk);
 
 	udelay(10000);
 
-	clk = SYSCTL_PEREN;
-	/* On imx systems the clock must be explicitely enabled */
-	if (cfg->clk_enable)
-		clk |= SYSCTL_CKEN;
+	clk = SYSCTL_PEREN | SYSCTL_CKEN;
 
 	esdhc_setbits32(&regs->sysctl, clk);
 }
@@ -304,12 +421,6 @@ static int esdhc_init(struct mmc *mmc)
 	struct fsl_esdhc_cfg *cfg = (struct fsl_esdhc_cfg *)mmc->priv;
 	struct fsl_esdhc *regs = (struct fsl_esdhc *)cfg->esdhc_base;
 	int timeout = 1000;
-	int ret = 0;
-	u8 card_absent;
-
-	/* Enable cache snooping */
-	if (cfg && !cfg->no_snoop)
-		esdhc_write32(&regs->scr, 0x00000040);
 
 	/* Reset the entire host controller */
 	esdhc_write32(&regs->sysctl, SYSCTL_RSTA);
@@ -318,10 +429,17 @@ static int esdhc_init(struct mmc *mmc)
 	while ((esdhc_read32(&regs->sysctl) & SYSCTL_RSTA) && --timeout)
 		udelay(1000);
 
+	/* Enable cache snooping */
+
+	if (cfg && !cfg->no_snoop) {
+		asm volatile("" ::: "memory");
+		esdhc_write32(&regs->scr, 0x00000040);
+	}
+
 	esdhc_write32(&regs->sysctl, SYSCTL_HCKEN | SYSCTL_IPGEN);
 
 	/* Set the initial clock speed */
-	set_sysctl(mmc, 400000);
+	mmc_set_clock(mmc, 400000);
 
 	/* Disable the BRR and BWR bits in IRQSTAT */
 	esdhc_clrbits32(&regs->irqstaten, IRQSTATEN_BRR | IRQSTATEN_BWR);
@@ -332,50 +450,81 @@ static int esdhc_init(struct mmc *mmc)
 	/* Set timout to the maximum value */
 	esdhc_clrsetbits32(&regs->sysctl, SYSCTL_TIMEOUT_MASK, 14 << 16);
 
-	/* Check if there is a callback for detecting the card */
-	if (board_mmc_getcd(&card_absent, mmc)) {
-		timeout = 1000;
-		while (!(esdhc_read32(&regs->prsstat) & PRSSTAT_CINS) &&
-				--timeout)
-			udelay(1000);
+	return 0;
+}
 
-		if (timeout <= 0)
-			ret = NO_CARD_ERR;
-	} else {
-		if (card_absent)
-			ret = NO_CARD_ERR;
-	}
+static int esdhc_getcd(struct mmc *mmc)
+{
+	struct fsl_esdhc_cfg *cfg = (struct fsl_esdhc_cfg *)mmc->priv;
+	struct fsl_esdhc *regs = (struct fsl_esdhc *)cfg->esdhc_base;
+	int timeout = 1000;
 
-	return ret;
+	while (!(esdhc_read32(&regs->prsstat) & PRSSTAT_CINS) && --timeout)
+		udelay(1000);
+
+	return timeout > 0;
+}
+
+static void esdhc_reset(struct fsl_esdhc *regs)
+{
+	unsigned long timeout = 100; /* wait max 100 ms */
+
+	/* reset the controller */
+	esdhc_write32(&regs->sysctl, SYSCTL_RSTA);
+
+	/* hardware clears the bit when it is done */
+	while ((esdhc_read32(&regs->sysctl) & SYSCTL_RSTA) && --timeout)
+		udelay(1000);
+	if (!timeout)
+		printf("MMC/SD: Reset never completed.\n");
 }
 
 int fsl_esdhc_initialize(bd_t *bis, struct fsl_esdhc_cfg *cfg)
 {
 	struct fsl_esdhc *regs;
 	struct mmc *mmc;
-	u32 caps;
+	u32 caps, voltage_caps;
 
 	if (!cfg)
 		return -1;
 
 	mmc = malloc(sizeof(struct mmc));
 
-	sprintf(mmc->name, "FSL_ESDHC");
+	sprintf(mmc->name, "FSL_SDHC");
 	regs = (struct fsl_esdhc *)cfg->esdhc_base;
+
+	/* First reset the eSDHC controller */
+	esdhc_reset(regs);
 
 	mmc->priv = cfg;
 	mmc->send_cmd = esdhc_send_cmd;
 	mmc->set_ios = esdhc_set_ios;
 	mmc->init = esdhc_init;
+	mmc->getcd = esdhc_getcd;
 
+	voltage_caps = 0;
 	caps = regs->hostcapblt;
 
+#ifdef CONFIG_SYS_FSL_ERRATUM_ESDHC135
+	caps = caps & ~(ESDHC_HOSTCAPBLT_SRS |
+			ESDHC_HOSTCAPBLT_VS18 | ESDHC_HOSTCAPBLT_VS30);
+#endif
 	if (caps & ESDHC_HOSTCAPBLT_VS18)
-		mmc->voltages |= MMC_VDD_165_195;
+		voltage_caps |= MMC_VDD_165_195;
 	if (caps & ESDHC_HOSTCAPBLT_VS30)
-		mmc->voltages |= MMC_VDD_29_30 | MMC_VDD_30_31;
+		voltage_caps |= MMC_VDD_29_30 | MMC_VDD_30_31;
 	if (caps & ESDHC_HOSTCAPBLT_VS33)
-		mmc->voltages |= MMC_VDD_32_33 | MMC_VDD_33_34;
+		voltage_caps |= MMC_VDD_32_33 | MMC_VDD_33_34;
+
+#ifdef CONFIG_SYS_SD_VOLTAGE
+	mmc->voltages = CONFIG_SYS_SD_VOLTAGE;
+#else
+	mmc->voltages = MMC_VDD_32_33 | MMC_VDD_33_34;
+#endif
+	if ((mmc->voltages & voltage_caps) == 0) {
+		printf("voltage not supported by controller\n");
+		return -1;
+	}
 
 	mmc->host_caps = MMC_MODE_4BIT | MMC_MODE_8BIT;
 
@@ -383,8 +532,9 @@ int fsl_esdhc_initialize(bd_t *bis, struct fsl_esdhc_cfg *cfg)
 		mmc->host_caps |= MMC_MODE_HS_52MHz | MMC_MODE_HS;
 
 	mmc->f_min = 400000;
-	mmc->f_max = MIN(gd->sdhc_clk, 50000000);
+	mmc->f_max = MIN(gd->sdhc_clk, 52000000);
 
+	mmc->b_max = 0;
 	mmc_register(mmc);
 
 	return 0;
@@ -397,6 +547,9 @@ int fsl_esdhc_mmc_init(bd_t *bis)
 	cfg = malloc(sizeof(struct fsl_esdhc_cfg));
 	memset(cfg, 0, sizeof(struct fsl_esdhc_cfg));
 	cfg->esdhc_base = CONFIG_SYS_FSL_ESDHC_ADDR;
+#ifdef CONFIG_ESDHC_NO_SNOOP
+	cfg->no_snoop = 1;
+#endif
 	return fsl_esdhc_initialize(bis, cfg);
 }
 
@@ -404,17 +557,19 @@ int fsl_esdhc_mmc_init(bd_t *bis)
 void fdt_fixup_esdhc(void *blob, bd_t *bd)
 {
 	const char *compat = "fsl,esdhc";
-	const char *status = "okay";
 
+#ifdef CONFIG_FSL_ESDHC_PIN_MUX
 	if (!hwconfig("esdhc")) {
-		status = "disabled";
-		goto out;
+		do_fixup_by_compat(blob, compat, "status", "disabled",
+				8 + 1, 1);
+		return;
 	}
+#endif
 
 	do_fixup_by_compat_u32(blob, compat, "clock-frequency",
 			       gd->sdhc_clk, 1);
-out:
-	do_fixup_by_compat(blob, compat, "status", status,
-			   strlen(status) + 1, 1);
+
+	do_fixup_by_compat(blob, compat, "status", "okay",
+			   4 + 1, 1);
 }
 #endif
