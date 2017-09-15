@@ -125,6 +125,13 @@ void cortex_m3_soc_init(void)
 	kinetis_periph_enable(KINETIS_CG_NFC, 1);
 #endif /* CONFIG_CMD_NAND */
 
+#ifdef CONFIG_FSL_ESDHC
+	/*
+	 * Enable the clock on the SDHC Controller module of the MCU
+	 */
+	kinetis_periph_enable(KINETIS_CG_ESDHC, 1);
+#endif /* CONFIG_CMD_NAND */
+
 	/*
 	 * Disable the MPU to let the Ethernet module access the SRAM
 	 */

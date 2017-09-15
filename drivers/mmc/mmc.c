@@ -724,7 +724,12 @@ int sd_change_freq(struct mmc *mmc)
 	if (mmc_host_is_spi(mmc))
 		return 0;
 
+	timeout = 3;
+
 	/* Read the SCR to find out if this card supports higher speeds */
+#ifdef CONFIG_MMC_RETRY_SCR_FIX
+retry_scr:
+#endif
 	cmd.cmdidx = MMC_CMD_APP_CMD;
 	cmd.resp_type = MMC_RSP_R1;
 	cmd.cmdarg = mmc->rca << 16;
@@ -740,9 +745,9 @@ int sd_change_freq(struct mmc *mmc)
 	cmd.cmdarg = 0;
 	cmd.flags = 0;
 
-	timeout = 3;
-
+#ifndef CONFIG_MMC_RETRY_SCR_FIX
 retry_scr:
+#endif
 	data.dest = (char *)scr;
 	data.blocksize = 8;
 	data.blocks = 1;

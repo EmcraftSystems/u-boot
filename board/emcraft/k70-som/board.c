@@ -26,6 +26,9 @@
 
 #include <common.h>
 #include <netdev.h>
+#include <nand.h>
+#include <mmc.h>
+#include <fsl_esdhc.h>
 
 #include <asm/arch/kinetis.h>
 #include <asm/arch/kinetis_gpio.h>
@@ -422,6 +425,24 @@ static const struct kinetis_gpio_pin_config k70_som_gpio[] = {
 	/* C.5 = NFC_D7 */
 	{{KINETIS_GPIO_PORT_C,  5}, KINETIS_GPIO_CONFIG_DSE(5)},
 #endif /* CONFIG_CMD_NAND */
+
+#ifdef CONFIG_FSL_ESDHC
+	/* E.0 = SDHC0_D1 */
+	{{KINETIS_GPIO_PORT_E, 0}, KINETIS_GPIO_CONFIG_MUX(4)},
+	/* E.1 = SDHC0_D0 */
+	{{KINETIS_GPIO_PORT_E, 1}, KINETIS_GPIO_CONFIG_MUX(4)},
+	/* E.2 = SDHC0_DCLK */
+	{{KINETIS_GPIO_PORT_E, 2}, KINETIS_GPIO_CONFIG_MUX(4)},
+	/* E.3 = SDHC0_CMD */
+	{{KINETIS_GPIO_PORT_E, 3}, KINETIS_GPIO_CONFIG_MUX(4)},
+	/* E.4 = SDHC0_D3 */
+	{{KINETIS_GPIO_PORT_E, 4}, KINETIS_GPIO_CONFIG_MUX(4)},
+	/* E.5 = SDHC0_D2 */
+	{{KINETIS_GPIO_PORT_E, 5}, KINETIS_GPIO_CONFIG_MUX(4)},
+
+	/* E.28 = SD switch */
+	{{KINETIS_GPIO_PORT_E, 28}, KINETIS_GPIO_CONFIG_PULLUP(1)},
+#endif
 };
 
 /*
@@ -899,3 +920,17 @@ int board_eth_init(bd_t *bis)
 }
 #endif
 
+#ifdef CONFIG_FSL_ESDHC
+int board_mmc_getcd(struct mmc *mmc)
+{
+	/*
+	 * Check GPIO E.28 for the SD card presence
+	 */
+	return (*(volatile uint *)0x400FF110 & (1 << 28)) ? 0 : 1;
+}
+
+int board_mmc_init(bd_t *bis)
+{
+	return fsl_esdhc_mmc_init(bis);
+}
+#endif
