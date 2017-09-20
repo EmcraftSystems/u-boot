@@ -256,7 +256,14 @@
 #define CONFIG_HOSTNAME	stm-disco
 #define CONFIG_BOOTARGS	"stm32_platform=stm-disco "\
 				"console=ttyS0,115200 panic=10"
-#define LOADADDR		"0xD0007FC0"
+
+/*
+ * These are the good addresses to get Image data right at the 'Load Address'
+ * (0xD0008000), and thus avoid additional uImage relocation:
+ * - linux-2.6: 0xD0007FC0 (reserve place for uImage header)
+ * - linux-4.2: 0xD0007FB4 (reserve place for 2-files multi-image header)
+ */
+#define LOADADDR		"0xD0007FB4"
 
 #define REV_EXTRA_ENV		\
 	"envmboot=run args addip;bootm ${envmaddr}\0"		\
@@ -286,5 +293,12 @@
  */
 #define CONFIG_SETUP_MEMORY_TAGS
 #define CONFIG_CMDLINE_TAG
+
+/*
+ * Enable support for booting with FDT
+ */
+#define CONFIG_OF_LIBFDT
+#define CONFIG_OF_FORCE_RELOCATE
+#define CONFIG_SYS_BOOTMAPSZ		CONFIG_SYS_RAM_SIZE
 
 #endif /* __CONFIG_H */
