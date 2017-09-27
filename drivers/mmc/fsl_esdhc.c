@@ -286,7 +286,15 @@ esdhc_send_cmd(struct mmc *mmc, struct mmc_cmd *cmd, struct mmc_data *data)
 	 * Note: This is way more than 8 cycles, but 1ms seems to
 	 * resolve timing issues with some cards
 	 */
+#ifdef CONFIG_SYS_KINETIS
+	/*
+	 * Attempt to optimize the driver performance
+	 * 8 SD clock cycles at the 400 KHz frequency is 20 usec
+	 */
+	udelay(40);
+#else
 	udelay(1000);
+#endif
 
 	/* Set up for a data transfer if we have one */
 	if (data) {
@@ -372,11 +380,11 @@ void set_sysctl(struct mmc *mmc, uint clock)
 		clock = mmc->f_min;
 
 	if (sdhc_clk / 16 > clock) {
-		for (pre_div = 2; pre_div < 256; pre_div *= 2)
-			if ((sdhc_clk / pre_div) <= (clock * 16))
+		for (pre_div = 1; pre_div < 256; pre_div *= 2)
+			if ((sdhc_clk / pre_div) < (clock * 16))
 				break;
 	} else
-		pre_div = 2;
+		pre_div = 1;
 
 	for (div = 1; div <= 16; div++)
 		if ((sdhc_clk / (div * pre_div)) <= clock)
