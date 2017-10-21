@@ -140,7 +140,7 @@ static int phy_init(struct core10100_dev *bp)
 /* get link status */
 static int phy_link_stat(struct core10100_dev *bp)
 {
-	u16 val;
+	u16 val, lpa, adv;
 	u32 link_stat = 0;
 
 	/* If not initialized, return no link */
@@ -155,17 +155,19 @@ static int phy_link_stat(struct core10100_dev *bp)
 	if (val &  PHY_BMSR_LS) {
 		link_stat |= LINK_UP;
 	}
+	/* Read autonegotiations results, code from linux/drivers/net/phy/phy_device.c, genphy_read_status() */
+	lpa = mii_read(bp, PHY_ANLPAR);
+	adv = mii_read(bp, PHY_ANAR);
+	lpa &= adv;
 
-	/* Read link speed and duplex */
-	val = mii_read(bp, PHY_BMCR);
-
-	/* Update link speed */
-	if (val & (PHY_BMSR_100TXH | PHY_BMSR_100TXF)) {
+	if (lpa & (PHY_ANLPAR_100HALF | PHY_ANLPAR_100FULL)){
 		link_stat |= LINK_100;
-	}
 
-	/* Update link speed */
-	if (val & PHY_BMSR_EXT_STAT) {
+		if (lpa & PHY_ANLPAR_100FULL){
+		       link_stat |= LINK_FD;
+
+		}
+	} else if (lpa & PHY_ANLPAR_10FD) {
 		link_stat |= LINK_FD;
 	}
 
