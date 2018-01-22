@@ -385,6 +385,10 @@ static const struct kinetis_gpio_pin_config k70_som_gpio[] = {
 	{{KINETIS_GPIO_PORT_B,  0}, KINETIS_GPIO_CONFIG_MUX(4)},
 	/* B.1 = RMII0_MDC */
 	{{KINETIS_GPIO_PORT_B,  1}, KINETIS_GPIO_CONFIG_MUX(4)},
+#ifdef CONFIG_KINETIS_UCL
+	/* C.3 = PWR_ENABLE */
+	{{KINETIS_GPIO_PORT_C,  3}, KINETIS_GPIO_CONFIG_MUX(1)},
+#endif
 #endif /* CONFIG_MCFFEC */
 
 #ifdef CONFIG_CMD_NAND
@@ -466,6 +470,15 @@ int board_init(void)
 	 * Enable GPIO pins
 	 */
 	gpio_init();
+
+#ifdef CONFIG_KINETIS_UCL
+	/*
+	 * Enable power of various peripheral devices (PWR_EN on UCL-SOM-BSB)
+	 * Set PTC3 to output/high
+	 */
+	*(volatile uint *)0x400ff094 |= (1 << 3); /* GPIOC_PDDR */
+	*(volatile uint *)0x400ff084  = (1 << 3); /* GPIOC_PSOR */
+#endif
 
 	return 0;
 }
