@@ -31,7 +31,7 @@ int get_clocks(void)
 	DECLARE_GLOBAL_DATA_PTR;
 
 #ifdef CONFIG_FSL_ESDHC
-	gd->sdhc_clk = 120000000;
+	gd->sdhc_clk = clock_get(CLOCK_SYSTICK);
 #endif
 	return 0;
 }
