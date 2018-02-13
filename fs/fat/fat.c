@@ -30,6 +30,9 @@
 #include <fat.h>
 #include <asm/byteorder.h>
 #include <part.h>
+#ifdef CONFIG_CMD_FAT_MALLOC
+#include <malloc.h>
+#endif
 
 /*
  * Convert a string to lowercase.
@@ -413,8 +416,12 @@ slot2str(dir_slot *slotptr, char *l_name, int *idx)
  * into 'retdent'
  * Return 0 on success, -1 otherwise.
  */
+#ifndef CONFIG_CMD_FAT_MALLOC
 __attribute__ ((__aligned__(__alignof__(dir_entry))))
 __u8 get_vfatname_block[MAX_CLUSTSIZE];
+#else
+static __u8 * get_vfatname_block = NULL;
+#endif
 static int
 get_vfatname(fsdata *mydata, int curclust, __u8 *cluster,
 	     dir_entry *retdent, char *l_name)
@@ -424,6 +431,14 @@ get_vfatname(fsdata *mydata, int curclust, __u8 *cluster,
 	__u8	  *nextclust = cluster + mydata->clust_size * SECTOR_SIZE;
 	__u8	   counter = (slotptr->id & ~LAST_LONG_ENTRY_MASK) & 0xff;
 	int idx = 0;
+
+#ifdef CONFIG_CMD_FAT_MALLOC
+	if (get_vfatname_block == NULL &&
+	    (get_vfatname_block = (__u8 *)memalign(__alignof__(dir_entry), MAX_CLUSTSIZE)) == NULL) {
+		FAT_ERROR("Error: No memory for vfat block\n");
+		return -1;
+	}
+#endif
 
 	while ((__u8*)slotptr < nextclust) {
 		if (counter == 0) break;
@@ -500,8 +515,12 @@ mkcksum(const char *str)
  * Get the directory entry associated with 'filename' from the directory
  * starting at 'startsect'
  */
+#ifndef CONFIG_CMD_FAT_MALLOC
 __attribute__ ((__aligned__(__alignof__(dir_entry))))
 __u8 get_dentfromdir_block[MAX_CLUSTSIZE];
+#else
+static __u8 * get_dentfromdir_block = NULL;
+#endif
 static dir_entry *get_dentfromdir (fsdata * mydata, int startsect,
 				   char *filename, dir_entry * retdent,
 				   int dols)
@@ -509,6 +528,14 @@ static dir_entry *get_dentfromdir (fsdata * mydata, int startsect,
     __u16 prevcksum = 0xffff;
     __u32 curclust = START (retdent);
     int files = 0, dirs = 0;
+
+#ifdef CONFIG_CMD_FAT_MALLOC
+    if (get_dentfromdir_block == NULL &&
+	(get_dentfromdir_block = (__u8 *)memalign(__alignof__(dir_entry), MAX_CLUSTSIZE)) == NULL) {
+	    FAT_ERROR("Error: No memory for vfat block\n");
+	    return NULL;
+    }
+#endif
 
     FAT_DPRINT ("get_dentfromdir: %s\n", filename);
     while (1) {
@@ -702,8 +729,12 @@ read_bootsectandvi(boot_sector *bs, volume_info *volinfo, int *fatsize)
 	return -1;
 }
 
+#ifndef CONFIG_CMD_FAT_MALLOC
 __attribute__ ((__aligned__(__alignof__(dir_entry))))
 __u8 do_fat_read_block[MAX_CLUSTSIZE];
+#else
+static __u8 * do_fat_read_block = NULL;
+#endif
 long
 do_fat_read (const char *filename, void *buffer, unsigned long maxsize,
 	     int dols)
@@ -724,6 +755,14 @@ do_fat_read (const char *filename, void *buffer, unsigned long maxsize,
     int files = 0, dirs = 0;
     long ret = 0;
     int firsttime;
+
+#ifdef CONFIG_CMD_FAT_MALLOC
+    if (do_fat_read_block == NULL &&
+	(do_fat_read_block = (__u8 *)memalign(__alignof__(dir_entry), MAX_CLUSTSIZE)) == NULL) {
+	    FAT_ERROR("Error: No memory for vfat block\n");
+	    return -1;
+    }
+#endif
 
     if (read_bootsectandvi (&bs, &volinfo, &mydata->fatsize)) {
 	FAT_DPRINT ("Error: reading boot sector\n");
