@@ -81,6 +81,22 @@
 #endif
 
 /*
+ * GPIO configuration registers
+ */
+#define KINETIS_GPIO_BASE	0x400FF000
+#define KINETIS_GPIO(a)		((volatile struct kinetis_gpio *) \
+				(KINETIS_GPIO_BASE + (a)*0x40))
+
+struct kinetis_gpio {
+	u32 pdor; /* data output */
+	u32 psor; /* set output */
+	u32 pcor; /* clear output */
+	u32 ptor; /* toggle output */
+	u32 pdir; /* data input */
+	u32 pddr; /* data direction */
+};
+
+/*
  * GPIO descriptor
  */
 struct kinetis_gpio_dsc {

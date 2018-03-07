@@ -139,3 +139,40 @@ int kinetis_gpio_config_table(
 out:
 	return rv;
 }
+
+/*
+ * Configure the GPIO pin to output and set it to high/low depending on val
+ */
+int kinetis_gpio_set_out(struct kinetis_gpio_dsc *dsc, int val)
+{
+	int rv;
+
+	/*
+	 * Verify the function arguments
+	 */
+	rv = kinetis_validate_gpio(dsc);
+	if (rv != 0)
+		goto out;
+
+	/*
+	 * Configure Mux Control to GPIO
+	 */
+	kinetis_gpio_config(dsc, KINETIS_GPIO_CONFIG_MUX(1));
+
+	/*
+	 * Configure Data Direction to Output
+	 */
+	KINETIS_GPIO(dsc->port)->pddr |= (1 << dsc->pin);
+
+	/*
+	 * Set pin level
+	 */
+	if (val)
+		KINETIS_GPIO(dsc->port)->psor |= (1 << dsc->pin);
+	else
+		KINETIS_GPIO(dsc->port)->pcor |= (1 << dsc->pin);
+
+	rv = 0;
+out:
+	return rv;
+}

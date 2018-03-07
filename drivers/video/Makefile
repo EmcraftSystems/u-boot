@@ -40,6 +40,7 @@ COBJS-$(CONFIG_VIDEO_SMI_LYNXEM) += smiLynxEM.o
 COBJS-$(CONFIG_VIDEO_VCXK) += bus_vcxk.o
 COBJS-$(CONFIG_LCD_ILI932x) += ili932x.o
 COBJS-$(CONFIG_VIDEO_STM32F4_LTDC) += stm32f4_lcdfb.o
+COBJS-$(CONFIG_VIDEO_IMXFB) += imxfb.o
 COBJS-y += videomodes.o
 
 COBJS	:= $(COBJS-y)

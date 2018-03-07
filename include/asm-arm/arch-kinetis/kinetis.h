@@ -99,6 +99,8 @@ typedef u32 kinetis_clock_gate_t;
 #define KINETIS_CG_OSC1		KINETIS_MKCG(0, 5)	/* SIM_SCGC1[5] */
 /* RTC */
 #define KINETIS_CG_RTC		KINETIS_MKCG(5, 29)	/* SIM_SCGC6[29] */
+/* LCDC */
+#define KINETIS_CG_LCDC		KINETIS_MKCG(2, 22)	/* SIM_SCGC3[22] */
 
 /*
  * Limits for the `kinetis_periph_enable()` function:
