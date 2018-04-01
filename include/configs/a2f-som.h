@@ -133,12 +133,20 @@
 /*
  * Optimized timings for external SRAM
  */
+#if defined(CONFIG_A2F500_100MHZ)	/* for 100 MHz SOC */
+#define CONFIG_SYS_EMC0CS0CR		0x00003335
+#else
 #define CONFIG_SYS_EMC0CS0CR		0x00002225
+#endif
 
 /*
  * Optimized timings for external SRAM in Page Mode
  */
+#if defined(CONFIG_A2F500_100MHZ)	/* for 100 MHz SOC */
+#define CONFIG_SYS_EMC0CS0CR_PM		0x00003135
+#else
 #define CONFIG_SYS_EMC0CS0CR_PM		0x000020A5
+#endif
 
 /*
  * Settings for the EMC MUX register
