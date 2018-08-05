@@ -455,7 +455,7 @@ int dram_init(void)
 	FMC_BUSY_WAIT();
 
 	/* Refresh timer */
-	STM32_SDRAM_FMC->sdrtr = SDRAM_TREF;
+	STM32_SDRAM_FMC->sdrtr = (SDRAM_TREF << 1);
 
 	/*
 	 * Fill in global info with description of SRAM configuration
