@@ -180,22 +180,37 @@
  * MTYP(3-2) = 0b10, NOR flash
  * MWID(5-4) = 0b01, 16 bit
  * FACCEN(6) = 1,
- * reserved(7) = 0,
+ * reserved(7) = 1,
  * WREN(12) = 1,
  * EXTMOD(14) = 1
  */
-#define CONFIG_SYS_FSMC_FLASH_BCR	0x00005059
+#define CONFIG_SYS_FSMC_FLASH_BCR	(0x00005059 | (1<<7))
 /*
- * Flash timinigs are almost same for write and read.
  * See Spansion memory reference manual for S29GL128S10DHI010
- * ns <-> HCLK below assumes 180 MHz System Clock
- * tACC(MAX) = ADDSET(3-0) = 110 ns = 19.8 HCLK
- * tRC(MIN) = DATAST(15-8) = 110 ns = 19.8 HCLK
- * tNE switch = BUSTURN(19-16) = 10 ns = 1.8 HCLK
+ * For the READ operations, for the DATAST and ADDSET calculations,
+ * the following conditions must be met (for this particluar type of NOR Flash):
+ * 1. ADDSET+DATAST > tACC(MAX)
+ * 2. DATAST > tOE(MAX)
+ * This gives the following settings for BTR
+ * ADDSET(3-0) = 25 ns = 5 HCLK (on 180 MHz)
+ * DATAST(15-8) = 110 ns = 20 HCLK (on 180 MHz)
+ * BUSTURN(19-16) = 10 ns = 2 HCLK
+ * ACCMODE(29-28) = 0x2 (mode C)
+ *
+ * For the WRITE operations, for the DATAST and ADDSET calculations,
+ * the following conditions must be met:
+ * 1. ADDSET+DATAST > tWC(MIN)
+ * 2. DATAST > tWP(MIN)
+ * 3. ADDSET > tWPH(MIN)
+ * 4. DATAST+1HCLK > tAH(MIN)
+ * This gives the following settings for BTR
+ * ADDSET(3-0) = 40 ns = 8 HCLK (on 180 MHz)
+ * DATAST(15-8) = 50 ns = 9 HCLK (on 180 MHz)
+ * BUSTURN(19-16) = 10 ns = 2 HCLK
  * ACCMODE(29-28) = 0x2 (mode C)
  */
-#define CONFIG_SYS_FSMC_FLASH_BTR	0x2002140f
-#define CONFIG_SYS_FSMC_FLASH_BWTR	0x2002130f
+#define CONFIG_SYS_FSMC_FLASH_BTR	0x20021405
+#define CONFIG_SYS_FSMC_FLASH_BWTR	0x20020908
 #define CONFIG_FSMC_NOR_PSRAM_CS2_ENABLE
 
 #define CONFIG_SYS_FLASH_BANK1_BASE	FSMC_NOR_PSRAM_CS_ADDR(CONFIG_SYS_FLASH_CS)
