@@ -218,27 +218,38 @@
  * MTYP(3-2) = 0b10, NOR flash
  * MWID(5-4) = 0b01, 16 bit
  * FACCEN(6) = 1,
- * reserved(7) = 0,
+ * reserved(7) = 1,
  * WREN(12) = 1,
  * EXTMOD(14) = 1
  */
-#define CONFIG_SYS_FSMC_FLASH_BCR	0x00005059
+#define CONFIG_SYS_FSMC_FLASH_BCR	(0x00005059 | (1<<7))
 
 /*
  * See Spansion memory reference manual for S29GL128S10DHI010
- * Read:
+ * For the READ operations, for the DATAST and ADDSET calculations,
+ * the following conditions must be met (for this particluar type of NOR Flash):
+ * 1. ADDSET+DATAST > tACC(MAX)
+ * 2. DATAST > tOE(MAX)
+ * This gives the following settings for BTR
  * ADDSET(3-0) = 25 ns = 5 HCLK (on 200 MHz)
  * DATAST(15-8) = 110 ns = 22 HCLK (on 200 MHz)
  * BUSTURN(19-16) = 10 ns = 2 HCLK
  * ACCMODE(29-28) = 0x2 (mode C)
- * Write:
- * ADDSET(3-0) = 35 ns = 7 HCLK (on 200 MHz)
- * DATAST(15-8) = 25 ns + 1HCLC = 6 HCLK (on 200 MHz)
+ *
+ * For the WRITE operations, for the DATAST and ADDSET calculations,
+ * the following conditions must be met:
+ * 1. ADDSET+DATAST > tWC(MIN)
+ * 2. DATAST > tWP(MIN)
+ * 3. ADDSET > tWPH(MIN)
+ * 4. DATAST+1HCLK > tAH(MIN)
+ * This gives the following settings for BTR
+ * ADDSET(3-0) = 40 ns = 8 HCLK (on 200 MHz)
+ * DATAST(15-8) = 50 ns = 10 HCLK (on 200 MHz)
  * BUSTURN(19-16) = 10 ns = 2 HCLK
  * ACCMODE(29-28) = 0x2 (mode C)
  */
 #define CONFIG_SYS_FSMC_FLASH_BTR	0x20021605
-#define CONFIG_SYS_FSMC_FLASH_BWTR	0x20020607
+#define CONFIG_SYS_FSMC_FLASH_BWTR	0x20020a08
 #define CONFIG_FSMC_NOR_PSRAM_CS1_ENABLE
 
 #define CONFIG_SYS_FLASH_BANK1_BASE	\
