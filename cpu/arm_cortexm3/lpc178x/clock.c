@@ -469,6 +469,24 @@ static void clock_setup(void)
  */
 void clock_init(void)
 {
+	/* adjust eNVM access timings */
+	if (LPC178X_CPU_RATE/1000000 >= 80) {
+	    LPC178X_SCC->flashcfg &= ~LPC178X_SCC_FLASHCFG_FTIM_MSK;
+	    LPC178X_SCC->flashcfg |= LPC178X_SCC_FLASHCFG_FTIM_5CLK;
+	} else if (LPC178X_CPU_RATE/1000000 >= 60) {
+	    LPC178X_SCC->flashcfg &= ~LPC178X_SCC_FLASHCFG_FTIM_MSK;
+	    LPC178X_SCC->flashcfg |= LPC178X_SCC_FLASHCFG_FTIM_4CLK;
+	} else if (LPC178X_CPU_RATE/1000000 >= 40) {
+	    LPC178X_SCC->flashcfg &= ~LPC178X_SCC_FLASHCFG_FTIM_MSK;
+	    LPC178X_SCC->flashcfg |= LPC178X_SCC_FLASHCFG_FTIM_3CLK;
+	} else if (LPC178X_CPU_RATE/1000000 >= 20) {
+	    LPC178X_SCC->flashcfg &= ~LPC178X_SCC_FLASHCFG_FTIM_MSK;
+	    LPC178X_SCC->flashcfg |= LPC178X_SCC_FLASHCFG_FTIM_2CLK;
+	} else {
+	    LPC178X_SCC->flashcfg &= ~LPC178X_SCC_FLASHCFG_FTIM_MSK;
+	    LPC178X_SCC->flashcfg |= LPC178X_SCC_FLASHCFG_FTIM_1CLK;
+	}
+
 	clock_setup();
 
 	/*

@@ -62,6 +62,17 @@
 #define LPC178X_SCC_PCONP_PCUSB_MSK	(1 << 31)
 
 /*
+ * Flash Accelerator Configuration register values
+ */
+#define LPC178X_SCC_FLASHCFG_FTIM_MSK	(0xF << 12)
+#define LPC178X_SCC_FLASHCFG_FTIM_1CLK	(0x0 << 12)
+#define LPC178X_SCC_FLASHCFG_FTIM_2CLK	(0x1 << 12)
+#define LPC178X_SCC_FLASHCFG_FTIM_3CLK	(0x2 << 12)
+#define LPC178X_SCC_FLASHCFG_FTIM_4CLK	(0x3 << 12)
+#define LPC178X_SCC_FLASHCFG_FTIM_5CLK	(0x4 << 12)
+#define LPC178X_SCC_FLASHCFG_FTIM_6CLK	(0x5 << 12)
+
+/*
  * PLL register map
  * Used for PLL0 at 0x400FC080 and for PLL1 at 0x400FC0A0.
  *
@@ -84,7 +95,10 @@ struct lpc178x_pll_regs {
  */
 struct lpc178x_scc_regs {
 	/* 0x400FC000: Flash Accelerator Configuration Register */
-	u32 rsv0[32];
+	u32 flashcfg;
+
+	/* 0x400FC004: reserved */
+	u32 rsv0[31];
 
 	/* 0x400FC080: PLL0 registers */
 	struct lpc178x_pll_regs pll0; /* PLL0 registers */
